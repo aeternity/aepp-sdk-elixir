@@ -1,4 +1,4 @@
-# AeppSdkElixir
+# Aepp SDK Elixir
 
 **TODO: Add description**
 
