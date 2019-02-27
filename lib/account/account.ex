@@ -1,12 +1,20 @@
 defmodule AeppSDKElixir.Account.Account do
+
+  alias AeppSDKElixir.Client.Worker, as: Client
+
   @type error :: {:error, String.t()}
 
   @spec get_balance(String.t()) :: integer() | error()
   def get_balance(key) when is_binary(key) do
-    {:ok, %HTTPoison.Response{body: body}} =
-      HTTPoison.get("http://127.0.0.1:3013/v2/accounts/#{key}")
+    url = Client.get_url()
+    path = "#{url}/v2/accounts/#{key}"
 
-    Poison.decode!(body)["balance"]
+    case Client.http_get(path) do
+      {:ok, %{"balance" => balance}} ->
+        {:ok, balance}
+      {:error, _} = error ->
+        error
+    end
   end
 
   def get_balance(key) do
