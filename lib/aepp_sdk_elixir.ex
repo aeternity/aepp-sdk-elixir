@@ -1,18 +1,16 @@
 defmodule AeppSDKElixir do
   @moduledoc """
-  Documentation for AeppSdkElixir.
+  Documentation for AeppSDKElixir.
   """
 
-  @doc """
-  Hello world.
+  use Application
 
-  ## Examples
+  def start(_type, _args) do
+    children = [
+      AeppSDKElixir.Client.Worker.Supervisor
+    ]
 
-      iex> AeppSdkElixir.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, strategy: :one_for_one, name: __MODULE__)
   end
+
 end
