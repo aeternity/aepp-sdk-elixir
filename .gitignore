@@ -19,11 +19,8 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
-# Ignore package tarball (built via "mix hex.build").
-aepp_sdk_elixir-*.tar
-
-# Ignore linter directories
-.elixir_ls/
+/.elixir_ls/
+/apps/*/.swagger-codegen/
 
 # Igonore Intellij
 .idea/
