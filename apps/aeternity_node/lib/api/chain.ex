@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.Chain do
   API calls for all endpoints tagged `Chain`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -25,9 +24,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/generations/current")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -49,9 +46,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/current")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -73,9 +68,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/current/hash")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -97,9 +90,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/current/height")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -122,9 +113,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/generations/hash/#{hash}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -147,9 +136,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/generations/height/#{height}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -172,9 +159,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/hash/#{hash}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -197,9 +182,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/height/#{height}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -222,9 +205,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/micro-blocks/hash/#{hash}/header")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -252,9 +233,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/micro-blocks/hash/#{hash}/transactions/index/#{index}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -277,9 +256,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/micro-blocks/hash/#{hash}/transactions")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -302,9 +279,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/micro-blocks/hash/#{hash}/transactions/count")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -326,9 +301,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/key-blocks/pending")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -349,9 +322,7 @@ defmodule AeternityNode.Api.Chain do
     %{}
     |> method(:get)
     |> url("/blocks/top")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -375,8 +346,6 @@ defmodule AeternityNode.Api.Chain do
     |> method(:post)
     |> url("/key-blocks")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

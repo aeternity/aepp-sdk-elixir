@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.Transaction do
   API calls for all endpoints tagged `Transaction`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -25,9 +24,7 @@ defmodule AeternityNode.Api.Transaction do
     %{}
     |> method(:get)
     |> url("/debug/transactions/pending")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -50,9 +47,7 @@ defmodule AeternityNode.Api.Transaction do
     %{}
     |> method(:get)
     |> url("/transactions/#{hash}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -75,9 +70,7 @@ defmodule AeternityNode.Api.Transaction do
     %{}
     |> method(:get)
     |> url("/transactions/#{hash}/info")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -100,9 +93,7 @@ defmodule AeternityNode.Api.Transaction do
     |> method(:post)
     |> url("/debug/transactions/spend")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -126,8 +117,6 @@ defmodule AeternityNode.Api.Transaction do
     |> method(:post)
     |> url("/transactions")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.Channel do
   API calls for all endpoints tagged `Channel`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -26,9 +25,7 @@ defmodule AeternityNode.Api.Channel do
     %{}
     |> method(:get)
     |> url("/channels/#{pubkey}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -52,9 +49,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/close/mutual")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -78,9 +73,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/close/solo")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -104,9 +97,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/create")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -130,9 +121,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/deposit")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -156,9 +145,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/settle")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -182,9 +169,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/slash")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -208,9 +193,7 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/snapshot/solo")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -234,8 +217,6 @@ defmodule AeternityNode.Api.Channel do
     |> method(:post)
     |> url("/debug/channels/withdraw")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

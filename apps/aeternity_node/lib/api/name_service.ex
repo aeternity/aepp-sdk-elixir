@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.NameService do
   API calls for all endpoints tagged `NameService`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -29,9 +28,7 @@ defmodule AeternityNode.Api.NameService do
     |> url("/debug/names/commitment-id")
     |> add_param(:query, :name, name)
     |> add_param(:query, :salt, salt)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -54,9 +51,7 @@ defmodule AeternityNode.Api.NameService do
     %{}
     |> method(:get)
     |> url("/names/#{name}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -80,9 +75,7 @@ defmodule AeternityNode.Api.NameService do
     |> method(:post)
     |> url("/debug/names/claim")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -106,9 +99,7 @@ defmodule AeternityNode.Api.NameService do
     |> method(:post)
     |> url("/debug/names/preclaim")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -132,9 +123,7 @@ defmodule AeternityNode.Api.NameService do
     |> method(:post)
     |> url("/debug/names/revoke")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -158,9 +147,7 @@ defmodule AeternityNode.Api.NameService do
     |> method(:post)
     |> url("/debug/names/transfer")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -184,8 +171,6 @@ defmodule AeternityNode.Api.NameService do
     |> method(:post)
     |> url("/debug/names/update")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

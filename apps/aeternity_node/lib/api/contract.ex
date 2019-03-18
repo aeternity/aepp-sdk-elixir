@@ -3,11 +3,10 @@ defmodule AeternityNode.Api.Contract do
   API calls for all endpoints tagged `Contract`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
-  Call a sophia function with a given name and argument in the given bytecode off chain.
+  (DEPRECATED to-be-removed in 3.0) - Call a sophia function with a given name and argument in the given bytecode off chain.
 
   ## Parameters
 
@@ -27,13 +26,11 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/code/call")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
-  Compile a sophia contract from source and return byte code
+  (DEPRECATED to-be-removed in 3.0) - Compile a sophia contract from source and return byte code
 
   ## Parameters
 
@@ -53,13 +50,11 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/code/compile")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
-  Decode Sophia return data encoded according to Sophia ABI.
+  (DEPRECATED to-be-removed in 3.0) - Decode Sophia return data encoded according to Sophia ABI.
 
   ## Parameters
 
@@ -79,13 +74,11 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/code/decode-data")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
-  Encode sophia data and function name according to sophia ABI.
+  (DEPRECATED to-be-removed in 3.0) - Encode sophia data and function name according to sophia ABI.
 
   ## Parameters
 
@@ -105,9 +98,7 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/code/encode-calldata")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -130,9 +121,7 @@ defmodule AeternityNode.Api.Contract do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -155,9 +144,7 @@ defmodule AeternityNode.Api.Contract do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/code")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -180,9 +167,7 @@ defmodule AeternityNode.Api.Contract do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/poi")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -205,9 +190,7 @@ defmodule AeternityNode.Api.Contract do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/store")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -231,13 +214,11 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/call")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
-  Compute the call_data for SOPHIA and get contract_call transaction object
+  (DEPRECATED to-be-removed in 3.0) - Compute the call_data for SOPHIA and get contract_call transaction object
 
   ## Parameters
 
@@ -257,9 +238,7 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/call/compute")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -283,13 +262,11 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/create")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
-  Compute the call_data for SOPHIA and get a contract_create transaction object
+  (DEPRECATED to-be-removed in 3.0) - Compute the call_data for SOPHIA and get a contract_create transaction object
 
   ## Parameters
 
@@ -309,8 +286,6 @@ defmodule AeternityNode.Api.Contract do
     |> method(:post)
     |> url("/debug/contracts/create/compute")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

@@ -3,6 +3,8 @@ defmodule AeternityNode.RequestBuilder do
   Helper functions for building Tesla requests
   """
 
+  alias AeternityNode.Connection
+
   @doc """
   Specify the request method when building a request
 
@@ -138,5 +140,14 @@ defmodule AeternityNode.RequestBuilder do
       {:ok, error_response} -> {:error, error_response}
       decode_error -> decode_error
     end
+  end
+
+  @spec process_request(map(), Tesla.Env.client()) ::
+          {:ok, struct()} | {:error, Tesla.Env.t()} | {:error, term()}
+  def process_request(map, connection) do
+    map
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> decode()
   end
 end

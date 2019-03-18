@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.Oracle do
   API calls for all endpoints tagged `Oracle`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -26,9 +25,7 @@ defmodule AeternityNode.Api.Oracle do
     %{}
     |> method(:get)
     |> url("/oracles/#{pubkey}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -61,9 +58,7 @@ defmodule AeternityNode.Api.Oracle do
     |> method(:get)
     |> url("/oracles/#{pubkey}/queries")
     |> add_optional_params(optional_params, opts)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -91,9 +86,7 @@ defmodule AeternityNode.Api.Oracle do
     %{}
     |> method(:get)
     |> url("/oracles/#{pubkey}/queries/#{query_id}")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -117,9 +110,7 @@ defmodule AeternityNode.Api.Oracle do
     |> method(:post)
     |> url("/debug/oracles/extend")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -143,9 +134,7 @@ defmodule AeternityNode.Api.Oracle do
     |> method(:post)
     |> url("/debug/oracles/query")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -169,9 +158,7 @@ defmodule AeternityNode.Api.Oracle do
     |> method(:post)
     |> url("/debug/oracles/register")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -195,8 +182,6 @@ defmodule AeternityNode.Api.Oracle do
     |> method(:post)
     |> url("/debug/oracles/respond")
     |> add_param(:body, :body, body)
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end

@@ -3,7 +3,6 @@ defmodule AeternityNode.Api.NodeInfo do
   API calls for all endpoints tagged `NodeInfo`.
   """
 
-  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -25,9 +24,7 @@ defmodule AeternityNode.Api.NodeInfo do
     %{}
     |> method(:get)
     |> url("/debug/accounts/beneficiary")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -48,9 +45,7 @@ defmodule AeternityNode.Api.NodeInfo do
     %{}
     |> method(:get)
     |> url("/debug/accounts/node")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -71,9 +66,7 @@ defmodule AeternityNode.Api.NodeInfo do
     %{}
     |> method(:get)
     |> url("/peers/pubkey")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -94,9 +87,7 @@ defmodule AeternityNode.Api.NodeInfo do
     %{}
     |> method(:get)
     |> url("/debug/peers")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 
   @doc """
@@ -117,8 +108,6 @@ defmodule AeternityNode.Api.NodeInfo do
     %{}
     |> method(:get)
     |> url("/status")
-    |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
-    |> decode()
+    |> process_request(connection)
   end
 end
