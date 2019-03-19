@@ -3,7 +3,7 @@ defmodule AeternityNode.RequestBuilder do
   Helper functions for building Tesla requests
   """
 
-  alias AeternityNode.Connection
+  alias AeternityNode.Client
 
   @doc """
   Specify the request method when building a request
@@ -89,7 +89,10 @@ defmodule AeternityNode.RequestBuilder do
     |> Map.put_new_lazy(:body, &Tesla.Multipart.new/0)
     |> Map.update!(
       :body,
-      &Tesla.Multipart.add_field(&1, key, Poison.encode!(value),
+      &Tesla.Multipart.add_field(
+        &1,
+        key,
+        Poison.encode!(value),
         headers: [{:"Content-Type", "application/json"}]
       )
     )
@@ -147,7 +150,7 @@ defmodule AeternityNode.RequestBuilder do
   def process_request(map, connection) do
     map
     |> Enum.into([])
-    |> (&Connection.request(connection, &1)).()
+    |> (&Client.request(connection, &1)).()
     |> decode()
   end
 end
