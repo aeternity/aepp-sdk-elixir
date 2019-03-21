@@ -3,49 +3,59 @@ defmodule AeternityNode.Api.NodeInfo do
   API calls for all endpoints tagged `NodeInfo`.
   """
 
+  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
-  Get node&#39;s beneficiary public key
+  Get node's beneficiary public key
 
   ## Parameters
 
   - connection (AeternityNode.Connection): Connection to server
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.PubKey{}} on success
   {:error, info} on failure
   """
   @spec get_node_beneficiary(Tesla.Env.client(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.PubKey.t()} | {:error, Tesla.Env.t()}
   def get_node_beneficiary(connection, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/debug/accounts/beneficiary")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.PubKey{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
-  Get node&#39;s public key
+  Get node's public key
 
   ## Parameters
 
   - connection (AeternityNode.Connection): Connection to server
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.PubKey{}} on success
   {:error, info} on failure
   """
-  @spec get_node_pubkey(Tesla.Env.client(), keyword()) :: {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec get_node_pubkey(Tesla.Env.client(), keyword()) ::
+          {:ok, AeternityNode.Model.PubKey.t()} | {:error, Tesla.Env.t()}
   def get_node_pubkey(connection, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/debug/accounts/node")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.PubKey{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -55,18 +65,22 @@ defmodule AeternityNode.Api.NodeInfo do
 
   - connection (AeternityNode.Connection): Connection to server
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.InlineResponse2003{}} on success
   {:error, info} on failure
   """
-  @spec get_peer_pubkey(Tesla.Env.client(), keyword()) :: {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec get_peer_pubkey(Tesla.Env.client(), keyword()) ::
+          {:ok, AeternityNode.Model.InlineResponse2003.t()} | {:error, Tesla.Env.t()}
   def get_peer_pubkey(connection, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/peers/pubkey")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.InlineResponse2003{}}
+    ])
   end
 
   @doc """
@@ -76,18 +90,23 @@ defmodule AeternityNode.Api.NodeInfo do
 
   - connection (AeternityNode.Connection): Connection to server
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Peers{}} on success
   {:error, info} on failure
   """
-  @spec get_peers(Tesla.Env.client(), keyword()) :: {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec get_peers(Tesla.Env.client(), keyword()) ::
+          {:ok, AeternityNode.Model.Peers.t()} | {:error, Tesla.Env.t()}
   def get_peers(connection, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/debug/peers")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Peers{}},
+      {403, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -97,17 +116,21 @@ defmodule AeternityNode.Api.NodeInfo do
 
   - connection (AeternityNode.Connection): Connection to server
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Status{}} on success
   {:error, info} on failure
   """
-  @spec get_status(Tesla.Env.client(), keyword()) :: {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec get_status(Tesla.Env.client(), keyword()) ::
+          {:ok, AeternityNode.Model.Status.t()} | {:error, Tesla.Env.t()}
   def get_status(connection, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/status")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Status{}}
+    ])
   end
 end
