@@ -31,7 +31,7 @@ defmodule Utils.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:enacl, github: "aeternity/enacl", ref: "2f50ba6"},
+      {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
       {:erl_base58, "~> 0.0.1"}
     ]
   end

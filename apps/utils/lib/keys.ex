@@ -1,6 +1,8 @@
 defmodule Utils.Keys do
   alias Utils.Encoding
 
+  @hex_base 16
+
   @type pubkey :: Encoding.base58c()
   @type privkey :: Encoding.hex()
   @type keypair :: %{public: pubkey(), secret: privkey()}
@@ -92,16 +94,15 @@ defmodule Utils.Keys do
 
   @spec privkey_from_binary(binary()) :: privkey()
   def privkey_from_binary(binary_privkey) do
-    <<integer_privkey::512>> = binary_privkey
-
-    integer_privkey
-    |> Integer.to_string(16)
+    binary_privkey
+    |> :binary.decode_unsigned()
+    |> Integer.to_string(@hex_base)
     |> String.downcase()
   end
 
   @spec privkey_to_binary(privkey()) :: binary()
   def privkey_to_binary(privkey) do
-    {integer_privkey, _} = Integer.parse(privkey, 16)
+    {integer_privkey, _} = Integer.parse(privkey, @hex_base)
     :binary.encode_unsigned(integer_privkey)
   end
 
