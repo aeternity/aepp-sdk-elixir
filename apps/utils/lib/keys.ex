@@ -55,13 +55,14 @@ defmodule Utils.Keys do
     binary_pubkey = pubkey_to_binary(pubkey)
     binary_privkey = privkey_to_binary(privkey)
 
-    privkey_path = Path.join(path, name)
-    pubkey_path = Path.join(path, "#{name}.pub")
+    pubkey_write =
+      path |> Path.join("#{name}.pub") |> File.write(encrypt_key(binary_pubkey, password))
+
+    privkey_write = path |> Path.join(name) |> File.write(encrypt_key(binary_privkey, password))
 
     case mkdir(path) do
       :ok ->
-        case {File.write(pubkey_path, encrypt_key(binary_pubkey, password)),
-              File.write(privkey_path, encrypt_key(binary_privkey, password))} do
+        case {pubkey_write, privkey_write} do
           {:ok, :ok} ->
             :ok
 
