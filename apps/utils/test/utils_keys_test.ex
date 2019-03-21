@@ -5,7 +5,7 @@ defmodule UtilsKeysTest do
 
   @keys_path "./keys"
 
-  setup do
+  setup_all do
     keypair = Keys.generate_keypair()
     %{public: pubkey, secret: privkey} = keypair
     pubkey_binary = Keys.pubkey_to_binary(pubkey)
@@ -35,6 +35,7 @@ defmodule UtilsKeysTest do
   test "signing", keys do
     signature = Keys.sign("message123", keys.privkey_binary)
     assert {:ok, "message123"} == Keys.verify(signature, "message123", keys.pubkey_binary)
+  end
 
   test "encoding", keys do
     assert keys.pubkey == Keys.pubkey_from_binary(keys.pubkey_binary)

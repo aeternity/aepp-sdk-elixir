@@ -9,7 +9,7 @@ defmodule Utils.Encoding do
 
   @type hex :: String.t()
 
-  @spec binary_to_base58c(binary(), binary()) :: base58c()
+  @spec binary_to_base58c(String.t(), binary()) :: base58c()
   def binary_to_base58c(prefix, payload) when is_binary(payload),
     do: prefix <> "_" <> encode_base58c(payload)
 
