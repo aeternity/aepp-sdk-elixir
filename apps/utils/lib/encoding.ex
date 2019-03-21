@@ -1,11 +1,15 @@
 defmodule Utils.Encoding do
+  @type base58c :: String.t()
 
-  @spec binary_to_base58c(binary(), binary()) :: binary()
-  def binary_to_base58c(prefix, payload) when is_binary(payload) do
-    prefix <> "_" <> encode58(payload)
-  end
+  @type base64 :: String.t()
 
-  @spec base58c_to_binary(binary()) :: binary()
+  @type hex :: String.t()
+
+  @spec binary_to_base58c(binary(), binary()) :: base58c()
+  def binary_to_base58c(prefix, payload) when is_binary(payload),
+    do: prefix <> "_" <> encode_base58c(payload)
+
+  @spec base58c_to_binary(base58c()) :: binary()
   def base58c_to_binary(<<_prefix::24, payload::binary>>) do
     decoded_payload =
       payload
@@ -18,7 +22,7 @@ defmodule Utils.Encoding do
     data
   end
 
-  defp encode58(payload) do
+  defp encode_base58c(payload) do
     checksum = generate_checksum(payload)
 
     payload
@@ -33,5 +37,4 @@ defmodule Utils.Encoding do
 
     checksum
   end
-
 end
