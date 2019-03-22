@@ -47,10 +47,10 @@ defmodule Utils.Keys do
                Atom.to_string(privkey_reason)
              } in #{path})"}
 
-          {{:error, reason}, {:ok, _}} ->
+          {{:error, reason}, :ok} ->
             {:error, "Couldn't write public key in #{path}: #{Atom.to_string(reason)}"}
 
-          {{:ok, _}, {:error, reason}} ->
+          {:ok, {:error, reason}} ->
             {:error, "Couldn't write private key in #{path}: #{Atom.to_string(reason)}"}
         end
 
