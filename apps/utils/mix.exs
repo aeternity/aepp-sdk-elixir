@@ -8,7 +8,8 @@ defmodule Utils.Mixfile do
       elixir: "~> 1.8",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
