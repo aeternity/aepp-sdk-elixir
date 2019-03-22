@@ -25,11 +25,11 @@ defmodule UtilsKeysTest do
   end
 
   test "save and read keys", keys do
-    assert :ok == Keys.save_keypair(keys.keypair, "password123", "keypair1", @keys_path)
-    assert {:ok, keys.keypair} == Keys.read_keypair("password123", "keypair1", @keys_path)
+    assert :ok == Keys.save_keypair(keys.keypair, "password123", @keys_path, "keypair1")
+    assert {:ok, keys.keypair} == Keys.read_keypair("password123", @keys_path, "keypair1")
 
     # non-existent keys
-    assert match?({:error, _reason}, Keys.read_keypair("password123", "keypair123", @keys_path))
+    assert match?({:error, _reason}, Keys.read_keypair("password123", @keys_path, "keypair123"))
   end
 
   test "signing", keys do

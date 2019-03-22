@@ -18,42 +18,15 @@ defmodule Utils.Keys do
     %{public: pubkey_from_binary(binary_pubkey), secret: privkey_from_binary(binary_privkey)}
   end
 
-  @spec sign(binary(), privkey()) :: signature()
+  @spec sign(binary(), binary()) :: signature()
   def sign(message, privkey), do: :enacl.sign_detached(message, privkey)
 
-  @spec verify(message(), signature(), binary()) :: boolean()
+  @spec verify(message(), signature(), binary()) :: {:ok, message()} | {:error, atom()}
   def verify(signature, message, pubkey),
     do: :enacl.sign_verify_detached(signature, message, pubkey)
 
-  @spec read_keypair(password(), String.t(), String.t()) ::
-          {:ok, keypair()} | {:error, String.t()}
-  def read_keypair(password, name, path) do
-    pubkey_read = path |> Path.join("#{name}.pub") |> File.read()
-    privkey_read = path |> Path.join("#{name}") |> File.read()
-
-    case {pubkey_read, privkey_read} do
-      {{:ok, encrypted_pubkey}, {:ok, encrypted_privkey}} ->
-        pubkey = encrypted_pubkey |> decrypt_key(password) |> pubkey_from_binary()
-        privkey = encrypted_privkey |> decrypt_key(password) |> privkey_from_binary()
-
-        {:ok, %{public: pubkey, secret: privkey}}
-
-      {{:error, pubkey_reason}, {:error, privkey_reason}} ->
-        {:error,
-         "Couldn't read public (reason: #{Atom.to_string(pubkey_reason)}) or private key (reason: #{
-           Atom.to_string(privkey_reason)
-         }) from #{path}"}
-
-      {{:error, reason}, {:ok, _}} ->
-        {:error, "Couldn't read public key from #{path}: #{Atom.to_string(reason)} "}
-
-      {{:ok, _}, {:error, reason}} ->
-        {:error, "Couldn't read private key from #{path}: #{Atom.to_string(reason)}"}
-    end
-  end
-
   @spec save_keypair(keypair(), password(), String.t(), String.t()) :: :ok | {:error, String.t()}
-  def save_keypair(%{public: pubkey, secret: privkey}, password, name, path) do
+  def save_keypair(%{public: pubkey, secret: privkey}, password, path, name) do
     binary_pubkey = pubkey_to_binary(pubkey)
     binary_privkey = privkey_to_binary(privkey)
 
@@ -86,11 +59,44 @@ defmodule Utils.Keys do
     end
   end
 
-  @spec pubkey_from_binary(binary()) :: pubkey()
-  def pubkey_from_binary(binary_pubkey), do: Encoding.binary_to_base58c("ak", binary_pubkey)
+  @spec read_keypair(password(), String.t(), String.t()) ::
+          {:ok, keypair()} | {:error, String.t()}
+  def read_keypair(password, path, name) do
+    pubkey_read = path |> Path.join("#{name}.pub") |> File.read()
+    privkey_read = path |> Path.join("#{name}") |> File.read()
+
+    case {pubkey_read, privkey_read} do
+      {{:ok, encrypted_pubkey}, {:ok, encrypted_privkey}} ->
+        pubkey = encrypted_pubkey |> decrypt_key(password) |> pubkey_from_binary()
+        privkey = encrypted_privkey |> decrypt_key(password) |> privkey_from_binary()
+
+        {:ok, %{public: pubkey, secret: privkey}}
+
+      {{:error, pubkey_reason}, {:error, privkey_reason}} ->
+        {:error,
+         "Couldn't read public (reason: #{Atom.to_string(pubkey_reason)}) or private key (reason: #{
+           Atom.to_string(privkey_reason)
+         }) from #{path}"}
+
+      {{:error, reason}, {:ok, _}} ->
+        {:error, "Couldn't read public key from #{path}: #{Atom.to_string(reason)} "}
+
+      {{:ok, _}, {:error, reason}} ->
+        {:error, "Couldn't read private key from #{path}: #{Atom.to_string(reason)}"}
+    end
+  end
 
   @spec pubkey_to_binary(pubkey()) :: binary()
   def pubkey_to_binary(pubkey), do: Encoding.base58c_to_binary(pubkey)
+
+  @spec pubkey_from_binary(binary()) :: pubkey()
+  def pubkey_from_binary(binary_pubkey), do: Encoding.binary_to_base58c("ak", binary_pubkey)
+
+  @spec privkey_to_binary(privkey()) :: binary()
+  def privkey_to_binary(privkey) do
+    {integer_privkey, _} = Integer.parse(privkey, @hex_base)
+    :binary.encode_unsigned(integer_privkey)
+  end
 
   @spec privkey_from_binary(binary()) :: privkey()
   def privkey_from_binary(binary_privkey) do
@@ -98,12 +104,6 @@ defmodule Utils.Keys do
     |> :binary.decode_unsigned()
     |> Integer.to_string(@hex_base)
     |> String.downcase()
-  end
-
-  @spec privkey_to_binary(privkey()) :: binary()
-  def privkey_to_binary(privkey) do
-    {integer_privkey, _} = Integer.parse(privkey, @hex_base)
-    :binary.encode_unsigned(integer_privkey)
   end
 
   defp mkdir(path) do
