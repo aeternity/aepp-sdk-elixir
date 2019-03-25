@@ -3,6 +3,7 @@ defmodule AeternityNode.Api.Account do
   API calls for all endpoints tagged `Account`.
   """
 
+  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -13,19 +14,24 @@ defmodule AeternityNode.Api.Account do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): The public key of the account
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Account{}} on success
   {:error, info} on failure
   """
   @spec get_account_by_pubkey(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.Account.t()} | {:error, Tesla.Env.t()}
   def get_account_by_pubkey(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/accounts/#{pubkey}")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Account{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -37,19 +43,24 @@ defmodule AeternityNode.Api.Account do
   - pubkey (String.t): The public key of the account
   - hash (String.t): The hash of the block
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Account{}} on success
   {:error, info} on failure
   """
   @spec get_account_by_pubkey_and_hash(Tesla.Env.client(), String.t(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.Account.t()} | {:error, Tesla.Env.t()}
   def get_account_by_pubkey_and_hash(connection, pubkey, hash, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/accounts/#{pubkey}/hash/#{hash}")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Account{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -61,19 +72,24 @@ defmodule AeternityNode.Api.Account do
   - pubkey (String.t): The public key of the account
   - height (integer()): The height of the key block
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Account{}} on success
   {:error, info} on failure
   """
   @spec get_account_by_pubkey_and_height(Tesla.Env.client(), String.t(), integer(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.Account.t()} | {:error, Tesla.Env.t()}
   def get_account_by_pubkey_and_height(connection, pubkey, height, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/accounts/#{pubkey}/height/#{height}")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Account{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -84,18 +100,23 @@ defmodule AeternityNode.Api.Account do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): The public key of the account
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.GenericTxs{}} on success
   {:error, info} on failure
   """
   @spec get_pending_account_transactions_by_pubkey(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.GenericTxs.t()} | {:error, Tesla.Env.t()}
   def get_pending_account_transactions_by_pubkey(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/accounts/#{pubkey}/transactions/pending")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.GenericTxs{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 end

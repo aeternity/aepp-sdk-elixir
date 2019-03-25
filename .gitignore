@@ -20,7 +20,8 @@ erl_crash.dump
 *.ez
 
 /.elixir_ls/
-/apps/*/.swagger-codegen/
+/apps/*/.openapi-generator/
+/apps/*/.openapi-generator-ignore
 
 # Igonore Intellij
 .idea/
