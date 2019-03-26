@@ -7,10 +7,14 @@ defmodule Utils.Encoding do
 
   @prefix_bits 24
 
+  @typedoc """
+  A base58check string.
+  """
   @type base58c :: String.t()
 
-  @type base64 :: String.t()
-
+  @typedoc """
+  A hexadecimal string.
+  """
   @type hex :: String.t()
 
   @doc false

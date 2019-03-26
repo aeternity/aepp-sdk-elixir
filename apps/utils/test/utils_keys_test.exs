@@ -1,6 +1,8 @@
 defmodule UtilsKeysTest do
   use ExUnit.Case
 
+  doctest Utils.Keys, except: [generate_keypair: 0, read_keypair: 3]
+
   alias Utils.Keys
 
   @keys_path "./keys"
