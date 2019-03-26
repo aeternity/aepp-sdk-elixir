@@ -1,9 +1,9 @@
-defmodule AeternityNode.Mixfile do
+defmodule Utils.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :aeternity_node,
+      app: :utils,
       version: "0.1.0",
       elixir: "~> 1.8",
       build_embedded: Mix.env() == :prod,
@@ -32,8 +32,8 @@ defmodule AeternityNode.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:tesla, "~> 1.2.1"},
-      {:poison, "~> 3.0.0"}
+      {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
+      {:erl_base58, "~> 0.0.1"}
     ]
   end
 end
