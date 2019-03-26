@@ -5,7 +5,8 @@ defmodule AeppSdkElixir.MixProject do
     [
       apps_path: "apps",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -16,5 +17,51 @@ defmodule AeppSdkElixir.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     []
+  end
+  defp aliases do
+    [build_api: &build_api/1]
+  end
+
+  defp build_api([generator_version, api_specification_version]) do
+    Enum.each(
+      [
+        {"wget",
+         [
+           "--verbose",
+           "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"
+         ]},
+        {"wget",
+         [
+           "--verbose",
+           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/config/#{get_file_name(:specification)}.yaml"
+         ]},
+        {"tar", ["zxvf", "#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
+        {"rm", ["#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
+        {"java",
+         [
+           "-jar",
+           "./#{get_file_name(:generator)}.jar",
+           "generate",
+           "-i",
+           "./#{get_file_name(:specification)}.yaml",
+           "-g",
+           "elixir",
+           "-o",
+           "./apps/aeternity_node/"
+         ]},
+         {"mix",["format"]},
+         {"rm", ["-f","#{get_file_name(:generator)}.jar"]},
+         {"rm", ["-f","#{get_file_name(:specification)}.yaml"]}
+      ],
+      fn {com, args} -> System.cmd(com, args) end
+    )
+  end
+
+  defp get_file_name(:specification) do
+    "swagger"
+  end
+
+  defp get_file_name(:generator) do
+    "openapi-generator-cli"
   end
 end
