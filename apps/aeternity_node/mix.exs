@@ -33,7 +33,7 @@ defmodule AeternityNode.Mixfile do
   defp deps do
     [
       {:tesla, "~> 1.2.1"},
-      {:poison, ">= 4.0.1"}
+      {:poison, "~> 3.0.0"}
     ]
   end
 end

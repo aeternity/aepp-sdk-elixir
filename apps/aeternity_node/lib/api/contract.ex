@@ -3,6 +3,7 @@ defmodule AeternityNode.Api.Contract do
   API calls for all endpoints tagged `Contract`.
   """
 
+  alias AeternityNode.Connection
   import AeternityNode.RequestBuilder
 
   @doc """
@@ -13,20 +14,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCallInput): contract call
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.CallResult{}} on success
   {:error, info} on failure
   """
-  @spec call_contract(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec call_contract(Tesla.Env.client(), AeternityNode.Model.ContractCallInput.t(), keyword()) ::
+          {:ok, AeternityNode.Model.CallResult.t()} | {:error, Tesla.Env.t()}
   def call_contract(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/code/call")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.CallResult{}},
+      {403, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -37,20 +42,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (Contract): contract code
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.ByteCode{}} on success
   {:error, info} on failure
   """
-  @spec compile_contract(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec compile_contract(Tesla.Env.client(), AeternityNode.Model.Contract.t(), keyword()) ::
+          {:ok, AeternityNode.Model.ByteCode.t()} | {:error, Tesla.Env.t()}
   def compile_contract(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/code/compile")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.ByteCode{}},
+      {403, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -61,20 +70,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (SophiaBinaryData): Binary data in Sophia ABI format
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.SophiaJsonData{}} on success
   {:error, info} on failure
   """
-  @spec decode_data(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec decode_data(Tesla.Env.client(), AeternityNode.Model.SophiaBinaryData.t(), keyword()) ::
+          {:ok, AeternityNode.Model.SophiaJsonData.t()} | {:error, Tesla.Env.t()}
   def decode_data(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/code/decode-data")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.SophiaJsonData{}},
+      {400, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -85,20 +98,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCallInput): Arguments in sophia
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.Calldata{}} on success
   {:error, info} on failure
   """
-  @spec encode_calldata(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec encode_calldata(Tesla.Env.client(), AeternityNode.Model.ContractCallInput.t(), keyword()) ::
+          {:ok, AeternityNode.Model.Calldata.t()} | {:error, Tesla.Env.t()}
   def encode_calldata(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/code/encode-calldata")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.Calldata{}},
+      {403, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -109,19 +126,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): The pubkey of the contract
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.ContractObject{}} on success
   {:error, info} on failure
   """
   @spec get_contract(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.ContractObject.t()} | {:error, Tesla.Env.t()}
   def get_contract(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.ContractObject{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, false}
+    ])
   end
 
   @doc """
@@ -132,19 +154,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): The pubkey of the contract
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.ByteCode{}} on success
   {:error, info} on failure
   """
   @spec get_contract_code(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.ByteCode.t()} | {:error, Tesla.Env.t()}
   def get_contract_code(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/code")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.ByteCode{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -155,19 +182,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): Contract pubkey to get proof for
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.PoI{}} on success
   {:error, info} on failure
   """
   @spec get_contract_po_i(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.PoI.t()} | {:error, Tesla.Env.t()}
   def get_contract_po_i(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/poi")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.PoI{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -178,19 +210,24 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - pubkey (String.t): The pubkey of the contract
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.ContractStore{}} on success
   {:error, info} on failure
   """
   @spec get_contract_store(Tesla.Env.client(), String.t(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+          {:ok, AeternityNode.Model.ContractStore.t()} | {:error, Tesla.Env.t()}
   def get_contract_store(connection, pubkey, _opts \\ []) do
     %{}
     |> method(:get)
     |> url("/contracts/#{pubkey}/store")
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.ContractStore{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, false}
+    ])
   end
 
   @doc """
@@ -201,20 +238,25 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCallTx): 
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.UnsignedTx{}} on success
   {:error, info} on failure
   """
-  @spec post_contract_call(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec post_contract_call(Tesla.Env.client(), AeternityNode.Model.ContractCallTx.t(), keyword()) ::
+          {:ok, AeternityNode.Model.UnsignedTx.t()} | {:error, Tesla.Env.t()}
   def post_contract_call(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/call")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.UnsignedTx{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -225,20 +267,28 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCallCompute): 
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.UnsignedTx{}} on success
   {:error, info} on failure
   """
-  @spec post_contract_call_compute(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec post_contract_call_compute(
+          Tesla.Env.client(),
+          AeternityNode.Model.ContractCallCompute.t(),
+          keyword()
+        ) :: {:ok, AeternityNode.Model.UnsignedTx.t()} | {:error, Tesla.Env.t()}
   def post_contract_call_compute(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/call/compute")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.UnsignedTx{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -249,20 +299,28 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCreateTx): 
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.CreateContractUnsignedTx{}} on success
   {:error, info} on failure
   """
-  @spec post_contract_create(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec post_contract_create(
+          Tesla.Env.client(),
+          AeternityNode.Model.ContractCreateTx.t(),
+          keyword()
+        ) :: {:ok, AeternityNode.Model.CreateContractUnsignedTx.t()} | {:error, Tesla.Env.t()}
   def post_contract_create(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/create")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.CreateContractUnsignedTx{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 
   @doc """
@@ -273,19 +331,27 @@ defmodule AeternityNode.Api.Contract do
   - connection (AeternityNode.Connection): Connection to server
   - body (ContractCreateCompute): 
   - opts (KeywordList): [optional] Optional parameters
-
   ## Returns
 
-  {:ok, map()} on success
+  {:ok, %AeternityNode.Model.CreateContractUnsignedTx{}} on success
   {:error, info} on failure
   """
-  @spec post_contract_create_compute(Tesla.Env.client(), map(), keyword()) ::
-          {:ok, map()} | {:error, Tesla.Env.t()}
+  @spec post_contract_create_compute(
+          Tesla.Env.client(),
+          AeternityNode.Model.ContractCreateCompute.t(),
+          keyword()
+        ) :: {:ok, AeternityNode.Model.CreateContractUnsignedTx.t()} | {:error, Tesla.Env.t()}
   def post_contract_create_compute(connection, body, _opts \\ []) do
     %{}
     |> method(:post)
     |> url("/debug/contracts/create/compute")
     |> add_param(:body, :body, body)
-    |> process_request(connection)
+    |> Enum.into([])
+    |> (&Connection.request(connection, &1)).()
+    |> evaluate_response([
+      {200, %AeternityNode.Model.CreateContractUnsignedTx{}},
+      {400, %AeternityNode.Model.Error{}},
+      {404, %AeternityNode.Model.Error{}}
+    ])
   end
 end

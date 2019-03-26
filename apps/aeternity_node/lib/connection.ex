@@ -5,8 +5,8 @@ defmodule AeternityNode.Connection do
 
   use Tesla
 
-  plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
-  plug(Tesla.Middleware.EncodeJson)
+  plug(Tesla.Middleware.Headers, [{"user-agent", "Elixir"}])
+  plug(Tesla.Middleware.EncodeJson, engine: Poison)
 
   @doc """
   Configure an authless client connection
@@ -16,7 +16,7 @@ defmodule AeternityNode.Connection do
   Tesla.Env.client
   """
   @spec new() :: Tesla.Env.client()
-  def new() do
+  def new do
     Tesla.client([{Tesla.Middleware.BaseUrl, "http://localhost:3013/v2"}])
   end
 
