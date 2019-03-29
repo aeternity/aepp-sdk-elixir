@@ -31,12 +31,26 @@ defmodule Utils.Serialization do
   @version_contract_create_tx 1
   @version_contract_call_tx 1
 
+  @type structure_type ::
+          :signed_tx
+          | :spend_tx
+          | :oracle_register_tx
+          | :oracle_query_tx
+          | :oracle_extend_tx
+          | :name_claim_tx
+          | :name_preclaim_tx
+          | :name_update_tx
+          | :name_revoke_tx
+          | :name_transfer_tx
+          | :contract_create_tx
+          | :contract_call_tx
+
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
 
   @type rlp_binary :: binary()
 
-  @spec serialize(list(), atom()) :: rlp_binary()
+  @spec serialize(list(), structure_type()) :: rlp_binary()
   def serialize(fields, type) do
     template = serialization_template(type)
     fields_with_keys = set_keys(fields, template, [])
