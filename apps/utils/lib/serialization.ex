@@ -61,7 +61,7 @@ defmodule Utils.Serialization do
 
   # this is the way the id record is represented in erlang
   @spec id_to_record(id_type(), binary()) :: id()
-  def id_to_record(type, value) when byte_size(value) == 32, do: {:id, type, value}
+  def id_to_record(type, value), do: {:id, type, value}
 
   defp set_keys([field | rest_fields], [{key, _type} | rest_template], fields_with_keys),
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])
