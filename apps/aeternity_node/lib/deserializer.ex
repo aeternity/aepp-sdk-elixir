@@ -12,6 +12,12 @@ defmodule AeternityNode.Deserializer do
     |> Map.update!(field, &Poison.Decode.decode(&1, Keyword.merge(options, as: [struct(mod)])))
   end
 
+  # TODO: check auto generation
+  def deserialize(model, field, :struct, AeternityNode.Model.Map, options) do
+    model
+    |> Map.update!(field, &Poison.Decode.decode(&1, Keyword.merge(options, as: %{})))
+  end
+
   def deserialize(model, field, :struct, mod, options) do
     model
     |> Map.update!(field, &Poison.Decode.decode(&1, Keyword.merge(options, as: struct(mod))))

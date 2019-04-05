@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>cover/Elixir.Core.Contract.html</title>
+</head><body style='background-color: white; color: black'>
+<pre>
+File generated from /home/boko/workspace/aepp-sdk-elixir/apps/core/lib/contract.ex by COVER 2019-04-05 at 11:41:53
+
+****************************************************************************
+
+        |  defmodule Core.Contract do
+        |    alias AeternityNode.Api.Contract, as: ContractApi
+        |    alias AeternityNode.Api.Debug, as: DebugApi
+        |  
+        |    alias AeternityNode.Model.{
+        |      ByteCode,
+        |      Contract,
+        |      Calldata,
+        |      ContractCallInput,
+        |      ContractCallObject,
+        |      DryRunInput,
+        |      DryRunResult,
+        |      DryRunResults,
+        |      SophiaBinaryData,
+        |      SophiaJsonData,
+        |      Error
+        |    }
+        |  
+        |    alias Utils.{Serialization, Encoding, Keys}
+        |    alias Utils.Account, as: AccountUtils
+        |    alias Utils.Chain, as: ChainUtils
+        |    alias Utils.Transaction, as: TransactionUtils
+        |    alias Core.Client
+        |    alias Tesla.Env
+        |  
+        |    @default_deposit 0
+        |    @default_amount 0
+        |    @default_gas 1_000_000
+        |    @default_gas_price 1_000_000_000
+        |    @sophia_abi "sophia"
+        |    @init_function "init"
+        |    # vm_version 0x03 and abi_version 0x01, packed together
+        |    @ct_version 0x30001
+        |    @abi_version 0x01
+        |    @hash_bytes 32
+        |  
+        |    @doc """
+        |    Deploy a contract
+        |  
+        |    ## Examples
+        |        iex&gt; pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+        |        iex&gt; privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+        |        iex&gt; network_id = "ae_uat"
+        |        iex&gt; url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; internal_url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+        |        iex&gt; source_code = "contract Number =\\n  record state = { number : int }\\n\\n  function init(x : int) =\\n    { number = x }\\n\\n  function add_to_number(x : int) = state.number + x"
+        |        iex&gt; init_args = "(42)"
+        |        iex&gt; Core.Contract.deploy(client, source_code, init_args)
+        |        {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
+        |    """
+        |  
+        |    @spec deploy(Client.t(), String.t(), String.t(), list()) ::
+        |            {:ok, String.t()} | {:error, String.t()} | {:error, Env.t()}
+        |  
+        |    def deploy(
+        |          %Client{
+        |            keypair: %{pubkey: pubkey, privkey: privkey},
+        |            network_id: network_id,
+        |            connection: connection,
+        |            internal_connection: internal_connection
+        |          },
+        |          source_code,
+        |          init_args,
+     5..|          opts \\ []
+        |        )
+        |        when is_binary(source_code) and is_binary(init_args) and is_list(opts) do
+     5..|      pubkey_binary = Keys.pubkey_to_binary(pubkey)
+     5..|      owner_id = Serialization.id_to_record(pubkey_binary, :account)
+        |  
+     5..|      with {:ok, nonce} &lt;- AccountUtils.next_valid_nonce(connection, pubkey),
+     5..|           {:ok, %ByteCode{bytecode: bytecode}} &lt;-
+        |             ContractApi.compile_contract(internal_connection, %Contract{
+        |               code: String.trim(source_code),
+        |               options: ""
+        |             }),
+     4..|           {:ok, %Calldata{calldata: calldata}} &lt;-
+        |             ContractApi.encode_calldata(internal_connection, %ContractCallInput{
+        |               abi: @sophia_abi,
+        |               code: bytecode,
+        |               function: @init_function,
+        |               arg: init_args,
+        |               call: ""
+        |             }),
+     4..|           decoded_bytecode = Encoding.prefix_decode_base64(bytecode),
+     4..|           decoded_calldata = Encoding.prefix_decode_base64(calldata),
+     4..|           contract_create_fields = [
+        |             owner_id,
+        |             nonce,
+        |             decoded_bytecode,
+        |             @ct_version,
+        |             Keyword.get(opts, :fee, TransactionUtils.calculate_min_fee()),
+        |             Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+        |             Keyword.get(opts, :deposit, @default_deposit),
+        |             Keyword.get(opts, :amount, @default_amount),
+        |             Keyword.get(opts, :gas, @default_gas),
+        |             Keyword.get(opts, :gas_price, @default_gas_price),
+        |             decoded_calldata
+        |           ],
+     4..|           {:ok, %ContractCallObject{}} &lt;-
+        |             TransactionUtils.post(
+        |               connection,
+        |               privkey,
+        |               network_id,
+        |               contract_create_fields,
+        |               :contract_create_tx
+        |             ),
+     4..|           contract_pubkey = compute_contract_pubkey(pubkey_binary, nonce) do
+        |        {:ok, contract_pubkey}
+        |      else
+        |        {:ok, %Error{reason: message}} -&gt;
+        |          {:error, message}
+        |  
+        |        {:error, _} = error -&gt;
+<font color=red>     0..|          error</font>
+        |      end
+        |    end
+        |  
+        |    @doc """
+        |    Call a contract
+        |  
+        |    ## Examples
+        |        iex&gt; pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+        |        iex&gt; privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+        |        iex&gt; network_id = "ae_uat"
+        |        iex&gt; url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; internal_url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+        |        iex&gt; contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
+        |        iex&gt; function_name = "add_to_number"
+        |        iex&gt; function_args = "(33)"
+        |        iex&gt; Core.Contract.call(client, contract_address, function_name, function_args)
+        |        {:ok,
+        |          %{
+        |           return_type: "ok",
+        |           return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+        |          }}
+        |    """
+        |  
+        |    @spec call(Client.t(), String.t(), String.t(), String.t(), list()) ::
+        |            {:ok, %{return_value: String.t(), return_type: String.t()}}
+        |            | {:error, String.t()}
+        |            | {:error, Env.t()}
+        |    def call(
+        |          %Client{
+        |            keypair: %{privkey: privkey},
+        |            network_id: network_id,
+        |            connection: connection
+        |          } = client,
+        |          contract_address,
+        |          function_name,
+        |          function_args,
+     3..|          opts \\ []
+        |        )
+        |        when is_binary(contract_address) and is_binary(function_name) and is_binary(function_args) and
+        |               is_list(opts) do
+     3..|      with {:ok, contract_call_fields} &lt;-
+        |             build_contract_call_fields(
+        |               client,
+        |               contract_address,
+        |               function_name,
+        |               function_args,
+        |               opts
+        |             ),
+     2..|           {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} &lt;-
+        |             TransactionUtils.post(
+        |               connection,
+        |               privkey,
+        |               network_id,
+        |               contract_call_fields,
+        |               :contract_call_tx
+        |             ) do
+        |        {:ok, %{return_value: return_value, return_type: return_type}}
+        |      else
+        |        {:error, _} = error -&gt;
+     1..|          error
+        |      end
+        |    end
+        |  
+        |    @doc """
+        |    Call a contract without posting a transaction (execute off-chain)
+        |  
+        |    ## Examples
+        |        iex&gt; pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+        |        iex&gt; privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+        |        iex&gt; network_id = "ae_uat"
+        |        iex&gt; url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; internal_url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+        |        iex&gt; contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
+        |        iex&gt; function_name = "add_to_number"
+        |        iex&gt; function_args = "(33)"
+        |        iex&gt; top_block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
+        |        iex&gt; Core.Contract.call_static(client, contract_address, function_name, function_args, [top: top_block_hash])
+        |        {:ok,
+        |          %{
+        |           return_type: "ok",
+        |           return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+        |          }}
+        |    """
+        |  
+        |    @spec call_static(Client.t(), String.t(), String.t(), String.t(), list()) ::
+        |            {:ok, %{return_value: String.t(), return_type: String.t()}}
+        |            | {:error, String.t()}
+        |            | {:error, Env.t()}
+        |    def call_static(
+        |          %Client{
+        |            connection: connection,
+        |            internal_connection: internal_connection
+        |          } = client,
+        |          contract_address,
+        |          function_name,
+        |          function_args,
+     2..|          opts \\ []
+        |        )
+        |        when is_binary(contract_address) and is_binary(function_name) and is_binary(function_args) and
+        |               is_list(opts) do
+     2..|      with {:ok, contract_call_fields} &lt;-
+        |             build_contract_call_fields(
+        |               client,
+        |               contract_address,
+        |               function_name,
+        |               function_args,
+        |               opts
+        |             ),
+     1..|           serialized_contract_call_fields =
+        |             Serialization.serialize(contract_call_fields, :contract_call_tx),
+     1..|           {:ok, top_block_hash} &lt;- ChainUtils.get_top_block_hash(connection),
+     1..|           encoded_contract_call_tx =
+        |             Encoding.prefix_encode_base64("tx", serialized_contract_call_fields),
+        |           {:ok,
+        |            %DryRunResults{
+        |              results: [
+        |                %DryRunResult{
+        |                  call_obj: %ContractCallObject{
+        |                    return_type: return_type,
+        |                    return_value: return_value
+        |                  }
+        |                }
+        |              ]
+     1..|            }} &lt;-
+        |             DebugApi.dry_run_txs(internal_connection, %DryRunInput{
+        |               top: Keyword.get(opts, :top, top_block_hash),
+        |               accounts: [],
+        |               txs: [encoded_contract_call_tx]
+        |             }) do
+        |        {:ok, %{return_value: return_value, return_type: return_type}}
+        |      else
+        |        {:error, _} = error -&gt;
+     1..|          error
+        |      end
+        |    end
+        |  
+        |    @doc """
+        |    Decode a return value
+        |  
+        |    ## Examples
+        |        iex&gt; pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+        |        iex&gt; privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+        |        iex&gt; network_id = "ae_uat"
+        |        iex&gt; url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; internal_url = "https://sdk-testnet.aepps.com/v2"
+        |        iex&gt; client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+        |        iex&gt; contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
+        |        iex&gt; function_name = "add_to_number"
+        |        iex&gt; function_args = "(33)"
+        |        iex&gt; {:ok, %{return_value: data, return_type: "ok"}} = Core.Contract.call(client, contract_address, function_name, function_args)
+        |        iex&gt; data_type = "int"
+        |        iex&gt; Core.Contract.decode_return_value(client, data_type, data)
+        |        {:ok, %{"type" =&gt; "word", "value" =&gt; 75}}
+        |    """
+        |  
+        |    @spec decode_return_value(Client.t(), String.t(), String.t()) ::
+        |            {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
+        |    def decode_return_value(
+        |          %Client{
+        |            internal_connection: internal_connection
+        |          },
+        |          sophia_type,
+        |          return_value
+        |        )
+        |        when is_binary(sophia_type) and is_binary(return_value) do
+     2..|      case ContractApi.decode_data(internal_connection, %SophiaBinaryData{
+        |             "sophia-type": sophia_type,
+        |             data: return_value
+        |           }) do
+        |        {:ok, %SophiaJsonData{data: data}} -&gt;
+        |          {:ok, data}
+        |  
+        |        {:ok, %Error{reason: message}} -&gt;
+        |          {:error, message}
+        |  
+        |        {:error, %Env{} = env} -&gt;
+        |          {:error, env}
+        |      end
+        |    end
+        |  
+        |    defp compute_contract_pubkey(owner_address, nonce) do
+     4..|      nonce_binary = :binary.encode_unsigned(nonce)
+     4..|      {:ok, hash} = :enacl.generichash(@hash_bytes, &lt;&lt;owner_address::binary, nonce_binary::binary&gt;&gt;)
+        |  
+     4..|      Encoding.prefix_encode_base58c("ct", hash)
+        |    end
+        |  
+        |    defp build_contract_call_fields(
+        |           %Client{
+        |             keypair: %{pubkey: pubkey},
+        |             connection: connection,
+        |             internal_connection: internal_connection
+        |           },
+        |           contract_address,
+        |           function_name,
+        |           function_args,
+        |           opts
+        |         ) do
+     5..|      owner_id = pubkey |&gt; Keys.pubkey_to_binary() |&gt; Serialization.id_to_record(:account)
+        |  
+     5..|      contract_id =
+        |        contract_address
+        |        |&gt; Encoding.prefix_decode_base58c()
+        |        |&gt; Serialization.id_to_record(:contract)
+        |  
+     5..|      with {:ok, nonce} &lt;- AccountUtils.next_valid_nonce(connection, pubkey),
+     5..|           {:ok, %ByteCode{bytecode: bytecode}} &lt;-
+        |             ContractApi.get_contract_code(connection, contract_address),
+     5..|           {:ok, %Calldata{calldata: calldata}} &lt;-
+        |             ContractApi.encode_calldata(internal_connection, %ContractCallInput{
+        |               abi: @sophia_abi,
+        |               code: bytecode,
+        |               function: function_name,
+        |               arg: function_args,
+        |               call: ""
+        |             }) do
+     3..|        decoded_calldata = Encoding.prefix_decode_base64(calldata)
+        |  
+     3..|        contract_call_fields = [
+        |          owner_id,
+        |          nonce,
+        |          contract_id,
+        |          @abi_version,
+        |          Keyword.get(opts, :fee, TransactionUtils.calculate_min_fee()),
+        |          Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+        |          Keyword.get(opts, :amount, @default_amount),
+        |          Keyword.get(opts, :gas, @default_gas),
+        |          Keyword.get(opts, :gas_price, @default_gas_price),
+        |          decoded_calldata
+        |        ]
+        |  
+        |        {:ok, contract_call_fields}
+        |      else
+        |        {:ok, %Error{reason: message}} -&gt;
+        |          {:error, message}
+        |  
+        |        {:error, %Env{} = env} -&gt;
+        |          {:error, env}
+        |      end
+        |    end
+        |  end
+</pre>
+</body>
+</html>

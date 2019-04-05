@@ -63,6 +63,12 @@ defmodule Utils.Keys do
   def sign(message, privkey), do: :enacl.sign_detached(message, privkey)
 
   @doc """
+  false
+  """
+  @spec sign(binary(), binary(), String.t()) :: signature()
+  def sign(message, privkey, network_id), do: :enacl.sign_detached(network_id <> message, privkey)
+
+  @doc """
   Verify that a message has been signed by a private key corresponding to the given public key
 
   ## Examples

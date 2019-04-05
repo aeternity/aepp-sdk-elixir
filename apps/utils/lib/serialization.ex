@@ -60,8 +60,8 @@ defmodule Utils.Serialization do
   end
 
   # this is the way the id record is represented in erlang
-  @spec id_to_record(id_type(), binary()) :: id()
-  def id_to_record(type, value), do: {:id, type, value}
+  @spec id_to_record(binary(), id_type()) :: id()
+  def id_to_record(value, type), do: {:id, type, value}
 
   defp set_keys([field | rest_fields], [{key, _type} | rest_template], fields_with_keys),
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])

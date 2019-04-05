@@ -87,7 +87,10 @@ defmodule AeternityNode.RequestBuilder do
     |> Map.put_new_lazy(:body, &Tesla.Multipart.new/0)
     |> Map.update!(
       :body,
-      &Tesla.Multipart.add_field(&1, key, Poison.encode!(value),
+      &Tesla.Multipart.add_field(
+        &1,
+        key,
+        Poison.encode!(value),
         headers: [{:"Content-Type", "application/json"}]
       )
     )
