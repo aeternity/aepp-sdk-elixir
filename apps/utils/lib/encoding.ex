@@ -109,6 +109,8 @@ defmodule Utils.Encoding do
   def prefix_decode_base64(<<_prefix::@prefix_bits, payload::binary>>), do: decode_base64(payload)
 
   @doc """
+  Decodes a base64 string to binary.
+
   ## Examples
       iex> Utils.Encoding.decode_base64("+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A==")
       <<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
