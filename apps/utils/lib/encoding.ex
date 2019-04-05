@@ -13,6 +13,11 @@ defmodule Utils.Encoding do
   @type base58c :: String.t()
 
   @typedoc """
+  A base64 string.
+  """
+  @type base64 :: String.t()
+
+  @typedoc """
   A hexadecimal string.
   """
   @type hex :: String.t()
@@ -65,6 +70,30 @@ defmodule Utils.Encoding do
     <<data::binary-size(bsize), _checksum::binary-size(@checksum_bytes)>> = decoded_payload
 
     data
+  end
+
+  @doc """
+  Encodes a binary payload to base64.
+
+  ## Examples
+      iex> Utils.Encoding.encode_base64(<<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
+          138, 106, 29, 17, 149, 151, 170, 181, 55, 176, 222, 189, 77, 127, 227, 78,
+          202, 253, 6, 159, 235, 140, 41, 165, 77, 120, 145, 151, 173, 179, 55, 74, 138,
+          45, 208, 75, 138, 56, 227, 165, 195, 24, 147, 126, 191, 206, 210, 161, 170,
+          87, 136, 229, 30, 6, 2, 184, 84, 248, 82, 12, 1, 161, 1, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          161, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 10, 10, 135, 112, 97, 121, 108, 111, 97,
+          100, 93, 73, 89, 98>>)
+      "+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A=="
+  """
+  @spec encode_base64(binary()) :: base64()
+  def encode_base64(payload) do
+    checksum = generate_checksum(payload)
+
+    payload
+    |> Kernel.<>(checksum)
+    |> Base.encode64()
   end
 
   defp generate_checksum(payload) do
