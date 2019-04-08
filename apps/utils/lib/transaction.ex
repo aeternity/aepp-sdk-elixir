@@ -1,6 +1,6 @@
 defmodule Utils.Transaction do
   @moduledoc """
-  false
+  Transaction utils
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Model.{PostTxResponse, ContractCallObject, Tx, Error}
