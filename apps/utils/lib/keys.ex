@@ -12,7 +12,7 @@ defmodule Utils.Keys do
   @type pubkey :: Encoding.base58c()
 
   @typedoc """
-  A hex encoded prviate key.
+  A hex encoded private key.
   """
   @type privkey :: Encoding.hex()
 
@@ -63,7 +63,16 @@ defmodule Utils.Keys do
   def sign(message, privkey), do: :enacl.sign_detached(message, privkey)
 
   @doc """
-  false
+  Prefixes a network ID string to a binary message and signs it with the given private key
+
+  ## Examples
+      iex> message = "some message"
+      iex> privkey = <<34, 123, 222, 237, 180, 195, 221, 43, 85, 78, 166, 180, 72, 172, 103, 136,251, 230, 109, 241, 180, 248, 112, 147, 164, 80, 187, 167, 72, 242, 150, 245,52, 139, 208, 116, 83, 115, 83, 147, 226, 255, 140, 3, 198, 91, 69, 147, 243,189, 217, 79, 149, 122, 46, 124, 179, 20, 104, 139, 83, 68, 18, 128>>
+      iex> Utils.Keys.sign(message, privkey, "ae_uat")
+      <<15, 246, 136, 55, 63, 30, 144, 154, 249, 161, 243, 93, 52, 0, 218, 22, 43,
+      200, 145, 252, 247, 218, 197, 125, 177, 17, 60, 177, 212, 106, 249, 130, 42,
+      179, 233, 174, 116, 145, 154, 244, 80, 48, 142, 153, 170, 34, 199, 219, 248,
+      107, 115, 155, 254, 69, 37, 68, 68, 1, 174, 95, 102, 10, 6, 14>>
   """
   @spec sign(binary(), binary(), String.t()) :: signature()
   def sign(message, privkey, network_id), do: :enacl.sign_detached(network_id <> message, privkey)

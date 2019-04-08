@@ -1,6 +1,6 @@
 defmodule Utils.Serialization do
   @moduledoc """
-  false
+  Transaction serialization
   """
 
   @tag_signed_tx 11
@@ -50,16 +50,66 @@ defmodule Utils.Serialization do
 
   @type rlp_binary :: binary()
 
+  @doc """
+  Serializes a list of fields with the template corresponding to the given type
+
+  ## Examples
+      iex> fields = [{:id, :account,
+      <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+        91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>},
+     8579,
+     {:id, :contract,
+      <<64, 216, 143, 81, 41, 52, 245, 89, 135, 253, 7, 12, 94, 142, 96, 251, 212,
+        96, 76, 248, 1, 152, 97, 16, 144, 62, 43, 186, 148, 174, 76, 114>>},
+     1,
+     2000000000000000000,
+     0,
+     0,
+     1000000,
+     1000000000,
+     <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 32, 112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34,
+       30, 100, 222, 2, 111, 12, 11, 11, 82, 86, 82, 53, 206, 145, 155, 60, 13,
+       206, 214, 183, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33>>]
+      iex> type = :contract_create_tx
+      iex> Utils.Serialization.serialize(fields, type)
+          <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
+          225, 52, 13, 18, 51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57,
+          212, 30, 97, 130, 33, 131, 161, 5, 64, 216, 143, 81, 41, 52, 245, 89, 135,
+          253, 7, 12, 94, 142, 96, 251, 212, 96, 76, 248, 1, 152, 97, 16, 144, 62, 43,
+          186, 148, 174, 76, 114, 1, 136, 27, 193, 109, 103, 78, 200, 0, 0, 0, 0, 131,
+          15, 66, 64, 132, 59, 154, 202, 0, 184, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 112, 194, 27,
+          63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2, 111, 12, 11, 11, 82,
+          86, 82, 53, 206, 145, 155, 60, 13, 206, 214, 183, 62, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 33>>
+  """
   @spec serialize(list(), structure_type()) :: rlp_binary()
   def serialize(fields, type) do
     template = serialization_template(type)
     fields_with_keys = set_keys(fields, template, [])
     tag = type_to_tag(type)
     version = version(type)
+
     :aeserialization.serialize(tag, version, template, fields_with_keys)
   end
 
-  # this is the way the id record is represented in erlang
+  @doc """
+  Builds an ID record from the given binary value and type
+
+  ## Examples
+      iex> value = <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51, 91,
+      42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>
+      iex> type = :account
+      iex> Utils.Serialization.id_to_record(value, type)
+      {:id, :account,
+      <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51, 91,
+      42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>}
+  """
   @spec id_to_record(binary(), id_type()) :: id()
   def id_to_record(value, type), do: {:id, type, value}
 

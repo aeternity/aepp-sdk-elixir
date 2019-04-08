@@ -7,8 +7,8 @@ defmodule UtilsSerializationTest do
     account_id = Serialization.id_to_record(<<0::256>>, :account)
     oracle_id = Serialization.id_to_record(<<0::256>>, :oracle)
     commitment_id = Serialization.id_to_record(<<0::256>>, :commitment)
-    name_id = Serialization.id_to_record( <<0::256>>, :name)
-    contract_id = Serialization.id_to_record( <<0::256>>, :contract)
+    name_id = Serialization.id_to_record(<<0::256>>, :name)
+    contract_id = Serialization.id_to_record(<<0::256>>, :contract)
 
     spend_fields = [
       account_id,
