@@ -10,6 +10,7 @@ defmodule Utils.Keys do
   A base58c encoded public key.
   """
   @type pubkey :: Encoding.base58c()
+  @prefix_bits 24
 
   @typedoc """
   A hex encoded prviate key.
@@ -176,6 +177,21 @@ defmodule Utils.Keys do
 
   @spec pubkey_to_binary(pubkey()) :: binary()
   def pubkey_to_binary(pubkey), do: Encoding.prefix_decode_base58c(pubkey)
+
+  @doc """
+  Convert a base58check public key string to tuple of prefix and binary
+
+  ## Examples
+      iex> pubkey = "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb"
+      iex> Utils.Keys.pubkey_to_binary(pubkey, :with_prefix)
+      {"ak_",
+       <<253, 16, 150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190,
+         47, 157, 115, 126, 32, 118, 191, 137, 134, 107, 183, 134, 188, 15, 191>>}
+      ```
+  """
+  @spec pubkey_to_binary(pubkey(), atom()) :: tuple()
+  def pubkey_to_binary(<<prefix::@prefix_bits, _payload::binary>> = pubkey, :with_prefix),
+    do: {<<prefix::@prefix_bits>>, Encoding.prefix_decode_base58c(pubkey)}
 
   @doc """
   Convert a binary public key to a base58check string
