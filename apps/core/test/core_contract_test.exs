@@ -27,62 +27,63 @@ defmodule CoreContractTest do
   end
 
   test "create, call, call static and decode contract", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "(42)")
+    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "42")
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
-    call_result = Contract.call(setup_data.client, ct_address, "add_to_number", "(33)")
+    call_result = Contract.call(setup_data.client, ct_address, "add_to_number", "33")
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
     call_static_result =
-      Contract.call_static(setup_data.client, ct_address, "add_to_number", "(33)")
+      Contract.call_static(setup_data.client, ct_address, "add_to_number", "33")
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)
 
     {:ok, %{return_value: data, return_type: "ok"}} = call_result
 
-    assert {:ok, %{"type" => "word", "value" => 75}} ==
-             Contract.decode_return_value(setup_data.client, "int", data)
+    assert {:ok, 75} == Contract.decode_return_value("int", data)
   end
 
   test "create invalid contract", setup_data do
     invalid_source_code = String.replace(setup_data.source_code, "x : int", "x : list(int)")
-    deploy_result = Contract.deploy(setup_data.client, invalid_source_code, "(42)")
+    deploy_result = Contract.deploy(setup_data.client, invalid_source_code, "42")
     assert match?({:error, _}, deploy_result)
   end
 
   test "call non-existent function", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "(42)")
+    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "42")
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
-    call_result = Contract.call(setup_data.client, ct_address, "non_existing_function", "(33)")
+    call_result = Contract.call(setup_data.client, ct_address, "non_existing_function", "33")
     assert match?({:error, _}, call_result)
   end
 
   test "call static non-existent function", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "(42)")
+    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "42")
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
 
     call_result =
-      Contract.call_static(setup_data.client, ct_address, "non_existing_function", "(33)")
+      Contract.call_static(setup_data.client, ct_address, "non_existing_function", "33")
 
     assert match?({:error, _}, call_result)
   end
 
   test "decode data wrong type", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "(42)")
+    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, "42")
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
-    call_result = Contract.call(setup_data.client, ct_address, "add_to_number", "(33)")
+    call_result = Contract.call(setup_data.client, ct_address, "add_to_number", "33")
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
     {:ok, %{return_value: data, return_type: "ok"}} = call_result
 
-    assert {:error, "bad type/data"} ==
-             Contract.decode_return_value(setup_data.client, "list(int)", data)
+    assert {:error,
+            {:badmatch,
+             <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+               0, 0, 0, 75>>}} == Contract.decode_return_value("list(int)", data)
   end
 end

@@ -81,6 +81,9 @@ defmodule Utils.Transaction do
 
       {:error, %Env{} = env} ->
         {:error, env}
+
+      {:error, _} = error ->
+        error
     end
   end
 

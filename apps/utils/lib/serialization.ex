@@ -46,6 +46,7 @@ defmodule Utils.Serialization do
           | :name_transfer_tx
           | :contract_create_tx
           | :contract_call_tx
+          | :sophia_byte_code
 
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
@@ -75,9 +76,36 @@ defmodule Utils.Serialization do
        206, 214, 183, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33>>]
-      iex> type = :contract_create_tx
+      iex> type = :contract_call_tx
       iex> Utils.Serialization.serialize(fields, type)
-          <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
+      <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
+      225, 52, 13, 18, 51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57,
+      212, 30, 97, 130, 33, 131, 161, 5, 64, 216, 143, 81, 41, 52, 245, 89, 135,
+      253, 7, 12, 94, 142, 96, 251, 212, 96, 76, 248, 1, 152, 97, 16, 144, 62, 43,
+      186, 148, 174, 76, 114, 1, 136, 27, 193, 109, 103, 78, 200, 0, 0, 0, 0, 131,
+      15, 66, 64, 132, 59, 154, 202, 0, 184, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 112, 194, 27,
+      63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2, 111, 12, 11, 11, 82,
+      86, 82, 53, 206, 145, 155, 60, 13, 206, 214, 183, 62, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 33>>
+  """
+  @spec serialize(list(), structure_type()) :: rlp_binary()
+  def serialize(fields, type) do
+    template = serialization_template(type)
+    fields_with_keys = set_keys(fields, template, [])
+    tag = type_to_tag(type)
+    version = version(type)
+
+    :aeserialization.serialize(tag, version, template, fields_with_keys)
+  end
+
+  @doc """
+  Deserialize an RLP binary payload with the template corresponding to the given type
+
+  ## Examples
+      iex> payload = <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
           225, 52, 13, 18, 51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57,
           212, 30, 97, 130, 33, 131, 161, 5, 64, 216, 143, 81, 41, 52, 245, 89, 135,
           253, 7, 12, 94, 142, 96, 251, 212, 96, 76, 248, 1, 152, 97, 16, 144, 62, 43,
@@ -89,15 +117,37 @@ defmodule Utils.Serialization do
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 33>>
+      iex> type = :contract_call_tx
+      iex> Utils.Serialization.deserialize(payload, type)
+      [
+        caller_id: {:id, :account,
+         <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+           91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>},
+        nonce: 8579,
+        contract_id: {:id, :contract,
+         <<64, 216, 143, 81, 41, 52, 245, 89, 135, 253, 7, 12, 94, 142, 96, 251, 212,
+           96, 76, 248, 1, 152, 97, 16, 144, 62, 43, 186, 148, 174, 76, 114>>},
+        abi_version: 1,
+        fee: 2000000000000000000,
+        ttl: 0,
+        amount: 0,
+        gas: 1000000,
+        gas_price: 1000000000,
+        call_data: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 112, 194, 27, 63, 171, 248, 210, 119, 144,
+          238, 34, 30, 100, 222, 2, 111, 12, 11, 11, 82, 86, 82, 53, 206, 145, 155,
+          60, 13, 206, 214, 183, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33>>
+      ]
   """
-  @spec serialize(list(), structure_type()) :: rlp_binary()
-  def serialize(fields, type) do
+  @spec deserialize(binary(), structure_type()) :: list()
+  def deserialize(payload, type) do
     template = serialization_template(type)
-    fields_with_keys = set_keys(fields, template, [])
     tag = type_to_tag(type)
     version = version(type)
 
-    :aeserialization.serialize(tag, version, template, fields_with_keys)
+    :aeserialization.deserialize(:sophia_byte_code, tag, version, template, payload)
   end
 
   @doc """
@@ -114,13 +164,6 @@ defmodule Utils.Serialization do
   """
   @spec id_to_record(binary(), id_type()) :: id()
   def id_to_record(value, type), do: {:id, type, value}
-
-  # defp set_keys([field | rest_fields], [{key, type} | rest_template], fields_with_keys)
-  #      when is_list(field) and is_list(type),
-  #      do:
-  #        set_keys(rest_fields, rest_template, [
-  #          {key, set_keys(field, type, [])} | fields_with_keys
-  #        ])
 
   defp set_keys([field | rest_fields], [{key, _type} | rest_template], fields_with_keys),
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])
@@ -265,8 +308,7 @@ defmodule Utils.Serialization do
     [
       source_code_hash: :binary,
       type_info: [{:binary, :binary, :binary, :binary}],
-      byte_code: :binary,
-      compiler_version: :binary
+      byte_code: :binary
     ]
   end
 

@@ -23,8 +23,12 @@ defmodule AeppSdkElixir.MixProject do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    [{:excoveralls, "~> 0.10", only: :test}, {:ex_doc, "~> 0.19", only: :dev, runtime: false}]
+    [
+      {:excoveralls, "~> 0.10", only: :test},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
+    ]
   end
+
   defp aliases do
     [build_api: &build_api/1]
   end
@@ -35,14 +39,19 @@ defmodule AeppSdkElixir.MixProject do
         {"wget",
          [
            "--verbose",
-           "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"
+           "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{
+             get_file_name(:generator)
+           }-#{generator_version}-ubuntu-x86_64.tar.gz"
          ]},
         {"wget",
          [
            "--verbose",
-           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/config/#{get_file_name(:specification)}.yaml"
+           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/config/#{
+             get_file_name(:specification)
+           }.yaml"
          ]},
-        {"tar", ["zxvf", "#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
+        {"tar",
+         ["zxvf", "#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
         {"rm", ["#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
         {"java",
          [
@@ -56,9 +65,9 @@ defmodule AeppSdkElixir.MixProject do
            "-o",
            "./apps/aeternity_node/"
          ]},
-         {"mix",["format"]},
-         {"rm", ["-f","#{get_file_name(:generator)}.jar"]},
-         {"rm", ["-f","#{get_file_name(:specification)}.yaml"]}
+        {"mix", ["format"]},
+        {"rm", ["-f", "#{get_file_name(:generator)}.jar"]},
+        {"rm", ["-f", "#{get_file_name(:specification)}.yaml"]}
       ],
       fn {com, args} -> System.cmd(com, args) end
     )
