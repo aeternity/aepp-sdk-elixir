@@ -16,6 +16,7 @@ defmodule Utils.Serialization do
   @tag_name_transfer_tx 36
   @tag_contract_create_tx 42
   @tag_contract_call_tx 43
+  @tag_sophia_byte_code 70
 
   @version_signed_tx 1
   @version_spend_tx 1
@@ -30,6 +31,7 @@ defmodule Utils.Serialization do
   @version_name_transfer_tx 1
   @version_contract_create_tx 1
   @version_contract_call_tx 1
+  @version_sophia_byte_code 1
 
   @type structure_type ::
           :signed_tx
@@ -112,6 +114,13 @@ defmodule Utils.Serialization do
   """
   @spec id_to_record(binary(), id_type()) :: id()
   def id_to_record(value, type), do: {:id, type, value}
+
+  # defp set_keys([field | rest_fields], [{key, type} | rest_template], fields_with_keys)
+  #      when is_list(field) and is_list(type),
+  #      do:
+  #        set_keys(rest_fields, rest_template, [
+  #          {key, set_keys(field, type, [])} | fields_with_keys
+  #        ])
 
   defp set_keys([field | rest_fields], [{key, _type} | rest_template], fields_with_keys),
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])
@@ -252,6 +261,15 @@ defmodule Utils.Serialization do
     ]
   end
 
+  defp serialization_template(:sophia_byte_code) do
+    [
+      source_code_hash: :binary,
+      type_info: [{:binary, :binary, :binary, :binary}],
+      byte_code: :binary,
+      compiler_version: :binary
+    ]
+  end
+
   defp type_to_tag(:signed_tx), do: @tag_signed_tx
   defp type_to_tag(:spend_tx), do: @tag_spend_tx
   defp type_to_tag(:oracle_register_tx), do: @tag_oracle_register_tx
@@ -265,6 +283,7 @@ defmodule Utils.Serialization do
   defp type_to_tag(:name_transfer_tx), do: @tag_name_transfer_tx
   defp type_to_tag(:contract_create_tx), do: @tag_contract_create_tx
   defp type_to_tag(:contract_call_tx), do: @tag_contract_call_tx
+  defp type_to_tag(:sophia_byte_code), do: @tag_sophia_byte_code
 
   defp version(:signed_tx), do: @version_signed_tx
   defp version(:spend_tx), do: @version_spend_tx
@@ -279,4 +298,5 @@ defmodule Utils.Serialization do
   defp version(:name_transfer_tx), do: @version_name_transfer_tx
   defp version(:contract_create_tx), do: @version_contract_create_tx
   defp version(:contract_call_tx), do: @version_contract_call_tx
+  defp version(:sophia_byte_code), do: @version_sophia_byte_code
 end
