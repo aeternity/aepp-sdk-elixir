@@ -49,7 +49,7 @@ defmodule Core.Contract do
 
   def deploy(
         %Client{
-          keypair: %{pubkey: pubkey, privkey: privkey},
+          keypair: %{public: pubkey, secret: privkey},
           network_id: network_id,
           connection: connection
         },
@@ -133,7 +133,7 @@ defmodule Core.Contract do
           | {:error, Env.t()}
   def call(
         %Client{
-          keypair: %{privkey: privkey},
+          keypair: %{secret: privkey},
           network_id: network_id,
           connection: connection
         } = client,
@@ -291,7 +291,7 @@ defmodule Core.Contract do
 
   defp build_contract_call_fields(
          %Client{
-           keypair: %{pubkey: pubkey},
+           keypair: %{public: pubkey},
            connection: connection
          },
          contract_address,
