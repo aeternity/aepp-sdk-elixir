@@ -4,6 +4,23 @@ defmodule Utils.Serialization do
   """
   alias Utils.Keys
 
+  alias AeternityNode.Model.{
+    SpendTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    OracleQueryTx,
+    OracleExtendTx,
+    NamePreclaimTx,
+    NameClaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx,
+    ContractCreateTx,
+    ContractCallTx,
+    RelativeTtl,
+    Ttl
+  }
+
   @tag_signed_tx 11
   @tag_spend_tx 12
   @tag_oracle_register_tx 22
@@ -37,6 +54,7 @@ defmodule Utils.Serialization do
           | :spend_tx
           | :oracle_register_tx
           | :oracle_query_tx
+          | :oracle_response_tx
           | :oracle_extend_tx
           | :name_claim_tx
           | :name_preclaim_tx
@@ -47,18 +65,18 @@ defmodule Utils.Serialization do
           | :contract_call_tx
 
   @type tx_type ::
-          AeternityNode.Model.SpendTx
-          | AeternityNode.Model.OracleRegisterTx
-          | AeternityNode.Model.OracleRespondTx
-          | AeternityNode.Model.OracleQueryTx
-          | AeternityNode.Model.OracleExtendTx
-          | AeternityNode.Model.NamePreclaimTx
-          | AeternityNode.Model.NameClaimTx
-          | AeternityNode.Model.NameRevokeTx
-          | AeternityNode.Model.NameTransferTx
-          | AeternityNode.Model.NameUpdateTx
-          | AeternityNode.Model.ContractCreateTx
-          | AeternityNode.Model.ContractCallTx
+          SpendTx
+          | OracleRegisterTx
+          | OracleRespondTx
+          | OracleQueryTx
+          | OracleExtendTx
+          | NamePreclaimTx
+          | NameClaimTx
+          | NameRevokeTx
+          | NameTransferTx
+          | NameUpdateTx
+          | ContractCreateTx
+          | ContractCallTx
 
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
@@ -89,7 +107,7 @@ defmodule Utils.Serialization do
              :contract_create_tx,
              :contract_call_tx
            ] do
-    {:ok, fields} = process_tx_fields(tx, type)
+    {:ok, fields} = process_tx_fields(tx)
     process_serialize(fields, type)
   end
 
@@ -99,68 +117,106 @@ defmodule Utils.Serialization do
       when type in [:account, :oracle, :name, :commitment, :contract, :channel],
       do: {:id, type, value}
 
-  defp process_tx_fields(tx, :spend_tx) do
-    sender_id = proccess_id_to_record(tx.sender_id)
-    recipient_id = proccess_id_to_record(tx.recipient_id)
+  defp process_tx_fields(%SpendTx{
+         recipient_id: tx_recipient_id,
+         amount: amount,
+         fee: fee,
+         ttl: ttl,
+         sender_id: tx_sender_id,
+         nonce: nonce,
+         payload: payload
+       }) do
+    sender_id = proccess_id_to_record(tx_sender_id)
+    recipient_id = proccess_id_to_record(tx_recipient_id)
 
     {:ok,
      [
        sender_id,
        recipient_id,
-       tx.amount,
-       tx.fee,
-       tx.ttl,
-       tx.nonce,
-       tx.payload
-     ]}
-  end
-
-  defp process_tx_fields(tx, :oracle_register_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
-
-    ttl =
-      case tx.oracle_ttl.type do
-        "block" -> 1
-        "delta" -> 0
-      end
-
-    {:ok,
-     [
-       account_id,
-       tx.nonce,
-       tx.query_format,
-       tx.response_format,
-       tx.query_fee,
+       amount,
+       fee,
        ttl,
-       tx.oracle_ttl.value,
-       tx.fee,
-       tx.ttl,
-       tx.abi_version
+       nonce,
+       payload
      ]}
   end
 
-  defp process_tx_fields(tx, :oracle_response_tx) do
-    oracle_id = proccess_id_to_record(tx.oracle_id)
+  defp process_tx_fields(%OracleRegisterTx{
+         query_format: query_format,
+         response_format: response_format,
+         query_fee: query_fee,
+         oracle_ttl: %Ttl{type: type, value: value},
+         account_id: tx_account_id,
+         nonce: nonce,
+         fee: fee,
+         ttl: ttl,
+         vm_version: _vm_version,
+         abi_version: abi_version
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
+
+    ttl_type =
+      case type do
+        "block" -> 1
+        "delta" -> 0
+      end
+
+    {:ok,
+     [
+       account_id,
+       nonce,
+       query_format,
+       response_format,
+       query_fee,
+       ttl_type,
+       value,
+       fee,
+       ttl,
+       abi_version
+     ]}
+  end
+
+  defp process_tx_fields(%OracleRespondTx{
+         query_id: query_id,
+         response: response,
+         response_ttl: %RelativeTtl{type: _type, value: value},
+         fee: fee,
+         ttl: ttl,
+         oracle_id: tx_oracle_id,
+         nonce: nonce
+       }) do
+    oracle_id = proccess_id_to_record(tx_oracle_id)
 
     {:ok,
      [
        oracle_id,
-       tx.nonce,
-       tx.query_id,
-       tx.response,
+       nonce,
+       query_id,
+       response,
+       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_response_tx.erl#L48
        0,
-       tx.response_ttl.value,
-       tx.fee,
-       tx.ttl
+       value,
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :oracle_query_tx) do
-    sender_id = proccess_id_to_record(tx.sender_id)
-    oracle_id = proccess_id_to_record(tx.oracle_id)
+  defp process_tx_fields(%OracleQueryTx{
+         oracle_id: tx_oracle_id,
+         query: query,
+         query_fee: query_fee,
+         query_ttl: %Ttl{type: query_type, value: query_value},
+         response_ttl: %RelativeTtl{type: _response_type, value: response_value},
+         fee: fee,
+         ttl: ttl,
+         sender_id: tx_sender_id,
+         nonce: nonce
+       }) do
+    sender_id = proccess_id_to_record(tx_sender_id)
+    oracle_id = proccess_id_to_record(tx_oracle_id)
 
-    query_ttl =
-      case tx.query_ttl.type do
+    query_ttl_type =
+      case query_type do
         "block" -> 1
         "delta" -> 0
       end
@@ -168,148 +224,216 @@ defmodule Utils.Serialization do
     {:ok,
      [
        sender_id,
-       tx.nonce,
+       nonce,
        oracle_id,
-       tx.query,
-       tx.query_fee,
-       query_ttl,
-       tx.query_ttl.value,
+       query,
+       query_fee,
+       query_ttl_type,
+       query_value,
+       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_query_tx.erl#L54
        0,
-       tx.response_ttl.value,
-       tx.fee,
-       tx.ttl
+       response_value,
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :oracle_extend_tx) do
-    oracle_id = proccess_id_to_record(tx.oracle_id)
+  defp process_tx_fields(%OracleExtendTx{
+         fee: fee,
+         oracle_ttl: %RelativeTtl{type: _type, value: value},
+         oracle_id: tx_oracle_id,
+         nonce: nonce,
+         ttl: ttl
+       }) do
+    oracle_id = proccess_id_to_record(tx_oracle_id)
 
     {:ok,
      [
        oracle_id,
-       tx.nonce,
+       nonce,
+       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_extend_tx.erl#L43
        0,
-       tx.oracle_ttl.value,
-       tx.fee,
-       tx.ttl
+       value,
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :name_claim_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
+  defp process_tx_fields(%NameClaimTx{
+         name: name,
+         name_salt: name_salt,
+         fee: fee,
+         ttl: ttl,
+         account_id: tx_account_id,
+         nonce: nonce
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
 
     {:ok,
      [
        account_id,
-       tx.nonce,
-       tx.name,
-       tx.name_salt,
-       tx.fee,
-       tx.ttl
+       nonce,
+       name,
+       name_salt,
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :name_preclaim_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
-    commitment_id = proccess_id_to_record(tx.commitment_id)
+  defp process_tx_fields(%NamePreclaimTx{
+         commitment_id: tx_commitment_id,
+         fee: fee,
+         ttl: ttl,
+         account_id: tx_account_id,
+         nonce: nonce
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
+    commitment_id = proccess_id_to_record(tx_commitment_id)
 
     {:ok,
      [
        account_id,
-       tx.nonce,
+       nonce,
        commitment_id,
-       tx.fee,
-       tx.ttl
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :name_update_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
-    name_id = proccess_id_to_record(tx.name_id)
+  defp process_tx_fields(%NameUpdateTx{
+         name_id: tx_name_id,
+         name_ttl: name_ttl,
+         pointers: pointers,
+         client_ttl: client_ttl,
+         fee: fee,
+         ttl: ttl,
+         account_id: tx_account_id,
+         nonce: nonce
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
+    name_id = proccess_id_to_record(tx_name_id)
 
     {:ok,
      [
        account_id,
-       tx.nonce,
+       nonce,
        name_id,
-       tx.name_ttl,
-       tx.pointers,
-       tx.client_ttl,
-       tx.fee,
-       tx.ttl
+       name_ttl,
+       pointers,
+       client_ttl,
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :name_revoke_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
-    name_id = proccess_id_to_record(tx.name_id)
+  defp process_tx_fields(%NameRevokeTx{
+         name_id: tx_name_id,
+         fee: fee,
+         ttl: ttl,
+         account_id: tx_account_id,
+         nonce: nonce
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
+    name_id = proccess_id_to_record(tx_name_id)
 
     {:ok,
      [
        account_id,
-       tx.nonce,
+       nonce,
        name_id,
-       tx.fee,
-       tx.ttl
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :name_transfer_tx) do
-    account_id = proccess_id_to_record(tx.account_id)
-    name_id = proccess_id_to_record(tx.name_id)
-    recipient_id = proccess_id_to_record(tx.recipient_id)
+  defp process_tx_fields(%NameTransferTx{
+         name_id: tx_name_id,
+         recipient_id: tx_recipient_id,
+         fee: fee,
+         ttl: ttl,
+         account_id: tx_account_id,
+         nonce: nonce
+       }) do
+    account_id = proccess_id_to_record(tx_account_id)
+    name_id = proccess_id_to_record(tx_name_id)
+    recipient_id = proccess_id_to_record(tx_recipient_id)
 
     {:ok,
      [
        account_id,
-       tx.nonce,
+       nonce,
        name_id,
        recipient_id,
-       tx.fee,
-       tx.ttl
+       fee,
+       ttl
      ]}
   end
 
-  defp process_tx_fields(tx, :contract_create_tx) do
-    owner_id = proccess_id_to_record(tx.owner_id)
+  defp process_tx_fields(%ContractCreateTx{
+         owner_id: tx_owner_id,
+         nonce: nonce,
+         code: code,
+         vm_version: _vm_version,
+         abi_version: _abi_version,
+         deposit: deposit,
+         amount: amount,
+         gas: gas,
+         gas_price: gas_price,
+         fee: fee,
+         ttl: ttl,
+         call_data: call_data
+       }) do
+    owner_id = proccess_id_to_record(tx_owner_id)
 
     {:ok,
      [
        owner_id,
-       tx.nonce,
-       tx.code,
+       nonce,
+       code,
        @ct_version,
-       tx.fee,
-       tx.ttl,
-       tx.deposit,
-       tx.amount,
-       tx.gas,
-       tx.gas_price,
-       tx.call_data
+       fee,
+       ttl,
+       deposit,
+       amount,
+       gas,
+       gas_price,
+       call_data
      ]}
   end
 
-  defp process_tx_fields(tx, :contract_call_tx) do
-    caller_id = proccess_id_to_record(tx.caller_id)
-    contract_id = proccess_id_to_record(tx.contract_id)
+  defp process_tx_fields(%ContractCallTx{
+         caller_id: tx_caller_id,
+         nonce: nonce,
+         contract_id: tx_contract_id,
+         vm_version: _vm_version,
+         abi_version: abi_version,
+         fee: fee,
+         ttl: ttl,
+         amount: amount,
+         gas: gas,
+         gas_price: gas_price,
+         call_data: call_data
+       }) do
+    caller_id = proccess_id_to_record(tx_caller_id)
+    contract_id = proccess_id_to_record(tx_contract_id)
 
     {:ok,
      [
        caller_id,
-       tx.nonce,
+       nonce,
        contract_id,
-       tx.abi_version,
-       tx.fee,
-       tx.ttl,
-       tx.amount,
-       tx.gas,
-       tx.gas_price,
-       tx.call_data
+       abi_version,
+       fee,
+       ttl,
+       amount,
+       gas,
+       gas_price,
+       call_data
      ]}
   end
 
-  defp process_tx_fields(_tx, type) do
-    {:error, "Unknown or invalid given tx type: #{type}"}
+  defp process_tx_fields(tx) do
+    {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end
 
   defp proccess_id_to_record(tx_pubkey) when is_binary(tx_pubkey) do

@@ -16,6 +16,7 @@ defmodule UtilsSerializationTest do
     NameUpdateTx,
     ContractCreateTx,
     ContractCallTx,
+    RelativeTtl,
     Ttl
   }
 
@@ -181,7 +182,7 @@ defmodule UtilsSerializationTest do
     oracle_respond_tx = %OracleRespondTx{
       query_id: <<"query_id">>,
       response: <<"response_format">>,
-      response_ttl: %Ttl{type: "delta", value: 10},
+      response_ttl: %RelativeTtl{type: "delta", value: 10},
       fee: 0,
       ttl: 10,
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
@@ -193,7 +194,7 @@ defmodule UtilsSerializationTest do
       query: <<"query">>,
       query_fee: 10,
       query_ttl: %Ttl{type: "delta", value: 10},
-      response_ttl: %Ttl{type: "delta", value: 10},
+      response_ttl: %RelativeTtl{type: "delta", value: 10},
       fee: 0,
       ttl: 10,
       sender_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
@@ -202,7 +203,7 @@ defmodule UtilsSerializationTest do
 
     oracle_extend_tx = %OracleExtendTx{
       fee: 0,
-      oracle_ttl: %Ttl{type: "delta", value: 10},
+      oracle_ttl: %RelativeTtl{type: "delta", value: 10},
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0,
       ttl: 0
