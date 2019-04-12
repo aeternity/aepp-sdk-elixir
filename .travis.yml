@@ -4,6 +4,14 @@ sudo: false
 language: elixir
 elixir: '1.8'
 
+env:
+  global:
+    - LD_LIBRARY_PATH=$HOME/.libsodium/lib:$LD_LIBRARY_PATH
+    - LD_RUN_PATH=$HOME/.libsodium/lib:$LD_RUN_PATH
+    - PATH=$PATH:$HOME/.libsodium/lib:$HOME/.libsodium/include:$HOME/.kiex
+    - LIBRARY_PATH=$HOME/.libsodium/lib:$LIBRARY_PATH
+    - C_INCLUDE_PATH=$HOME/.libsodium/include:$C_INCLUDE_PATH
+
 install:
   # Install libsodium
   - mkdir -p libsodium-src
