@@ -2,8 +2,7 @@ dist: xenial
 sudo: false
 
 language: elixir
-elixir: '1.8.1'
-otp_release: '21.0.0'
+elixir: '1.8'
 
 script:
   - mix format --check-formatted
