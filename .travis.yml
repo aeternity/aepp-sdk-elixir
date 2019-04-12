@@ -14,6 +14,9 @@ env:
   matrix:
     - LIBSODIUM_VER=1.0.16
 
+before_install: 
+  - mix local.hex --force  
+
 install:
   # Install libsodium
   - mkdir -p libsodium-src
@@ -24,6 +27,8 @@ install:
 
   # Recompile enacl if necessary
   - "[ -z $LIBSODIUM_NEW ] || (mix deps.compile enacl)"
+
+  
 
 script:
   - mix format --check-formatted
