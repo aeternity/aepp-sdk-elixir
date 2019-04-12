@@ -31,8 +31,6 @@ install:
   # Recompile enacl if necessary
   - "[ -z $LIBSODIUM_NEW ] || (mix deps.compile enacl)"
 
-  
-
 script:
   - mix format --check-formatted
   - mix compile --warnings-as-errors
