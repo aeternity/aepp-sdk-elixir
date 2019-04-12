@@ -4,6 +4,17 @@ sudo: false
 language: elixir
 elixir: '1.8'
 
+install:
+  # Install libsodium
+  - mkdir -p libsodium-src
+  - "[ -d $HOME/.libsodium/lib ] || (wget -O libsodium-src.tar.gz https://github.com/jedisct1/libsodium/releases/download/$LIBSODIUM_VER/libsodium-$LIBSODIUM_VER.tar.gz && tar -zxf libsodium-src.tar.gz -C libsodium-src --strip-components=1)"
+  - cd libsodium-src
+  - "[ -d $HOME/.libsodium/lib ] || (./configure --prefix=$HOME/.libsodium && make -j$(nproc) && make install && export LIBSODIUM_NEW=yes)"
+  - cd ..
+
+  # Recompile enacl if necessary
+  - "[ -z $LIBSODIUM_NEW ] || (mix deps.compile enacl)"
+
 script:
   - mix format --check-formatted
   - mix compile --warnings-as-errors
