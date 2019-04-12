@@ -369,17 +369,17 @@ defmodule UtilsSerializationTest do
   end
 
   test "valid serialization of transactions", fields do
-    Serialization.serialize(fields.spend_tx, :spend_tx)
-    Serialization.serialize(fields.oracle_register_tx, :oracle_register_tx)
-    Serialization.serialize(fields.oracle_respond_tx, :oracle_response_tx)
-    Serialization.serialize(fields.oracle_query_tx, :oracle_query_tx)
-    Serialization.serialize(fields.oracle_extend_tx, :oracle_extend_tx)
-    Serialization.serialize(fields.name_pre_claim_tx, :name_preclaim_tx)
-    Serialization.serialize(fields.name_claim_tx, :name_claim_tx)
-    Serialization.serialize(fields.name_revoke_tx, :name_revoke_tx)
-    Serialization.serialize(fields.name_update_tx, :name_update_tx)
-    Serialization.serialize(fields.name_transfer_tx, :name_transfer_tx)
-    Serialization.serialize(fields.contract_create_tx, :contract_create_tx)
-    Serialization.serialize(fields.contract_call_tx, :contract_call_tx)
+    Serialization.serialize(fields.spend_tx)
+    Serialization.serialize(fields.oracle_register_tx)
+    Serialization.serialize(fields.oracle_respond_tx)
+    Serialization.serialize(fields.oracle_query_tx)
+    Serialization.serialize(fields.oracle_extend_tx)
+    Serialization.serialize(fields.name_pre_claim_tx)
+    Serialization.serialize(fields.name_claim_tx)
+    Serialization.serialize(fields.name_revoke_tx)
+    Serialization.serialize(fields.name_update_tx)
+    Serialization.serialize(fields.name_transfer_tx)
+    Serialization.serialize(fields.contract_create_tx)
+    Serialization.serialize(fields.contract_call_tx)
   end
 end
