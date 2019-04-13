@@ -24,7 +24,7 @@ before_install:
   - asdf plugin-add maven
   - asdf install maven 3.3.3
   - asdf global maven 3.3.3
-  - asdf global java oracle-8.191
+  - asdf global java oracle-8.141
   - mix local.rebar --force
   - mix local.hex --force  
   - mix deps.get
