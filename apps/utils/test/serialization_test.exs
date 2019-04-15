@@ -197,7 +197,7 @@ defmodule UtilsSerializationTest do
       response_ttl: %RelativeTtl{type: "delta", value: 10},
       fee: 0,
       ttl: 10,
-      sender_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+      sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0
     }
 
