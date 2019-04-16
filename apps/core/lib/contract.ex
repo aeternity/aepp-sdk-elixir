@@ -22,7 +22,7 @@ defmodule Core.Contract do
   @default_amount 0
   @default_gas 1_000_000
   @default_gas_price 1_000_000_000
-  @init_function 'init'
+  @init_function "init"
   # vm_version 0x03 and abi_version 0x01, packed together
   @ct_version 0x30001
   @abi_version 0x01
@@ -60,14 +60,11 @@ defmodule Core.Contract do
       when is_binary(source_code) and is_list(opts) do
     pubkey_binary = Keys.pubkey_to_binary(pubkey)
     owner_id = Serialization.id_to_record(pubkey_binary, :account)
-    source_code_charlist = String.to_charlist(source_code)
-    init_args_charlist = String.to_charlist(init_args)
     {:ok, source_hash} = hash(source_code)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
-         {:ok, %{byte_code: byte_code, type_info: type_info} = contract} <-
-           compile(source_code_charlist),
-         {:ok, calldata} <- create_calldata(contract, @init_function, init_args_charlist),
+         {:ok, %{byte_code: byte_code, type_info: type_info} = contract} <- compile(source_code),
+         {:ok, calldata} <- create_calldata(contract, @init_function, init_args),
          byte_code_fields = [
            source_hash,
            type_info,
@@ -143,15 +140,12 @@ defmodule Core.Contract do
         opts \\ []
       )
       when is_binary(contract_address) and is_binary(function_name) and is_list(opts) do
-    function_name_charlist = String.to_charlist(function_name)
-    function_args_charlist = String.to_charlist(function_args)
-
     with {:ok, contract_call_fields} <-
            build_contract_call_fields(
              client,
              contract_address,
-             function_name_charlist,
-             function_args_charlist,
+             function_name,
+             function_args,
              opts
            ),
          {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} <-
@@ -206,15 +200,12 @@ defmodule Core.Contract do
         opts \\ []
       )
       when is_binary(contract_address) and is_binary(function_name) and is_list(opts) do
-    function_name_charlist = String.to_charlist(function_name)
-    function_args_charlist = String.to_charlist(function_args)
-
     with {:ok, contract_call_fields} <-
            build_contract_call_fields(
              client,
              contract_address,
-             function_name_charlist,
-             function_args_charlist,
+             function_name,
+             function_args,
              opts
            ),
          serialized_contract_call_fields =
@@ -282,6 +273,202 @@ defmodule Core.Contract do
     end
   end
 
+  @doc """
+  Compile a contract
+
+  ## Examples
+      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+      iex> Core.Contract.compile(source_code)
+      {:ok,
+       %{
+         byte_code: <<98, 0, 0, 100, 98, 0, 0, 132, 145, 128, 128, 128, 81, 127, 185,
+           201, 86, 242, 139, 49, 73, 169, 245, 152, 122, 165, 5, 243, 218, 27, 34, 9,
+           204, 87, 57, 35, 64, 6, 43, 182, 193, 189, 159, 159, 153, 234, 20, 98, 0,
+           0, 192, 87, 80, 128, 81, 127, 104, 242, 103, 99, 56, 255, 80, 136, 57, 171,
+           164, 119, 73, 239, 250, 139, 232, 126, 242, 132, 242, 7, 251, 61, 153, 152,
+           112, 28, 213, 56, 135, 197, 20, 98, 0, 0, 175, 87, 80, 96, 1, 25, 81, 0,
+           91, 96, 0, 25, 89, 96, 32, 1, 144, 129, 82, 96, 32, 144, 3, 96, 3, 129, 82,
+           144, 89, 96, 0, 81, 89, 82, 96, 0, 82, 96, 0, 243, 91, 96, 0, 128, 82, 96,
+           0, 243, 91, 89, 89, 96, 32, 1, 144, 129, 82, 96, 32, 144, 3, 96, 0, 25, 89,
+           96, 32, 1, 144, 129, 82, 96, 32, 144, 3, 96, 3, 129, 82, 129, 82, 144, 86,
+           91, 96, 32, 1, 81, 81, 89, 80, 128, 145, 80, 80, 128, 144, 80, 144, 86, 91,
+           80, 80, 130, 145, 80, 80, 98, 0, 0, 140, 86>>,
+         compiler_version: 2,
+         contract_source: 'contract Identity =\n  type state = ()\n  function main(x : int) = x',
+         type_info: [
+           {<<104, 242, 103, 99, 56, 255, 80, 136, 57, 171, 164, 119, 73, 239, 250,
+              139, 232, 126, 242, 132, 242, 7, 251, 61, 153, 152, 112, 28, 213, 56,
+              135, 197>>, "main",
+            <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 160, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>},
+           {<<185, 201, 86, 242, 139, 49, 73, 169, 245, 152, 122, 165, 5, 243, 218,
+              27, 34, 9, 204, 87, 57, 35, 64, 6, 43, 182, 193, 189, 159, 159, 153,
+              234>>, "init",
+            <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255>>,
+            <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              3, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+              255, 255, 255, 255>>}
+         ]
+       }}
+  """
+  def compile(source_code) when is_binary(source_code) do
+    charlist_source = String.to_charlist(source_code)
+
+    try do
+      contract = :aeso_compiler.from_string(charlist_source, [])
+
+      {:ok, contract}
+    rescue
+      e in ErlangError ->
+        %ErlangError{original: {_, message_list}} = e
+
+        {:error, message_list}
+    end
+  end
+
+  @doc """
+  Create contract calldata
+
+  ## Examples
+      iex> contract =
+      %{
+       byte_code: <<98, 0, 0, 100, 98, 0, 0, 151, 145, 128, 128, 128, 81, 127, 112,
+         194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2, 111, 12,
+         11, 11, 82, 86, 82, 53, 206, 145, 155, 60, 13, 206, 214, 183, 62, 20, 98,
+         0, 0, 242, 87, 80, 128, 81, 127, 226, 35, 29, 108, 223, 201, 57, 22, 222,
+         76, 179, 169, 133, 123, 246, 92, 244, 15, 194, 86, 244, 161, 73, 139, 63,
+         126, 124, 152, 12, 25, 147, 68, 20, 98, 0, 0, 170, 87, 80, 96, 1, 25, 81,
+         0, 91, 96, 0, 25, 89, 96, 32, 1, 144, 129, 82, 96, 32, 144, 3, 96, 0, 89,
+         144, 129, 82, 129, 82, 89, 96, 32, 1, 144, 129, 82, 96, 32, 144, 3, 96, 3,
+         129, 82, 144, 89, 96, 0, 81, 89, 82, 96, 0, 82, 96, 0, 243, 91, 96, 0, 128,
+         82, 96, 0, 243, 91, 128, 96, 0, 81, 81, 1, 144, 80, 144, 86, 91, 96, 32, 1,
+         81, 81, 131, 146, 80, 128, 145, 80, 80, 128, 89, 144, 129, 82, 89, 96, 32,
+         1, 144, 129, 82, 96, 32, 144, 3, 96, 0, 25, 89, 96, 32, 1, 144, 129, 82,
+         96, 32, 144, 3, 96, 0, 89, 144, 129, 82, 129, 82, 89, 96, 32, 1, 144, 129,
+         82, 96, 32, 144, 3, 96, 3, 129, 82, 129, 82, 144, 80, 144, 86, 91, 96, 32,
+         1, 81, 81, 144, 80, 89, 80, 128, 145, 80, 80, 98, 0, 0, 159, 86>>,
+       compiler_version: 2,
+       contract_source: 'contract Identity =\n        record state = { number : int }\n\n        function init(x : int) =\n          { number = x }\n\n        function add_to_number(x : int) = state.number + x',
+       type_info: [
+         {<<112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2,
+            111, 12, 11, 11, 82, 86, 82, 53, 206, 145, 155, 60, 13, 206, 214, 183,
+            62>>, "add_to_number",
+          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 160, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>},
+         {<<226, 35, 29, 108, 223, 201, 57, 22, 222, 76, 179, 169, 133, 123, 246,
+            92, 244, 15, 194, 86, 244, 161, 73, 139, 63, 126, 124, 152, 12, 25, 147,
+            68>>, "init",
+          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 160, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 1, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 128, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+            255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0>>}
+       ]
+     }
+     iex> function_name = "init"
+     iex> function_args = "42"
+     iex> Core.Contract.create_calldata(contract,function_name, function_args)
+     {:ok, <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 32, 226, 35, 29, 108, 223, 201, 57, 22, 222, 76, 179, 169,
+     133, 123, 246, 92, 244, 15, 194, 86, 244, 161, 73, 139, 63, 126, 124, 152,
+     12, 25, 147, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42>>}
+  """
+  def create_calldata(
+        contract,
+        function_name,
+        function_args
+      )
+      when is_map(contract) and is_binary(function_name) and is_binary(function_args) do
+    charlist_function_name = String.to_charlist(function_name)
+    charlist_function_args = String.to_charlist(function_args)
+
+    try do
+      {:ok, calldata, _, _} =
+        :aeso_compiler.create_calldata(
+          contract,
+          charlist_function_name,
+          charlist_function_args
+        )
+
+      {:ok, calldata}
+    rescue
+      e in ErlangError ->
+        message =
+          case e do
+            %ErlangError{original: {_, message_list}} ->
+              message_list
+
+            %MatchError{term: {:error, message}} ->
+              message
+          end
+
+        {:error, message}
+    end
+  end
+
   defp compute_contract_pubkey(owner_address, nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)
     {:ok, hash} = hash(<<owner_address::binary, nonce_binary::binary>>)
@@ -345,47 +532,5 @@ defmodule Core.Contract do
 
   defp hash(payload) do
     :enacl.generichash(@hash_bytes, payload)
-  end
-
-  defp compile(source_code) do
-    try do
-      contract = :aeso_compiler.from_string(source_code, [])
-
-      {:ok, contract}
-    rescue
-      e in ErlangError ->
-        %ErlangError{original: {_, message_list}} = e
-
-        {:error, message_list}
-    end
-  end
-
-  defp create_calldata(
-         contract,
-         function_name,
-         function_args
-       ) do
-    try do
-      {:ok, calldata, _, _} =
-        :aeso_compiler.create_calldata(
-          contract,
-          function_name,
-          function_args
-        )
-
-      {:ok, calldata}
-    rescue
-      e in ErlangError ->
-        message =
-          case e do
-            %ErlangError{original: {_, message_list}} ->
-              message_list
-
-            %MatchError{term: {:error, message}} ->
-              message
-          end
-
-        {:error, message}
-    end
   end
 end
