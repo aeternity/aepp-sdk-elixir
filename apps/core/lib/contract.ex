@@ -38,7 +38,7 @@ defmodule Core.Contract do
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
       iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
-      iex> source_code = "contract Number =\\n  record state = { number : int }\\n\\n  function init(x : int) =\\n    { number = x }\\n\\n  function add_to_number(x : int) = state.number + x"
+      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> init_args = "42"
       iex> Core.Contract.deploy(client, source_code, init_args)
       {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
@@ -260,7 +260,7 @@ defmodule Core.Contract do
       iex> function_args = "33"
       iex> {:ok, %{return_value: data, return_type: "ok"}} = Core.Contract.call(client, contract_address, function_name, function_args)
       iex> data_type = "int"
-      iex> Core.Contract.decode_return_value(client, data_type, data)
+      iex> Core.Contract.decode_return_value(data_type, data)
       {:ok, 75}
   """
 
