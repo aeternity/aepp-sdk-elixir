@@ -48,18 +48,18 @@ defmodule Utils.Serialization do
           | :contract_call_tx
 
   @type tx_type ::
-          AeternityNode.Model.SpendTx
-          | AeternityNode.Model.OracleRegisterTx
-          | AeternityNode.Model.OracleRespondTx
-          | AeternityNode.Model.OracleQueryTx
-          | AeternityNode.Model.OracleExtendTx
-          | AeternityNode.Model.NamePreclaimTx
-          | AeternityNode.Model.NameClaimTx
-          | AeternityNode.Model.NameRevokeTx
-          | AeternityNode.Model.NameTransferTx
-          | AeternityNode.Model.NameUpdateTx
-          | AeternityNode.Model.ContractCreateTx
-          | AeternityNode.Model.ContractCallTx
+          AeternityNode.Model.SpendTx.t()
+          | AeternityNode.Model.OracleRegisterTx.t()
+          | AeternityNode.Model.OracleRespondTx.t()
+          | AeternityNode.Model.OracleQueryTx.t()
+          | AeternityNode.Model.OracleExtendTx.t()
+          | AeternityNode.Model.NamePreclaimTx.t()
+          | AeternityNode.Model.NameClaimTx.t()
+          | AeternityNode.Model.NameRevokeTx.t()
+          | AeternityNode.Model.NameTransferTx.t()
+          | AeternityNode.Model.NameUpdateTx.t()
+          | AeternityNode.Model.ContractCreateTx.t()
+          | AeternityNode.Model.ContractCallTx.t()
 
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
@@ -72,27 +72,26 @@ defmodule Utils.Serialization do
   end
 
   @doc """
-
   Serializes a transaction to a binary.
 
   ## Examples
-  iex> alias AeternityNode.Model.{Ttl,OracleRegisterTx}
-  iex> Utils.Serialization.serialize( %OracleRegisterTx{
-       query_format: <<"query_format">>,
-       response_format: <<"response_format">>,
-       query_fee: 10,
-       oracle_ttl: %Ttl{type: "block", value: 10},
-       account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-       nonce: 37122,
-       fee: 0,
-       ttl: 10,
-       vm_version: 0x30001,
-       abi_version: 0x30001
-     })
-   <<248, 77, 22, 1, 161, 1, 9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234,
-    251, 255, 59, 141, 224, 214, 250, 79, 248, 30, 246, 237, 55, 83, 153, 134,
-    240, 138, 216, 129, 130, 145, 2, 140, 113, 117, 101, 114, 121, 95, 102, 111,
-    ...>>
+      iex> alias AeternityNode.Model.{Ttl,OracleRegisterTx}
+      iex> Utils.Serialization.serialize( %OracleRegisterTx{
+           query_format: <<"query_format">>,
+           response_format: <<"response_format">>,
+           query_fee: 10,
+           oracle_ttl: %Ttl{type: "block", value: 10},
+           account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+           nonce: 37122,
+           fee: 0,
+           ttl: 10,
+           vm_version: 0x30001,
+           abi_version: 0x30001
+         })
+       <<248, 77, 22, 1, 161, 1, 9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234,
+        251, 255, 59, 141, 224, 214, 250, 79, 248, 30, 246, 237, 55, 83, 153, 134,
+        240, 138, 216, 129, 130, 145, 2, 140, 113, 117, 101, 114, 121, 95, 102, 111,
+        ...>>
   """
   @spec serialize(tx_type()) :: rlp_binary()
   def serialize(tx) do

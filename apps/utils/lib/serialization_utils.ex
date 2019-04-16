@@ -56,6 +56,7 @@ defmodule Utils.SerializationUtils do
    ""], :spend_tx}
 
   """
+  @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
         recipient_id: tx_recipient_id,
         amount: amount,
