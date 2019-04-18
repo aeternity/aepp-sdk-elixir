@@ -5,6 +5,7 @@ defmodule Core.Contract do
   alias AeternityNode.Model.{
     ByteCode,
     ContractCallObject,
+    GenericSignedTx,
     DryRunInput,
     DryRunResult,
     DryRunResults,
@@ -37,8 +38,8 @@ defmodule Core.Contract do
       iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
+      iex> source_code = "contract Number =\n  record state = { number : int }\n  function init(x : int) =\n    { number = x }\n  function add_to_number(x : int) = state.number + x"
       iex> init_args = "42"
       iex> Core.Contract.deploy(client, source_code, init_args)
       {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
@@ -49,7 +50,7 @@ defmodule Core.Contract do
 
   def deploy(
         %Client{
-          keypair: %{pubkey: pubkey, privkey: privkey},
+          keypair: %{public: pubkey, secret: privkey},
           network_id: network_id,
           connection: connection
         },
@@ -84,7 +85,7 @@ defmodule Core.Contract do
            Keyword.get(opts, :gas_price, @default_gas_price),
            calldata
          ],
-         {:ok, %ContractCallObject{}} <-
+         {:ok, %GenericSignedTx{}} <-
            TransactionUtils.post(
              connection,
              privkey,
@@ -112,7 +113,7 @@ defmodule Core.Contract do
       iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> function_name = "add_to_number"
       iex> function_args = "33"
@@ -130,7 +131,7 @@ defmodule Core.Contract do
           | {:error, Env.t()}
   def call(
         %Client{
-          keypair: %{privkey: privkey},
+          keypair: %{secret: privkey},
           network_id: network_id,
           connection: connection
         } = client,
@@ -172,7 +173,7 @@ defmodule Core.Contract do
       iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> function_name = "add_to_number"
       iex> function_args = "33"
@@ -245,7 +246,7 @@ defmodule Core.Contract do
       iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> function_name = "add_to_number"
       iex> function_args = "33"
@@ -478,7 +479,7 @@ defmodule Core.Contract do
 
   defp build_contract_call_fields(
          %Client{
-           keypair: %{pubkey: pubkey},
+           keypair: %{public: pubkey},
            connection: connection
          },
          contract_address,

@@ -3,7 +3,7 @@ defmodule Utils.Transaction do
   Transaction utils
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
-  alias AeternityNode.Model.{PostTxResponse, ContractCallObject, Tx, Error}
+  alias AeternityNode.Model.{PostTxResponse, Tx, Error, GenericSignedTx, ContractCallObject}
   alias Utils.{Keys, Encoding, Serialization}
   alias Tesla.Env
 
@@ -73,7 +73,7 @@ defmodule Utils.Transaction do
            TransactionApi.post_transaction(connection, %Tx{
              tx: encoded_signed_tx
            }),
-         {:ok, %ContractCallObject{}} = response <- await_mining(connection, tx_hash) do
+         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
       response
     else
       {:ok, %Error{reason: message}} ->
@@ -87,24 +87,39 @@ defmodule Utils.Transaction do
     end
   end
 
-  defp await_mining(connection, tx_hash) do
-    await_mining(connection, tx_hash, @await_attempts)
+  defp await_mining(connection, tx_hash, type) do
+    await_mining(connection, tx_hash, @await_attempts, type)
   end
 
-  defp await_mining(_connection, _tx_hash, 0),
+  defp await_mining(_connection, _tx_hash, 0, _type),
     do:
       {:error,
        "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
 
-  defp await_mining(connection, tx_hash, attempts) do
+  defp await_mining(connection, tx_hash, attempts, type) do
     :timer.sleep(@await_attempt_interval)
 
-    case TransactionApi.get_transaction_info_by_hash(connection, tx_hash) do
+    mining_status =
+      case type do
+        :contract_call_tx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
+        _ ->
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+      end
+
+    case mining_status do
+      {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
+        await_mining(connection, tx_hash, attempts - 1, type)
+
+      {:ok, %GenericSignedTx{}} = response ->
+        response
+
       {:ok, %ContractCallObject{}} = response ->
         response
 
       {:ok, %Error{}} ->
-        await_mining(connection, tx_hash, attempts - 1)
+        await_mining(connection, tx_hash, attempts - 1, type)
 
       {:error, %Env{} = env} ->
         {:error, env}
@@ -112,7 +127,7 @@ defmodule Utils.Transaction do
   end
 
   # TODO: to be calculated dynamically
-  def calculate_min_fee(), do: 2_000_000_000_000_000_000
+  def calculate_min_fee(), do: 2_000_000_000_000_000
 
   def default_ttl, do: @default_ttl
 end
