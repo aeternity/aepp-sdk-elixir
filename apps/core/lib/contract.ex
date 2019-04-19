@@ -1,16 +1,21 @@
 defmodule Core.Contract do
   alias AeternityNode.Api.Contract, as: ContractApi
   alias AeternityNode.Api.Debug, as: DebugApi
+  alias AeternityNode.Api.Chain, as: ChainApi
 
   alias AeternityNode.Model.{
     ByteCode,
     ContractCallObject,
     GenericSignedTx,
+    ContractCallTx,
+    ContractCreateTx,
     DryRunInput,
     DryRunResult,
     DryRunResults,
     Error
   }
+
+  alias AeternityNode.Model.InlineResponse2001, as: HeightResponse
 
   alias Utils.{Serialization, Encoding, Keys}
   alias Utils.Account, as: AccountUtils
@@ -24,8 +29,6 @@ defmodule Core.Contract do
   @default_gas 1_000_000
   @default_gas_price 1_000_000_000
   @init_function "init"
-  # vm_version 0x03 and abi_version 0x01, packed together
-  @ct_version 0x30001
   @abi_version 0x01
   @hash_bytes 32
 
@@ -60,7 +63,6 @@ defmodule Core.Contract do
       )
       when is_binary(source_code) and is_list(opts) do
     pubkey_binary = Keys.pubkey_to_binary(pubkey)
-    owner_id = Serialization.id_to_record(pubkey_binary, :account)
     {:ok, source_hash} = hash(source_code)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
@@ -72,26 +74,37 @@ defmodule Core.Contract do
            byte_code
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
-         contract_create_fields = [
-           owner_id,
-           nonce,
-           serialized_wrapped_code,
-           @ct_version,
-           Keyword.get(opts, :fee, TransactionUtils.calculate_min_fee()),
-           Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
-           Keyword.get(opts, :deposit, @default_deposit),
-           Keyword.get(opts, :amount, @default_amount),
-           Keyword.get(opts, :gas, @default_gas),
-           Keyword.get(opts, :gas_price, @default_gas_price),
-           calldata
-         ],
+         tx_dummy_fee = %ContractCreateTx{
+           owner_id: pubkey,
+           nonce: nonce,
+           code: serialized_wrapped_code,
+           vm_version: :unused,
+           abi_version: :unused,
+           deposit: Keyword.get(opts, :deposit, @default_deposit),
+           amount: Keyword.get(opts, :amount, @default_amount),
+           gas: Keyword.get(opts, :gas, @default_gas),
+           gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
+           fee: 0,
+           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           call_data: calldata
+         },
+         {:ok, %HeightResponse{height: height}} <-
+           ChainApi.get_current_key_block_height(connection),
+         tx = %{
+           tx_dummy_fee
+           | fee:
+               Keyword.get(
+                 opts,
+                 :fee,
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
+               )
+         },
          {:ok, %GenericSignedTx{}} <-
            TransactionUtils.post(
              connection,
              privkey,
              network_id,
-             contract_create_fields,
-             :contract_create_tx
+             tx
            ),
          contract_pubkey = compute_contract_pubkey(pubkey_binary, nonce) do
       {:ok, contract_pubkey}
@@ -141,8 +154,8 @@ defmodule Core.Contract do
         opts \\ []
       )
       when is_binary(contract_address) and is_binary(function_name) and is_list(opts) do
-    with {:ok, contract_call_fields} <-
-           build_contract_call_fields(
+    with {:ok, contract_call_tx} <-
+           build_contract_call_tx(
              client,
              contract_address,
              function_name,
@@ -154,8 +167,7 @@ defmodule Core.Contract do
              connection,
              privkey,
              network_id,
-             contract_call_fields,
-             :contract_call_tx
+             contract_call_tx
            ) do
       {:ok, %{return_value: return_value, return_type: return_type}}
     else
@@ -201,19 +213,18 @@ defmodule Core.Contract do
         opts \\ []
       )
       when is_binary(contract_address) and is_binary(function_name) and is_list(opts) do
-    with {:ok, contract_call_fields} <-
-           build_contract_call_fields(
+    with {:ok, contract_call_tx} <-
+           build_contract_call_tx(
              client,
              contract_address,
              function_name,
              function_args,
              opts
            ),
-         serialized_contract_call_fields =
-           Serialization.serialize(contract_call_fields, :contract_call_tx),
+         serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
          {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
          encoded_contract_call_tx =
-           Encoding.prefix_encode_base64("tx", serialized_contract_call_fields),
+           Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
          {:ok,
           %DryRunResults{
             results: [
@@ -477,23 +488,17 @@ defmodule Core.Contract do
     Encoding.prefix_encode_base58c("ct", hash)
   end
 
-  defp build_contract_call_fields(
+  defp build_contract_call_tx(
          %Client{
            keypair: %{public: pubkey},
-           connection: connection
+           connection: connection,
+           network_id: network_id
          },
          contract_address,
          function_name,
          function_args,
          opts
        ) do
-    owner_id = pubkey |> Keys.pubkey_to_binary() |> Serialization.id_to_record(:account)
-
-    contract_id =
-      contract_address
-      |> Encoding.prefix_decode_base58c()
-      |> Serialization.id_to_record(:contract)
-
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          {:ok, %ByteCode{bytecode: bytecode}} <-
            ContractApi.get_contract_code(connection, contract_address),
@@ -504,21 +509,32 @@ defmodule Core.Contract do
            type_info: type_info,
            byte_code: byte_code
          },
-         {:ok, calldata} <- create_calldata(contract, function_name, function_args) do
-      contract_call_fields = [
-        owner_id,
-        nonce,
-        contract_id,
-        @abi_version,
-        Keyword.get(opts, :fee, TransactionUtils.calculate_min_fee()),
-        Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
-        Keyword.get(opts, :amount, @default_amount),
-        Keyword.get(opts, :gas, @default_gas),
-        Keyword.get(opts, :gas_price, @default_gas_price),
-        calldata
-      ]
-
-      {:ok, contract_call_fields}
+         {:ok, calldata} <- create_calldata(contract, function_name, function_args),
+         tx_dummy_fee = %ContractCallTx{
+           caller_id: pubkey,
+           nonce: nonce,
+           contract_id: contract_address,
+           vm_version: :unused,
+           abi_version: @abi_version,
+           fee: 0,
+           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           amount: Keyword.get(opts, :amount, @default_amount),
+           gas: Keyword.get(opts, :gas, @default_gas),
+           gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
+           call_data: calldata
+         },
+         {:ok, %HeightResponse{height: height}} <-
+           ChainApi.get_current_key_block_height(connection),
+         tx = %{
+           tx_dummy_fee
+           | fee:
+               Keyword.get(
+                 opts,
+                 :fee,
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
+               )
+         } do
+      {:ok, tx}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}

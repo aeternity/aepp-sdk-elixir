@@ -16,7 +16,7 @@ Where:
  - `v2.2.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v2.2.0/config/swagger.yaml).
 
 ## Example usage
-Functions that make requests to a node require a client as their first parameter. A client can be defined like so:
+Functions that make requests to a node require a client as their first parameter. A client is defined like so:
 ```elixir
 Core.Client.new(
   %{
