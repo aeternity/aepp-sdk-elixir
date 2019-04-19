@@ -25,12 +25,8 @@ defmodule Core.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:aesophia,
-       git: "https://github.com/aeternity/aesophia.git",
-       manager: :rebar,
-       ref: "267fef3a5bb87c8ac35f125024fbfa07511f13de"},
-    {:aeternity_node, in_umbrella: true},
-    {:utils, in_umbrella: true}
+      {:aeternity_node, in_umbrella: true},
+      {:utils, in_umbrella: true}
     ]
   end
 end

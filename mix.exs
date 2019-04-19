@@ -25,7 +25,11 @@ defmodule AeppSdkElixir.MixProject do
   defp deps do
     [
       {:excoveralls, "~> 0.10", only: :test},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:aesophia,
+       git: "https://github.com/aeternity/aesophia.git",
+       manager: :rebar,
+       ref: "ef761a4c579e2d457a36aa8e377db4364e875b8f"}
     ]
   end
 
