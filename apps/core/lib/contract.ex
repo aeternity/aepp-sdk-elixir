@@ -92,7 +92,7 @@ defmodule Core.Contract do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
          {:ok, %GenericSignedTx{}} <-
@@ -491,7 +491,7 @@ defmodule Core.Contract do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          } do
       {:ok, tx}
