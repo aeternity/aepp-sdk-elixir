@@ -49,7 +49,7 @@ defmodule Core.Contract do
           {:ok, String.t()} | {:error, String.t()} | {:error, Env.t()}
   def deploy(
         %Client{
-          keypair: %{public: pubkey, secret: privkey},
+          keypair: %{public: public_key, secret: secret_key},
           network_id: network_id,
           connection: connection
         },
@@ -58,10 +58,10 @@ defmodule Core.Contract do
         opts \\ []
       )
       when is_binary(source_code) and is_list(init_args) and is_list(opts) do
-    pubkey_binary = Keys.pubkey_to_binary(pubkey)
+    public_key_binary = Keys.public_key_to_binary(public_key)
     {:ok, source_hash} = hash(source_code)
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),
          {:ok, calldata} <- create_calldata(source_code, @init_function, init_args),
          byte_code_fields = [
@@ -71,7 +71,7 @@ defmodule Core.Contract do
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
          tx_dummy_fee = %ContractCreateTx{
-           owner_id: pubkey,
+           owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
            vm_version: :unused,
@@ -98,12 +98,12 @@ defmodule Core.Contract do
          {:ok, %GenericSignedTx{}} <-
            TransactionUtils.post(
              connection,
-             privkey,
+             secret_key,
              network_id,
              tx
            ),
-         contract_pubkey = compute_contract_pubkey(pubkey_binary, nonce) do
-      {:ok, contract_pubkey}
+         contract_account = compute_contract_account(public_key_binary, nonce) do
+      {:ok, contract_account}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -134,7 +134,7 @@ defmodule Core.Contract do
           | {:error, Env.t()}
   def call(
         %Client{
-          keypair: %{secret: privkey},
+          keypair: %{secret: secret_key},
           network_id: network_id,
           connection: connection
         } = client,
@@ -158,7 +158,7 @@ defmodule Core.Contract do
          {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} <-
            TransactionUtils.post(
              connection,
-             privkey,
+             secret_key,
              network_id,
              contract_call_tx
            ) do
@@ -423,7 +423,7 @@ defmodule Core.Contract do
     end
   end
 
-  defp compute_contract_pubkey(owner_address, nonce) do
+  defp compute_contract_account(owner_address, nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)
     {:ok, hash} = hash(<<owner_address::binary, nonce_binary::binary>>)
 
@@ -432,7 +432,7 @@ defmodule Core.Contract do
 
   defp build_contract_call_tx(
          %Client{
-           keypair: %{public: pubkey},
+           keypair: %{public: public_key},
            connection: connection,
            network_id: network_id
          },
@@ -445,15 +445,15 @@ defmodule Core.Contract do
     nonce_result =
       if Keyword.has_key?(opts, :top) do
         top_block_hash = Keyword.get(opts, :top)
-        AccountUtils.nonce_at_hash(connection, pubkey, top_block_hash)
+        AccountUtils.nonce_at_hash(connection, public_key, top_block_hash)
       else
-        AccountUtils.next_valid_nonce(connection, pubkey)
+        AccountUtils.next_valid_nonce(connection, public_key)
       end
 
     with {:ok, nonce} <- nonce_result,
          {:ok, calldata} <- create_calldata(source_code, function_name, function_args),
          tx_dummy_fee = %ContractCallTx{
-           caller_id: pubkey,
+           caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
            vm_version: :unused,

@@ -376,10 +376,10 @@ defmodule Utils.SerializationUtils do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end
 
-  defp proccess_id_to_record(tx_pubkey) when is_binary(tx_pubkey) do
-    {type, pubkey} =
-      tx_pubkey
-      |> Keys.pubkey_to_binary(:with_prefix)
+  defp proccess_id_to_record(tx_public_key) when is_binary(tx_public_key) do
+    {type, public_key} =
+      tx_public_key
+      |> Keys.public_key_to_binary(:with_prefix)
 
     id =
       case type do
@@ -391,6 +391,6 @@ defmodule Utils.SerializationUtils do
         "ch_" -> :channel
       end
 
-    {:id, id, pubkey}
+    {:id, id, public_key}
   end
 end

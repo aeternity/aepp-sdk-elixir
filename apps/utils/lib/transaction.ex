@@ -53,10 +53,10 @@ defmodule Utils.Transaction do
 
   ## Examples
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+      iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
       iex> network_id = "ae_uat"
-      iex> {:ok, nonce} = Utils.Account.next_valid_nonce(connection, pubkey)
+      iex> {:ok, nonce} = Utils.Account.next_valid_nonce(connection, public_key)
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
@@ -71,7 +71,7 @@ defmodule Utils.Transaction do
       ]
       iex> serialized_wrapped_code = Utils.Serialization.serialize(byte_code_fields, :sophia_byte_code)
       iex> tx_dummy_fee = %AeternityNode.Model.ContractCreateTx{
-        owner_id: pubkey,
+        owner_id: public_key,
         nonce: nonce,
         code: serialized_wrapped_code,
         vm_version: :unused,
@@ -86,7 +86,7 @@ defmodule Utils.Transaction do
       }
       iex> {:ok, %AeternityNode.Model.InlineResponse2001{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
       iex> tx = %{tx_dummy_fee | fee: Utils.Transaction.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000}
-      iex> Utils.Transaction.post(connection, privkey, network_id, tx)
+      iex> Utils.Transaction.post(connection, secret_key, network_id, tx)
       {:ok,
        %AeternityNode.Model.GenericSignedTx{
          block_hash: "mh_29ZNDHkaa1k54Gr9HqFDJ3ubDg7Wi6yJEsfuCy9qKQEjxeHdH4",
@@ -98,13 +98,13 @@ defmodule Utils.Transaction do
   """
   @spec post(struct(), String.t(), String.t(), struct()) ::
           {:ok, ContractCallObject.t()} | {:error, String.t()} | {:error, Env.t()}
-  def post(connection, privkey, network_id, %type{} = tx) do
+  def post(connection, secret_key, network_id, %type{} = tx) do
     serialized_tx = Serialization.serialize(tx)
 
     signature =
       Keys.sign(
         serialized_tx,
-        Keys.privkey_to_binary(privkey),
+        Keys.secret_key_to_binary(secret_key),
         network_id
       )
 
@@ -140,7 +140,7 @@ defmodule Utils.Transaction do
        "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
 
   defp await_mining(connection, tx_hash, attempts, type) do
-    :timer.sleep(@await_attempt_interval)
+    Process.sleep(@await_attempt_interval)
 
     mining_status =
       case type do

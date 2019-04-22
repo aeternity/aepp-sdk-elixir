@@ -45,28 +45,28 @@ defmodule UtilsKeysTest do
 
   test "signing", setup_data do
     Enum.each(setup_data.bundled_keys, fn keys ->
-      signature = Keys.sign("message123", keys.privkey_binary)
-      assert {:ok, "message123"} == Keys.verify(signature, "message123", keys.pubkey_binary)
+      signature = Keys.sign("message123", keys.secret_key_binary)
+      assert {:ok, "message123"} == Keys.verify(signature, "message123", keys.public_key_binary)
     end)
   end
 
   test "encoding", setup_data do
     Enum.each(setup_data.bundled_keys, fn keys ->
-      assert keys.public == Keys.pubkey_from_binary(keys.pubkey_binary)
-      assert keys.secret == Keys.privkey_from_binary(keys.privkey_binary)
+      assert keys.public == Keys.public_key_from_binary(keys.public_key_binary)
+      assert keys.secret == Keys.secret_key_from_binary(keys.secret_key_binary)
     end)
   end
 
-  defp bundle_keys(%{public: pubkey, secret: privkey} = keypair) do
-    pubkey_binary = Keys.pubkey_to_binary(pubkey)
-    privkey_binary = Keys.privkey_to_binary(privkey)
+  defp bundle_keys(%{public: public_key, secret: secret_key} = keypair) do
+    public_key_binary = Keys.public_key_to_binary(public_key)
+    secret_key_binary = Keys.secret_key_to_binary(secret_key)
 
     %{
       keypair: keypair,
-      public: pubkey,
-      pubkey_binary: pubkey_binary,
-      secret: privkey,
-      privkey_binary: privkey_binary
+      public: public_key,
+      public_key_binary: public_key_binary,
+      secret: secret_key,
+      secret_key_binary: secret_key_binary
     }
   end
 end
