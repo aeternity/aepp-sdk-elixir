@@ -52,8 +52,8 @@ defmodule UtilsKeysTest do
 
   test "encoding", setup_data do
     Enum.each(setup_data.bundled_keys, fn keys ->
-      assert keys.pubkey == Keys.pubkey_from_binary(keys.pubkey_binary)
-      assert keys.privkey == Keys.privkey_from_binary(keys.privkey_binary)
+      assert keys.public == Keys.pubkey_from_binary(keys.pubkey_binary)
+      assert keys.secret == Keys.privkey_from_binary(keys.privkey_binary)
     end)
   end
 
@@ -63,9 +63,9 @@ defmodule UtilsKeysTest do
 
     %{
       keypair: keypair,
-      pubkey: pubkey,
+      public: pubkey,
       pubkey_binary: pubkey_binary,
-      privkey: privkey,
+      secret: privkey,
       privkey_binary: privkey_binary
     }
   end

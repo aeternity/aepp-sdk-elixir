@@ -32,14 +32,13 @@ Core.Client.new(
 
 **Deploy a smart contract:**
 ``` elixir
-iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+iex> keypair = Utils.Keys.generate_keypair()
 iex> network_id = "ae_uat"
 iex> url = "https://sdk-testnet.aepps.com/v2"
 iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
+iex> client = Core.Client.new(keypair, network_id, url, internal_url)
 iex> source_code = "contract Number =\n  record state = { number : int }\n  function init(x : int) =\n    { number = x }\n  function add_to_number(x : int) = state.number + x"
-iex> init_args = "42"
+iex> init_args = ["42"]
 iex> Core.Contract.deploy(client, source_code, init_args)
 {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
 ```

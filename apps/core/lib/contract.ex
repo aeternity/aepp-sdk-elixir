@@ -1,4 +1,10 @@
 defmodule Core.Contract do
+  @moduledoc """
+  Contains all contract-related functionality
+
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `Core.Client.new/4`
+  """
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
 
@@ -34,12 +40,6 @@ defmodule Core.Contract do
   Deploy a contract
 
   ## Examples
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "ae_uat"
-      iex> url = "https://sdk-testnet.aepps.com/v2"
-      iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> init_args = ["42"]
       iex> Core.Contract.deploy(client, source_code, init_args)
@@ -117,12 +117,6 @@ defmodule Core.Contract do
   Call a contract
 
   ## Examples
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "ae_uat"
-      iex> url = "https://sdk-testnet.aepps.com/v2"
-      iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "add_to_number"
@@ -179,12 +173,6 @@ defmodule Core.Contract do
   Call a contract without posting a transaction (execute off-chain)
 
   ## Examples
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "ae_uat"
-      iex> url = "https://sdk-testnet.aepps.com/v2"
-      iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "add_to_number"
@@ -262,18 +250,12 @@ defmodule Core.Contract do
   Decode a return value
 
   ## Examples
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> privkey = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "ae_uat"
-      iex> url = "https://sdk-testnet.aepps.com/v2"
-      iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> client = Core.Client.new(%{public: pubkey, secret: privkey}, network_id, url, internal_url)
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
       iex> {:ok, %{return_value: data, return_type: "ok"}} = Core.Contract.call(client, contract_address, source_code, function_name, function_args)
-        iex> data_type = "int"
+      iex> data_type = "int"
       iex> Core.Contract.decode_return_value(data_type, data)
       {:ok, 75}
   """

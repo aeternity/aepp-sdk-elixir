@@ -39,6 +39,7 @@ defmodule Utils.Encoding do
   @doc """
   Decode a base58check string to binary and remove its prefix
 
+  ## Examples
       iex> Utils.Encoding.prefix_decode_base58c("ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
       <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
   """
