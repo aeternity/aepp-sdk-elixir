@@ -2,6 +2,7 @@ defmodule Utils.Serialization do
   @moduledoc """
   Transaction serialization
   """
+  alias Utils.SerializationUtils
 
   @tag_signed_tx 11
   @tag_spend_tx 12
@@ -38,6 +39,7 @@ defmodule Utils.Serialization do
           | :spend_tx
           | :oracle_register_tx
           | :oracle_query_tx
+          | :oracle_response_tx
           | :oracle_extend_tx
           | :name_claim_tx
           | :name_preclaim_tx
@@ -47,6 +49,20 @@ defmodule Utils.Serialization do
           | :contract_create_tx
           | :contract_call_tx
           | :sophia_byte_code
+
+  @type tx_type ::
+          AeternityNode.Model.SpendTx.t()
+          | AeternityNode.Model.OracleRegisterTx.t()
+          | AeternityNode.Model.OracleRespondTx.t()
+          | AeternityNode.Model.OracleQueryTx.t()
+          | AeternityNode.Model.OracleExtendTx.t()
+          | AeternityNode.Model.NamePreclaimTx.t()
+          | AeternityNode.Model.NameClaimTx.t()
+          | AeternityNode.Model.NameRevokeTx.t()
+          | AeternityNode.Model.NameTransferTx.t()
+          | AeternityNode.Model.NameUpdateTx.t()
+          | AeternityNode.Model.ContractCreateTx.t()
+          | AeternityNode.Model.ContractCallTx.t()
 
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
@@ -92,13 +108,36 @@ defmodule Utils.Serialization do
       0, 0, 0, 33>>
   """
   @spec serialize(list(), structure_type()) :: rlp_binary()
-  def serialize(fields, type) do
-    template = serialization_template(type)
-    fields_with_keys = set_keys(fields, template, [])
-    tag = type_to_tag(type)
-    version = version(type)
+  def serialize(fields, type) when is_list(fields) do
+    process_serialize(fields, type)
+  end
 
-    :aeserialization.serialize(tag, version, template, fields_with_keys)
+  @doc """
+  Serializes a transaction to a binary.
+
+  ## Examples
+      iex> alias AeternityNode.Model.{Ttl,OracleRegisterTx}
+      iex> Utils.Serialization.serialize( %OracleRegisterTx{
+           query_format: <<"query_format">>,
+           response_format: <<"response_format">>,
+           query_fee: 10,
+           oracle_ttl: %Ttl{type: "block", value: 10},
+           account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+           nonce: 37122,
+           fee: 0,
+           ttl: 10,
+           vm_version: 0x30001,
+           abi_version: 0x30001
+         })
+       <<248, 77, 22, 1, 161, 1, 9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234,
+        251, 255, 59, 141, 224, 214, 250, 79, 248, 30, 246, 237, 55, 83, 153, 134,
+        240, 138, 216, 129, 130, 145, 2, 140, 113, 117, 101, 114, 121, 95, 102, 111,
+        ...>>
+  """
+  @spec serialize(tx_type()) :: rlp_binary()
+  def serialize(tx) do
+    {:ok, fields, type} = SerializationUtils.process_tx_fields(tx)
+    process_serialize(fields, type)
   end
 
   @doc """
@@ -150,20 +189,20 @@ defmodule Utils.Serialization do
     :aeserialization.deserialize(:sophia_byte_code, tag, version, template, payload)
   end
 
-  @doc """
-  Builds an ID record from the given binary value and type
-
-  ## Examples
-      iex> value = <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51, 91,
-      42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>
-      iex> type = :account
-      iex> Utils.Serialization.id_to_record(value, type)
-      {:id, :account,
-      <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51, 91,
-      42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>}
-  """
+  # this is the way the id record is represented in erlang
   @spec id_to_record(binary(), id_type()) :: id()
-  def id_to_record(value, type), do: {:id, type, value}
+  def id_to_record(value, type)
+      when type in [:account, :oracle, :name, :commitment, :contract, :channel],
+      do: {:id, type, value}
+
+  defp process_serialize(fields, type) do
+    template = serialization_template(type)
+    fields_with_keys = set_keys(fields, template, [])
+    tag = type_to_tag(type)
+    version = version(type)
+
+    :aeserialization.serialize(tag, version, template, fields_with_keys)
+  end
 
   defp set_keys([field | rest_fields], [{key, _type} | rest_template], fields_with_keys),
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])

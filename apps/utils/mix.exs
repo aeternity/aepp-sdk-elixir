@@ -32,8 +32,6 @@ defmodule Utils.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:aeserialization,
-       github: "aeternity/aeserialization", ref: "6dce265753af4e651f77746e77ea125145c85dd3"},
       {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
       {:erl_base58, "~> 0.0.1"}
     ]

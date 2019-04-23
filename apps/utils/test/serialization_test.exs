@@ -4,155 +4,8 @@ defmodule UtilsSerializationTest do
   alias Utils.Serialization
 
   setup_all do
-    account_id = Serialization.id_to_record(<<0::256>>, :account)
-    oracle_id = Serialization.id_to_record(<<0::256>>, :oracle)
-    commitment_id = Serialization.id_to_record(<<0::256>>, :commitment)
-    name_id = Serialization.id_to_record(<<0::256>>, :name)
-    contract_id = Serialization.id_to_record(<<0::256>>, :contract)
-
-    spend_fields = [
-      account_id,
-      account_id,
-      10,
-      10,
-      10,
-      10,
-      <<"payload">>
-    ]
-
-    oracle_register_fields = [
-      account_id,
-      10,
-      <<"query_format">>,
-      <<"response_format">>,
-      10,
-      1,
-      10,
-      10,
-      10,
-      1
-    ]
-
-    oracle_query_fields = [
-      account_id,
-      10,
-      oracle_id,
-      <<"query">>,
-      10,
-      1,
-      10,
-      1,
-      10,
-      10,
-      10
-    ]
-
-    oracle_response_fields = [
-      oracle_id,
-      10,
-      <<0::256>>,
-      <<"response">>,
-      1,
-      10,
-      10,
-      10
-    ]
-
-    oracle_extend_fields = [
-      oracle_id,
-      10,
-      1,
-      10,
-      10,
-      10
-    ]
-
-    name_claim_fields = [
-      account_id,
-      10,
-      <<"name">>,
-      10,
-      10,
-      10
-    ]
-
-    name_preclaim_fields = [
-      account_id,
-      10,
-      commitment_id,
-      10,
-      10
-    ]
-
-    name_update_fields = [
-      account_id,
-      10,
-      name_id,
-      10,
-      [{<<1>>, name_id}],
-      10,
-      10,
-      10
-    ]
-
-    name_revoke_fields = [
-      account_id,
-      10,
-      name_id,
-      10,
-      10
-    ]
-
-    name_transfer_fields = [
-      account_id,
-      10,
-      name_id,
-      account_id,
-      10,
-      10
-    ]
-
-    contract_create_fields = [
-      account_id,
-      10,
-      <<"code">>,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      <<"call data">>
-    ]
-
-    contract_call_fields = [
-      account_id,
-      10,
-      contract_id,
-      10,
-      10,
-      10,
-      10,
-      10,
-      10,
-      <<"call data">>
-    ]
-
-    [
-      spend_fields: spend_fields,
-      oracle_register_fields: oracle_register_fields,
-      oracle_query_fields: oracle_query_fields,
-      oracle_response_fields: oracle_response_fields,
-      oracle_extend_fields: oracle_extend_fields,
-      name_claim_fields: name_claim_fields,
-      name_preclaim_fields: name_preclaim_fields,
-      name_revoke_fields: name_revoke_fields,
-      name_update_fields: name_update_fields,
-      name_transfer_fields: name_transfer_fields,
-      contract_create_fields: contract_create_fields,
-      contract_call_fields: contract_call_fields
-    ]
+    Code.require_file("test_utils.ex", "./test")
+    TestUtils.get_test_data()
   end
 
   test "serialization of valid fields doesn't raise error", fields do
@@ -206,5 +59,20 @@ defmodule UtilsSerializationTest do
                      :name_update_tx
                    )
                  end
+  end
+
+  test "valid serialization of transactions", fields do
+    Serialization.serialize(fields.spend_tx)
+    Serialization.serialize(fields.oracle_register_tx)
+    Serialization.serialize(fields.oracle_respond_tx)
+    Serialization.serialize(fields.oracle_query_tx)
+    Serialization.serialize(fields.oracle_extend_tx)
+    Serialization.serialize(fields.name_pre_claim_tx)
+    Serialization.serialize(fields.name_claim_tx)
+    Serialization.serialize(fields.name_revoke_tx)
+    Serialization.serialize(fields.name_update_tx)
+    Serialization.serialize(fields.name_transfer_tx)
+    Serialization.serialize(fields.contract_create_tx)
+    Serialization.serialize(fields.contract_call_tx)
   end
 end
