@@ -33,8 +33,6 @@ defmodule Utils.Mixfile do
   defp deps do
     [
       {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
-      {:aeserialization,
-       github: "aeternity/aeserialization", ref: "6dce265753af4e651f77746e77ea125145c85dd3"},
       {:erl_base58, "~> 0.0.1"}
     ]
   end
