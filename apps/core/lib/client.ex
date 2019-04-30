@@ -54,7 +54,8 @@ defmodule Core.Client do
   """
   @spec new(keypair(), String.t(), String.t(), String.t()) :: Client.t()
   def new(%{public: public_key, secret: secret_key} = keypair, network_id, url, internal_url)
-      when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and is_binary(url) and
+      when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
+             is_binary(url) and
              is_binary(internal_url) do
     connection = Connection.new(url)
     internal_connection = Connection.new(internal_url)

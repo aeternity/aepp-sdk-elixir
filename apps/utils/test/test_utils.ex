@@ -1,5 +1,6 @@
 defmodule TestUtils do
   alias Utils.Serialization
+  alias Core.Client
 
   alias AeternityNode.Model.{
     SpendTx,
@@ -285,6 +286,22 @@ defmodule TestUtils do
       call_data: "call_data"
     }
 
+    client =
+      Client.new(
+        %{
+          public: "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT4",
+          secret:
+            "42225194122641a843a160c92bf4b466213207299e4b6cbd3388ad31445b0d83a6beceb8f376deca8122846ad08f16212220eb9372ef6e6c28a7c93986a6ad3b"
+        },
+        "ae_uat",
+        "https://sdk-testnet.aepps.com/v2",
+        "https://sdk-testnet.aepps.com/v2"
+      )
+
+    valid_pub_key = "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT4"
+    invalid_pub_key = "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT5"
+    amount = 40_000_000
+
     [
       spend_fields: spend_fields,
       oracle_register_fields: oracle_register_fields,
@@ -309,7 +326,11 @@ defmodule TestUtils do
       name_transfer_tx: name_transfer_tx,
       name_update_tx: name_update_tx,
       contract_create_tx: contract_create_tx,
-      contract_call_tx: contract_call_tx
+      contract_call_tx: contract_call_tx,
+      client: client,
+      valid_pub_key: valid_pub_key,
+      invalid_pub_key: invalid_pub_key,
+      amount: amount
     ]
   end
 end

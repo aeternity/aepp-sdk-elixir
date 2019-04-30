@@ -2,6 +2,8 @@ defmodule TransactionUtilTest do
   use ExUnit.Case
 
   alias Utils.Transaction
+  alias AeternityNode.Model.GenericSignedTx
+  alias Core.Account
 
   setup_all do
     Code.require_file("test_utils.ex", "./test")
@@ -41,5 +43,17 @@ defmodule TransactionUtilTest do
 
     assert 451_880_000_000 ==
              Transaction.calculate_min_fee(fields.contract_call_tx, 50_000, "ae_mainnet")
+  end
+
+  test "post valid spend transaction", fields do
+    assert {:ok, %GenericSignedTx{}} =
+             Account.spend(fields.client, fields.valid_pub_key, fields.amount,
+               gas_price: 1_000_000_000_000
+             )
+  end
+
+  test "post with invalid recipient_pubkey spend transaction", fields do
+    assert {:error, "Invalid tx"} ==
+             Account.spend(fields.client, fields.invalid_pub_key, fields.amount)
   end
 end

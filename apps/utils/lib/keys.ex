@@ -44,7 +44,11 @@ defmodule Utils.Keys do
   @spec generate_keypair :: keypair()
   def generate_keypair do
     %{public: binary_public_key, secret: binary_secret_key} = :enacl.sign_keypair()
-    %{public: public_key_from_binary(binary_public_key), secret: secret_key_from_binary(binary_secret_key)}
+
+    %{
+      public: public_key_from_binary(binary_public_key),
+      secret: secret_key_from_binary(binary_secret_key)
+    }
   end
 
   @doc """
@@ -76,7 +80,8 @@ defmodule Utils.Keys do
       107, 115, 155, 254, 69, 37, 68, 68, 1, 174, 95, 102, 10, 6, 14>>
   """
   @spec sign(binary(), binary(), String.t()) :: signature()
-  def sign(message, secret_key, network_id), do: :enacl.sign_detached(network_id <> message, secret_key)
+  def sign(message, secret_key, network_id),
+    do: :enacl.sign_detached(network_id <> message, secret_key)
 
   @doc """
   Verify that a message has been signed by a private key corresponding to the given public key
@@ -217,7 +222,8 @@ defmodule Utils.Keys do
       "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb"
   """
   @spec public_key_from_binary(binary()) :: public_key()
-  def public_key_from_binary(binary_public_key), do: Encoding.prefix_encode_base58c("ak", binary_public_key)
+  def public_key_from_binary(binary_public_key),
+    do: Encoding.prefix_encode_base58c("ak", binary_public_key)
 
   @doc """
   Convert a hex string private key to binary
