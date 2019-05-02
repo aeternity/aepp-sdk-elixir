@@ -299,7 +299,6 @@ defmodule TestUtils do
       )
 
     valid_pub_key = "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT4"
-    invalid_pub_key = "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT5"
     amount = 40_000_000
 
     [
@@ -329,7 +328,6 @@ defmodule TestUtils do
       contract_call_tx: contract_call_tx,
       client: client,
       valid_pub_key: valid_pub_key,
-      invalid_pub_key: invalid_pub_key,
       amount: amount
     ]
   end

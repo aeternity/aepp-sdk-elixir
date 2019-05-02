@@ -8,20 +8,16 @@ defmodule Core.Account do
   alias AeternityNode.Model.{SpendTx, InlineResponse2001}
   alias AeternityNode.Api.Chain
 
+  @default_payload ""
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
 
   @doc """
-  Builds and posts a new spend transaction.
+  Send tokens to an account.
 
   ## Examples:
 
-   iex> pubkey = "ak_2GSHayUGeqHXz2unJKpioHkXFXzjWBf3GhzVjQPdJunpBb4HT4"
-   iex> privkey = "42225194122641a843a160c92bf4b466213207299e4b6cbd3388ad31445b0d83a6beceb8f376deca8122846ad08f16212220eb9372ef6e6c28a7c93986a6ad3b"
-   iex> network_id = "ae_uat"
-   iex> url = "https://sdk-testnet.aepps.com/v2"
-   iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-   iex> client = Core.Client.new(%{pubkey: pubkey, privkey: privkey}, network_id, url, internal_url)
+   Client example can be found at: `Core.Client.new/4`
    iex> Core.Account.spend(client, pubkey, 10_000_000, 1_000_000_000_000)
       {:ok,
        %AeternityNode.Model.GenericSignedTx{
@@ -34,6 +30,10 @@ defmodule Core.Account do
 
 
   """
+  @spec spend(Client.t(), binary(), non_neg_integer(), list()) ::
+          {:ok, AeternityNode.Model.GenericSignedTx.t()}
+          | {:error, String.t()}
+          | {:error, Env.t()}
   def spend(
         %Client{
           keypair: %{
@@ -49,17 +49,17 @@ defmodule Core.Account do
       )
       when recipient_prefix in @allowed_recipient_tags and
              sender_prefix == "ak" do
-    with {:ok, spend_tx_fields} <-
+    with {:ok, spend_tx} <-
            build_spend_tx_fields(
              client,
              recipient_id,
              amount,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
-             Keyword.get(opts, :payload, ""),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
+             Keyword.get(opts, :payload, @default_payload),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
            ) do
-      Transaction.post(connection, privkey, network_id, struct(SpendTx, spend_tx_fields))
+      Transaction.post(connection, privkey, network_id, spend_tx)
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of SpendTX"}
     end
@@ -103,7 +103,7 @@ defmodule Core.Account do
         end
 
       {:ok,
-       [
+       struct(SpendTx,
          sender_id: sender_pubkey,
          recipient_id: recipient_pubkey,
          amount: amount,
@@ -111,7 +111,7 @@ defmodule Core.Account do
          ttl: ttl,
          nonce: nonce,
          payload: payload
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end

@@ -51,9 +51,4 @@ defmodule TransactionUtilTest do
                gas_price: 1_000_000_000_000
              )
   end
-
-  test "post with invalid recipient_pubkey spend transaction", fields do
-    assert {:error, "Invalid tx"} ==
-             Account.spend(fields.client, fields.invalid_pub_key, fields.amount)
-  end
 end
