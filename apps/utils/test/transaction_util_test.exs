@@ -47,8 +47,7 @@ defmodule TransactionUtilTest do
 
   test "post valid spend transaction", fields do
     assert {:ok, %GenericSignedTx{}} =
-             Account.spend(fields.client, fields.valid_pub_key, fields.amount,
-               gas_price: 1_000_000_000_000
+             Account.spend(fields.client, fields.valid_pub_key, fields.amount, 1_000_000_000_000_000
              )
   end
 end

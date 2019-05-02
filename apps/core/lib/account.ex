@@ -45,19 +45,20 @@ defmodule Core.Account do
         } = client,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
+        gas_price,
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and
-             sender_prefix == "ak" do
+             sender_prefix == "ak" and gas_price > 0 do
     with {:ok, spend_tx} <-
            build_spend_tx_fields(
              client,
              recipient_id,
              amount,
+             gas_price,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :payload, @default_payload),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+             Keyword.get(opts, :ttl, Transaction.default_ttl),
+             Keyword.get(opts, :payload, @default_payload)
            ) do
       Transaction.post(connection, privkey, network_id, spend_tx)
     else
@@ -75,10 +76,10 @@ defmodule Core.Account do
          },
          recipient_pubkey,
          amount,
+         gas_price,
          fee,
          ttl,
-         payload,
-         gas_price
+         payload
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, spend_tx} <-
