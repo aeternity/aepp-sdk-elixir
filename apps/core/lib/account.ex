@@ -5,7 +5,7 @@ defmodule Core.Account do
   alias Core.Client
   alias Utils.Transaction
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.{SpendTx, InlineResponse2001}
+  alias AeternityNode.Model.{SpendTx, InlineResponse2001, GenericSignedTx}
   alias AeternityNode.Api.Chain
 
   @default_payload ""
@@ -57,10 +57,12 @@ defmodule Core.Account do
              amount,
              gas_price,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :payload, @default_payload)
-           ) do
-      Transaction.post(connection, privkey, network_id, spend_tx)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(connection, privkey, network_id, spend_tx) do
+      {:ok, Map.from_struct(tx)}
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of SpendTX"}
     end

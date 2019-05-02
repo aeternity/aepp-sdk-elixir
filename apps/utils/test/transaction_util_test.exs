@@ -2,7 +2,6 @@ defmodule TransactionUtilTest do
   use ExUnit.Case
 
   alias Utils.Transaction
-  alias AeternityNode.Model.GenericSignedTx
   alias Core.Account
 
   setup_all do
@@ -46,8 +45,12 @@ defmodule TransactionUtilTest do
   end
 
   test "post valid spend transaction", fields do
-    assert {:ok, %GenericSignedTx{}} =
-             Account.spend(fields.client, fields.valid_pub_key, fields.amount, 1_000_000_000_000_000
+    assert {:ok, %{}} =
+             Account.spend(
+               fields.client,
+               fields.valid_pub_key,
+               fields.amount,
+               1_000_000_000_000_000
              )
   end
 end
