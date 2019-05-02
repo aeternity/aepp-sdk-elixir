@@ -97,7 +97,10 @@ defmodule Utils.Transaction do
        }}
   """
   @spec post(struct(), String.t(), String.t(), struct()) ::
-          {:ok, ContractCallObject.t()} | {:error, String.t()} | {:error, Env.t()}
+          {:ok, ContractCallObject.t()}
+          | {:ok, GenericSignedTx.t()}
+          | {:error, String.t()}
+          | {:error, Env.t()}
   def post(connection, secret_key, network_id, %type{} = tx) do
     serialized_tx = Serialization.serialize(tx)
 

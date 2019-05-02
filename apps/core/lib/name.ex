@@ -5,7 +5,8 @@ defmodule Core.Name do
     NameRevokeTx,
     NameTransferTx,
     NameUpdateTx,
-    InlineResponse2001
+    InlineResponse2001,
+    GenericSignedTx
   }
 
   alias AeternityNode.Api.Chain
@@ -14,6 +15,26 @@ defmodule Core.Name do
   alias Utils.Transaction
   @prefix_byte_size 2
 
+  @doc """
+  Preclaims a name.
+
+  ## Examples
+      iex> name = "name.test"
+      iex> name_salt = 7
+      iex> {:ok, binary_commitment_hash} = Utils.Name.commitment_hash(name, name_salt)
+      iex> commitment_hash = Utils.Encoding.prefix_encode_base58c("cm", binary_commitment_hash)
+      iex> Core.Name.preclaim client, commitment_hash, [gas_price:  1_000_000_000_000]
+      {:ok,
+       %{
+         block_hash: "mh_2aBYJJkAKWUrLgfuYMtzuwe664qcJmKTg9nZbJKJqCZCP45qXx",
+         block_height: 74520,
+         hash: "th_2sSWCChUievTNvuuZXUGr3EdKmGdDiH3GVd9au7eaTYdTSFh85",
+         signatures: ["sg_CUjN52PbibG2US2KYowbkjqEvGauPie1rqcGPagFJ9CfnzCVrFTxaedRQpyqr1zvT9oGu9WP6hqZaVp7nDW1mzcuyEqPF"],
+         tx: %AeternityNode.Model.GenericTx{type: "NamePreclaimTx", version: 1}
+       }}
+  """
+  @spec preclaim(Core.Client.t(), binary(), list()) ::
+          {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
           keypair: %{
@@ -27,25 +48,29 @@ defmodule Core.Name do
         opts \\ []
       )
       when sender_prefix == "ak" and commitment_prefix == "cm" do
-    with {:ok, preclaim_tx_fields} <-
+    with {:ok, preclaim_tx} <-
            build_preclaim_tx_fields(
              client,
              commitment_id,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             preclaim_tx
            ) do
-      Transaction.post(
-        connection,
-        privkey,
-        network_id,
-        struct(NamePreclaimTx, preclaim_tx_fields)
-      )
+      {:ok, Map.from_struct(tx)}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx"}
+      err -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx : #{inspect(err)}"}
     end
   end
 
+  @spec claim(Core.Client.t(), String.t(), integer(), list()) ::
+          {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
           keypair: %{
@@ -60,26 +85,30 @@ defmodule Core.Name do
         opts \\ []
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
-    with {:ok, claim_tx_fields} <-
+    with {:ok, claim_tx} <-
            build_claim_tx_fields(
              client,
              name,
              name_salt,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             claim_tx
            ) do
-      Transaction.post(
-        connection,
-        privkey,
-        network_id,
-        struct(NameClaimTx, claim_tx_fields)
-      )
+      {:ok, Map.from_struct(tx)}
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameClaimTx"}
     end
   end
 
+  @spec transfer(Core.Client.t(), binary(), binary(), list()) ::
+          {:error, String.t()} | {:ok, map()}
   def transfer(
         %Client{
           keypair: %{
@@ -94,26 +123,36 @@ defmodule Core.Name do
         opts \\ []
       )
       when name_prefix == "nm" and recipient_prefix == "ak" and sender_prefix == "ak" do
-    with {:ok, transfer_tx_fields} <-
+    with {:ok, transfer_tx} <-
            build_transfer_tx_fields(
              client,
              name_id,
              recipient_id,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             transfer_tx
            ) do
-      Transaction.post(
-        connection,
-        privkey,
-        network_id,
-        struct(NameTransferTx, transfer_tx_fields)
-      )
+      {:ok, Map.from_struct(tx)}
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameTransferTx"}
     end
   end
 
+  @spec update(
+          Core.Client.t(),
+          binary(),
+          integer(),
+          list(),
+          integer(),
+          list()
+        ) :: {:error, String.t()} | {:ok, map()}
   def update(
         %Client{
           keypair: %{
@@ -131,7 +170,7 @@ defmodule Core.Name do
       )
       when is_integer(name_ttl) and name_prefix == "nm" and is_integer(client_ttl) and
              is_list(pointers) and sender_prefix == "ak" do
-    with {:ok, update_tx_fields} <-
+    with {:ok, update_tx} <-
            build_update_tx_fields(
              client,
              name_id,
@@ -139,20 +178,23 @@ defmodule Core.Name do
              pointers,
              client_ttl,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             update_tx
            ) do
-      Transaction.post(
-        connection,
-        privkey,
-        network_id,
-        struct(NameUpdateTx, update_tx_fields)
-      )
+      {:ok, Map.from_struct(tx)}
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx"}
     end
   end
 
+  @spec revoke(Core.Client.t(), binary(), list()) :: {:error, String.t()} | {:ok, map()}
   def revoke(
         %Client{
           keypair: %{
@@ -162,24 +204,26 @@ defmodule Core.Name do
           network_id: network_id,
           connection: connection
         } = client,
-        name_id,
+        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
         opts \\ []
       )
-      when sender_prefix == "ak" do
-    with {:ok, revoke_tx_fields} <-
+      when sender_prefix == "ak" and name_prefix == "nm" do
+    with {:ok, revoke_tx} <-
            build_revoke_tx_fields(
              client,
              name_id,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             revoke_tx
            ) do
-      Transaction.post(
-        connection,
-        privkey,
-        network_id,
-        struct(NameRevokeTx, revoke_tx_fields)
-      )
+      {:ok, Map.from_struct(tx)}
     else
       _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameRevokeTx"}
     end
@@ -212,13 +256,13 @@ defmodule Core.Name do
         end
 
       {:ok,
-       [
+       struct(NamePreclaimTx,
          account_id: sender_pubkey,
          nonce: nonce,
          commitment_id: commitment_id,
          fee: fee,
          ttl: ttl
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end
@@ -252,14 +296,14 @@ defmodule Core.Name do
         end
 
       {:ok,
-       [
+       struct(NameClaimTx,
          account_id: sender_pubkey,
          nonce: nonce,
          name: name,
          name_salt: name_salt,
          fee: fee,
          ttl: ttl
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end
@@ -294,14 +338,14 @@ defmodule Core.Name do
         end
 
       {:ok,
-       [
+       struct(NameTransferTx,
          account_id: sender_pubkey,
          nonce: nonce,
          name_id: name_id,
          recipient_id: recipient_id,
          fee: fee,
          ttl: ttl
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end
@@ -347,7 +391,7 @@ defmodule Core.Name do
         end
 
       {:ok,
-       [
+       struct(NameUpdateTx,
          account_id: sender_pubkey,
          nonce: nonce,
          name_id: name_id,
@@ -355,7 +399,7 @@ defmodule Core.Name do
          client_ttl: client_ttl,
          fee: fee,
          ttl: ttl
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end
@@ -395,13 +439,13 @@ defmodule Core.Name do
         end
 
       {:ok,
-       [
+       struct(NameRevokeTx,
          account_id: sender_pubkey,
          nonce: nonce,
          name_id: name_id,
          fee: fee,
          ttl: ttl
-       ]}
+       )}
     else
       {:error, _info} = error -> error
     end

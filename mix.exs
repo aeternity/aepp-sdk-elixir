@@ -29,7 +29,8 @@ defmodule AeppSdkElixir.MixProject do
       {:aesophia,
        git: "https://github.com/aeternity/aesophia.git",
        manager: :rebar,
-       ref: "ef761a4c579e2d457a36aa8e377db4364e875b8f"}
+       ref: "ef761a4c579e2d457a36aa8e377db4364e875b8f"},
+       {:idna, github: "aeternity/erlang-idna", tag: "6.0.0", manager: :rebar, override: true}
     ]
   end
 
