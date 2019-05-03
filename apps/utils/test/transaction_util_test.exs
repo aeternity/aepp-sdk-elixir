@@ -50,7 +50,7 @@ defmodule TransactionUtilTest do
                fields.client,
                fields.valid_pub_key,
                fields.amount,
-               1_000_000_000_000_000
+               fee: 1_000_000_000_000_000
              )
   end
 end
