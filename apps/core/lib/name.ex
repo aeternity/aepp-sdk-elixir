@@ -1,29 +1,33 @@
 defmodule Core.Name do
+  @moduledoc """
+  Contains all name-related functionality
+
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `Core.Client.new/4`
+  """
   alias AeternityNode.Model.{
     NamePreclaimTx,
     NameClaimTx,
     NameRevokeTx,
     NameTransferTx,
     NameUpdateTx,
-    InlineResponse2001,
     GenericSignedTx
   }
 
-  alias AeternityNode.Api.Chain
   alias Core.Client
   alias Utils.Account, as: AccountUtil
   alias Utils.Transaction
+
   @prefix_byte_size 2
 
   @doc """
   Preclaims a name.
 
   ## Examples
-      iex> name = "name.test"
+      iex> name = "a123.test"
       iex> name_salt = 7
-      iex> {:ok, binary_commitment_hash} = Utils.Name.commitment_hash(name, name_salt)
-      iex> commitment_hash = Utils.Encoding.prefix_encode_base58c("cm", binary_commitment_hash)
-      iex> Core.Name.preclaim client, commitment_hash, [gas_price:  1_000_000_000_000]
+      iex> commitment_id = Utils.Name.commitment_id(client, name, name_salt)
+      iex> Core.Name.preclaim(client, commitment_id, [fee:  1_000_000_000_000_000])
       {:ok,
        %{
          block_hash: "mh_2aBYJJkAKWUrLgfuYMtzuwe664qcJmKTg9nZbJKJqCZCP45qXx",
@@ -49,12 +53,11 @@ defmodule Core.Name do
       )
       when sender_prefix == "ak" and commitment_prefix == "cm" do
     with {:ok, preclaim_tx} <-
-           build_preclaim_tx_fields(
+           build_preclaim_tx(
              client,
              commitment_id,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+             Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %GenericSignedTx{} = tx} <-
            Transaction.post(
@@ -65,10 +68,26 @@ defmodule Core.Name do
            ) do
       {:ok, Map.from_struct(tx)}
     else
-      err -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx : #{inspect(err)}"}
+      error -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx : #{inspect(error)}"}
     end
   end
 
+  @doc """
+  Claims a name.
+
+  ## Examples
+      iex> name = "a123.test"
+      iex> name_salt = 7
+      iex> Core.Name.claim(client, name, name_salt, [fee:  1_000_000_000_000_000])
+       {:ok,
+        %{
+          block_hash: "mh_7UU32yA7UFYKUXUeacuywogKgheJBmNrKCDRRXb6vqCzMrism",
+          block_height: 74932,
+          hash: "th_bRhCGSguVScR4V8KKjKiaaJPbvKthFZSB7nP2DLggyStcpQjQ",
+          signatures: ["sg_a4eaiajvEoh1ZC6cuHJLzXtfvRiVJwbnzLP5qpA8KYEgEZt6VxgXR8ZjcZGpoDDyYq5cH3LXkLDXRS4vqfu2BVEdChGJa"],
+          tx: %AeternityNode.Model.GenericTx{type: "NameClaimTx", version: 1}
+      }}
+  """
   @spec claim(Core.Client.t(), String.t(), integer(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def claim(
@@ -86,13 +105,12 @@ defmodule Core.Name do
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
     with {:ok, claim_tx} <-
-           build_claim_tx_fields(
+           build_claim_tx(
              client,
              name,
              name_salt,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+             Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %GenericSignedTx{} = tx} <-
            Transaction.post(
@@ -103,48 +121,29 @@ defmodule Core.Name do
            ) do
       {:ok, Map.from_struct(tx)}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameClaimTx"}
+      error -> {:error, "#{__MODULE__}: Unsuccessful post of NameClaimTx: #{inspect(error)} "}
     end
   end
 
-  @spec transfer(Core.Client.t(), binary(), binary(), list()) ::
-          {:error, String.t()} | {:ok, map()}
-  def transfer(
-        %Client{
-          keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
-          },
-          network_id: network_id,
-          connection: connection
-        } = client,
-        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
-        <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
-        opts \\ []
-      )
-      when name_prefix == "nm" and recipient_prefix == "ak" and sender_prefix == "ak" do
-    with {:ok, transfer_tx} <-
-           build_transfer_tx_fields(
-             client,
-             name_id,
-             recipient_id,
-             Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
-           ),
-         {:ok, %GenericSignedTx{} = tx} <-
-           Transaction.post(
-             connection,
-             privkey,
-             network_id,
-             transfer_tx
-           ) do
-      {:ok, Map.from_struct(tx)}
-    else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameTransferTx"}
-    end
-  end
+  @doc """
+  Updates a name.
 
+  ## Examples
+      iex> name = "a123.test"
+      iex> name_id = Utils.Name.get_name_id_by_name(client, name)
+      iex> name_ttl = 49_999
+      iex> pointers = []
+      iex> client_ttl = 50_000
+      iex> Core.Name.update(client, name_id, name_ttl, pointers, client_ttl, [fee:  1_000_000_000_000_000])
+       {:ok,
+        %{
+          block_hash: "mh_KaN4zRfCqsm2pKKBq7NShMQWV2Mt3sL4VPEszc7ZwJb2s7CZZ",
+          block_height: 74971,
+          hash: "th_29YCfGGaarxy322azZrYuBDZAABWrMP1CuMsAFiUDoshzXkVjc",
+          signatures: ["sg_GnAPiuQmNwwRBtY7zgoN3ihaFz5XH4KsjTzuJgViFyCkZVE3Qgvw56HfymZL4LvFxPWwmkGf3UvhzPmak1nFinFFn3yAG"],
+          tx: %AeternityNode.Model.GenericTx{type: "NameUpdateTx", version: 1}
+        }}
+  """
   @spec update(
           Core.Client.t(),
           binary(),
@@ -171,15 +170,14 @@ defmodule Core.Name do
       when is_integer(name_ttl) and name_prefix == "nm" and is_integer(client_ttl) and
              is_list(pointers) and sender_prefix == "ak" do
     with {:ok, update_tx} <-
-           build_update_tx_fields(
+           build_update_tx(
              client,
              name_id,
              name_ttl,
              pointers,
              client_ttl,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+             Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %GenericSignedTx{} = tx} <-
            Transaction.post(
@@ -190,10 +188,79 @@ defmodule Core.Name do
            ) do
       {:ok, Map.from_struct(tx)}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx"}
+      error -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx: #{inspect(error)}"}
     end
   end
 
+  @doc """
+  Transfers a name.
+
+  ## Examples
+      iex> name = "a123.test"
+      iex> name_id = Utils.Name.get_name_id_by_name(client, name)
+      iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
+      iex> Core.Name.transfer(client, name_id, recipient_key, [fee:  1_000_000_000_000_000])
+       {:ok,
+        %{
+          block_hash: "mh_mhmJEB3W8uQQsGzprNSZenC783FWAihP1miKW8qi3qDqkQAi9",
+          block_height: 74934,
+          hash: "th_XpwwJqW4S5oVLDRbgouPWo3nF1u8oon9KDmM944aKEJgr63az",
+          signatures: ["sg_P6mPiWpa7yN3N2Q4ZuXMhxaJ1YruHHAfDZAQCBkyd4MM8peeffK3mEoZp4Wuote8ZmkLSCF3fzxdZLkE1BDz2SDXYu3CX"],
+          tx: %AeternityNode.Model.GenericTx{type: "NameTransferTx", version: 1}
+        }}
+  """
+  @spec transfer(Core.Client.t(), binary(), binary(), list()) ::
+          {:error, String.t()} | {:ok, map()}
+  def transfer(
+        %Client{
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
+            secret: privkey
+          },
+          network_id: network_id,
+          connection: connection
+        } = client,
+        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
+        <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
+        opts \\ []
+      )
+      when name_prefix == "nm" and recipient_prefix == "ak" and sender_prefix == "ak" do
+    with {:ok, transfer_tx} <-
+           build_transfer_tx(
+             client,
+             name_id,
+             recipient_id,
+             Keyword.get(opts, :fee, 0),
+             Keyword.get(opts, :ttl, Transaction.default_ttl())
+           ),
+         {:ok, %GenericSignedTx{} = tx} <-
+           Transaction.post(
+             connection,
+             privkey,
+             network_id,
+             transfer_tx
+           ) do
+      {:ok, Map.from_struct(tx)}
+    else
+      error -> {:error, "#{__MODULE__}: Unsuccessful post of NameTransferTx: #{inspect(error)}"}
+    end
+  end
+
+  @doc """
+  Revokes a name.
+
+  ## Examples
+      iex> name_id = Utils.Name.get_name_id_by_name(client, "a123.test")
+      iex> Core.Name.revoke(client, name_id, [fee:  1_000_000_000_000_000])
+       {:ok,
+        %{
+          block_hash: "mh_2TeNu2CF1rjyCzk9FYqhBfBBH4LqfSvj3qx3hpKuPGrMUDGpXU",
+          block_height: 74973,
+          hash: "th_G4s1Befn1JLws54ZTSAxVidEqJ4vqVPaowzeqELf7u4DPfHks",
+          signatures: ["sg_3kPx3pDu4CFDYZQdSQ2RrNU7wFuqcB2M83u8CxHXoRnN3xHQVgnpAmQvcbHT2ANpRCxvEKRA1r2JfA9rwkC9nDcnbQUve"],
+          tx: %AeternityNode.Model.GenericTx{type: "NameRevokeTx", version: 1}
+        }}
+  """
   @spec revoke(Core.Client.t(), binary(), list()) :: {:error, String.t()} | {:ok, map()}
   def revoke(
         %Client{
@@ -209,12 +276,11 @@ defmodule Core.Name do
       )
       when sender_prefix == "ak" and name_prefix == "nm" do
     with {:ok, revoke_tx} <-
-           build_revoke_tx_fields(
+           build_revoke_tx(
              client,
              name_id,
              Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :gas_price, :minimum_protocol_gas_price)
+             Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %GenericSignedTx{} = tx} <-
            Transaction.post(
@@ -225,36 +291,22 @@ defmodule Core.Name do
            ) do
       {:ok, Map.from_struct(tx)}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of NameRevokeTx"}
+      error -> {:error, "#{__MODULE__}: Unsuccessful post of NameRevokeTx: #{inspect(error)}"}
     end
   end
 
-  defp build_preclaim_tx_fields(
+  defp build_preclaim_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           network_id: network_id,
            connection: connection
          },
          commitment_id,
          fee,
-         ttl,
-         gas_price
+         ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, preclaim_tx} <- create_preclaim_tx(commitment_id, fee, ttl, sender_pubkey, nonce),
-         {:ok, %InlineResponse2001{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      fee =
-        case gas_price do
-          :minimum_protocol_gas_price ->
-            Transaction.calculate_min_fee(preclaim_tx, height, network_id)
-
-          gas_price when gas_price > 0 ->
-            Transaction.min_gas(preclaim_tx, height) * gas_price
-        end
-
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
        struct(NamePreclaimTx,
          account_id: sender_pubkey,
@@ -268,33 +320,19 @@ defmodule Core.Name do
     end
   end
 
-  defp build_claim_tx_fields(
+  defp build_claim_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           network_id: network_id,
            connection: connection
          },
          name,
          name_salt,
          fee,
-         ttl,
-         gas_price
+         ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, claim_tx} <- create_claim_tx(name, name_salt, fee, ttl, sender_pubkey, nonce),
-         {:ok, %InlineResponse2001{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      fee =
-        case gas_price do
-          :minimum_protocol_gas_price ->
-            Transaction.calculate_min_fee(claim_tx, height, network_id)
-
-          gas_price when gas_price > 0 ->
-            Transaction.min_gas(claim_tx, height) * gas_price
-        end
-
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
        struct(NameClaimTx,
          account_id: sender_pubkey,
@@ -309,34 +347,19 @@ defmodule Core.Name do
     end
   end
 
-  defp build_transfer_tx_fields(
+  defp build_transfer_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           network_id: network_id,
            connection: connection
          },
          name_id,
          recipient_id,
          fee,
-         ttl,
-         gas_price
+         ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, transfer_tx} <-
-           create_transfer_tx(name_id, recipient_id, fee, ttl, sender_pubkey, nonce),
-         {:ok, %InlineResponse2001{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      fee =
-        case gas_price do
-          :minimum_protocol_gas_price ->
-            Transaction.calculate_min_fee(transfer_tx, height, network_id)
-
-          gas_price when gas_price > 0 ->
-            Transaction.min_gas(transfer_tx, height) * gas_price
-        end
-
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
        struct(NameTransferTx,
          account_id: sender_pubkey,
@@ -351,12 +374,11 @@ defmodule Core.Name do
     end
   end
 
-  defp build_update_tx_fields(
+  defp build_update_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           network_id: network_id,
            connection: connection
          },
          name_id,
@@ -364,38 +386,16 @@ defmodule Core.Name do
          pointers,
          client_ttl,
          fee,
-         ttl,
-         gas_price
+         ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, update_tx} <-
-           create_update_tx(
-             name_id,
-             name_ttl,
-             pointers,
-             client_ttl,
-             fee,
-             ttl,
-             sender_pubkey,
-             nonce
-           ),
-         {:ok, %InlineResponse2001{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      fee =
-        case gas_price do
-          :minimum_protocol_gas_price ->
-            Transaction.calculate_min_fee(update_tx, height, network_id)
-
-          gas_price when gas_price > 0 ->
-            Transaction.min_gas(update_tx, height) * gas_price
-        end
-
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
        struct(NameUpdateTx,
          account_id: sender_pubkey,
          nonce: nonce,
          name_id: name_id,
          pointers: pointers,
+         name_ttl: name_ttl,
          client_ttl: client_ttl,
          fee: fee,
          ttl: ttl
@@ -405,39 +405,18 @@ defmodule Core.Name do
     end
   end
 
-  defp build_revoke_tx_fields(
+  defp build_revoke_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           network_id: network_id,
            connection: connection
          },
          name_id,
          fee,
-         ttl,
-         gas_price
+         ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, revoke_tx} <-
-           create_revoke_tx(
-             name_id,
-             fee,
-             ttl,
-             sender_pubkey,
-             nonce
-           ),
-         {:ok, %InlineResponse2001{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      fee =
-        case gas_price do
-          :minimum_protocol_gas_price ->
-            Transaction.calculate_min_fee(revoke_tx, height, network_id)
-
-          gas_price when gas_price > 0 ->
-            Transaction.min_gas(revoke_tx, height) * gas_price
-        end
-
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
        struct(NameRevokeTx,
          account_id: sender_pubkey,
@@ -449,100 +428,5 @@ defmodule Core.Name do
     else
       {:error, _info} = error -> error
     end
-  end
-
-  defp create_preclaim_tx(
-         commitment_id,
-         fee,
-         ttl,
-         account_id,
-         nonce
-       ) do
-    {:ok,
-     %NamePreclaimTx{
-       commitment_id: commitment_id,
-       fee: fee,
-       ttl: ttl,
-       account_id: account_id,
-       nonce: nonce
-     }}
-  end
-
-  defp create_claim_tx(
-         name,
-         name_salt,
-         fee,
-         ttl,
-         account_id,
-         nonce
-       ) do
-    {:ok,
-     %NameClaimTx{
-       name: name,
-       name_salt: name_salt,
-       fee: fee,
-       ttl: ttl,
-       account_id: account_id,
-       nonce: nonce
-     }}
-  end
-
-  defp create_transfer_tx(
-         name_id,
-         recipient_id,
-         fee,
-         ttl,
-         account_id,
-         nonce
-       ) do
-    {:ok,
-     %NameTransferTx{
-       name_id: name_id,
-       recipient_id: recipient_id,
-       fee: fee,
-       ttl: ttl,
-       account_id: account_id,
-       nonce: nonce
-     }}
-  end
-
-  defp create_update_tx(
-         name_id,
-         name_ttl,
-         pointers,
-         client_ttl,
-         fee,
-         ttl,
-         account_id,
-         nonce
-       ) do
-    {:ok,
-     %NameUpdateTx{
-       name_id: name_id,
-       name_ttl: name_ttl,
-       pointers: pointers,
-       client_ttl: client_ttl,
-       fee: fee,
-       ttl: ttl,
-       account_id: account_id,
-       nonce: nonce
-     }}
-  end
-
-  defp create_revoke_tx(
-         name_id,
-         fee,
-         ttl,
-         account_id,
-         nonce
-       ) do
-    {:ok,
-     %NameRevokeTx{
-       name_id: name_id,
-       fee: fee,
-       ttl: ttl,
-       account_id: account_id,
-       nonce: nonce
-     }}
   end
 end
