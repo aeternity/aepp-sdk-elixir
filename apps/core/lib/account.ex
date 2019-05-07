@@ -4,8 +4,9 @@ defmodule Core.Account do
   """
   alias Core.Client
   alias Utils.Transaction
+  alias AeternityNode.Api.Chain
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.{SpendTx, GenericSignedTx}
+  alias AeternityNode.Model.{SpendTx, GenericSignedTx, InlineResponse2001}
 
   @default_payload ""
   @prefix_byte_size 2
@@ -68,7 +69,9 @@ defmodule Core.Account do
            keypair: %{
              public: sender_pubkey
            },
-           connection: connection
+           connection: connection,
+           gas_price: gas_price,
+           network_id: network_id
          },
          recipient_pubkey,
          amount,
@@ -76,19 +79,35 @@ defmodule Core.Account do
          ttl,
          payload
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(SpendTx,
-         sender_id: sender_pubkey,
-         recipient_id: recipient_pubkey,
-         amount: amount,
-         fee: fee,
-         ttl: ttl,
-         nonce: nonce,
-         payload: payload
-       )}
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      spend_tx =
+        struct(SpendTx,
+          sender_id: sender_pubkey,
+          recipient_id: recipient_pubkey,
+          amount: amount,
+          fee: fee,
+          ttl: ttl,
+          nonce: nonce,
+          payload: payload
+        )
+
+      {:ok, %{spend_tx | fee: calculate_fee(spend_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
+  end
+
+  defp calculate_fee(spend_tx, height, network_id, 0, 0) do
+    Transaction.calculate_min_fee(spend_tx, height, network_id)
+  end
+
+  defp calculate_fee(spend_tx, height, _network_id, 0, gas_price) do
+    Transaction.min_gas(spend_tx, height) * gas_price
+  end
+
+  defp calculate_fee(_spend_tx, _height, _network_id, fee, _gas_price) do
+    fee
   end
 end

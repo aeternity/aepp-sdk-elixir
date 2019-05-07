@@ -44,13 +44,22 @@ defmodule TransactionUtilTest do
              Transaction.calculate_min_fee(fields.contract_call_tx, 50_000, "ae_mainnet")
   end
 
-  test "post valid spend transaction", fields do
+  test "post valid spend transaction by given fee", fields do
     assert {:ok, %{}} =
              Account.spend(
                fields.client,
                fields.valid_pub_key,
                fields.amount,
                fee: 1_000_000_000_000_000
+             )
+  end
+
+  test "post valid spend transaction by given gas price", fields do
+    assert {:ok, %{}} =
+             Account.spend(
+               %{fields.client | gas_price: 1_000_000_000_000},
+               fields.valid_pub_key,
+               fields.amount
              )
   end
 end
