@@ -1,5 +1,6 @@
-defmodule Core.Name do
+defmodule Core.AENS do
   @moduledoc """
+  Aeternity Naming System: https://github.com/aeternity/protocol/blob/master/AENS.md
   Contains all name-related functionality
 
   In order for its functions to be used, a client must be defined first.
@@ -13,10 +14,12 @@ defmodule Core.Name do
     NameUpdateTx,
     GenericSignedTx,
     CommitmentId,
-    NameEntry
+    NameEntry,
+    InlineResponse2001
   }
 
   alias AeternityNode.Api.NameService
+  alias AeternityNode.Api.Chain
   alias Core.Client
   alias Utils.Account, as: AccountUtil
   alias Utils.Transaction
@@ -29,8 +32,7 @@ defmodule Core.Name do
   ## Examples
       iex> name = "a123.test"
       iex> name_salt = 7
-      iex> commitment_id = Core.Name.commitment_id(client, name, name_salt)
-      iex> Core.Name.preclaim(client, commitment_id, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.preclaim(client, name, name_salt, [fee:  1_000_000_000_000_000])
       {:ok,
        %{
          block_hash: "mh_2aBYJJkAKWUrLgfuYMtzuwe664qcJmKTg9nZbJKJqCZCP45qXx",
@@ -40,7 +42,7 @@ defmodule Core.Name do
          tx: %AeternityNode.Model.GenericTx{type: "NamePreclaimTx", version: 1}
        }}
   """
-  @spec preclaim(Core.Client.t(), binary(), list()) ::
+  @spec preclaim(Client.t(), String.t(), non_neg_integer(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
@@ -51,11 +53,14 @@ defmodule Core.Name do
           network_id: network_id,
           connection: connection
         } = client,
-        <<commitment_prefix::binary-size(@prefix_byte_size), _::binary>> = commitment_id,
+        name,
+        name_salt,
         opts \\ []
       )
-      when sender_prefix == "ak" and commitment_prefix == "cm" do
-    with {:ok, preclaim_tx} <-
+      when sender_prefix == "ak" do
+    with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
+           NameService.get_commitment_id(connection, name, name_salt),
+         {:ok, preclaim_tx} <-
            build_preclaim_tx(
              client,
              commitment_id,
@@ -81,7 +86,7 @@ defmodule Core.Name do
   ## Examples
       iex> name = "a123.test"
       iex> name_salt = 7
-      iex> Core.Name.claim(client, name, name_salt, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.claim(client, name, name_salt, [fee:  1_000_000_000_000_000])
        {:ok,
         %{
           block_hash: "mh_7UU32yA7UFYKUXUeacuywogKgheJBmNrKCDRRXb6vqCzMrism",
@@ -91,7 +96,7 @@ defmodule Core.Name do
           tx: %AeternityNode.Model.GenericTx{type: "NameClaimTx", version: 1}
       }}
   """
-  @spec claim(Core.Client.t(), String.t(), integer(), list()) ::
+  @spec claim(Client.t(), String.t(), integer(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
@@ -133,11 +138,10 @@ defmodule Core.Name do
 
   ## Examples
       iex> name = "a123.test"
-      iex> name_id = Utils.Name.get_name_id_by_name(client, name)
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> Core.Name.update(client, name_id, name_ttl, pointers, client_ttl, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.update(client, name, name_ttl, pointers, client_ttl, [fee:  1_000_000_000_000_000])
        {:ok,
         %{
           block_hash: "mh_KaN4zRfCqsm2pKKBq7NShMQWV2Mt3sL4VPEszc7ZwJb2s7CZZ",
@@ -147,9 +151,10 @@ defmodule Core.Name do
           tx: %AeternityNode.Model.GenericTx{type: "NameUpdateTx", version: 1}
         }}
   """
+
   @spec update(
-          Core.Client.t(),
-          binary(),
+          Client.t(),
+          String.t(),
           integer(),
           list(),
           integer(),
@@ -164,15 +169,16 @@ defmodule Core.Name do
           network_id: network_id,
           connection: connection
         } = client,
-        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
+        name,
         name_ttl,
         pointers,
         client_ttl,
-        opts \\ []
+        opts
       )
-      when is_integer(name_ttl) and name_prefix == "nm" and is_integer(client_ttl) and
+      when is_integer(name_ttl) and is_integer(client_ttl) and
              is_list(pointers) and sender_prefix == "ak" do
-    with {:ok, update_tx} <-
+    with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
+         {:ok, update_tx} <-
            build_update_tx(
              client,
              name_id,
@@ -200,9 +206,8 @@ defmodule Core.Name do
 
   ## Examples
       iex> name = "a123.test"
-      iex> name_id = Utils.Name.get_name_id_by_name(client, name)
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> Core.Name.transfer(client, name_id, recipient_key, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.transfer(client, name, recipient_key, [fee:  1_000_000_000_000_000])
        {:ok,
         %{
           block_hash: "mh_mhmJEB3W8uQQsGzprNSZenC783FWAihP1miKW8qi3qDqkQAi9",
@@ -212,7 +217,7 @@ defmodule Core.Name do
           tx: %AeternityNode.Model.GenericTx{type: "NameTransferTx", version: 1}
         }}
   """
-  @spec transfer(Core.Client.t(), binary(), binary(), list()) ::
+  @spec transfer(Client.t(), String.t(), binary(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def transfer(
         %Client{
@@ -223,12 +228,13 @@ defmodule Core.Name do
           network_id: network_id,
           connection: connection
         } = client,
-        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
+        name,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         opts \\ []
       )
-      when name_prefix == "nm" and recipient_prefix == "ak" and sender_prefix == "ak" do
-    with {:ok, transfer_tx} <-
+      when recipient_prefix == "ak" and sender_prefix == "ak" do
+    with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
+         {:ok, transfer_tx} <-
            build_transfer_tx(
              client,
              name_id,
@@ -253,8 +259,8 @@ defmodule Core.Name do
   Revokes a name.
 
   ## Examples
-      iex> name_id = Utils.Name.get_name_id_by_name(client, "a123.test")
-      iex> Core.Name.revoke(client, name_id, [fee:  1_000_000_000_000_000])
+      iex> name = "a123.test"
+      iex> Core.AENS.revoke(client, name, [fee:  1_000_000_000_000_000])
        {:ok,
         %{
           block_hash: "mh_2TeNu2CF1rjyCzk9FYqhBfBBH4LqfSvj3qx3hpKuPGrMUDGpXU",
@@ -264,7 +270,7 @@ defmodule Core.Name do
           tx: %AeternityNode.Model.GenericTx{type: "NameRevokeTx", version: 1}
         }}
   """
-  @spec revoke(Core.Client.t(), binary(), list()) :: {:error, String.t()} | {:ok, map()}
+  @spec revoke(Client.t(), String.t(), list()) :: {:error, String.t()} | {:ok, map()}
   def revoke(
         %Client{
           keypair: %{
@@ -274,11 +280,12 @@ defmodule Core.Name do
           network_id: network_id,
           connection: connection
         } = client,
-        <<name_prefix::binary-size(@prefix_byte_size), _::binary>> = name_id,
+        name,
         opts \\ []
       )
-      when sender_prefix == "ak" and name_prefix == "nm" do
-    with {:ok, revoke_tx} <-
+      when sender_prefix == "ak" do
+    with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
+         {:ok, revoke_tx} <-
            build_revoke_tx(
              client,
              name_id,
@@ -298,57 +305,32 @@ defmodule Core.Name do
     end
   end
 
-  @doc """
-  Creates name commitment hash .
-
-  ## Examples
-      iex> Core.Name.commitment_id(client, "a123.test", 7)
-      "cm_2rxmhXWBzjsXTsLfxYK5dqGxKzcJphSijJ3TVHe23mVWYJZhTY"
-  """
-  @spec commitment_id(Client.t(), String.t(), integer()) :: String.t() | {:error, String.t()}
-  def commitment_id(%Client{connection: connection}, name, name_salt)
-      when is_binary(name) and is_integer(name_salt) do
-    case NameService.get_commitment_id(connection, name, name_salt) do
-      {:ok, %CommitmentId{commitment_id: commitment_id}} -> commitment_id
-      error -> error
-    end
-  end
-
-  @doc """
-  Lookups the information about the given name.
-
-  ## Examples
-      iex> Core.Name.get_name_id_by_name(client, "a123.test")
-      {:ok, %AeternityNode.Model.Error{reason: "Name revoked"}}
-  """
-  @spec get_name_id_by_name(Client.t(), String.t()) :: String.t() | {:error, String.t()}
-  def get_name_id_by_name(%Client{connection: connection}, name) when is_binary(name) do
-    case NameService.get_name_entry_by_name(connection, name) do
-      {:ok, %NameEntry{id: id}} -> id
-      error -> error
-    end
-  end
-
   defp build_preclaim_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
            },
-           connection: connection
+           connection: connection,
+           gas_price: gas_price,
+           network_id: network_id
          },
          commitment_id,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(NamePreclaimTx,
-         account_id: sender_pubkey,
-         nonce: nonce,
-         commitment_id: commitment_id,
-         fee: fee,
-         ttl: ttl
-       )}
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      preclaim_tx =
+        struct(NamePreclaimTx,
+          account_id: sender_pubkey,
+          nonce: nonce,
+          commitment_id: commitment_id,
+          fee: fee,
+          ttl: ttl
+        )
+
+      {:ok, %{preclaim_tx | fee: calculate_fee(preclaim_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -359,23 +341,29 @@ defmodule Core.Name do
            keypair: %{
              public: sender_pubkey
            },
-           connection: connection
+           connection: connection,
+           gas_price: gas_price,
+           network_id: network_id
          },
          name,
          name_salt,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(NameClaimTx,
-         account_id: sender_pubkey,
-         nonce: nonce,
-         name: name,
-         name_salt: name_salt,
-         fee: fee,
-         ttl: ttl
-       )}
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      claim_tx =
+        struct(NameClaimTx,
+          account_id: sender_pubkey,
+          nonce: nonce,
+          name: name,
+          name_salt: name_salt,
+          fee: fee,
+          ttl: ttl
+        )
+
+      {:ok, %{claim_tx | fee: calculate_fee(claim_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -386,6 +374,8 @@ defmodule Core.Name do
            keypair: %{
              public: sender_pubkey
            },
+           gas_price: gas_price,
+           network_id: network_id,
            connection: connection
          },
          name_id,
@@ -393,16 +383,20 @@ defmodule Core.Name do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(NameTransferTx,
-         account_id: sender_pubkey,
-         nonce: nonce,
-         name_id: name_id,
-         recipient_id: recipient_id,
-         fee: fee,
-         ttl: ttl
-       )}
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      transfer_tx =
+        struct(NameTransferTx,
+          account_id: sender_pubkey,
+          nonce: nonce,
+          name_id: name_id,
+          recipient_id: recipient_id,
+          fee: fee,
+          ttl: ttl
+        )
+
+      {:ok, %{transfer_tx | fee: calculate_fee(transfer_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -413,6 +407,8 @@ defmodule Core.Name do
            keypair: %{
              public: sender_pubkey
            },
+           gas_price: gas_price,
+           network_id: network_id,
            connection: connection
          },
          name_id,
@@ -422,18 +418,23 @@ defmodule Core.Name do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      name_update_tx =
+        struct(NameUpdateTx,
+          account_id: sender_pubkey,
+          nonce: nonce,
+          name_id: name_id,
+          pointers: pointers,
+          name_ttl: name_ttl,
+          client_ttl: client_ttl,
+          fee: fee,
+          ttl: ttl
+        )
+
       {:ok,
-       struct(NameUpdateTx,
-         account_id: sender_pubkey,
-         nonce: nonce,
-         name_id: name_id,
-         pointers: pointers,
-         name_ttl: name_ttl,
-         client_ttl: client_ttl,
-         fee: fee,
-         ttl: ttl
-       )}
+       %{name_update_tx | fee: calculate_fee(name_update_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -444,23 +445,41 @@ defmodule Core.Name do
            keypair: %{
              public: sender_pubkey
            },
+           gas_price: gas_price,
+           network_id: network_id,
            connection: connection
          },
          name_id,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(NameRevokeTx,
-         account_id: sender_pubkey,
-         nonce: nonce,
-         name_id: name_id,
-         fee: fee,
-         ttl: ttl
-       )}
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %InlineResponse2001{height: height}} <-
+           Chain.get_current_key_block_height(connection) do
+      revoke_tx =
+        struct(NameRevokeTx,
+          account_id: sender_pubkey,
+          nonce: nonce,
+          name_id: name_id,
+          fee: fee,
+          ttl: ttl
+        )
+
+      {:ok, %{revoke_tx | fee: calculate_fee(revoke_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
+  end
+
+  defp calculate_fee(spend_tx, height, network_id, 0, 0) do
+    Transaction.calculate_min_fee(spend_tx, height, network_id)
+  end
+
+  defp calculate_fee(spend_tx, height, _network_id, 0, gas_price) do
+    Transaction.min_gas(spend_tx, height) * gas_price
+  end
+
+  defp calculate_fee(_spend_tx, _height, _network_id, fee, _gas_price) do
+    fee
   end
 end
