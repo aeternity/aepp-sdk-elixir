@@ -15,6 +15,39 @@ env:
     - LIBSODIUM_VER=1.0.16
 
 before_install: 
+  - bash <(curl -s https://raw.githubusercontent.com/aeternity/installer/v2.0.0/install.sh)
+  - mkdir -p $HOME/.epoch/epoch/
+  - touch $HOME/.epoch/epoch/epoch.yaml
+  - echo "
+    ---
+     peers:
+         - "aenode://pp_2i8N6XsjCGe1wkdMhDRs7t7xzijrjJDN4xA22RoNGCgt6ay9QB@31.13.249.70:3011" # wrong port
+     fork_management:
+         network_id: "my_test" 
+     chain:
+         persist: true
+     http:
+         external:
+           port: 3013
+         internal:
+           port: 3113
+           listen_address: 0.0.0.0
+           debug_endpoints: true
+     mining:
+         autostart: true
+         expected_mine_rate: 100
+         # Public key of beneficiary account that will receive fees from mining on a node.
+         beneficiary: "ak_JV5aveau3CmasD5UfA1WanyJD9BRAow8315sdgcSRYTKUnrkk"
+         cuckoo:
+             miner:
+                 # Use the fast executable binary of the miner.
+                 executable: mean15-generic
+                 # Extra arguments to pass to the miner executable binary.
+                 extra_args: "-t 1"
+                 # Use the smaller graph for faster mining
+                 edge_bits: 15
+    "  >> $HOME/.epoch/epoch/epoch.yaml
+  - $HOME/aeternity/node/bin/aeternity start
   - git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.1
   - echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bashrc
   - echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.bashrc
