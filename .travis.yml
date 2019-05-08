@@ -1,5 +1,5 @@
 dist: xenial
-sudo: false
+sudo: true
 
 language: elixir
 elixir: '1.8'
