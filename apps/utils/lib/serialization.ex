@@ -121,7 +121,7 @@ defmodule Utils.Serialization do
            query_format: <<"query_format">>,
            response_format: <<"response_format">>,
            query_fee: 10,
-           oracle_ttl: %Ttl{type: "block", value: 10},
+           oracle_ttl: %Ttl{type: :absolute, value: 10},
            account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
            nonce: 37122,
            fee: 0,

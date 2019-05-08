@@ -3,9 +3,9 @@ defmodule Core.Account do
    High-level module for Account-related activities.
   """
   alias Core.Client
-  alias Utils.Transaction
+  alias Utils.{Transaction, Encoding}
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.{SpendTx, GenericSignedTx}
+  alias AeternityNode.Model.SpendTx
 
   @default_payload ""
   @prefix_byte_size 2
@@ -22,13 +22,16 @@ defmodule Core.Account do
         %{
           block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
           block_height: 74871,
-          hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4",
-          signatures: ["sg_YTdAtWjFX7Mr6yaRacLRkAh77nTc6Nimed11qWEZwrfEWsyJxeeWz3UtRmAx5cmsmjGFFB8axo3SJzDHHYfKCFnLzsqQq"],
-          tx: %AeternityNode.Model.GenericTx{type: "SpendTx", version: 1}
+          tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
         }}
   """
   @spec spend(Client.t(), binary(), non_neg_integer(), list()) ::
-          {:ok, AeternityNode.Model.GenericSignedTx.t()}
+          {:ok,
+           %{
+             block_hash: Encoding.base58c(),
+             block_height: non_neg_integer(),
+             tx_hash: Encoding.base58c()
+           }}
           | {:error, String.t()}
           | {:error, Env.t()}
   def spend(
@@ -44,8 +47,7 @@ defmodule Core.Account do
         amount,
         opts \\ []
       )
-      when recipient_prefix in @allowed_recipient_tags and
-             sender_prefix == "ak" do
+      when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     with {:ok, spend_tx} <-
            build_spend_tx_fields(
              client,
@@ -55,11 +57,10 @@ defmodule Core.Account do
              Keyword.get(opts, :ttl, Transaction.default_ttl()),
              Keyword.get(opts, :payload, @default_payload)
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
-           Transaction.post(connection, privkey, network_id, spend_tx) do
-      {:ok, Map.from_struct(tx)}
+         {:ok, response} <- Transaction.post(connection, privkey, network_id, spend_tx) do
+      {:ok, response}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of SpendTX"}
+      {:error, _} = err -> err
     end
   end
 
@@ -78,7 +79,8 @@ defmodule Core.Account do
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
       {:ok,
-       struct(SpendTx,
+       struct(
+         SpendTx,
          sender_id: sender_pubkey,
          recipient_id: recipient_pubkey,
          amount: amount,

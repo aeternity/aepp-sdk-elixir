@@ -37,7 +37,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(
@@ -88,7 +88,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(
@@ -114,7 +114,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call_static(
@@ -140,7 +140,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(

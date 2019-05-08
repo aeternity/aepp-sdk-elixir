@@ -96,7 +96,7 @@ defmodule Utils.Transaction do
   """
   @spec post(struct(), String.t(), String.t(), struct()) ::
           {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
-  def post(connection, privkey, network_id, %type{} = tx) do
+  def post(connection, secret_key, network_id, %type{} = tx) do
     serialized_tx = Serialization.serialize(tx)
 
     signature =
@@ -157,7 +157,7 @@ defmodule Utils.Transaction do
         {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
       {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
-        %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash} =
+        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
 
         {:ok,

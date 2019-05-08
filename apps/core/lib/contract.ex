@@ -45,7 +45,15 @@ defmodule Core.Contract do
       {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
   """
   @spec deploy(Client.t(), String.t(), list(String.t()), list()) ::
-          {:ok, String.t()} | {:error, String.t()} | {:error, Env.t()}
+          {:ok,
+           %{
+             block_hash: Encoding.base58c(),
+             block_height: non_neg_integer(),
+             tx_hash: Encoding.base58c(),
+             contract_id: Encoding.base58c()
+           }}
+          | {:error, String.t()}
+          | {:error, Env.t()}
   def deploy(
         %Client{
           keypair: %{public: public_key, secret: secret_key},
@@ -58,7 +66,7 @@ defmodule Core.Contract do
       )
       when is_binary(source_code) and is_list(init_args) and is_list(opts) do
     public_key_binary = Keys.public_key_to_binary(public_key)
-    {:ok, source_hash} = hash(source_code)
+    {:ok, source_hash} = Hash.hash(source_code)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),
@@ -102,7 +110,7 @@ defmodule Core.Contract do
              tx
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok, contract_account}
+      {:ok, Map.put(response, :contract_id, contract_account)}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -128,7 +136,14 @@ defmodule Core.Contract do
         }}
   """
   @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
-          {:ok, %{return_value: String.t(), return_type: String.t()}}
+          {:ok,
+           %{
+             block_hash: Encoding.base58c(),
+             block_height: non_neg_integer(),
+             tx_hash: Encoding.base58c(),
+             return_value: String.t(),
+             return_type: String.t()
+           }}
           | {:error, String.t()}
           | {:error, Env.t()}
   def call(

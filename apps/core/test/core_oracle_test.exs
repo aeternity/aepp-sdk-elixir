@@ -7,9 +7,9 @@ defmodule CoreOracleTest do
     client =
       Client.new(
         %{
-          public: "ak_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM",
+          public: "ak_Rro7GgyG3gJ7Tsu4k4YvZ45P1GtNfMyRX4Xfv8VWDjbvLDphN",
           secret:
-            "303ef8fb879e9ef8e4f13f0d964d48f64a7f4591c2402901e87dce9a99fd018007845806798e4eaa6cdfb4e5400675b0ebca5d1f806bae3e7ae1633d38efc5cd"
+            "57f62f3f370e34f93c0cd4d25d1c83287de75b9a6008a31cf02ec7c379d8e5f43871c06a8f08eaf7e79ba4d7633668ffbeb2f4745aef75f2c9775e714856f088"
         },
         "ae_uat",
         "https://sdk-testnet.aepps.com/v2",
@@ -19,7 +19,7 @@ defmodule CoreOracleTest do
     [client: client]
   end
 
-  test "register oracle", setup_data do
+  test "register, query, respond, extend oracle", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
       Oracle.register(

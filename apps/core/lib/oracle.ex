@@ -217,6 +217,7 @@ defmodule Core.Oracle do
 
   ## Examples
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
+      iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
       iex> query_ttl = %{type: :relative, value: 10}
       iex> response_ttl = 10
@@ -438,8 +439,8 @@ defmodule Core.Oracle do
   end
 
   defp calculate_query_id(sender, nonce, oracle_id) do
-    binary_sender = Keys.pubkey_to_binary(sender)
-    binary_oracle_id = Keys.pubkey_to_binary(oracle_id)
+    binary_sender = Keys.public_key_to_binary(sender)
+    binary_oracle_id = Keys.public_key_to_binary(oracle_id)
 
     {:ok, hash} =
       Hash.hash(<<binary_sender::binary, nonce::@nonce_size, binary_oracle_id::binary>>)
