@@ -1,0 +1,27 @@
+---
+peers:
+    - "aenode://pp_2i8N6XsjCGe1wkdMhDRs7t7xzijrjJDN4xA22RoNGCgt6ay9QB@31.13.249.70:3011" # wrong port
+fork_management:
+    network_id: "my_test" 
+chain:
+    persist: true
+http:
+    external:
+      port: 3013
+    internal:
+      port: 3113
+      listen_address: 0.0.0.0
+      debug_endpoints: true
+mining:
+    autostart: true
+    expected_mine_rate: 100
+    # Public key of beneficiary account that will receive fees from mining on a node.
+    beneficiary: "ak_JV5aveau3CmasD5UfA1WanyJD9BRAow8315sdgcSRYTKUnrkk"
+    cuckoo:
+        miner:
+            # Use the fast executable binary of the miner.
+            executable: mean15-generic
+            # Extra arguments to pass to the miner executable binary.
+            extra_args: "-t 1"
+            # Use the smaller graph for faster mining
+            edge_bits: 15
