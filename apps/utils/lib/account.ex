@@ -12,14 +12,14 @@ defmodule Utils.Account do
 
   ## Examples
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> Utils.Account.next_valid_nonce(connection, pubkey)
+      iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> Utils.Account.next_valid_nonce(connection, public_key)
       {:ok, 8544}
   """
-  @spec next_valid_nonce(Env.t(), String.t()) ::
+  @spec next_valid_nonce(Tesla.Client.t(), String.t()) ::
           {:ok, integer()} | {:error, String.t()} | {:error, Env.t()}
-  def next_valid_nonce(connection, pubkey) do
-    response = AccountApi.get_account_by_pubkey(connection, pubkey)
+  def next_valid_nonce(connection, public_key) do
+    response = AccountApi.get_account_by_pubkey(connection, public_key)
 
     prepare_result(response)
   end
@@ -29,15 +29,15 @@ defmodule Utils.Account do
 
   ## Examples
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-      iex> Utils.Account.nonce_at_hash(connection, pubkey, block_hash)
+      iex> Utils.Account.nonce_at_hash(connection, public_key, block_hash)
       {:ok, 8327}
   """
-  @spec nonce_at_hash(Env.t(), String.t(), String.t()) ::
+  @spec nonce_at_hash(Tesla.Client.t(), String.t(), String.t()) ::
           {:ok, integer()} | {:error, String.t()} | {:error, Env.t()}
-  def nonce_at_hash(connection, pubkey, block_hash) do
-    response = AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash)
+  def nonce_at_hash(connection, public_key, block_hash) do
+    response = AccountApi.get_account_by_pubkey_and_hash(connection, public_key, block_hash)
 
     prepare_result(response)
   end

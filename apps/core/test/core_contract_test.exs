@@ -27,13 +27,27 @@ defmodule CoreContractTest do
   end
 
   test "create, call, call static and decode contract", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, ["42"])
+    deploy_result =
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
+        fee: 10_000_000_000_000_000
+      )
+
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
 
     call_result =
-      Contract.call(setup_data.client, ct_address, setup_data.source_code, "add_to_number", ["33"])
+      Contract.call(
+        setup_data.client,
+        ct_address,
+        setup_data.source_code,
+        "add_to_number",
+        ["33"],
+        fee: 10_000_000_000_000_000
+      )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
@@ -43,7 +57,8 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "add_to_number",
-        ["33"]
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)
@@ -55,12 +70,22 @@ defmodule CoreContractTest do
 
   test "create invalid contract", setup_data do
     invalid_source_code = String.replace(setup_data.source_code, "x : int", "x : list(int)")
-    deploy_result = Contract.deploy(setup_data.client, invalid_source_code, ["42"])
+
+    deploy_result =
+      Contract.deploy(setup_data.client, invalid_source_code, ["42"], fee: 10_000_000_000_000_000)
+
     assert match?({:error, _}, deploy_result)
   end
 
   test "call non-existent function", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, ["42"])
+    deploy_result =
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
+        fee: 10_000_000_000_000_000
+      )
+
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
@@ -71,14 +96,22 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "non_existing_function",
-        ["33"]
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:error, _}, call_result)
   end
 
   test "call static non-existent function", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, ["42"])
+    deploy_result =
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
+        fee: 10_000_000_000_000_000
+      )
+
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
@@ -89,20 +122,35 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "non_existing_function",
-        ["33"]
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:error, _}, call_result)
   end
 
   test "decode data wrong type", setup_data do
-    deploy_result = Contract.deploy(setup_data.client, setup_data.source_code, ["42"])
+    deploy_result =
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
+        fee: 10_000_000_000_000_000
+      )
+
     assert match?({:ok, _}, deploy_result)
 
     {:ok, ct_address} = deploy_result
 
     call_result =
-      Contract.call(setup_data.client, ct_address, setup_data.source_code, "add_to_number", ["33"])
+      Contract.call(
+        setup_data.client,
+        ct_address,
+        setup_data.source_code,
+        "add_to_number",
+        ["33"],
+        fee: 10_000_000_000_000_000
+      )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
