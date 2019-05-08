@@ -19,7 +19,6 @@ before_install:
   - sudo apt install wget
   - wget https://github.com/aeternity/aeternity/releases/download/v2.5.0/aeternity-2.5.0-ubuntu-x86_64.tar.gz
   - tar -xvf aeternity-2.5.0-ubuntu-x86_64.tar.gz
-  - ./bin/aeternity start
   - git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.1
   - echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bashrc
   - echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.bashrc
@@ -50,6 +49,7 @@ install:
   - "[ -z $LIBSODIUM_NEW ] || (mix deps.compile enacl)"
 
 script:
+  - ./bin/aeternity start
   - mix format --check-formatted
   - mix compile --warnings-as-errors
   - mix compile.xref --warnings-as-errors
