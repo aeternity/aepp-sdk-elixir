@@ -16,7 +16,7 @@ mining:
     autostart: true
     expected_mine_rate: 100
     # Public key of beneficiary account that will receive fees from mining on a node.
-    beneficiary: "ak_JV5aveau3CmasD5UfA1WanyJD9BRAow8315sdgcSRYTKUnrkk"
+    beneficiary: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
     cuckoo:
         miner:
             # Use the fast executable binary of the miner.
