@@ -4,7 +4,7 @@ peers:
 fork_management:
     network_id: "my_test" 
 chain:
-    persist: true
+    persist: false
 http:
     external:
       port: 3013
