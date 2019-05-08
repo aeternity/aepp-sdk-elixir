@@ -3,7 +3,7 @@ defmodule Utils.SerializationUtils do
   Serialization helper module.
   """
 
-  alias Utils.Keys
+  alias Utils.{Encoding, Keys}
 
   alias AeternityNode.Model.{
     SpendTx,
@@ -126,12 +126,13 @@ defmodule Utils.SerializationUtils do
         nonce: nonce
       }) do
     oracle_id = proccess_id_to_record(tx_oracle_id)
+    binary_query_id = Encoding.prefix_decode_base58c(query_id)
 
     {:ok,
      [
        oracle_id,
        nonce,
-       query_id,
+       binary_query_id,
        response,
        # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_response_tx.erl#L48
        0,

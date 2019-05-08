@@ -4,7 +4,6 @@ defmodule Core.Contract do
 
   alias AeternityNode.Model.{
     ContractCallObject,
-    GenericSignedTx,
     ContractCallTx,
     ContractCreateTx,
     DryRunInput,
@@ -19,6 +18,7 @@ defmodule Core.Contract do
   alias Utils.Account, as: AccountUtils
   alias Utils.Chain, as: ChainUtils
   alias Utils.Transaction, as: TransactionUtils
+  alias Utils.Hash
   alias Core.Client
   alias Tesla.Env
 
@@ -28,7 +28,6 @@ defmodule Core.Contract do
   @default_gas_price 1_000_000_000
   @init_function "init"
   @abi_version 0x01
-  @hash_bytes 32
 
   @doc """
   Deploy a contract
@@ -59,7 +58,7 @@ defmodule Core.Contract do
       )
       when is_binary(source_code) and is_list(init_args) and is_list(opts) do
     pubkey_binary = Keys.pubkey_to_binary(pubkey)
-    {:ok, source_hash} = hash(source_code)
+    {:ok, source_hash} = Hash.hash(source_code)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),
@@ -95,7 +94,7 @@ defmodule Core.Contract do
                  TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
-         {:ok, %GenericSignedTx{}} <-
+         {:ok, response} <-
            TransactionUtils.post(
              connection,
              privkey,
@@ -103,7 +102,7 @@ defmodule Core.Contract do
              tx
            ),
          contract_pubkey = compute_contract_pubkey(pubkey_binary, nonce) do
-      {:ok, contract_pubkey}
+      {:ok, Map.put(response, :contract_address, contract_pubkey)}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -161,14 +160,14 @@ defmodule Core.Contract do
              function_args,
              opts
            ),
-         {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} <-
+         {:ok, response} <-
            TransactionUtils.post(
              connection,
              privkey,
              network_id,
              contract_call_tx
            ) do
-      {:ok, %{return_value: return_value, return_type: return_type}}
+      {:ok, response}
     else
       {:error, _} = error ->
         error
@@ -443,7 +442,7 @@ defmodule Core.Contract do
 
   defp compute_contract_pubkey(owner_address, nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)
-    {:ok, hash} = hash(<<owner_address::binary, nonce_binary::binary>>)
+    {:ok, hash} = Hash.hash(<<owner_address::binary, nonce_binary::binary>>)
 
     Encoding.prefix_encode_base58c("ct", hash)
   end
@@ -505,9 +504,5 @@ defmodule Core.Contract do
       {:error, _} = error ->
         error
     end
-  end
-
-  defp hash(payload) do
-    :enacl.generichash(@hash_bytes, payload)
   end
 end

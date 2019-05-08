@@ -137,16 +137,14 @@ defmodule Utils.Transaction do
       }
       iex> Utils.Transaction.post(connection, privkey, network_id, tx)
       {:ok,
-       %AeternityNode.Model.GenericSignedTx{
+       %{
          block_hash: "mh_29ZNDHkaa1k54Gr9HqFDJ3ubDg7Wi6yJEsfuCy9qKQEjxeHdH4",
          block_height: 68240,
-         hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j",
-         signatures: ["sg_44yKiQRQ3NdDnAKiSJ7RDW9ku31GiiB5DmEXXNv4zYFYMzgkrujoLi2cmfHutXppucr7NaTpLkHBsjrXT54ekb4MGCKGX"],
-         tx: %AeternityNode.Model.GenericTx{type: "ContractCreateTx", version: 1}
+         hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j"
        }}
   """
   @spec post(struct(), String.t(), String.t(), struct()) ::
-          {:ok, ContractCallObject.t()} | {:error, String.t()} | {:error, Env.t()}
+          {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def post(connection, privkey, network_id, %type{} = tx) do
     serialized_tx = Serialization.serialize(tx)
 
@@ -204,11 +202,21 @@ defmodule Utils.Transaction do
       {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
         await_mining(connection, tx_hash, attempts - 1, type)
 
-      {:ok, %GenericSignedTx{}} = response ->
-        response
+      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
+        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
-      {:ok, %ContractCallObject{}} = response ->
-        response
+      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
+        %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash} =
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+
+        {:ok,
+         %{
+           block_hash: block_hash,
+           block_height: block_height,
+           tx_hash: tx_hash,
+           return_value: return_value,
+           return_type: return_type
+         }}
 
       {:ok, %Error{}} ->
         await_mining(connection, tx_hash, attempts - 1, type)

@@ -1,6 +1,7 @@
 defmodule Utils.Encoding do
   @moduledoc """
-  Contains encoding/decoding utils
+  Contains encoding/decoding utils,
+  see: https://github.com/aeternity/protocol/blob/a1474c275ad36d1699378924e07bed7f5eb102be/node/api/api_encoding.md
   """
 
   @checksum_bytes 4
