@@ -449,12 +449,13 @@ defmodule Core.Oracle do
   end
 
   defp sophia_type_to_binary(type) do
-    case type |> String.to_charlist() |> :aeso_compiler.sophia_type_to_typerep() do
-      {:ok, typerep} ->
-        {:ok, :aeb_heap.to_binary(typerep)}
+    charlist_type = String.to_charlist(type)
 
-      {:error, _} ->
-        {:error, "Bad Sophia type: #{type}"}
+    try do
+      {:ok, typerep} = :aeso_compiler.sophia_type_to_typerep(charlist_type)
+      {:ok, :aeb_heap.to_binary(typerep)}
+    rescue
+      _ -> {:error, "Bad Sophia type: #{type}"}
     end
   end
 

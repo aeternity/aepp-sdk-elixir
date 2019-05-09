@@ -7,9 +7,9 @@ defmodule CoreOracleTest do
     client =
       Client.new(
         %{
-          public: "ak_Rro7GgyG3gJ7Tsu4k4YvZ45P1GtNfMyRX4Xfv8VWDjbvLDphN",
+          public: "ak_2BiD4FJmm75NHTcPpmrmyQv1LsqXbShqw8aMiZVhhK7TswbLd2",
           secret:
-            "57f62f3f370e34f93c0cd4d25d1c83287de75b9a6008a31cf02ec7c379d8e5f43871c06a8f08eaf7e79ba4d7633668ffbeb2f4745aef75f2c9775e714856f088"
+            "6c4e21d09e4c4f5b68fe154a6248cce16583e7f4693a24a13734f99cf2e57f999c03fb2aaf3948cf01c44053c38545b2c0d849accad48faa7f743b013710ec50"
         },
         "ae_uat",
         "https://sdk-testnet.aepps.com/v2",
@@ -19,7 +19,7 @@ defmodule CoreOracleTest do
     [client: client]
   end
 
-  test "register, query, respond, extend oracle", setup_data do
+  test "register, query, respond, extend, get oracle", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
       Oracle.register(
@@ -56,5 +56,67 @@ defmodule CoreOracleTest do
            )
 
     assert match?({:ok, _}, Oracle.extend(setup_data.client, oracle_id, 10))
+
+    assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
+  end
+
+  test "register oracle with bad formats", setup_data do
+    assert match?(
+             {:error, "Bad Sophia type: bad format"},
+             Oracle.register(
+               setup_data.client,
+               "bad format",
+               "bad format",
+               %{type: :relative, value: 30},
+               30
+             )
+           )
+  end
+
+  test "query non-existent oracle", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.query(
+               setup_data.client,
+               "ok_123",
+               "a query",
+               %{type: :relative, value: 10},
+               10
+             )
+           )
+  end
+
+  test "respond to non-existent query", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.respond(
+               setup_data.client,
+               String.replace_prefix(setup_data.client.keypair.public, "ak", "ok"),
+               String.replace_prefix(setup_data.client.keypair.public, "ak", "oq"),
+               %{"b" => 2},
+               10
+             )
+           )
+  end
+
+  test "extend non-existent oracle", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.extend(
+               setup_data.client,
+               "ok_Aro7GgyG3gJ7Tsu4k4YvZ45P1GtNfMyRX4Xfv8VWDjbvLDphN",
+               10
+             )
+           )
+  end
+
+  test "get non-existent oracle", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.get_oracle(
+               setup_data.client,
+               "ok_Aro7GgyG3gJ7Tsu4k4YvZ45P1GtNfMyRX4Xfv8VWDjbvLDphN"
+             )
+           )
   end
 end
