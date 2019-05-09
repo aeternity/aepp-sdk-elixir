@@ -173,7 +173,7 @@ defmodule Core.AENS do
         name_ttl,
         pointers,
         client_ttl,
-        opts
+        opts \\ []
       )
       when is_integer(name_ttl) and is_integer(client_ttl) and
              is_list(pointers) and sender_prefix == "ak" do
