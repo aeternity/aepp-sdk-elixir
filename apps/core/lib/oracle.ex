@@ -106,7 +106,7 @@ defmodule Core.Oracle do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
          {:ok, response} <-
@@ -192,7 +192,7 @@ defmodule Core.Oracle do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
          {:ok, response} <-
@@ -278,7 +278,7 @@ defmodule Core.Oracle do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
          {:ok, response} <-
@@ -344,7 +344,7 @@ defmodule Core.Oracle do
                Keyword.get(
                  opts,
                  :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000
+                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
                )
          },
          {:ok, response} <-
