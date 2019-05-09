@@ -32,7 +32,7 @@ before_install:
   - asdf global java oracle-8.141
   - mix local.rebar --force
   - mix local.hex --force 
-  - mix build_api v1.0.0-elixir v2.2.0 
+  - mix build_api v1.0.0-elixir v${AETERNITY_VERSION} 
   - mix deps.get
   - mix clean
   

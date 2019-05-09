@@ -14,7 +14,8 @@ http:
       debug_endpoints: true
 mining:
     autostart: true
-    expected_mine_rate: 100
+    expected_mine_rate: 1000
+    beneficiary_reward_delay: 2
     # Public key of beneficiary account that will receive fees from mining on a node.
     beneficiary: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
     cuckoo:
