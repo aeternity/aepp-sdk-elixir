@@ -7,19 +7,19 @@ defmodule CoreOracleTest do
     client =
       Client.new(
         %{
-          public: "ak_Qsto9j1HqiigTvVzYb74MgktHYystCZvQwtjLw85jJu3VrXu9",
+          public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
           secret:
-            "31a17b6c9d6dfaee7c382ea467cd1367bd973d495645a499e6dfb7c55bcf0cd736377a264cf6175cae1a7767558041add576d562e24572075cb069682b30e155"
+            "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
-        "ae_uat",
-        "https://sdk-testnet.aepps.com/v2",
-        "https://sdk-testnet.aepps.com/v2"
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
       )
 
     [client: client]
   end
 
-  @tag :skip
+  @tag :travis_test
   test "register, query, respond, extend, get oracle", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
@@ -67,7 +67,7 @@ defmodule CoreOracleTest do
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
   end
 
-  @tag :skip
+  @tag :travis_test
   test "register oracle with bad formats", setup_data do
     assert match?(
              {:error, "Bad Sophia type: bad format"},
@@ -82,7 +82,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :skip
+  @tag :travis_test
   test "query non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -97,7 +97,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :skip
+  @tag :travis_test
   test "respond to non-existent query", setup_data do
     assert match?(
              {:error, _},
@@ -112,7 +112,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :skip
+  @tag :travis_test
   test "extend non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -125,7 +125,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :skip
+  @tag :travis_test
   test "get non-existent oracle", setup_data do
     assert match?(
              {:error, _},
