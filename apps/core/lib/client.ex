@@ -56,13 +56,13 @@ defmodule Core.Client do
         network_id: "ae_uat"
       }
   """
-  @spec new(keypair(), String.t(), String.t(), String.t(), keyword()) :: Client.t()
+  @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()
   def new(
         %{public: public_key, secret: secret_key} = keypair,
         network_id,
         url,
         internal_url,
-        opts \\ []
+        gas_price \\ 0
       )
       when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
              is_binary(url) and
@@ -75,7 +75,7 @@ defmodule Core.Client do
       network_id: network_id,
       connection: connection,
       internal_connection: internal_connection,
-      gas_price: Keyword.get(opts, :gas_price, @default_gas_price)
+      gas_price: gas_price
     }
   end
 end
