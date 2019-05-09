@@ -62,7 +62,7 @@ defmodule Core.Client do
         network_id,
         url,
         internal_url,
-        gas_price \\ 0
+        gas_price \\ @default_gas_price
       )
       when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
              is_binary(url) and
