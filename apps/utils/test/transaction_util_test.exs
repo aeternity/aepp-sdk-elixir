@@ -44,6 +44,8 @@ defmodule TransactionUtilTest do
              Transaction.calculate_min_fee(fields.contract_call_tx, 50_000, "ae_mainnet")
   end
 
+
+  @tag :travis_test
   test "post valid spend transaction by given fee", fields do
     assert {:ok, %{}} =
              Account.spend(
