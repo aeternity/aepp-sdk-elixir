@@ -19,6 +19,7 @@ defmodule CoreOracleTest do
     [client: client]
   end
 
+  @tag :skip
   test "register, query, respond, extend, get oracle", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
@@ -66,6 +67,7 @@ defmodule CoreOracleTest do
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
   end
 
+  @tag :skip
   test "register oracle with bad formats", setup_data do
     assert match?(
              {:error, "Bad Sophia type: bad format"},
@@ -80,6 +82,7 @@ defmodule CoreOracleTest do
            )
   end
 
+  @tag :skip
   test "query non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -94,6 +97,7 @@ defmodule CoreOracleTest do
            )
   end
 
+  @tag :skip
   test "respond to non-existent query", setup_data do
     assert match?(
              {:error, _},
@@ -108,6 +112,7 @@ defmodule CoreOracleTest do
            )
   end
 
+  @tag :skip
   test "extend non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -120,6 +125,7 @@ defmodule CoreOracleTest do
            )
   end
 
+  @tag :skip
   test "get non-existent oracle", setup_data do
     assert match?(
              {:error, _},
