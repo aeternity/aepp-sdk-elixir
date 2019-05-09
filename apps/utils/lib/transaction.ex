@@ -42,6 +42,20 @@ defmodule Utils.Transaction do
     ContractCreateTx
   ]
 
+  @type tx_types ::
+          SpendTx.t()
+          | OracleRegisterTx.t()
+          | OracleQueryTx.t()
+          | OracleRespondTx.t()
+          | OracleExtendTx.t()
+          | NamePreclaimTx.t()
+          | NameClaimTx.t()
+          | NameTransferTx.t()
+          | NameRevokeTx.t()
+          | NameUpdateTx.t()
+          | ContractCallTx.t()
+          | ContractCreateTx.t()
+
   @network_id_list ["ae_mainnet", "ae_uat"]
 
   @await_attempts 25
@@ -131,6 +145,42 @@ defmodule Utils.Transaction do
       {:error, _} = error ->
         error
     end
+  end
+
+  @doc """
+  Calculate the fee of the transaction.
+
+  ## Examples
+      iex> spend_tx = %AeternityNode.Model.SpendTx{
+        amount: 40000000,
+        fee: 0,
+        nonce: 10624,
+        payload: "",
+        recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+        sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+        ttl: 0
+        }
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 0)
+      16660000000
+  """
+  @spec calculate_fee(
+          tx_types(),
+          non_neg_integer(),
+          String.t(),
+          non_neg_integer(),
+          non_neg_integer()
+        ) ::
+          non_neg_integer()
+  def calculate_fee(tx, height, network_id, 0, 0) do
+    calculate_min_fee(tx, height, network_id)
+  end
+
+  def calculate_fee(tx, height, _network_id, 0, gas_price) do
+    min_gas(tx, height) * gas_price
+  end
+
+  def calculate_fee(_tx, _height, _network_id, fee, _gas_price) do
+    fee
   end
 
   defp await_mining(connection, tx_hash, type) do

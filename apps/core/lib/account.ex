@@ -48,7 +48,7 @@ defmodule Core.Account do
       when recipient_prefix in @allowed_recipient_tags and
              sender_prefix == "ak" do
     with {:ok, spend_tx} <-
-           build_spend_tx_fields(
+           build_spend_tx(
              client,
              recipient_id,
              amount,
@@ -64,7 +64,7 @@ defmodule Core.Account do
     end
   end
 
-  defp build_spend_tx_fields(
+  defp build_spend_tx(
          %Client{
            keypair: %{
              public: sender_pubkey
@@ -93,21 +93,10 @@ defmodule Core.Account do
           payload: payload
         )
 
-      {:ok, %{spend_tx | fee: calculate_fee(spend_tx, height, network_id, fee, gas_price)}}
+      {:ok,
+       %{spend_tx | fee: Transaction.calculate_fee(spend_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
-  end
-
-  defp calculate_fee(spend_tx, height, network_id, 0, 0) do
-    Transaction.calculate_min_fee(spend_tx, height, network_id)
-  end
-
-  defp calculate_fee(spend_tx, height, _network_id, 0, gas_price) do
-    Transaction.min_gas(spend_tx, height) * gas_price
-  end
-
-  defp calculate_fee(_spend_tx, _height, _network_id, fee, _gas_price) do
-    fee
   end
 end
