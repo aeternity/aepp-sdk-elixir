@@ -4,7 +4,15 @@ defmodule Core.Client do
   alias __MODULE__
   alias AeternityNode.Connection
 
-  defstruct [:keypair, :network_id, :connection, :internal_connection, gas_price: 0]
+  @default_gas_price 0
+
+  defstruct [
+    :keypair,
+    :network_id,
+    :connection,
+    :internal_connection,
+    gas_price: @default_gas_price
+  ]
 
   @type t :: %Client{
           keypair: keypair(),
@@ -18,8 +26,6 @@ defmodule Core.Client do
 
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
-
-  @default_gas_price 0
 
   @doc """
   Client constructor
