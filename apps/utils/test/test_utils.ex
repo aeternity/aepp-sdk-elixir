@@ -169,7 +169,7 @@ defmodule TestUtils do
       query_format: <<"query_format">>,
       response_format: <<"response_format">>,
       query_fee: 10,
-      oracle_ttl: %Ttl{type: "block", value: 10},
+      oracle_ttl: %Ttl{type: :absolute, value: 10},
       account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 37122,
       fee: 0,
@@ -179,9 +179,9 @@ defmodule TestUtils do
     }
 
     oracle_respond_tx = %OracleRespondTx{
-      query_id: <<"query_id">>,
+      query_id: "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq",
       response: <<"response_format">>,
-      response_ttl: %RelativeTtl{type: "delta", value: 10},
+      response_ttl: %RelativeTtl{type: :relative, value: 10},
       fee: 0,
       ttl: 10,
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
@@ -192,7 +192,7 @@ defmodule TestUtils do
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       query: <<"query">>,
       query_fee: 10,
-      query_ttl: %Ttl{type: "delta", value: 10},
+      query_ttl: %Ttl{type: :relative, value: 10},
       response_ttl: %RelativeTtl{type: "delta", value: 10},
       fee: 0,
       ttl: 10,
@@ -202,7 +202,7 @@ defmodule TestUtils do
 
     oracle_extend_tx = %OracleExtendTx{
       fee: 0,
-      oracle_ttl: %RelativeTtl{type: "delta", value: 10},
+      oracle_ttl: %RelativeTtl{type: :relative, value: 10},
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0,
       ttl: 0
