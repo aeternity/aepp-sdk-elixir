@@ -103,19 +103,14 @@ defmodule Utils.Transaction do
       iex> tx = %{tx_dummy_fee | fee: Utils.Transaction.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000}
       iex> Utils.Transaction.post(connection, secret_key, network_id, tx)
       {:ok,
-       %AeternityNode.Model.GenericSignedTx{
+       %{
          block_hash: "mh_29ZNDHkaa1k54Gr9HqFDJ3ubDg7Wi6yJEsfuCy9qKQEjxeHdH4",
          block_height: 68240,
-         hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j",
-         signatures: ["sg_44yKiQRQ3NdDnAKiSJ7RDW9ku31GiiB5DmEXXNv4zYFYMzgkrujoLi2cmfHutXppucr7NaTpLkHBsjrXT54ekb4MGCKGX"],
-         tx: %AeternityNode.Model.GenericTx{type: "ContractCreateTx", version: 1}
+         hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j"
        }}
   """
   @spec post(struct(), String.t(), String.t(), struct()) ::
-          {:ok, ContractCallObject.t()}
-          | {:ok, GenericSignedTx.t()}
-          | {:error, String.t()}
-          | {:error, Env.t()}
+          {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def post(connection, secret_key, network_id, %type{} = tx) do
     serialized_tx = Serialization.serialize(tx)
 
@@ -205,11 +200,21 @@ defmodule Utils.Transaction do
       {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
         await_mining(connection, tx_hash, attempts - 1, type)
 
-      {:ok, %GenericSignedTx{}} = response ->
-        response
+      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
+        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
-      {:ok, %ContractCallObject{}} = response ->
-        response
+      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
+        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+
+        {:ok,
+         %{
+           block_hash: block_hash,
+           block_height: block_height,
+           tx_hash: tx_hash,
+           return_value: return_value,
+           return_type: return_type
+         }}
 
       {:ok, %Error{}} ->
         await_mining(connection, tx_hash, attempts - 1, type)
@@ -291,7 +296,7 @@ defmodule Utils.Transaction do
               account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
               fee: 0,
               nonce: 37122,
-              oracle_ttl: %AeternityNode.Model.Ttl{type: "block", value: 10},
+              oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
               query_fee: 10,
               query_format: "query_format",
               response_format: "response_format",
@@ -305,7 +310,7 @@ defmodule Utils.Transaction do
   @spec gas_limit(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
   def gas_limit(%OracleRegisterTx{oracle_ttl: oracle_ttl} = tx, height) do
     case ttl_delta(height, {oracle_ttl.type, oracle_ttl.value}) do
-      {"delta", _d} = ttl ->
+      {:relative, _d} = ttl ->
         Governance.tx_base_gas(tx) +
           byte_size(Serialization.serialize(tx)) * Governance.byte_gas() + state_gas(tx, ttl)
 
@@ -316,7 +321,7 @@ defmodule Utils.Transaction do
 
   def gas_limit(%OracleExtendTx{oracle_ttl: oracle_ttl} = tx, height) do
     case ttl_delta(height, {oracle_ttl.type, oracle_ttl.value}) do
-      {"delta", _d} = ttl ->
+      {:relative, _d} = ttl ->
         Governance.tx_base_gas(tx) +
           byte_size(Serialization.serialize(tx)) * Governance.byte_gas() + state_gas(tx, ttl)
 
@@ -327,7 +332,7 @@ defmodule Utils.Transaction do
 
   def gas_limit(%OracleQueryTx{query_ttl: query_ttl} = tx, height) do
     case ttl_delta(height, {query_ttl.type, query_ttl.value}) do
-      {"delta", _d} = ttl ->
+      {:relative, _d} = ttl ->
         Governance.tx_base_gas(tx) +
           byte_size(Serialization.serialize(tx)) * Governance.byte_gas() + state_gas(tx, ttl)
 
@@ -338,7 +343,7 @@ defmodule Utils.Transaction do
 
   def gas_limit(%OracleRespondTx{response_ttl: response_ttl} = tx, height) do
     case ttl_delta(height, {response_ttl.type, response_ttl.value}) do
-      {"delta", _d} = ttl ->
+      {:relative, _d} = ttl ->
         Governance.tx_base_gas(tx) +
           byte_size(Serialization.serialize(tx)) * Governance.byte_gas() + state_gas(tx, ttl)
 
@@ -372,29 +377,29 @@ defmodule Utils.Transaction do
     {:error, "#{__MODULE__} Invalid #{inspect(tx)} and/or height #{inspect(height)}"}
   end
 
-  defp ttl_delta(_height, {"delta", _value} = ttl) do
-    {"delta", oracle_ttl_delta(0, ttl)}
+  defp ttl_delta(_height, {:relative, _value} = ttl) do
+    {:relative, oracle_ttl_delta(0, ttl)}
   end
 
-  defp ttl_delta(height, {"block", _value} = ttl) do
+  defp ttl_delta(height, {:absolute, _value} = ttl) do
     case oracle_ttl_delta(height, ttl) do
       ttl_delta when is_integer(ttl_delta) ->
-        {"delta", ttl_delta}
+        {:relative, ttl_delta}
 
       {:error, _reason} = err ->
         err
     end
   end
 
-  defp oracle_ttl_delta(_current_height, {"delta", d}), do: d
+  defp oracle_ttl_delta(_current_height, {:relative, d}), do: d
 
-  defp oracle_ttl_delta(current_height, {"block", h}) when h > current_height,
+  defp oracle_ttl_delta(current_height, {:absolute, h}) when h > current_height,
     do: h - current_height
 
-  defp oracle_ttl_delta(_current_height, {"block", _}),
+  defp oracle_ttl_delta(_current_height, {:absolute, _}),
     do: {:error, "#{__MODULE__} Too low height"}
 
-  defp state_gas(tx, {"delta", ttl}) do
+  defp state_gas(tx, {:relative, ttl}) do
     tx
     |> Governance.state_gas_per_block()
     |> Governance.state_gas(ttl)

@@ -34,6 +34,7 @@ defmodule Utils.Mixfile do
     [
       {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
       {:erl_base58, "~> 0.0.1"}
+      # {:jsx, github: "talentdeficit/jsx", manager: :rebar}
     ]
   end
 end
