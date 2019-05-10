@@ -62,7 +62,6 @@ defmodule Utils.Transaction do
   @await_attempt_interval 200
   @default_ttl 0
   @default_fee 0
-  @default_gas_price 0
 
   @doc """
   Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID and post it to the node
@@ -173,10 +172,6 @@ defmodule Utils.Transaction do
           non_neg_integer()
         ) ::
           non_neg_integer()
-  def calculate_fee(tx, height, network_id, @default_fee, @default_gas_price) do
-    calculate_min_fee(tx, height, network_id)
-  end
-
   def calculate_fee(tx, height, _network_id, @default_fee, gas_price) do
     min_gas(tx, height) * gas_price
   end

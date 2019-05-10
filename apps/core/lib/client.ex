@@ -4,7 +4,7 @@ defmodule Core.Client do
   alias __MODULE__
   alias AeternityNode.Connection
 
-  @default_gas_price 0
+  @default_gas_price 1_000_000
 
   defstruct [
     :keypair,
