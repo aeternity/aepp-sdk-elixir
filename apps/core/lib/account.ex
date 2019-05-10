@@ -6,7 +6,7 @@ defmodule Core.Account do
   alias Utils.Transaction
   alias AeternityNode.Api.Chain
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.{SpendTx, GenericSignedTx, InlineResponse2001}
+  alias AeternityNode.Model.{SpendTx, GenericSignedTx}
 
   @default_payload ""
   @prefix_byte_size 2
@@ -80,7 +80,7 @@ defmodule Core.Account do
          payload
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       spend_tx =
         struct(SpendTx,
