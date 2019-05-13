@@ -37,66 +37,37 @@ defmodule Core.Account do
   def spend(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id,
             secret: privkey
           },
           network_id: network_id,
-          connection: connection
-        } = client,
+          connection: connection,
+          gas_price: gas_price
+        },
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
-    with {:ok, spend_tx} <-
-           build_spend_tx(
-             client,
-             recipient_id,
-             amount,
-             Keyword.get(opts, :fee, Transaction.default_fee()),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :payload, Transaction.default_payload())
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         %SpendTx{fee: fee} = spend_tx <-
+           struct(SpendTx,
+             sender_id: sender_id,
+             recipient_id: recipient_id,
+             amount: amount,
+             fee: Keyword.get(opts, :fee, Transaction.dummy_fee()),
+             ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+             nonce: nonce,
+             payload: Keyword.get(opts, :payload, Transaction.default_payload())
            ),
-         {:ok, response} <- Transaction.post(connection, privkey, network_id, spend_tx) do
+         fee when is_integer(fee) <-
+           Transaction.calculate_fee(spend_tx, height, network_id, fee, gas_price),
+         {:ok, response} <-
+           Transaction.post(connection, privkey, network_id, %{spend_tx | fee: fee}) do
       {:ok, response}
     else
       {:error, _} = err -> err
-    end
-  end
-
-  defp build_spend_tx(
-         %Client{
-           keypair: %{
-             public: sender_pubkey
-           },
-           connection: connection,
-           gas_price: gas_price,
-           network_id: network_id
-         },
-         recipient_pubkey,
-         amount,
-         fee,
-         ttl,
-         payload
-       ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
-      spend_tx =
-        struct(SpendTx,
-          sender_id: sender_pubkey,
-          recipient_id: recipient_pubkey,
-          amount: amount,
-          fee: fee,
-          ttl: ttl,
-          nonce: nonce,
-          payload: payload
-        )
-
-      {:ok,
-       %{spend_tx | fee: Transaction.calculate_fee(spend_tx, height, network_id, fee, gas_price)}}
-    else
-      {:error, _info} = error -> error
     end
   end
 end

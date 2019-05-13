@@ -61,7 +61,7 @@ defmodule Utils.Transaction do
   @await_attempts 25
   @await_attempt_interval 200
   @default_ttl 0
-  @default_fee :default_fee
+  @dummy_fee 0
   @default_payload ""
 
   @doc """
@@ -168,7 +168,7 @@ defmodule Utils.Transaction do
           non_neg_integer()
         ) ::
           non_neg_integer()
-  def calculate_fee(tx, height, _network_id, @default_fee, gas_price) do
+  def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) do
     min_gas(tx, height) * gas_price
   end
 
@@ -231,8 +231,8 @@ defmodule Utils.Transaction do
   @spec default_payload :: String.t()
   def default_payload, do: @default_payload
 
-  @spec default_fee :: atom()
-  def default_fee, do: @default_fee
+  @spec dummy_fee() :: atom()
+  def dummy_fee(), do: @dummy_fee
 
   @doc """
   Calculates minimum fee of given transaction, depends on height and network_id
