@@ -8,7 +8,6 @@ defmodule Core.Account do
   alias Utils.Account, as: AccountUtil
   alias AeternityNode.Model.SpendTx
 
-  @default_payload ""
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
 
@@ -54,9 +53,9 @@ defmodule Core.Account do
              client,
              recipient_id,
              amount,
-             Keyword.get(opts, :fee, 0),
+             Keyword.get(opts, :fee, Transaction.default_fee()),
              Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :payload, @default_payload)
+             Keyword.get(opts, :payload, Transaction.default_payload())
            ),
          {:ok, response} <- Transaction.post(connection, privkey, network_id, spend_tx) do
       {:ok, response}

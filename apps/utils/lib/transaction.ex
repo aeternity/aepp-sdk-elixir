@@ -61,7 +61,8 @@ defmodule Utils.Transaction do
   @await_attempts 25
   @await_attempt_interval 200
   @default_ttl 0
-  @default_fee 0
+  @default_fee :default_fee
+  @default_payload ""
 
   @doc """
   Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID and post it to the node
@@ -149,21 +150,21 @@ defmodule Utils.Transaction do
   ## Examples
       iex> spend_tx = %AeternityNode.Model.SpendTx{
         amount: 40000000,
-        fee: 0,
+        fee: :default_fee,
         nonce: 10624,
         payload: "",
         recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
         }
-      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 0)
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", :default_fee, 0)
       16660000000
   """
   @spec calculate_fee(
           tx_types(),
           non_neg_integer(),
           String.t(),
-          non_neg_integer(),
+          atom() | non_neg_integer(),
           non_neg_integer()
         ) ::
           non_neg_integer()
@@ -224,7 +225,14 @@ defmodule Utils.Transaction do
     end
   end
 
+  @spec default_ttl :: non_neg_integer()
   def default_ttl, do: @default_ttl
+
+  @spec default_payload :: String.t()
+  def default_payload, do: @default_payload
+
+  @spec default_fee :: atom()
+  def default_fee, do: @default_fee
 
   @doc """
   Calculates minimum fee of given transaction, depends on height and network_id
