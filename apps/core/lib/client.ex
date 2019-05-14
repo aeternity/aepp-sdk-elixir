@@ -4,13 +4,22 @@ defmodule Core.Client do
   alias __MODULE__
   alias AeternityNode.Connection
 
-  defstruct [:keypair, :network_id, :connection, :internal_connection]
+  @default_gas_price 1_000_000
+
+  defstruct [
+    :keypair,
+    :network_id,
+    :connection,
+    :internal_connection,
+    gas_price: @default_gas_price
+  ]
 
   @type t :: %Client{
           keypair: keypair(),
           network_id: String.t(),
           connection: struct(),
-          internal_connection: struct()
+          internal_connection: struct(),
+          gas_price: non_neg_integer()
         }
 
   @type keypair :: %{public: String.t(), secret: String.t()}
@@ -37,6 +46,7 @@ defmodule Core.Client do
             {Tesla.Middleware.BaseUrl, :call, ["https://sdk-testnet.aepps.com/v2"]}
           ]
         },
+        gas_price: 0,
         internal_connection: %Tesla.Client{
           adapter: nil,
           fun: nil,
@@ -52,8 +62,14 @@ defmodule Core.Client do
         network_id: "ae_uat"
       }
   """
-  @spec new(keypair(), String.t(), String.t(), String.t()) :: Client.t()
-  def new(%{public: public_key, secret: secret_key} = keypair, network_id, url, internal_url)
+  @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()
+  def new(
+        %{public: public_key, secret: secret_key} = keypair,
+        network_id,
+        url,
+        internal_url,
+        gas_price \\ @default_gas_price
+      )
       when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
              is_binary(url) and
              is_binary(internal_url) do
@@ -64,7 +80,8 @@ defmodule Core.Client do
       keypair: keypair,
       network_id: network_id,
       connection: connection,
-      internal_connection: internal_connection
+      internal_connection: internal_connection,
+      gas_price: gas_price
     }
   end
 end

@@ -56,4 +56,14 @@ defmodule TransactionUtilTest do
              )
            )
   end
+
+  @tag :travis_test
+  test "post valid spend transaction by given gas price", fields do
+    assert {:ok, %{}} =
+             Account.spend(
+               %{fields.client | gas_price: 1_000_000_000_000},
+               fields.valid_pub_key,
+               fields.amount
+             )
+  end
 end

@@ -42,11 +42,27 @@ defmodule Utils.Transaction do
     ContractCreateTx
   ]
 
+  @type tx_types ::
+          SpendTx.t()
+          | OracleRegisterTx.t()
+          | OracleQueryTx.t()
+          | OracleRespondTx.t()
+          | OracleExtendTx.t()
+          | NamePreclaimTx.t()
+          | NameClaimTx.t()
+          | NameTransferTx.t()
+          | NameRevokeTx.t()
+          | NameUpdateTx.t()
+          | ContractCallTx.t()
+          | ContractCreateTx.t()
+
   @network_id_list ["ae_mainnet", "ae_uat"]
 
   @await_attempts 25
   @await_attempt_interval 200
   @default_ttl 0
+  @dummy_fee 0
+  @default_payload ""
 
   @doc """
   Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID and post it to the node
@@ -128,6 +144,38 @@ defmodule Utils.Transaction do
     end
   end
 
+  @doc """
+  Calculate the fee of the transaction.
+
+  ## Examples
+      iex> spend_tx = %AeternityNode.Model.SpendTx{
+        amount: 40000000,
+        fee: :default_fee,
+        nonce: 10624,
+        payload: "",
+        recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+        sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+        ttl: 0
+        }
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", :default_fee, 0)
+      16660000000
+  """
+  @spec calculate_fee(
+          tx_types(),
+          non_neg_integer(),
+          String.t(),
+          atom() | non_neg_integer(),
+          non_neg_integer()
+        ) ::
+          non_neg_integer()
+  def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) do
+    min_gas(tx, height) * gas_price
+  end
+
+  def calculate_fee(_tx, _height, _network_id, fee, _gas_price) do
+    fee
+  end
+
   defp await_mining(connection, tx_hash, type) do
     await_mining(connection, tx_hash, @await_attempts, type)
   end
@@ -177,7 +225,14 @@ defmodule Utils.Transaction do
     end
   end
 
+  @spec default_ttl :: non_neg_integer()
   def default_ttl, do: @default_ttl
+
+  @spec default_payload :: String.t()
+  def default_payload, do: @default_payload
+
+  @spec dummy_fee() :: atom()
+  def dummy_fee(), do: @dummy_fee
 
   @doc """
   Calculates minimum fee of given transaction, depends on height and network_id
