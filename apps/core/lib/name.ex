@@ -12,10 +12,8 @@ defmodule Core.AENS do
     NameRevokeTx,
     NameTransferTx,
     NameUpdateTx,
-    GenericSignedTx,
     CommitmentId,
-    NameEntry,
-    InlineResponse2001
+    NameEntry
   }
 
   alias AeternityNode.Api.NameService
@@ -67,14 +65,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
+         {:ok, _tx} = response <-
            Transaction.post(
              connection,
              privkey,
              network_id,
              preclaim_tx
            ) do
-      {:ok, Map.from_struct(tx)}
+      response
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx : #{inspect(error)}"}
     end
@@ -120,14 +118,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
+         {:ok, _tx} = response <-
            Transaction.post(
              connection,
              privkey,
              network_id,
              claim_tx
            ) do
-      {:ok, Map.from_struct(tx)}
+      response
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameClaimTx: #{inspect(error)} "}
     end
@@ -188,14 +186,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
+         {:ok, _tx} = response <-
            Transaction.post(
              connection,
              privkey,
              network_id,
              update_tx
            ) do
-      {:ok, Map.from_struct(tx)}
+      response
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx: #{inspect(error)}"}
     end
@@ -242,14 +240,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
+         {:ok, _tx} = response <-
            Transaction.post(
              connection,
              privkey,
              network_id,
              transfer_tx
            ) do
-      {:ok, Map.from_struct(tx)}
+      response
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameTransferTx: #{inspect(error)}"}
     end
@@ -292,14 +290,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
+         {:ok, _tx} = response <-
            Transaction.post(
              connection,
              privkey,
              network_id,
              revoke_tx
            ) do
-      {:ok, Map.from_struct(tx)}
+      response
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameRevokeTx: #{inspect(error)}"}
     end
@@ -319,7 +317,7 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       preclaim_tx =
         struct(NamePreclaimTx,
@@ -330,7 +328,7 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{preclaim_tx | fee: calculate_fee(preclaim_tx, height, network_id, fee, gas_price)}}
+      {:ok, %{preclaim_tx | fee: Transaction.calculate_fee(preclaim_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -351,7 +349,7 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       claim_tx =
         struct(NameClaimTx,
@@ -363,7 +361,7 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{claim_tx | fee: calculate_fee(claim_tx, height, network_id, fee, gas_price)}}
+      {:ok, %{claim_tx | fee: Transaction.calculate_fee(claim_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -384,7 +382,7 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       transfer_tx =
         struct(NameTransferTx,
@@ -396,7 +394,7 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{transfer_tx | fee: calculate_fee(transfer_tx, height, network_id, fee, gas_price)}}
+      {:ok, %{transfer_tx | fee: Transaction.calculate_fee(transfer_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -419,7 +417,7 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       name_update_tx =
         struct(NameUpdateTx,
@@ -434,7 +432,7 @@ defmodule Core.AENS do
         )
 
       {:ok,
-       %{name_update_tx | fee: calculate_fee(name_update_tx, height, network_id, fee, gas_price)}}
+       %{name_update_tx | fee: Transaction.calculate_fee(name_update_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -454,7 +452,7 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %InlineResponse2001{height: height}} <-
+         {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(connection) do
       revoke_tx =
         struct(NameRevokeTx,
@@ -465,21 +463,10 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{revoke_tx | fee: calculate_fee(revoke_tx, height, network_id, fee, gas_price)}}
+      {:ok, %{revoke_tx | fee: Transaction.calculate_fee(revoke_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
   end
 
-  defp calculate_fee(spend_tx, height, network_id, 0, 0) do
-    Transaction.calculate_min_fee(spend_tx, height, network_id)
-  end
-
-  defp calculate_fee(spend_tx, height, _network_id, 0, gas_price) do
-    Transaction.min_gas(spend_tx, height) * gas_price
-  end
-
-  defp calculate_fee(_spend_tx, _height, _network_id, fee, _gas_price) do
-    fee
-  end
 end

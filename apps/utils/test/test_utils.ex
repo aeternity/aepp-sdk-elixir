@@ -169,7 +169,7 @@ defmodule TestUtils do
       query_format: <<"query_format">>,
       response_format: <<"response_format">>,
       query_fee: 10,
-      oracle_ttl: %Ttl{type: "block", value: 10},
+      oracle_ttl: %Ttl{type: :absolute, value: 10},
       account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 37122,
       fee: 0,
@@ -179,9 +179,9 @@ defmodule TestUtils do
     }
 
     oracle_respond_tx = %OracleRespondTx{
-      query_id: <<"query_id">>,
+      query_id: "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq",
       response: <<"response_format">>,
-      response_ttl: %RelativeTtl{type: "delta", value: 10},
+      response_ttl: %RelativeTtl{type: :relative, value: 10},
       fee: 0,
       ttl: 10,
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
@@ -192,7 +192,7 @@ defmodule TestUtils do
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       query: <<"query">>,
       query_fee: 10,
-      query_ttl: %Ttl{type: "delta", value: 10},
+      query_ttl: %Ttl{type: :relative, value: 10},
       response_ttl: %RelativeTtl{type: "delta", value: 10},
       fee: 0,
       ttl: 10,
@@ -202,7 +202,7 @@ defmodule TestUtils do
 
     oracle_extend_tx = %OracleExtendTx{
       fee: 0,
-      oracle_ttl: %RelativeTtl{type: "delta", value: 10},
+      oracle_ttl: %RelativeTtl{type: :relative, value: 10},
       oracle_id: "ok_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0,
       ttl: 0
@@ -293,9 +293,9 @@ defmodule TestUtils do
           secret:
             "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
-        "ae_uat",
-        "https://sdk-testnet.aepps.com/v2",
-        "https://sdk-testnet.aepps.com/v2"
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
       )
 
     valid_pub_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
