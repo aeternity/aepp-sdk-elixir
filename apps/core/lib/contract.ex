@@ -125,7 +125,7 @@ defmodule Core.Contract do
       {:ok,
         %{
          return_type: "ok",
-         return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+         return_value: 75
         }}
   """
   @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
@@ -161,8 +161,11 @@ defmodule Core.Contract do
              secret_key,
              network_id,
              contract_call_tx
-           ) do
-      {:ok, %{return_value: return_value, return_type: return_type}}
+           ),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, return_value, return_type) do
+      {:ok, %{return_value: decoded_return_value, return_type: return_type}}
     else
       {:error, _} = error ->
         error
@@ -182,7 +185,7 @@ defmodule Core.Contract do
       {:ok,
         %{
          return_type: "ok",
-         return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+         return_value: 75
         }}
   """
   @spec call_static(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
@@ -230,8 +233,11 @@ defmodule Core.Contract do
              top: Keyword.get(opts, :top, top_block_hash),
              accounts: [],
              txs: [encoded_contract_call_tx]
-           }) do
-      {:ok, %{return_value: return_value, return_type: return_type}}
+           }),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, return_value, return_type) do
+      {:ok, %{return_value: decoded_return_value, return_type: return_type}}
     else
       {:ok,
        %DryRunResults{
@@ -254,26 +260,36 @@ defmodule Core.Contract do
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
-      iex> {:ok, %{return_value: data, return_type: "ok"}} = Core.Contract.call(client, contract_address, source_code, function_name, function_args)
+      iex> {:ok, %{return_value: data, return_type: return_type}} = Core.Contract.call(client, contract_address, source_code, function_name, function_args)
       iex> data_type = "int"
-      iex> Core.Contract.decode_return_value(data_type, data)
+      iex> Core.Contract.decode_return_value(data_type, data, return_type)
       {:ok, 75}
   """
-  @spec decode_return_value(String.t(), String.t()) :: {:ok, tuple()} | {:error, atom()}
+  @spec decode_return_value(String.t(), String.t(), String.t()) ::
+          {:ok, tuple()} | {:error, atom()}
   def decode_return_value(
         sophia_type,
-        return_value
+        return_value,
+        return_type
       )
       when is_binary(sophia_type) and is_binary(return_value) do
     sophia_type_charlist = String.to_charlist(sophia_type)
 
-    with {:ok, decoded_return_value} <-
+    with "ok" <- return_type,
+         {:ok, decoded_return_value} <-
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value),
          {:ok, typerep} <- :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
       :aeb_heap.from_binary(typerep, decoded_return_value)
     else
       {:error, _} = error ->
         error
+
+      _ ->
+        {:ok, decoded_return_value} =
+          :aeser_api_encoder.safe_decode(:contract_bytearray, return_value)
+
+        {:ok, message} = :aeb_heap.from_binary(:string, decoded_return_value)
+        {:error, message}
     end
   end
 
@@ -422,6 +438,76 @@ defmodule Core.Contract do
         {:error, message}
     end
   end
+
+  def get_function_return_type(source_code, function_name) do
+    charlist_source = String.to_charlist(source_code)
+
+    case :aeso_aci.encode(charlist_source) do
+      {:ok, json_contract_info} ->
+        contract_info = Poison.decode!(json_contract_info)
+        functions = contract_info["contract"]["functions"]
+
+        function_object =
+          Enum.find(functions, fn function -> function["name"] == function_name end)
+
+        case aci_to_sophia_type(function_object["returns"]) do
+          {:error, _} = err ->
+            err
+
+          type ->
+            {:ok, type}
+        end
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp aci_to_sophia_type(type) do
+    case type do
+      %{} ->
+        structure_type = type |> Map.keys() |> List.first()
+        field_types = type |> Map.values() |> List.first()
+        aci_to_sophia_type(structure_type, field_types)
+
+      [type] ->
+        aci_to_sophia_type(type)
+
+      type ->
+        type
+    end
+  end
+
+  defp aci_to_sophia_type("tuple", fields) do
+    fields
+    |> Enum.map(fn field ->
+      aci_to_sophia_type(field)
+    end)
+    |> into_tuple()
+  end
+
+  defp aci_to_sophia_type("record", fields) do
+    fields
+    |> Enum.map(fn field ->
+      aci_to_sophia_type(field["type"])
+    end)
+    |> into_tuple()
+  end
+
+  defp aci_to_sophia_type("map", [key_type, value_type]),
+    do: "map(#{aci_to_sophia_type(key_type)}, #{aci_to_sophia_type(value_type)})"
+
+  defp aci_to_sophia_type("list", type), do: "list(#{aci_to_sophia_type(type)})"
+
+  defp aci_to_sophia_type("oracle", [query_type, response_type]),
+    do: "oracle(#{aci_to_sophia_type(query_type)},#{aci_to_sophia_type(response_type)})"
+
+  defp aci_to_sophia_type("oracle_query", [query_type, response_type]),
+    do: "oracle_query(#{aci_to_sophia_type(query_type)},#{aci_to_sophia_type(response_type)})"
+
+  defp aci_to_sophia_type(type, _), do: {:error, "Can't decode type: #{type}"}
+
+  defp into_tuple(fields), do: "(#{Enum.join(fields, ", ")})"
 
   defp compute_contract_account(owner_address, nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)

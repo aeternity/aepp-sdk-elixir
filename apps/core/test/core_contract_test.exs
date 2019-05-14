@@ -28,7 +28,10 @@ defmodule CoreContractTest do
 
   test "create, call, call static and decode contract", setup_data do
     deploy_result =
-      Contract.deploy(setup_data.client, setup_data.source_code, ["42"],
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
         fee: 10_000_000_000_000_000
       )
 
@@ -62,7 +65,12 @@ defmodule CoreContractTest do
 
     {:ok, %{return_value: data, return_type: "ok"}} = call_result
 
-    assert {:ok, 75} == Contract.decode_return_value("int", data)
+    assert {:ok, data} ==
+             Contract.decode_return_value(
+               "int",
+               "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
+               "ok"
+             )
   end
 
   test "create invalid contract", setup_data do
@@ -76,7 +84,10 @@ defmodule CoreContractTest do
 
   test "call non-existent function", setup_data do
     deploy_result =
-      Contract.deploy(setup_data.client, setup_data.source_code, ["42"],
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
         fee: 10_000_000_000_000_000
       )
 
@@ -99,7 +110,10 @@ defmodule CoreContractTest do
 
   test "call static non-existent function", setup_data do
     deploy_result =
-      Contract.deploy(setup_data.client, setup_data.source_code, ["42"],
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
         fee: 10_000_000_000_000_000
       )
 
@@ -122,7 +136,10 @@ defmodule CoreContractTest do
 
   test "decode data wrong type", setup_data do
     deploy_result =
-      Contract.deploy(setup_data.client, setup_data.source_code, ["42"],
+      Contract.deploy(
+        setup_data.client,
+        setup_data.source_code,
+        ["42"],
         fee: 10_000_000_000_000_000
       )
 
@@ -142,11 +159,17 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = call_result
+    {:ok, %{return_value: _, return_type: "ok"}} = call_result
 
     assert {:error,
             {:badmatch,
              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 75>>}} == Contract.decode_return_value("list(int)", data)
+               0, 0, 0,
+               75>>}} ==
+             Contract.decode_return_value(
+               "list(int)",
+               "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
+               "ok"
+             )
   end
 end
