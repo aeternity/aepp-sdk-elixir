@@ -66,7 +66,12 @@ defmodule CoreContractTest do
 
     {:ok, %{return_value: data, return_type: "ok"}} = call_result
 
-    assert {:ok, 75} == Contract.decode_return_value("int", data)
+    assert {:ok, data} ==
+             Contract.decode_return_value(
+               "int",
+               "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
+               "ok"
+             )
   end
 
   @tag :travis_test
@@ -159,11 +164,17 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = call_result
+    {:ok, %{return_value: _, return_type: "ok"}} = call_result
 
     assert {:error,
             {:badmatch,
              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 75>>}} == Contract.decode_return_value("list(int)", data)
+               0, 0, 0,
+               75>>}} ==
+             Contract.decode_return_value(
+               "list(int)",
+               "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
+               "ok"
+             )
   end
 end

@@ -50,8 +50,8 @@ defmodule Utils.Account do
       {:ok, %Error{reason: message}} ->
         {:error, message}
 
-      {:error, %Env{} = env} ->
-        {:error, env}
+      {:error, _} = err ->
+        err
     end
   end
 end
