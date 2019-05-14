@@ -453,6 +453,22 @@ defmodule Core.Contract do
     end
   end
 
+  @doc """
+  Get the return type of a function in a contract
+
+  ## Examples
+      iex> source_code = "contract Identity =
+          record state = { number : int }
+
+          function init(x : int) =
+            { number = x }
+
+          function add_to_number(x : int) = state.number + x"
+      iex> function_name = "add_to_number"
+      iex> Core.Contract.get_function_return_type(source_code, function_name)
+      {:ok, "int"}
+  """
+  @spec get_function_return_type(String.t(), String.t()) :: String.t()
   def get_function_return_type(source_code, function_name) do
     charlist_source = String.to_charlist(source_code)
 
