@@ -11,9 +11,9 @@ defmodule CoreContractTest do
           secret:
             "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
-        "ae_uat",
-        "https://sdk-testnet.aepps.com/v2",
-        "https://sdk-testnet.aepps.com/v2"
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
       )
 
     source_code = "contract Identity =
@@ -26,6 +26,7 @@ defmodule CoreContractTest do
     [client: client, source_code: source_code]
   end
 
+  @tag :travis_test
   test "create, call, call static and decode contract", setup_data do
     deploy_result =
       Contract.deploy(
@@ -37,7 +38,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(
@@ -73,6 +74,7 @@ defmodule CoreContractTest do
              )
   end
 
+  @tag :travis_test
   test "create invalid contract", setup_data do
     invalid_source_code = String.replace(setup_data.source_code, "x : int", "x : list(int)")
 
@@ -82,6 +84,7 @@ defmodule CoreContractTest do
     assert match?({:error, _}, deploy_result)
   end
 
+  @tag :travis_test
   test "call non-existent function", setup_data do
     deploy_result =
       Contract.deploy(
@@ -93,7 +96,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(
@@ -108,6 +111,7 @@ defmodule CoreContractTest do
     assert match?({:error, _}, call_result)
   end
 
+  @tag :travis_test
   test "call static non-existent function", setup_data do
     deploy_result =
       Contract.deploy(
@@ -119,7 +123,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call_static(
@@ -134,6 +138,7 @@ defmodule CoreContractTest do
     assert match?({:error, _}, call_result)
   end
 
+  @tag :travis_test
   test "decode data wrong type", setup_data do
     deploy_result =
       Contract.deploy(
@@ -145,7 +150,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, _}, deploy_result)
 
-    {:ok, ct_address} = deploy_result
+    {:ok, %{contract_id: ct_address}} = deploy_result
 
     call_result =
       Contract.call(

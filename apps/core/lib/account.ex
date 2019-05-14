@@ -3,11 +3,11 @@ defmodule Core.Account do
    High-level module for Account-related activities.
   """
   alias Core.Client
-  alias Utils.Transaction
+  alias AeternityNode.Api.Chain
+  alias Utils.{Transaction, Encoding}
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.{SpendTx, GenericSignedTx}
+  alias AeternityNode.Model.SpendTx
 
-  @default_payload ""
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
 
@@ -22,73 +22,52 @@ defmodule Core.Account do
         %{
           block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
           block_height: 74871,
-          hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4",
-          signatures: ["sg_YTdAtWjFX7Mr6yaRacLRkAh77nTc6Nimed11qWEZwrfEWsyJxeeWz3UtRmAx5cmsmjGFFB8axo3SJzDHHYfKCFnLzsqQq"],
-          tx: %AeternityNode.Model.GenericTx{type: "SpendTx", version: 1}
+          tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
         }}
   """
   @spec spend(Client.t(), binary(), non_neg_integer(), list()) ::
-          {:ok, AeternityNode.Model.GenericSignedTx.t()}
+          {:ok,
+           %{
+             block_hash: Encoding.base58c(),
+             block_height: non_neg_integer(),
+             tx_hash: Encoding.base58c()
+           }}
           | {:error, String.t()}
           | {:error, Env.t()}
   def spend(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id,
             secret: privkey
           },
           network_id: network_id,
-          connection: connection
-        } = client,
+          connection: connection,
+          gas_price: gas_price
+        },
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []
       )
-      when recipient_prefix in @allowed_recipient_tags and
-             sender_prefix == "ak" do
-    with {:ok, spend_tx} <-
-           build_spend_tx_fields(
-             client,
-             recipient_id,
-             amount,
-             Keyword.get(opts, :fee, 0),
-             Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             Keyword.get(opts, :payload, @default_payload)
+      when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         %SpendTx{fee: fee} = spend_tx <-
+           struct(SpendTx,
+             sender_id: sender_id,
+             recipient_id: recipient_id,
+             amount: amount,
+             fee: Keyword.get(opts, :fee, Transaction.dummy_fee()),
+             ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+             nonce: nonce,
+             payload: Keyword.get(opts, :payload, Transaction.default_payload())
            ),
-         {:ok, %GenericSignedTx{} = tx} <-
-           Transaction.post(connection, privkey, network_id, spend_tx) do
-      {:ok, Map.from_struct(tx)}
+         fee when is_integer(fee) <-
+           Transaction.calculate_fee(spend_tx, height, network_id, fee, gas_price),
+         {:ok, response} <-
+           Transaction.post(connection, privkey, network_id, %{spend_tx | fee: fee}) do
+      {:ok, response}
     else
-      _ -> {:error, "#{__MODULE__}: Unsuccessful post of SpendTX"}
-    end
-  end
-
-  defp build_spend_tx_fields(
-         %Client{
-           keypair: %{
-             public: sender_pubkey
-           },
-           connection: connection
-         },
-         recipient_pubkey,
-         amount,
-         fee,
-         ttl,
-         payload
-       ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey) do
-      {:ok,
-       struct(SpendTx,
-         sender_id: sender_pubkey,
-         recipient_id: recipient_pubkey,
-         amount: amount,
-         fee: fee,
-         ttl: ttl,
-         nonce: nonce,
-         payload: payload
-       )}
-    else
-      {:error, _info} = error -> error
+      {:error, _} = err -> err
     end
   end
 end
