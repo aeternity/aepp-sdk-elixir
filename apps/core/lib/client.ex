@@ -27,6 +27,8 @@ defmodule Core.Client do
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
 
+  @default_gas_price 0
+
   @doc """
   Client constructor
 
@@ -62,6 +64,7 @@ defmodule Core.Client do
         network_id: "ae_uat"
       }
   """
+
   @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()
   def new(
         %{public: public_key, secret: secret_key} = keypair,
