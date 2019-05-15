@@ -328,7 +328,11 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{preclaim_tx | fee: Transaction.calculate_fee(preclaim_tx, height, network_id, fee, gas_price)}}
+      {:ok,
+       %{
+         preclaim_tx
+         | fee: Transaction.calculate_fee(preclaim_tx, height, network_id, fee, gas_price)
+       }}
     else
       {:error, _info} = error -> error
     end
@@ -361,7 +365,8 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{claim_tx | fee: Transaction.calculate_fee(claim_tx, height, network_id, fee, gas_price)}}
+      {:ok,
+       %{claim_tx | fee: Transaction.calculate_fee(claim_tx, height, network_id, fee, gas_price)}}
     else
       {:error, _info} = error -> error
     end
@@ -394,7 +399,11 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{transfer_tx | fee: Transaction.calculate_fee(transfer_tx, height, network_id, fee, gas_price)}}
+      {:ok,
+       %{
+         transfer_tx
+         | fee: Transaction.calculate_fee(transfer_tx, height, network_id, fee, gas_price)
+       }}
     else
       {:error, _info} = error -> error
     end
@@ -432,7 +441,10 @@ defmodule Core.AENS do
         )
 
       {:ok,
-       %{name_update_tx | fee: Transaction.calculate_fee(name_update_tx, height, network_id, fee, gas_price)}}
+       %{
+         name_update_tx
+         | fee: Transaction.calculate_fee(name_update_tx, height, network_id, fee, gas_price)
+       }}
     else
       {:error, _info} = error -> error
     end
@@ -463,10 +475,13 @@ defmodule Core.AENS do
           ttl: ttl
         )
 
-      {:ok, %{revoke_tx | fee: Transaction.calculate_fee(revoke_tx, height, network_id, fee, gas_price)}}
+      {:ok,
+       %{
+         revoke_tx
+         | fee: Transaction.calculate_fee(revoke_tx, height, network_id, fee, gas_price)
+       }}
     else
       {:error, _info} = error -> error
     end
   end
-
 end
