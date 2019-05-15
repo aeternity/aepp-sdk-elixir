@@ -11,7 +11,7 @@ defmodule Core.NamingTest do
   @tag :travis_test
   test "test naming workflow", setup do
     # Pre-claim a name
-    pre_claim = AENS.preclaim(setup.client, "test.test", 777, fee: 1_000_000_000_000_000)
+    pre_claim = AENS.preclaim(setup.client, "test.test", 777, [fee:  10_000_000_000_000_000])
     assert match?({:ok, _}, pre_claim)
     # We need to wait a bit
     Process.sleep(1000)
