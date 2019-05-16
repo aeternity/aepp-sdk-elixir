@@ -62,6 +62,7 @@ defmodule Utils.Transaction do
   @await_attempt_interval 200
   @default_ttl 0
   @dummy_fee 0
+  @tx_posting_attempts 20
   @default_payload ""
 
   @doc """
@@ -143,6 +144,58 @@ defmodule Utils.Transaction do
         error
     end
   end
+
+  def try_post(
+        connection,
+        secret_key,
+        network_id,
+        gas_price,
+        spend_tx,
+        height
+      ) do
+    try_post(connection, secret_key, network_id, gas_price, spend_tx, height, posting_attempts())
+  end
+
+  def try_post(
+        connection,
+        secret_key,
+        network_id,
+        _gas_price,
+        tx,
+        _height,
+        0
+      ) do
+    post(connection, secret_key, network_id, tx)
+  end
+
+  def try_post(
+        connection,
+        secret_key,
+        network_id,
+        gas_price,
+        tx,
+        height,
+        attempts
+      ) do
+    case post(connection, secret_key, network_id, tx) do
+      {:ok, _} = response ->
+        response
+
+      {:error, _} ->
+        try_post(
+          connection,
+          secret_key,
+          network_id,
+          gas_price,
+          %{tx | fee: calculate_fee(tx, height, network_id, dummy_fee(), gas_price)},
+          height,
+          attempts - 1
+        )
+    end
+  end
+
+  @spec posting_attempts() :: non_neg_integer()
+  def posting_attempts(), do: @tx_posting_attempts
 
   @doc """
   Calculate the fee of the transaction.
@@ -378,7 +431,8 @@ defmodule Utils.Transaction do
              ChannelSnapshotSoloTx,
              ChannelWithdrawTx
            ] do
-    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas()
+    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
+      Governance.gas(tx)
   end
 
   def gas_limit(tx, height) do
