@@ -150,14 +150,14 @@ defmodule Utils.Transaction do
   ## Examples
       iex> spend_tx = %AeternityNode.Model.SpendTx{
         amount: 40000000,
-        fee: :default_fee,
+        fee: 0,
         nonce: 10624,
         payload: "",
         recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
         }
-      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", :default_fee, 0)
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 0)
       16660000000
   """
   @spec calculate_fee(
@@ -231,7 +231,7 @@ defmodule Utils.Transaction do
   @spec default_payload :: String.t()
   def default_payload, do: @default_payload
 
-  @spec dummy_fee() :: atom()
+  @spec dummy_fee() :: non_neg_integer()
   def dummy_fee(), do: @dummy_fee
 
   @doc """

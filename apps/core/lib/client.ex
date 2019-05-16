@@ -27,8 +27,6 @@ defmodule Core.Client do
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
 
-  @default_gas_price 0
-
   @doc """
   Client constructor
 
