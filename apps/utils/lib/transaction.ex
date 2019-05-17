@@ -25,7 +25,6 @@ defmodule Utils.Transaction do
   }
 
   alias Utils.{Keys, Encoding, Serialization, Governance}
-  alias Core.Client
   alias Tesla.Env
 
   @struct_type [
@@ -66,14 +65,28 @@ defmodule Utils.Transaction do
   @tx_posting_attempts 20
   @default_payload ""
 
+  @spec default_ttl :: non_neg_integer()
+  def default_ttl, do: @default_ttl
+
+  @spec default_payload :: String.t()
+  def default_payload, do: @default_payload
+
+  @spec dummy_fee() :: non_neg_integer()
+  def dummy_fee(), do: @dummy_fee
+
+  @spec posting_attempts() :: non_neg_integer()
+  def posting_attempts(), do: @tx_posting_attempts
+
   @doc """
-  Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID and post it to the node
+  Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID,
+  add calculated minimum fee and post it to the node
 
   ## Examples
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
       iex> network_id = "ae_uat"
+      iex> gas_price = 1_000_000_000_000
       iex> {:ok, nonce} = Utils.Account.next_valid_nonce(connection, public_key)
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> function_name = "init"
@@ -88,7 +101,7 @@ defmodule Utils.Transaction do
         byte_code
       ]
       iex> serialized_wrapped_code = Utils.Serialization.serialize(byte_code_fields, :sophia_byte_code)
-      iex> tx_dummy_fee = %AeternityNode.Model.ContractCreateTx{
+      iex> contract_create_tx = %AeternityNode.Model.ContractCreateTx{
         owner_id: public_key,
         nonce: nonce,
         code: serialized_wrapped_code,
@@ -102,9 +115,8 @@ defmodule Utils.Transaction do
         ttl: Utils.Transaction.default_ttl(),
         call_data: calldata
       }
-      iex> {:ok, %AeternityNode.Model.InlineResponse2001{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
-      iex> tx = %{tx_dummy_fee | fee: Utils.Transaction.calculate_min_fee(tx_dummy_fee, height, network_id) * 100_000}
-      iex> Utils.Transaction.post(connection, secret_key, network_id, tx)
+      iex> {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
+      iex> Utils.Transaction.try_post(connection, secret_key, network_id, gas_price, contract_create_tx, height)
       {:ok,
        %{
          block_hash: "mh_29ZNDHkaa1k54Gr9HqFDJ3ubDg7Wi6yJEsfuCy9qKQEjxeHdH4",
@@ -112,42 +124,8 @@ defmodule Utils.Transaction do
          hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j"
        }}
   """
-  @spec post(struct(), String.t(), String.t(), struct()) ::
-          {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
-  def post(connection, secret_key, network_id, %type{} = tx) do
-    serialized_tx = Serialization.serialize(tx)
-
-    signature =
-      Keys.sign(
-        serialized_tx,
-        Keys.secret_key_to_binary(secret_key),
-        network_id
-      )
-
-    signed_tx_fields = [[signature], serialized_tx]
-    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
-    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
-
-    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
-           TransactionApi.post_transaction(connection, %Tx{
-             tx: encoded_signed_tx
-           }),
-         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
-      response
-    else
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{} = env} ->
-        {:error, env}
-
-      {:error, _} = error ->
-        error
-    end
-  end
-
   @spec try_post(
-          Client.t(),
+          struct(),
           String.t(),
           String.t(),
           non_neg_integer(),
@@ -203,8 +181,37 @@ defmodule Utils.Transaction do
     end
   end
 
-  @spec posting_attempts() :: non_neg_integer()
-  def posting_attempts(), do: @tx_posting_attempts
+  defp post(connection, secret_key, network_id, %type{} = tx) do
+    serialized_tx = Serialization.serialize(tx)
+
+    signature =
+      Keys.sign(
+        serialized_tx,
+        Keys.secret_key_to_binary(secret_key),
+        network_id
+      )
+
+    signed_tx_fields = [[signature], serialized_tx]
+    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
+
+    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+           TransactionApi.post_transaction(connection, %Tx{
+             tx: encoded_signed_tx
+           }),
+         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
+      response
+    else
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{} = env} ->
+        {:error, env}
+
+      {:error, _} = error ->
+        error
+    end
+  end
 
   @doc """
   Calculate the fee of the transaction.
@@ -286,15 +293,6 @@ defmodule Utils.Transaction do
         {:error, env}
     end
   end
-
-  @spec default_ttl :: non_neg_integer()
-  def default_ttl, do: @default_ttl
-
-  @spec default_payload :: String.t()
-  def default_payload, do: @default_payload
-
-  @spec dummy_fee() :: non_neg_integer()
-  def dummy_fee(), do: @dummy_fee
 
   @doc """
   Calculates minimum fee of given transaction, depends on height and network_id

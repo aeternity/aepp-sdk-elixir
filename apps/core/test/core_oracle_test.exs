@@ -28,8 +28,9 @@ defmodule CoreOracleTest do
         "map(string, int)",
         "map(string, int)",
         %{type: :relative, value: 30},
-        30,
-        fee: 10_000_000_000_000_000
+        30
+        # ,
+        # fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, _}, register)
@@ -41,8 +42,9 @@ defmodule CoreOracleTest do
         oracle_id,
         %{"a" => 1},
         %{type: :relative, value: 10},
-        10,
-        fee: 10_000_000_000_000_000
+        10
+        # ,
+        # fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, _}, query)
@@ -54,14 +56,20 @@ defmodule CoreOracleTest do
                oracle_id,
                query_id,
                %{"b" => 2},
-               10,
-               fee: 10_000_000_000_000_000
+               10
+               #  ,
+               #  fee: 10_000_000_000_000_000
              )
            )
 
     assert match?(
              {:ok, _},
-             Oracle.extend(setup_data.client, oracle_id, 10, fee: 10_000_000_000_000_000)
+             Oracle.extend(
+               setup_data.client,
+               oracle_id,
+               10
+               #  , fee: 10_000_000_000_000_000
+             )
            )
 
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
@@ -76,8 +84,9 @@ defmodule CoreOracleTest do
                "bad format",
                "bad format",
                %{type: :relative, value: 30},
-               30,
-               fee: 10_000_000_000_000_000
+               30
+               #  ,
+               #  fee: 10_000_000_000_000_000
              )
            )
   end
@@ -91,8 +100,9 @@ defmodule CoreOracleTest do
                "ok_123",
                "a query",
                %{type: :relative, value: 10},
-               10,
-               fee: 10_000_000_000_000_000
+               10
+               #  ,
+               #  fee: 10_000_000_000_000_000
              )
            )
   end
@@ -106,8 +116,9 @@ defmodule CoreOracleTest do
                String.replace_prefix(setup_data.client.keypair.public, "ak", "ok"),
                String.replace_prefix(setup_data.client.keypair.public, "ak", "oq"),
                %{"b" => 2},
-               10,
-               fee: 10_000_000_000_000_000
+               10
+               #  ,
+               #  fee: 10_000_000_000_000_000
              )
            )
   end
@@ -119,8 +130,9 @@ defmodule CoreOracleTest do
              Oracle.extend(
                setup_data.client,
                "ok_Aro7GgyG3gJ7Tsu4k4YvZ45P1GtNfMyRX4Xfv8VWDjbvLDphN",
-               10,
-               fee: 10_000_000_000_000_000
+               10
+               #  ,
+               #  fee: 10_000_000_000_000_000
              )
            )
   end
