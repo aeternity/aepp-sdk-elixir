@@ -25,6 +25,7 @@ defmodule Utils.Transaction do
   }
 
   alias Utils.{Keys, Encoding, Serialization, Governance}
+  alias Core.Client
   alias Tesla.Env
 
   @struct_type [
@@ -145,38 +146,46 @@ defmodule Utils.Transaction do
     end
   end
 
+  @spec try_post(
+          Client.t(),
+          String.t(),
+          String.t(),
+          non_neg_integer(),
+          tx_types(),
+          non_neg_integer()
+        ) :: {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def try_post(
         connection,
         secret_key,
         network_id,
         gas_price,
-        spend_tx,
+        tx,
         height
       ) do
-    try_post(connection, secret_key, network_id, gas_price, spend_tx, height, posting_attempts())
+    try_post(connection, secret_key, network_id, gas_price, tx, height, posting_attempts())
   end
 
-  def try_post(
-        connection,
-        secret_key,
-        network_id,
-        _gas_price,
-        tx,
-        _height,
-        0
-      ) do
+  defp try_post(
+         connection,
+         secret_key,
+         network_id,
+         _gas_price,
+         tx,
+         _height,
+         0
+       ) do
     post(connection, secret_key, network_id, tx)
   end
 
-  def try_post(
-        connection,
-        secret_key,
-        network_id,
-        gas_price,
-        tx,
-        height,
-        attempts
-      ) do
+  defp try_post(
+         connection,
+         secret_key,
+         network_id,
+         gas_price,
+         tx,
+         height,
+         attempts
+       ) do
     case post(connection, secret_key, network_id, tx) do
       {:ok, _} = response ->
         response

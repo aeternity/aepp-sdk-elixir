@@ -29,8 +29,8 @@ defmodule Core.Oracle do
   """
   @type sophia_type :: String.t()
   @type sophia_data :: any()
-  @type ttl :: %{type: ttl_type(), value: non_neg_integer()}
   @type ttl_type :: :relative | :absolute
+  @type ttl :: %{type: ttl_type(), value: non_neg_integer()}
 
   @doc """
   Register a typed oracle. Queries and responses that don't follow the oracle's respective formats are invalid.
