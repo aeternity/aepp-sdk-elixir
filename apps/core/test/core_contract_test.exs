@@ -32,9 +32,8 @@ defmodule CoreContractTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"]
-        # ,
-        # fee: 10_000_000_000_000_000
+        ["42"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, _}, deploy_result)
@@ -47,9 +46,8 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "add_to_number",
-        ["33"]
-        # ,
-        # fee: 10_000_000_000_000_000
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
@@ -60,9 +58,8 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "add_to_number",
-        ["33"]
-        # ,
-        # fee: 10_000_000_000_000_000
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)

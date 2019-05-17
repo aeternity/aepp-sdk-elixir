@@ -62,7 +62,7 @@ defmodule Utils.Transaction do
   @await_attempt_interval 200
   @default_ttl 0
   @dummy_fee 0
-  @tx_posting_attempts 20
+  @tx_posting_attempts 5
   @default_payload ""
 
   @spec default_ttl :: non_neg_integer()
@@ -143,76 +143,6 @@ defmodule Utils.Transaction do
     try_post(connection, secret_key, network_id, gas_price, tx, height, posting_attempts())
   end
 
-  defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         _gas_price,
-         tx,
-         _height,
-         0
-       ) do
-    post(connection, secret_key, network_id, tx)
-  end
-
-  defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         gas_price,
-         tx,
-         height,
-         attempts
-       ) do
-    case post(connection, secret_key, network_id, tx) do
-      {:ok, _} = response ->
-        response
-
-      {:error, _} ->
-        try_post(
-          connection,
-          secret_key,
-          network_id,
-          gas_price,
-          %{tx | fee: calculate_fee(tx, height, network_id, dummy_fee(), gas_price)},
-          height,
-          attempts - 1
-        )
-    end
-  end
-
-  defp post(connection, secret_key, network_id, %type{} = tx) do
-    serialized_tx = Serialization.serialize(tx)
-
-    signature =
-      Keys.sign(
-        serialized_tx,
-        Keys.secret_key_to_binary(secret_key),
-        network_id
-      )
-
-    signed_tx_fields = [[signature], serialized_tx]
-    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
-    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
-
-    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
-           TransactionApi.post_transaction(connection, %Tx{
-             tx: encoded_signed_tx
-           }),
-         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
-      response
-    else
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{} = env} ->
-        {:error, env}
-
-      {:error, _} = error ->
-        error
-    end
-  end
-
   @doc """
   Calculate the fee of the transaction.
 
@@ -226,7 +156,7 @@ defmodule Utils.Transaction do
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
         }
-      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 0)
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
       16660000000
   """
   @spec calculate_fee(
@@ -237,61 +167,16 @@ defmodule Utils.Transaction do
           non_neg_integer()
         ) ::
           non_neg_integer()
-  def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) do
+  def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) when gas_price > 0 do
     min_gas(tx, height) * gas_price
   end
 
-  def calculate_fee(_tx, _height, _network_id, fee, _gas_price) do
+  def calculate_fee(_tx, _height, _network_id, fee, _gas_price) when fee > 0 do
     fee
   end
 
-  defp await_mining(connection, tx_hash, type) do
-    await_mining(connection, tx_hash, @await_attempts, type)
-  end
-
-  defp await_mining(_connection, _tx_hash, 0, _type),
-    do:
-      {:error,
-       "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
-
-  defp await_mining(connection, tx_hash, attempts, type) do
-    Process.sleep(@await_attempt_interval)
-
-    mining_status =
-      case type do
-        ContractCallTx ->
-          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
-
-        _ ->
-          TransactionApi.get_transaction_by_hash(connection, tx_hash)
-      end
-
-    case mining_status do
-      {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
-        await_mining(connection, tx_hash, attempts - 1, type)
-
-      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
-        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
-
-      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
-        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
-          TransactionApi.get_transaction_by_hash(connection, tx_hash)
-
-        {:ok,
-         %{
-           block_hash: block_hash,
-           block_height: block_height,
-           tx_hash: tx_hash,
-           return_value: return_value,
-           return_type: return_type
-         }}
-
-      {:ok, %Error{}} ->
-        await_mining(connection, tx_hash, attempts - 1, type)
-
-      {:error, %Env{} = env} ->
-        {:error, env}
-    end
+  def calculate_fee(_tx, _height, _network_id, fee, gas_price) do
+    {:error, "#{__MODULE__}: Incorrect fee: #{fee} or gas price: #{gas_price}"}
   end
 
   @doc """
@@ -472,5 +357,124 @@ defmodule Utils.Transaction do
     tx
     |> Governance.state_gas_per_block()
     |> Governance.state_gas(ttl)
+  end
+
+  defp try_post(
+         connection,
+         secret_key,
+         network_id,
+         _gas_price,
+         tx,
+         _height,
+         0
+       ) do
+    post(connection, secret_key, network_id, tx)
+  end
+
+  defp try_post(
+         connection,
+         secret_key,
+         network_id,
+         gas_price,
+         tx,
+         height,
+         attempts
+       ) do
+    case post(connection, secret_key, network_id, tx) do
+      {:ok, _} = response ->
+        response
+
+      {:error, _} ->
+        try_post(
+          connection,
+          secret_key,
+          network_id,
+          gas_price,
+          %{tx | fee: calculate_fee(tx, height, network_id, dummy_fee(), gas_price)},
+          height,
+          attempts - 1
+        )
+    end
+  end
+
+  defp post(connection, secret_key, network_id, %type{} = tx) do
+    serialized_tx = Serialization.serialize(tx)
+
+    signature =
+      Keys.sign(
+        serialized_tx,
+        Keys.secret_key_to_binary(secret_key),
+        network_id
+      )
+
+    signed_tx_fields = [[signature], serialized_tx]
+    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
+
+    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+           TransactionApi.post_transaction(connection, %Tx{
+             tx: encoded_signed_tx
+           }),
+         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
+      response
+    else
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{} = env} ->
+        {:error, env}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp await_mining(connection, tx_hash, type) do
+    await_mining(connection, tx_hash, @await_attempts, type)
+  end
+
+  defp await_mining(_connection, _tx_hash, 0, _type),
+    do:
+      {:error,
+       "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
+
+  defp await_mining(connection, tx_hash, attempts, type) do
+    Process.sleep(@await_attempt_interval)
+
+    mining_status =
+      case type do
+        ContractCallTx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
+        _ ->
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+      end
+
+    case mining_status do
+      {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
+        await_mining(connection, tx_hash, attempts - 1, type)
+
+      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
+        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
+
+      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
+        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+
+        {:ok,
+         %{
+           block_hash: block_hash,
+           block_height: block_height,
+           tx_hash: tx_hash,
+           return_value: return_value,
+           return_type: return_type
+         }}
+
+      {:ok, %Error{}} ->
+        await_mining(connection, tx_hash, attempts - 1, type)
+
+      {:error, %Env{} = env} ->
+        {:error, env}
+    end
   end
 end
