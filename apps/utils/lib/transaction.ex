@@ -74,9 +74,6 @@ defmodule Utils.Transaction do
   @spec dummy_fee() :: non_neg_integer()
   def dummy_fee(), do: @dummy_fee
 
-  @spec posting_attempts() :: non_neg_integer()
-  def posting_attempts(), do: @tx_posting_attempts
-
   @doc """
   Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID,
   add calculated minimum fee and post it to the node
@@ -140,7 +137,7 @@ defmodule Utils.Transaction do
         tx,
         height
       ) do
-    try_post(connection, secret_key, network_id, gas_price, tx, height, posting_attempts())
+    try_post(connection, secret_key, network_id, gas_price, tx, height, @tx_posting_attempts)
   end
 
   @doc """
@@ -390,7 +387,7 @@ defmodule Utils.Transaction do
           secret_key,
           network_id,
           gas_price,
-          %{tx | fee: calculate_fee(tx, height, network_id, dummy_fee(), gas_price)},
+          %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
           height,
           attempts - 1
         )
