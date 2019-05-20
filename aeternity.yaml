@@ -16,6 +16,7 @@ mining:
     autostart: true
     expected_mine_rate: 1000
     beneficiary_reward_delay: 2
+    min_miner_gas_price: 1000000
     # Public key of beneficiary account that will receive fees from mining on a node.
     beneficiary: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
     cuckoo:
@@ -26,3 +27,4 @@ mining:
             extra_args: "-t 1"
             # Use the smaller graph for faster mining
             edge_bits: 15
+            

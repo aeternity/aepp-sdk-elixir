@@ -46,10 +46,11 @@ defmodule Core.AENS do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         name,
         name_salt,
@@ -58,6 +59,7 @@ defmodule Core.AENS do
       when sender_prefix == "ak" do
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
            NameService.get_commitment_id(connection, name, name_salt),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, preclaim_tx} <-
            build_preclaim_tx(
              client,
@@ -65,12 +67,14 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _tx} = response <-
-           Transaction.post(
+         {:ok, _} = response <-
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             preclaim_tx
+             gas_price,
+             preclaim_tx,
+             height
            ) do
       response
     else
@@ -100,10 +104,11 @@ defmodule Core.AENS do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         name,
         name_salt,
@@ -118,12 +123,15 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _tx} = response <-
-           Transaction.post(
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, _} = response <-
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             claim_tx
+             gas_price,
+             claim_tx,
+             height
            ) do
       response
     else
@@ -162,10 +170,11 @@ defmodule Core.AENS do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         name,
         name_ttl,
@@ -186,12 +195,15 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _tx} = response <-
-           Transaction.post(
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, _} = response <-
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             update_tx
+             gas_price,
+             update_tx,
+             height
            ) do
       response
     else
@@ -221,10 +233,11 @@ defmodule Core.AENS do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         name,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
@@ -240,12 +253,15 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _tx} = response <-
-           Transaction.post(
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, _} = response <-
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             transfer_tx
+             gas_price,
+             transfer_tx,
+             height
            ) do
       response
     else
@@ -273,10 +289,11 @@ defmodule Core.AENS do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         name,
         opts \\ []
@@ -290,12 +307,15 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _tx} = response <-
-           Transaction.post(
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, _} = response <-
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             revoke_tx
+             gas_price,
+             revoke_tx,
+             height
            ) do
       response
     else

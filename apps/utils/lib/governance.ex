@@ -55,6 +55,29 @@ defmodule Utils.Governance do
   def tx_base_gas(%ChannelSnapshotSoloTx{}), do: @tx_base_gas
   def tx_base_gas(%ChannelWithdrawTx{}), do: @tx_base_gas
 
+  def gas(%SpendTx{}), do: 0
+  def gas(%NamePreclaimTx{}), do: 0
+  def gas(%NameClaimTx{}), do: 0
+  def gas(%NameTransferTx{}), do: 0
+  def gas(%NameRevokeTx{}), do: 0
+  def gas(%NameUpdateTx{}), do: 0
+  def gas(%OracleRegisterTx{}), do: 0
+  def gas(%OracleQueryTx{}), do: 0
+  def gas(%OracleRespondTx{}), do: 0
+  def gas(%OracleExtendTx{}), do: 0
+  def gas(%ContractCallTx{gas: gas}), do: gas
+  def gas(%ContractCreateTx{gas: gas}), do: gas
+  def gas(%ChannelDepositTx{}), do: 0
+  def gas(%ChannelCloseMutualTx{}), do: 0
+  def gas(%ChannelCloseSoloTx{}), do: 0
+  def gas(%ChannelCreateTx{}), do: 0
+  # Have to be implemented
+  def gas(%ChannelForceProgressTx{}), do: 0
+  def gas(%ChannelSlashTx{}), do: 0
+  def gas(%ChannelSettleTx{}), do: 0
+  def gas(%ChannelSnapshotSoloTx{}), do: 0
+  def gas(%ChannelWithdrawTx{}), do: 0
+
   @spec byte_gas() :: non_neg_integer()
   def byte_gas(), do: @byte_gas
 
