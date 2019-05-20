@@ -1,7 +1,7 @@
 defmodule Core.NamingTest do
   use ExUnit.Case
 
-  alias Core.AENS
+  alias Core.{AENS, Account}
 
   setup_all do
     Code.require_file("test_utils.ex", "../utils/test")
@@ -11,17 +11,16 @@ defmodule Core.NamingTest do
   @tag :travis_test
   test "test naming workflow", setup do
     # Pre-claim a name
-    pre_claim = AENS.preclaim(setup.client, "test.test", 777, [fee:  10_000_000_000_000_000])
+    pre_claim = AENS.preclaim(setup.client, "test.test", 777)
     assert match?({:ok, _}, pre_claim)
     # We need to wait a bit
     Process.sleep(1000)
     # Claim a name
-    claim = AENS.claim(setup.client, "test.test", 777, fee: 1_000_000_000_000_000)
+    claim = AENS.claim(setup.client, "test.test", 777)
     assert match?({:ok, _}, claim)
     Process.sleep(1000)
     # Update a name
-    update =
-      AENS.update(setup.client, "test.test", 49_999, [], 50_000, fee: 1_000_000_000_000_000)
+    update = AENS.update(setup.client, "test.test", 49_999, [], 50_000)
 
     assert match?({:ok, _}, update)
     # Spending to another account, in order to transfer a name to it
@@ -35,24 +34,23 @@ defmodule Core.NamingTest do
     assert match?({:ok, _}, spend)
 
     # Transfer a name to another account
-    transfer =
-      AENS.transfer(setup.client, "test.test", setup.valid_pub_key, fee: 1_000_000_000_000_000)
+    transfer = AENS.transfer(setup.client, "test.test", setup.valid_pub_key)
 
     assert match?({:ok, _}, transfer)
     Process.sleep(1000)
 
     # Pre-claim a new name
-    pre_claim = AENS.preclaim(setup.client, "new_test.test", 888, fee: 1_000_000_000_000_000)
+    pre_claim = AENS.preclaim(setup.client, "newtest.test", 888)
     assert match?({:ok, _}, pre_claim)
     # We need to wait a bit
     Process.sleep(1000)
     # Claim a new name
-    claim = AENS.claim(setup.client, "new_test.test", 888, fee: 1_000_000_000_000_000)
+    claim = AENS.claim(setup.client, "newtest.test", 888)
     assert match?({:ok, _}, claim)
     Process.sleep(1000)
 
     # Revoke a new name
-    revoke = AENS.revoke(setup.client, "new_test.test", fee: 1_000_000_000_000_000)
+    revoke = AENS.revoke(setup.client, "newtest.test")
     assert match?({:ok, _}, revoke)
   end
 end
