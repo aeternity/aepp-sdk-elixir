@@ -1,6 +1,6 @@
 defmodule Core.NamingTest do
   use ExUnit.Case
-
+  alias Utils.{Keys, Serialization}
   alias Core.{AENS, Account}
 
   setup_all do
@@ -20,7 +20,23 @@ defmodule Core.NamingTest do
     assert match?({:ok, _}, claim)
     Process.sleep(1000)
     # Update a name
-    update = AENS.update(setup.client, "test.test", 49_999, [], 50_000)
+
+    list_of_pointers = [
+      {Utils.Keys.public_key_to_binary(setup.valid_pub_key),
+       Serialization.id_to_record(
+         Keys.public_key_to_binary(setup.valid_pub_key),
+         :account
+       )}
+    ]
+
+    update =
+      AENS.update(
+        setup.client,
+        "test.test",
+        49_999,
+        list_of_pointers,
+        50_000
+      )
 
     assert match?({:ok, _}, update)
     # Spending to another account, in order to transfer a name to it
