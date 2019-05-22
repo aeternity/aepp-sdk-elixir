@@ -162,8 +162,7 @@ defmodule Utils.Transaction do
           String.t(),
           atom() | non_neg_integer(),
           non_neg_integer()
-        ) ::
-          non_neg_integer()
+        ) :: non_neg_integer()
   def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) when gas_price > 0 do
     min_gas(tx, height) * gas_price
   end
