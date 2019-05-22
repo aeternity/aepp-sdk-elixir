@@ -3,10 +3,12 @@ defmodule Core.Account do
    High-level module for Account-related activities.
   """
   alias Core.Client
-  alias AeternityNode.Api.Chain
+  alias AeternityNode.Api.Account, as: AccountApi
+  alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Model.{Account, SpendTx, Error}
   alias Utils.{Transaction, Encoding}
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.SpendTx
+  alias Tesla.Env
 
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
@@ -50,7 +52,7 @@ defmodule Core.Account do
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
-         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{fee: fee} = spend_tx <-
            struct(SpendTx,
              sender_id: sender_id,
@@ -68,6 +70,73 @@ defmodule Core.Account do
       {:ok, response}
     else
       {:error, _} = err -> err
+    end
+  end
+
+  def balance(%Client{connection: connection}, pubkey) do
+    case AccountApi.get_account_by_pubkey(connection, pubkey) do
+      {:ok, %Account{balance: balance}} ->
+        {:ok, balance}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{}} = error ->
+        error
+    end
+  end
+
+  def balance(%Client{} = client, pubkey, height) when is_integer(height) do
+    case get(client, pubkey, height) do
+      {:ok, %Account{balance: balance}} ->
+        {:ok, balance}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{}} = error ->
+        error
+    end
+  end
+
+  def balance(%Client{} = client, pubkey, block_hash)
+      when is_bitstring(block_hash) do
+    case get(client, pubkey, block_hash) do
+      {:ok, %Account{balance: balance}} ->
+        {:ok, balance}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{}} = error ->
+        error
+    end
+  end
+
+  def get(%Client{connection: connection}, pubkey, height) when is_integer(height) do
+    case AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height) do
+      {:ok, %Account{}} = response ->
+        response
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{}} = error ->
+        error
+    end
+  end
+
+  def get(%Client{connection: connection}, pubkey, block_hash)
+      when is_bitstring(block_hash) do
+    case AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash) do
+      {:ok, %Account{}} = response ->
+        response
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{}} = error ->
+        error
     end
   end
 end
