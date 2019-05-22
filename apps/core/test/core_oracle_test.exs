@@ -49,7 +49,10 @@ defmodule CoreOracleTest do
 
     assert length(queries) == 1
 
-    assert match?({:ok, _}, Oracle.get_query(setup_data.client, oracle_id, query_id))
+    assert match?(
+             {:ok, %{query: %{"a" => 1}}},
+             Oracle.get_query(setup_data.client, oracle_id, query_id)
+           )
 
     assert match?({:ok, _}, query)
 
