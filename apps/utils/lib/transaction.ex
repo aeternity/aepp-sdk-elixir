@@ -102,7 +102,6 @@ defmodule Utils.Transaction do
         owner_id: public_key,
         nonce: nonce,
         code: serialized_wrapped_code,
-        vm_version: :unused,
         abi_version: :unused,
         deposit: 0,
         amount: 0,
@@ -162,8 +161,7 @@ defmodule Utils.Transaction do
           String.t(),
           atom() | non_neg_integer(),
           non_neg_integer()
-        ) ::
-          non_neg_integer()
+        ) :: non_neg_integer()
   def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) when gas_price > 0 do
     min_gas(tx, height) * gas_price
   end
@@ -250,8 +248,7 @@ defmodule Utils.Transaction do
               query_fee: 10,
               query_format: "query_format",
               response_format: "response_format",
-              ttl: 10,
-              vm_version: 196609
+              ttl: 10
             }
         iex> Utils.Transaction.gas_limit oracle_register_tx, 5
           16581
@@ -443,6 +440,9 @@ defmodule Utils.Transaction do
         ContractCallTx ->
           TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
 
+        ContractCreateTx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
         _ ->
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
       end
@@ -454,7 +454,14 @@ defmodule Utils.Transaction do
       {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
         {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
-      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
+      {:ok,
+       %AeternityNode.Model.TxInfoObject{
+         call_info: %ContractCallObject{
+           log: log,
+           return_value: return_value,
+           return_type: return_type
+         }
+       }} ->
         {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
 
@@ -464,7 +471,8 @@ defmodule Utils.Transaction do
            block_height: block_height,
            tx_hash: tx_hash,
            return_value: return_value,
-           return_type: return_type
+           return_type: return_type,
+           log: log
          }}
 
       {:ok, %Error{}} ->

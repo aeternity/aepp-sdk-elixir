@@ -94,11 +94,9 @@ defmodule Core.Oracle do
            nonce: nonce,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-           vm_version: :unused,
            abi_version: @abi_version
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(ttl, height),
          {:ok, response} <-
            Transaction.try_post(
@@ -176,8 +174,7 @@ defmodule Core.Oracle do
            sender_id: pubkey,
            nonce: nonce
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(query_ttl, height),
          :ok <- validate_query_object_ttl(oracle_ttl, query_ttl, response_ttl_value, height),
          {:ok, response} <-
@@ -258,8 +255,7 @@ defmodule Core.Oracle do
            oracle_id: oracle_id,
            nonce: nonce
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -318,8 +314,7 @@ defmodule Core.Oracle do
            nonce: nonce,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl())
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,

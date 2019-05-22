@@ -79,7 +79,6 @@ defmodule Core.Contract do
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
-           vm_version: :unused,
            abi_version: :unused,
            deposit: Keyword.get(opts, :deposit, @default_deposit),
            amount: Keyword.get(opts, :amount, @default_amount),
@@ -89,8 +88,7 @@ defmodule Core.Contract do
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -101,7 +99,7 @@ defmodule Core.Contract do
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok, Map.put(response, :contract_id, contract_account)}
+      {:ok, Map.merge(response, %{contract_id: contract_account, log: decode_logs(response.log)})}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -161,8 +159,7 @@ defmodule Core.Contract do
              function_args,
              opts
            ),
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -175,7 +172,7 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, response.return_value, response.return_type) do
-      {:ok, %{response | return_value: decoded_return_value}}
+      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
     else
       {:error, _} = error ->
         error
@@ -234,7 +231,8 @@ defmodule Core.Contract do
               %DryRunResult{
                 call_obj: %ContractCallObject{
                   return_type: return_type,
-                  return_value: return_value
+                  return_value: return_value,
+                  log: log
                 }
               }
             ]
@@ -247,7 +245,8 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, return_value, return_type) do
-      {:ok, %{return_value: decoded_return_value, return_type: return_type}}
+      {:ok,
+       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
     else
       {:ok,
        %DryRunResults{
@@ -490,6 +489,13 @@ defmodule Core.Contract do
     end
   end
 
+  defp decode_logs(logs) do
+    Enum.map(logs, fn log ->
+      string_data = Encoding.prefix_decode_base64(log.data)
+      log |> Map.from_struct() |> Map.replace!(:data, string_data)
+    end)
+  end
+
   defp aci_to_sophia_type(type) do
     case type do
       %{} ->
@@ -568,7 +574,6 @@ defmodule Core.Contract do
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
-           vm_version: :unused,
            abi_version: @abi_version,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
