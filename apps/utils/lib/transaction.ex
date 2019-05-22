@@ -217,8 +217,8 @@ defmodule Utils.Transaction do
            return_type: return_type
          }}
 
-      {:ok, %Error{}} ->
-        await_mining(connection, tx_hash, attempts - 1, type)
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
 
       {:error, %Env{} = env} ->
         {:error, env}

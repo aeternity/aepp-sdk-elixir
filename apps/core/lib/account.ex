@@ -13,6 +13,8 @@ defmodule Core.Account do
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
 
+  @type account :: %{id: String.t(), balance: non_neg_integer(), nonce: non_neg_integer()}
+
   @doc """
   Send tokens to an account.
 
@@ -69,78 +71,72 @@ defmodule Core.Account do
            Transaction.post(connection, privkey, network_id, %{spend_tx | fee: fee}) do
       {:ok, response}
     else
-      {:error, _} = err -> err
+      err -> prepare_result(err)
     end
   end
 
-  def balance(%Client{connection: connection}, pubkey) do
+  @spec balance(Client.t(), String.t()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
     case AccountApi.get_account_by_pubkey(connection, pubkey) do
       {:ok, %Account{balance: balance}} ->
         {:ok, balance}
 
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{}} = error ->
-        error
+      _ = response ->
+        prepare_result(response)
     end
   end
 
-  def balance(%Client{} = client, pubkey, height) when is_integer(height) do
-    case get(client, pubkey, height) do
-      {:ok, %Account{balance: balance}} ->
-        {:ok, balance}
+  @spec balance(Client.t(), String.t(), non_neg_integer()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
+    response = get(client, pubkey, height)
 
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{}} = error ->
-        error
-    end
+    prepare_result(response)
   end
 
+  @spec balance(Client.t(), String.t(), String.t()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
   def balance(%Client{} = client, pubkey, block_hash)
-      when is_bitstring(block_hash) do
-    case get(client, pubkey, block_hash) do
-      {:ok, %Account{balance: balance}} ->
-        {:ok, balance}
+      when is_binary(pubkey) and is_binary(block_hash) do
+    response = get(client, pubkey, block_hash)
 
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{}} = error ->
-        error
-    end
+    prepare_result(response)
   end
 
-  def get(%Client{connection: connection}, pubkey, height) when is_integer(height) do
-    case AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height) do
-      {:ok, %Account{} = account} ->
-        account_map = Map.from_struct(account)
+  @spec get(Client.t(), String.t(), non_neg_integer()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection}, pubkey, height)
+      when is_binary(pubkey) and is_integer(height) do
+    response = AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height)
 
-        {:ok, account_map}
-
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
-
-      {:error, %Env{}} = error ->
-        error
-    end
+    prepare_result(response)
   end
 
+  @spec get(Client.t(), String.t(), String.t()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
   def get(%Client{connection: connection}, pubkey, block_hash)
-      when is_bitstring(block_hash) do
-    case AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash) do
-      {:ok, %Account{} = account} ->
-        account_map = Map.from_struct(account)
+      when is_binary(pubkey) and is_binary(block_hash) do
+    response = AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash)
 
-        {:ok, account_map}
+    prepare_result(response)
+  end
 
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
+  defp prepare_result({:ok, %Account{} = account}) do
+    account_map = Map.from_struct(account)
 
-      {:error, %Env{}} = error ->
-        error
-    end
+    {:ok, account_map}
+  end
+
+  defp prepare_result({:ok, %{balance: balance}}) do
+    {:ok, balance}
+  end
+
+  defp prepare_result({:ok, %Error{reason: message}}) do
+    {:error, message}
+  end
+
+  defp prepare_result({:error, %Env{}} = error) do
+    error
   end
 end
