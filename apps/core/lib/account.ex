@@ -115,8 +115,10 @@ defmodule Core.Account do
 
   def get(%Client{connection: connection}, pubkey, height) when is_integer(height) do
     case AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height) do
-      {:ok, %Account{}} = response ->
-        response
+      {:ok, %Account{} = account} ->
+        account_map = Map.from_struct(account)
+
+        {:ok, account_map}
 
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -129,8 +131,10 @@ defmodule Core.Account do
   def get(%Client{connection: connection}, pubkey, block_hash)
       when is_bitstring(block_hash) do
     case AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash) do
-      {:ok, %Account{}} = response ->
-        response
+      {:ok, %Account{} = account} ->
+        account_map = Map.from_struct(account)
+
+        {:ok, account_map}
 
       {:ok, %Error{reason: message}} ->
         {:error, message}

@@ -9,6 +9,7 @@ defmodule Core.Chain do
   alias AeternityNode.Model.{
     ContractCallObject,
     DryRunInput,
+    DryRunResult,
     DryRunResults,
     Event,
     GenericTx,
@@ -18,6 +19,7 @@ defmodule Core.Chain do
     KeyBlock,
     MicroBlockHeader,
     Peers,
+    Protocol,
     PubKey,
     Status,
     Error
@@ -79,16 +81,16 @@ defmodule Core.Chain do
     case TransactionApi.get_transaction_by_hash(connection, tx_hash) do
       {:ok,
        %ContractCallObject{
-         log: logs
+         log: log
        } = transaction_info} ->
-        logs =
-          Enum.map(logs, fn log ->
-            Map.from_struct(log)
+        log =
+          Enum.map(log, fn %Event{} = event ->
+            Map.from_struct(event)
           end)
 
         transaction_info_map = Map.from_struct(transaction_info)
 
-        {:ok, %{transaction_info_map | log: logs}}
+        {:ok, %{transaction_info_map | log: log}}
 
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -214,8 +216,10 @@ defmodule Core.Chain do
 
   def get_micro_block_header(%Client{connection: connection}, block_hash) do
     case ChainApi.get_micro_block_header_by_hash(connection, block_hash) do
-      {:ok, %MicroBlockHeader{}} = response ->
-        response
+      {:ok, %MicroBlockHeader{} = micro_block_header} ->
+        micro_block_header_map = Map.from_struct(micro_block_header)
+
+        {:ok, micro_block_header_map}
 
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -239,6 +243,22 @@ defmodule Core.Chain do
 
     case DebugApi.dry_run_txs(internal_connection, input) do
       {:ok, %DryRunResults{results: results}} ->
+        results =
+          Enum.map(
+            results,
+            fn %DryRunResult{call_obj: %ContractCallObject{log: log} = call_obj} = dry_run_result ->
+              log =
+                Enum.map(log, fn %Event{} = event ->
+                  Map.from_struct(event)
+                end)
+
+              call_obj_map = Map.from_struct(call_obj)
+              dry_run_result_map = Map.from_struct(dry_run_result)
+
+              %{dry_run_result_map | call_obj: %{call_obj_map | log: log}}
+            end
+          )
+
         {:ok, results}
 
       {:ok, %Error{reason: message}} ->
@@ -252,49 +272,27 @@ defmodule Core.Chain do
   def get_info(%Client{connection: connection, internal_connection: internal_connection}) do
     with {:ok, %PeerPubkeyResponse{pubkey: peer_pubkey}} <-
            NodeInfoApi.get_peer_pubkey(connection),
-         {:ok,
-          %Status{
-            genesis_key_block_hash: genesis_key_block_hash,
-            solutions: solutions,
-            difficulty: difficulty,
-            syncing: syncing,
-            sync_progress: sync_progress,
-            listening: listening,
-            protocols: protocols,
-            node_version: node_version,
-            node_revision: node_revision,
-            peer_count: peer_count,
-            pending_transactions_count: pending_transactions_count,
-            network_id: network_id
-          }} <- NodeInfoApi.get_status(connection),
+         {:ok, %Status{protocols: protocols} = status} <- NodeInfoApi.get_status(connection),
          {:ok, %PubKey{pub_key: node_beneficiary}} <-
            NodeInfoApi.get_node_beneficiary(internal_connection),
          {:ok, %PubKey{pub_key: node_pubkey}} <- NodeInfoApi.get_node_pubkey(internal_connection),
-         {:ok, %Peers{peers: peers, blocked: blocked}} <-
+         {:ok, %Peers{} = peers} <-
            NodeInfoApi.get_peers(internal_connection) do
+      protocols =
+        Enum.map(protocols, fn %Protocol{} = protocol ->
+          Map.from_struct(protocol)
+        end)
+
+      status_map = Map.from_struct(status)
+      peers_map = Map.from_struct(peers)
+
       {:ok,
        %{
          peer_pubkey: peer_pubkey,
-         status: %{
-           genesis_key_block_hash: genesis_key_block_hash,
-           solutions: solutions,
-           difficulty: difficulty,
-           syncing: syncing,
-           sync_progress: sync_progress,
-           listening: listening,
-           protocols: protocols,
-           node_version: node_version,
-           node_revision: node_revision,
-           peer_count: peer_count,
-           pending_transactions_count: pending_transactions_count,
-           network_id: network_id
-         },
+         status: %{status_map | protocols: protocols},
          node_beneficiary: node_beneficiary,
          node_pubkey: node_pubkey,
-         peers: %{
-           peers: peers,
-           blocked: blocked
-         }
+         peers: peers_map
        }}
     end
   end
