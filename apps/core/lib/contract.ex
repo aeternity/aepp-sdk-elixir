@@ -79,7 +79,6 @@ defmodule Core.Contract do
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
-           vm_version: :unused,
            abi_version: :unused,
            deposit: Keyword.get(opts, :deposit, @default_deposit),
            amount: Keyword.get(opts, :amount, @default_amount),
@@ -89,8 +88,7 @@ defmodule Core.Contract do
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -161,8 +159,7 @@ defmodule Core.Contract do
              function_args,
              opts
            ),
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -568,7 +565,6 @@ defmodule Core.Contract do
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
-           vm_version: :unused,
            abi_version: @abi_version,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),

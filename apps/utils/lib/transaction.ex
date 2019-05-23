@@ -102,7 +102,6 @@ defmodule Utils.Transaction do
         owner_id: public_key,
         nonce: nonce,
         code: serialized_wrapped_code,
-        vm_version: :unused,
         abi_version: :unused,
         deposit: 0,
         amount: 0,
@@ -249,8 +248,7 @@ defmodule Utils.Transaction do
               query_fee: 10,
               query_format: "query_format",
               response_format: "response_format",
-              ttl: 10,
-              vm_version: 196609
+              ttl: 10
             }
         iex> Utils.Transaction.gas_limit oracle_register_tx, 5
           16581

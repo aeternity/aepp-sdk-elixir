@@ -96,7 +96,6 @@ defmodule Core.Oracle do
            nonce: nonce,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-           vm_version: :unused,
            abi_version: @abi_version
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
@@ -607,6 +606,7 @@ defmodule Core.Oracle do
       end
 
     if height + relative_query_ttl + response_ttl <= oracle_ttl do
+      IO.inspect({height + relative_query_ttl + response_ttl, oracle_ttl})
       :ok
     else
       {:error, "Query objects can't outlive oracle - query and response TTL too high"}
