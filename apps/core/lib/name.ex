@@ -50,6 +50,7 @@ defmodule Core.AENS do
           },
           network_id: network_id,
           connection: connection,
+          internal_connection: internal_connection,
           gas_price: gas_price
         } = client,
         name,
@@ -58,7 +59,7 @@ defmodule Core.AENS do
       )
       when sender_prefix == "ak" do
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
-           NameService.get_commitment_id(connection, name, name_salt),
+           NameService.get_commitment_id(internal_connection, name, name_salt),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, preclaim_tx} <-
            build_preclaim_tx(
