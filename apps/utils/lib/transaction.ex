@@ -331,21 +331,6 @@ defmodule Utils.Transaction do
     {:error, "#{__MODULE__} Invalid #{inspect(tx)} and/or height #{inspect(height)}"}
   end
 
-  @spec min_gas_price(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
-  def min_gas_price(%type{} = tx, height) when height > 0 and type in @contract_types do
-    tx_gas_limit = gas_limit(tx, height)
-    min(Governance.gas_price(tx), div(Governance.fee(tx) + tx_gas_limit - 1, tx_gas_limit))
-  end
-
-  def min_gas_price(%type{} = tx, height) when height > 0 and type in @struct_type do
-    tx_gas_limit = gas_limit(tx, height)
-    div(Governance.fee(tx) + tx_gas_limit - 1, tx_gas_limit)
-  end
-
-  def min_gas_price(tx, height) do
-    {:error, "#{__MODULE__}: Invalid tx: #{inspect(tx)} or height: #{inspect(height)}"}
-  end
-
   defp ttl_delta(_height, {:relative, _value} = ttl) do
     {:relative, oracle_ttl_delta(0, ttl)}
   end

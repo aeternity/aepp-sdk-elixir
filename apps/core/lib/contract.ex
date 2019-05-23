@@ -94,6 +94,7 @@ defmodule Core.Contract do
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
+         IO.inspect(contract_create_tx, limit: :infinity),
          {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
