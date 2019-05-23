@@ -1,6 +1,9 @@
 defmodule Core.Account do
   @moduledoc """
    High-level module for Account-related activities.
+
+   In order for its functions to be used, a client must be defined first.
+   Client example can be found at: `Core.Client.new/4`
   """
   alias Core.Client
   alias AeternityNode.Api.Account, as: AccountApi
@@ -75,6 +78,14 @@ defmodule Core.Account do
     end
   end
 
+  @doc """
+  Get an account's balance
+
+  ## Example
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> Core.Account.balance(client, pubkey)
+      {:ok, 1652992279192254044805}
+  """
   @spec balance(Client.t(), String.t()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
   def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
@@ -87,6 +98,15 @@ defmodule Core.Account do
     end
   end
 
+  @doc """
+  Get an account's balance at a given height
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> height = 80000
+      iex> Core.Account.balance(client, pubkey, height)
+      {:ok, 1641606227460612819475}
+  """
   @spec balance(Client.t(), String.t(), non_neg_integer()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
   def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
@@ -95,6 +115,15 @@ defmodule Core.Account do
     prepare_result(response)
   end
 
+  @doc """
+  Get an account's balance at a given block hash
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+      iex> Core.Account.balance(client, pubkey, block_hash)
+      {:ok, 1653014562214254044805}
+  """
   @spec balance(Client.t(), String.t(), String.t()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
   def balance(%Client{} = client, pubkey, block_hash)
@@ -104,6 +133,23 @@ defmodule Core.Account do
     prepare_result(response)
   end
 
+  @doc """
+  Get an account at a given height
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> height = 80000
+      iex> Core.Account.get(client, pubkey, height)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 1641606227460612819475,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 11215
+       }}
+  """
   @spec get(Client.t(), String.t(), non_neg_integer()) ::
           {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
   def get(%Client{connection: connection}, pubkey, height)
@@ -113,6 +159,23 @@ defmodule Core.Account do
     prepare_result(response)
   end
 
+  @doc """
+  Get an account at a given block hash
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+      iex> Core.Account.get(client, pubkey, block_hash)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 1653014562214254044805,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 11837
+       }}
+  """
   @spec get(Client.t(), String.t(), String.t()) ::
           {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
   def get(%Client{connection: connection}, pubkey, block_hash)
