@@ -78,6 +78,26 @@ defmodule Utils.Governance do
   def gas(%ChannelSnapshotSoloTx{}), do: 0
   def gas(%ChannelWithdrawTx{}), do: 0
 
+  def gas_price(%ContractCallTx{gas_price: gas_price}), do: gas_price
+  def gas_price(%ContractCreateTx{gas_price: gas_price}), do: gas_price
+
+  def fee(%SpendTx{fee: fee}), do: fee
+  def fee(%NamePreclaimTx{fee: fee}), do: fee
+  def fee(%NameClaimTx{fee: fee}), do: fee
+  def fee(%NameTransferTx{fee: fee}), do: fee
+  def fee(%NameRevokeTx{fee: fee}), do: fee
+  def fee(%NameUpdateTx{fee: fee}), do: fee
+  def fee(%OracleRegisterTx{fee: fee}), do: fee
+  def fee(%OracleQueryTx{fee: fee}), do: fee
+  def fee(%OracleRespondTx{fee: fee}), do: fee
+  def fee(%OracleExtendTx{fee: fee}), do: fee
+  def fee(%ContractCallTx{fee: fee}), do: fee
+  def fee(%ContractCreateTx{fee: fee}), do: fee
+  def fee(%ChannelDepositTx{fee: fee}), do: fee
+  def fee(%ChannelCloseMutualTx{fee: fee}), do: fee
+  def fee(%ChannelCloseSoloTx{fee: fee}), do: fee
+  def fee(%ChannelCreateTx{fee: fee}), do: fee
+
   @spec byte_gas() :: non_neg_integer()
   def byte_gas(), do: @byte_gas
 

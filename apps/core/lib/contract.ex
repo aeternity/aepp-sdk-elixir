@@ -41,7 +41,12 @@ defmodule Core.Contract do
       iex> Core.Contract.deploy(client, source_code, init_args)
       {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
   """
-  @spec deploy(Client.t(), String.t(), list(String.t()), list()) ::
+  @spec deploy(
+          Client.t(),
+          String.t(),
+          list(String.t()),
+          list()
+        ) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
