@@ -21,7 +21,8 @@ defmodule Utils.Transaction do
     NameRevokeTx,
     NameUpdateTx,
     ContractCallTx,
-    ContractCreateTx
+    ContractCreateTx,
+    TxInfoObject
   }
 
   alias Utils.{Keys, Encoding, Serialization, Governance}
@@ -455,7 +456,7 @@ defmodule Utils.Transaction do
         {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
       {:ok,
-       %AeternityNode.Model.TxInfoObject{
+       %TxInfoObject{
          call_info: %ContractCallObject{
            log: log,
            return_value: return_value,
