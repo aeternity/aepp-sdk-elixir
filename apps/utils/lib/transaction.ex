@@ -137,7 +137,6 @@ defmodule Utils.Transaction do
         tx,
         height
       ) do
-    IO.puts("A")
     try_post(connection, secret_key, network_id, gas_price, tx, height, @tx_posting_attempts)
   end
 
@@ -380,7 +379,7 @@ defmodule Utils.Transaction do
       {:ok, _} = response ->
         response
 
-      {:error, a} ->
+      {:error, _} ->
         try_post(
           connection,
           secret_key,
@@ -469,7 +468,7 @@ defmodule Utils.Transaction do
            return_type: return_type
          }}
 
-      {:ok, %Error{} = err} ->
+      {:ok, %Error{}} ->
         await_mining(connection, tx_hash, attempts - 1, type)
 
       {:error, %Env{} = env} ->

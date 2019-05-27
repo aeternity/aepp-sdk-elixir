@@ -27,7 +27,7 @@ defmodule CoreOracleTest do
         setup_data.client,
         "map(string, int)",
         "map(string, int)",
-        %{type: :relative, value: 2},
+        %{type: :relative, value: 3},
         30,
         fee: 10_000_000_000_000_000
       )
