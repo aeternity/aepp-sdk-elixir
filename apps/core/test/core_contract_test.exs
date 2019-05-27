@@ -75,8 +75,7 @@ defmodule CoreContractTest do
   test "create invalid contract", setup_data do
     invalid_source_code = String.replace(setup_data.source_code, "x : int", "x : list(int)")
 
-    deploy_result =
-      Contract.deploy(setup_data.client, invalid_source_code, ["42"])
+    deploy_result = Contract.deploy(setup_data.client, invalid_source_code, ["42"])
 
     assert match?({:error, _}, deploy_result)
   end

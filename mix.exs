@@ -62,6 +62,7 @@ defmodule AeppSdkElixir.MixProject do
            "-jar",
            "./#{get_file_name(:generator)}.jar",
            "generate",
+           "--skip-validate-spec",
            "-i",
            "./#{get_file_name(:specification)}.yaml",
            "-g",

@@ -90,7 +90,6 @@ defmodule Utils.SerializationUtils do
         nonce: nonce,
         fee: fee,
         ttl: ttl,
-        vm_version: _vm_version,
         abi_version: abi_version
       }) do
     account_id = proccess_id_to_record(tx_account_id)
@@ -346,7 +345,6 @@ defmodule Utils.SerializationUtils do
         caller_id: tx_caller_id,
         nonce: nonce,
         contract_id: tx_contract_id,
-        vm_version: _vm_version,
         abi_version: abi_version,
         fee: fee,
         ttl: ttl,
