@@ -94,7 +94,6 @@ defmodule Core.Oracle do
            nonce: nonce,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-           vm_version: :unused,
            abi_version: @abi_version
          },
          {:ok, %{height: height}} <-
