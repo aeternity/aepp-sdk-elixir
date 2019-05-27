@@ -28,8 +28,7 @@ defmodule CoreOracleTest do
         "map(string, int)",
         "map(string, int)",
         %{type: :relative, value: 30},
-        30,
-        fee: 10_000_000_000_000_000
+        30
       )
 
     assert match?({:ok, _}, register)
@@ -41,8 +40,7 @@ defmodule CoreOracleTest do
         oracle_id,
         %{"a" => 1},
         %{type: :relative, value: 10},
-        10,
-        fee: 10_000_000_000_000_000
+        10
       )
 
     assert match?({:ok, _}, query)
@@ -54,14 +52,17 @@ defmodule CoreOracleTest do
                oracle_id,
                query_id,
                %{"b" => 2},
-               10,
-               fee: 10_000_000_000_000_000
+               10
              )
            )
 
     assert match?(
              {:ok, _},
-             Oracle.extend(setup_data.client, oracle_id, 10, fee: 10_000_000_000_000_000)
+             Oracle.extend(
+               setup_data.client,
+               oracle_id,
+               10
+             )
            )
 
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))

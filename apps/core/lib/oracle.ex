@@ -2,7 +2,7 @@ defmodule Core.Oracle do
   @moduledoc """
   Module for oracle interaction, see: https://github.com/aeternity/protocol/blob/master/oracles/oracles.md
   """
-  alias Utils.Transaction, as: TransactionUtils
+  alias Utils.Transaction
   alias Utils.Account, as: AccountUtils
   alias Utils.{Keys, Hash, Encoding}
   alias Core.Client
@@ -18,7 +18,6 @@ defmodule Core.Oracle do
     Error
   }
 
-  alias AeternityNode.Model.InlineResponse2001, as: HeightResponse
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Oracle, as: OracleApi
 
@@ -30,8 +29,8 @@ defmodule Core.Oracle do
   """
   @type sophia_type :: String.t()
   @type sophia_data :: any()
-  @type ttl :: %{type: ttl_type(), value: non_neg_integer()}
   @type ttl_type :: :relative | :absolute
+  @type ttl :: %{type: ttl_type(), value: non_neg_integer()}
 
   @doc """
   Register a typed oracle. Queries and responses that don't follow the oracle's respective formats are invalid.
@@ -70,9 +69,10 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def register(
         %Client{
-          keypair: %{public: pubkey, secret: privkey},
+          keypair: %{public: pubkey, secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         },
         query_format,
         response_format,
@@ -85,7 +85,7 @@ defmodule Core.Oracle do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          {:ok, binary_query_format} <- sophia_type_to_binary(query_format),
          {:ok, binary_response_format} <- sophia_type_to_binary(response_format),
-         tx_dummy_fee = %OracleRegisterTx{
+         register_tx = %OracleRegisterTx{
            query_format: binary_query_format,
            response_format: binary_response_format,
            query_fee: query_fee,
@@ -96,24 +96,17 @@ defmodule Core.Oracle do
            ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
            abi_version: @abi_version
          },
-         {:ok, %HeightResponse{height: height}} <-
+         {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(ttl, height),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
-         },
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             tx
+             gas_price,
+             register_tx,
+             height
            ) do
       {:ok, Map.put(response, :oracle_id, String.replace_prefix(pubkey, "ak", "ok"))}
     else
@@ -152,9 +145,10 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def query(
         %Client{
-          keypair: %{public: pubkey, secret: privkey},
+          keypair: %{public: pubkey, secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         },
         oracle_id,
         query,
@@ -170,36 +164,29 @@ defmodule Core.Oracle do
           }} <- OracleApi.get_oracle_by_pubkey(connection, oracle_id),
          {:ok, binary_query} <- sophia_data_to_binary(query),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
-         tx_dummy_fee = %OracleQueryTx{
+         query_tx = %OracleQueryTx{
            oracle_id: oracle_id,
            query: binary_query,
            query_fee: Keyword.get(opts, :query_fee, oracle_query_fee),
            query_ttl: %Ttl{type: query_type, value: query_value},
            response_ttl: %RelativeTtl{type: :unused, value: response_ttl_value},
-           fee: 0,
-           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           fee: Keyword.get(opts, :fee, 0),
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            sender_id: pubkey,
            nonce: nonce
          },
-         {:ok, %HeightResponse{height: height}} <-
+         {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(query_ttl, height),
          :ok <- validate_query_object_ttl(oracle_ttl, query_ttl, response_ttl_value, height),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
-         },
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             tx
+             gas_price,
+             query_tx,
+             height
            ) do
       {:ok, Map.put(response, :query_id, calculate_query_id(pubkey, nonce, oracle_id))}
     else
@@ -246,9 +233,10 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def respond(
         %Client{
-          keypair: %{public: pubkey, secret: privkey},
+          keypair: %{public: pubkey, secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         },
         oracle_id,
         query_id,
@@ -260,32 +248,25 @@ defmodule Core.Oracle do
              is_list(opts) do
     with {:ok, binary_response} <- sophia_data_to_binary(response),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
-         tx_dummy_fee = %OracleRespondTx{
+         response_tx = %OracleRespondTx{
            query_id: query_id,
            response: binary_response,
            response_ttl: %RelativeTtl{type: :relative, value: response_ttl},
-           fee: 0,
-           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           fee: Keyword.get(opts, :fee, 0),
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            oracle_id: oracle_id,
            nonce: nonce
          },
-         {:ok, %HeightResponse{height: height}} <-
+         {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
-         },
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             tx
+             gas_price,
+             response_tx,
+             height
            ) do
       {:ok, response}
     else
@@ -318,9 +299,10 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def extend(
         %Client{
-          keypair: %{public: pubkey, secret: privkey},
+          keypair: %{public: pubkey, secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         },
         oracle_id,
         oracle_ttl,
@@ -328,30 +310,23 @@ defmodule Core.Oracle do
       )
       when is_binary(oracle_id) and is_integer(oracle_ttl) and is_list(opts) do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
-         tx_dummy_fee = %OracleExtendTx{
-           fee: 0,
+         extend_tx = %OracleExtendTx{
+           fee: Keyword.get(opts, :fee, 0),
            oracle_ttl: %RelativeTtl{type: :relative, value: oracle_ttl},
            oracle_id: oracle_id,
            nonce: nonce,
-           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl())
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl())
          },
-         {:ok, %HeightResponse{height: height}} <-
+         {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
-         },
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
-             privkey,
+             secret_key,
              network_id,
-             tx
+             gas_price,
+             extend_tx,
+             height
            ) do
       {:ok, response}
     else

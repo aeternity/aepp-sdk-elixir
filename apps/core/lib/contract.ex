@@ -18,12 +18,9 @@ defmodule Core.Contract do
     Error
   }
 
-  alias AeternityNode.Model.InlineResponse2001, as: HeightResponse
-
-  alias Utils.{Serialization, Encoding, Keys}
+  alias Utils.{Transaction, Serialization, Encoding, Keys}
   alias Utils.Account, as: AccountUtils
   alias Utils.Chain, as: ChainUtils
-  alias Utils.Transaction, as: TransactionUtils
   alias Utils.Hash
   alias Core.Client
   alias Tesla.Env
@@ -58,7 +55,8 @@ defmodule Core.Contract do
         %Client{
           keypair: %{public: public_key, secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         },
         source_code,
         init_args,
@@ -77,7 +75,7 @@ defmodule Core.Contract do
            byte_code
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
-         tx_dummy_fee = %ContractCreateTx{
+         contract_create_tx = %ContractCreateTx{
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
@@ -86,27 +84,20 @@ defmodule Core.Contract do
            amount: Keyword.get(opts, :amount, @default_amount),
            gas: Keyword.get(opts, :gas, @default_gas),
            gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
-           fee: 0,
-           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           fee: Keyword.get(opts, :fee, 0),
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
-         {:ok, %HeightResponse{height: height}} <-
+         {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
-         },
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
              secret_key,
              network_id,
-             tx
+             gas_price,
+             contract_create_tx,
+             height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
       {:ok, Map.put(response, :contract_id, contract_account)}
@@ -149,7 +140,8 @@ defmodule Core.Contract do
         %Client{
           keypair: %{secret: secret_key},
           network_id: network_id,
-          connection: connection
+          connection: connection,
+          gas_price: gas_price
         } = client,
         contract_address,
         source_code,
@@ -168,12 +160,16 @@ defmodule Core.Contract do
              function_args,
              opts
            ),
+         {:ok, %{height: height}} <-
+           ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
-           TransactionUtils.post(
+           Transaction.try_post(
              connection,
              secret_key,
              network_id,
-             contract_call_tx
+             gas_price,
+             contract_call_tx,
+             height
            ),
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
@@ -467,7 +463,8 @@ defmodule Core.Contract do
       iex> Core.Contract.get_function_return_type(source_code, function_name)
       {:ok, "int"}
   """
-  @spec get_function_return_type(String.t(), String.t()) :: String.t()
+  @spec get_function_return_type(String.t(), String.t()) ::
+          {:ok, String.t()} | {:error, String.t()}
   def get_function_return_type(source_code, function_name) do
     charlist_source = String.to_charlist(source_code)
 
@@ -548,8 +545,7 @@ defmodule Core.Contract do
   defp build_contract_call_tx(
          %Client{
            keypair: %{public: public_key},
-           connection: connection,
-           network_id: network_id
+           connection: connection
          },
          contract_address,
          source_code,
@@ -567,30 +563,19 @@ defmodule Core.Contract do
 
     with {:ok, nonce} <- nonce_result,
          {:ok, calldata} <- create_calldata(source_code, function_name, function_args),
-         tx_dummy_fee = %ContractCallTx{
+         contract_call_tx = %ContractCallTx{
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
            abi_version: @abi_version,
-           fee: 0,
-           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
+           fee: Keyword.get(opts, :fee, 0),
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            amount: Keyword.get(opts, :amount, @default_amount),
            gas: Keyword.get(opts, :gas, @default_gas),
            gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
            call_data: calldata
-         },
-         {:ok, %HeightResponse{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
-         tx = %{
-           tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 opts,
-                 :fee,
-                 TransactionUtils.calculate_min_fee(tx_dummy_fee, height, network_id)
-               )
          } do
-      {:ok, tx}
+      {:ok, contract_call_tx}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}

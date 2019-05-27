@@ -45,7 +45,7 @@ defmodule Core.Account do
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id,
-            secret: privkey
+            secret: secret_key
           },
           network_id: network_id,
           connection: connection,
@@ -57,8 +57,8 @@ defmodule Core.Account do
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
-         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         %SpendTx{fee: fee} = spend_tx <-
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         %SpendTx{} = spend_tx <-
            struct(SpendTx,
              sender_id: sender_id,
              recipient_id: recipient_id,
@@ -68,11 +68,16 @@ defmodule Core.Account do
              nonce: nonce,
              payload: Keyword.get(opts, :payload, Transaction.default_payload())
            ),
-         fee when is_integer(fee) <-
-           Transaction.calculate_fee(spend_tx, height, network_id, fee, gas_price),
-         {:ok, response} <-
-           Transaction.post(connection, privkey, network_id, %{spend_tx | fee: fee}) do
-      {:ok, response}
+         {:ok, _response} = response <-
+           Transaction.try_post(
+             connection,
+             secret_key,
+             network_id,
+             gas_price,
+             spend_tx,
+             height
+           ) do
+      response
     else
       err -> prepare_result(err)
     end
