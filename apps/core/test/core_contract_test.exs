@@ -56,7 +56,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
 
-    refute call_result |> elem(1) |> Map.get(log) |> Enum.empty?()
+    refute call_result |> elem(1) |> Map.get(:log) |> Enum.empty?()
 
     call_static_result =
       Contract.call_static(
