@@ -11,18 +11,22 @@ defmodule CoreContractTest do
           secret:
             "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
-        "my_test",
-        "http://localhost:3013/v2",
-        "http://localhost:3113/v2"
+        "ae_uat",
+        "https://sdk-testnet.aepps.com/v2",
+        "https://sdk-testnet.aepps.com/v2"
       )
 
     source_code = "contract Identity =
-        record state = { number : int }
+      datatype event = AddedNumberEvent(indexed int, string)
 
-        function init(x : int) =
-          { number = x }
+      record state = { number : int }
 
-        function add_to_number(x : int) = state.number + x"
+      function init(x : int) =
+        { number = x }
+
+      function add_to_number(x : int) =
+        Chain.event(AddedNumberEvent(x, \"Added a number\"))
+        state.number + x"
     [client: client, source_code: source_code]
   end
 
@@ -51,6 +55,8 @@ defmodule CoreContractTest do
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
+
+    refute call_result |> elem(1) |> Map.get(log) |> Enum.empty?()
 
     call_static_result =
       Contract.call_static(
