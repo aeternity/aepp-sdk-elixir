@@ -57,7 +57,7 @@ defmodule Core.Account do
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
-         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
            struct(SpendTx,
              sender_id: sender_id,
@@ -204,7 +204,7 @@ defmodule Core.Account do
     {:error, message}
   end
 
-  defp prepare_result({:error, %Env{}} = error) do
+  defp prepare_result({:error, _} = error) do
     error
   end
 end

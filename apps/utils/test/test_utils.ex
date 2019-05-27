@@ -174,7 +174,6 @@ defmodule TestUtils do
       nonce: 37122,
       fee: 0,
       ttl: 10,
-      vm_version: 0x30001,
       abi_version: 0x30001
     }
 
@@ -261,7 +260,6 @@ defmodule TestUtils do
                function init(x : int) =
                  { number = x }
                function add_to_number(x : int) = state.number + x",
-      vm_version: 0x30001,
       abi_version: 0x30001,
       deposit: 1000,
       amount: 1000,
@@ -276,7 +274,6 @@ defmodule TestUtils do
       caller_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0,
       contract_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-      vm_version: 0x30001,
       abi_version: 0x30001,
       fee: 0,
       ttl: 0,
@@ -294,8 +291,8 @@ defmodule TestUtils do
             "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
         "my_test",
-        "http://localhost:3013/v2",
-        "http://localhost:3113/v2"
+        "https://sdk-testnet.aepps.com/v2",
+        "https://sdk-testnet.aepps.com/v2"
       )
 
     valid_pub_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"

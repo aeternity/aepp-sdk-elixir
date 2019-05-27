@@ -2,7 +2,7 @@ defmodule Core.Oracle do
   @moduledoc """
   Module for oracle interaction, see: https://github.com/aeternity/protocol/blob/master/oracles/oracles.md
   """
-  alias Utils.Transaction
+  alias Utils.Transaction, as: TransactionUtils
   alias Utils.Account, as: AccountUtils
   alias Utils.{Keys, Hash, Encoding}
   alias Core.Client
@@ -100,7 +100,7 @@ defmodule Core.Oracle do
            ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(ttl, height),
          {:ok, response} <-
-           Transaction.try_post(
+           TransactionUtils.try_post(
              connection,
              secret_key,
              network_id,
@@ -171,7 +171,7 @@ defmodule Core.Oracle do
            query_ttl: %Ttl{type: query_type, value: query_value},
            response_ttl: %RelativeTtl{type: :unused, value: response_ttl_value},
            fee: Keyword.get(opts, :fee, 0),
-           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
            sender_id: pubkey,
            nonce: nonce
          },
@@ -180,7 +180,7 @@ defmodule Core.Oracle do
          :ok <- validate_ttl(query_ttl, height),
          :ok <- validate_query_object_ttl(oracle_ttl, query_ttl, response_ttl_value, height),
          {:ok, response} <-
-           Transaction.try_post(
+           TransactionUtils.try_post(
              connection,
              secret_key,
              network_id,
@@ -253,14 +253,14 @@ defmodule Core.Oracle do
            response: binary_response,
            response_ttl: %RelativeTtl{type: :relative, value: response_ttl},
            fee: Keyword.get(opts, :fee, 0),
-           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl()),
            oracle_id: oracle_id,
            nonce: nonce
          },
          {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
-           Transaction.try_post(
+           TransactionUtils.try_post(
              connection,
              secret_key,
              network_id,
@@ -315,12 +315,12 @@ defmodule Core.Oracle do
            oracle_ttl: %RelativeTtl{type: :relative, value: oracle_ttl},
            oracle_id: oracle_id,
            nonce: nonce,
-           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl())
+           ttl: Keyword.get(opts, :ttl, TransactionUtils.default_ttl())
          },
          {:ok, %{height: height}} <-
            ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
-           Transaction.try_post(
+           TransactionUtils.try_post(
              connection,
              secret_key,
              network_id,

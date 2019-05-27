@@ -158,6 +158,14 @@ defmodule Core.Chain do
     await_height(client, height, await_attempts, await_attempt_interval)
   end
 
+  @doc """
+  Wait for a transaction to be mined
+
+  ## Examples
+      iex> transaction_hash = "th_232gp9o5Lm1XZ8SMaDCAnLcvyj2CkDkf5tssfD5yVAoFAnPBm7"
+      iex> Core.Chain.await_transaction(client, transaction_hash)
+      :ok
+  """
   @spec await_transaction(Client.t(), String.t(), list()) ::
           :ok | {:error, String.t()} | {:error, Env.t()}
   def await_transaction(%Client{connection: connection}, tx_hash, opts \\ [])
@@ -497,6 +505,38 @@ defmodule Core.Chain do
     prepare_result(response)
   end
 
+  @doc """
+  Dry-run transactions on top of a given block
+
+  ## Examples
+        iex> transactions = ["tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw=="]
+        iex> accounts = [
+          %{
+            pubkey: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            amount: 1651002120672731042209
+          }
+        ]
+        iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
+        {:ok,
+         [
+           %{
+             call_obj: %{
+               caller_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               caller_nonce: 8327,
+               contract_id: "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR",
+               gas_price: 1000000000,
+               gas_used: 252,
+               height: 61481,
+               log: [],
+               return_type: "ok",
+               return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+             },
+             reason: nil,
+             result: "ok",
+             type: "contract_call"
+           }
+         ]}
+  """
   @spec dry_run(Client.t(), list(String.t()), list(dry_run_account()), String.t()) ::
           {:ok, list(dry_run_result())} | {:error, String.t()} | {:error, Env.t()}
   def dry_run(
@@ -683,7 +723,7 @@ defmodule Core.Chain do
     {:error, message}
   end
 
-  defp prepare_result({:error, %Env{}} = error) do
+  defp prepare_result({:error, _} = error) do
     error
   end
 

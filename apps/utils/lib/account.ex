@@ -50,7 +50,7 @@ defmodule Utils.Account do
     {:error, message}
   end
 
-  defp prepare_result({:error, %Env{}} = error) do
+  defp prepare_result({:error, _} = error) do
     error
   end
 end
