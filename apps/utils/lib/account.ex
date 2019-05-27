@@ -42,16 +42,15 @@ defmodule Utils.Account do
     prepare_result(response)
   end
 
-  defp prepare_result(response) do
-    case response do
-      {:ok, %Account{nonce: nonce}} ->
-        {:ok, nonce + 1}
+  defp prepare_result({:ok, %Account{nonce: nonce}}) do
+    {:ok, nonce + 1}
+  end
 
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
+  defp prepare_result({:ok, %Error{reason: message}}) do
+    {:error, message}
+  end
 
-      {:error, _} = err ->
-        err
-    end
+  defp prepare_result({:error, %Env{}} = error) do
+    error
   end
 end

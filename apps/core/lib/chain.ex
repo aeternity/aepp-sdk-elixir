@@ -167,7 +167,7 @@ defmodule Core.Chain do
     await_attempt_interval =
       Keyword.get(opts, :interval, TransactionUtils.default_await_attempt_interval())
 
-    await_tx(connection, tx_hash, await_attempts, await_attempt_interval)
+    await_transaction(connection, tx_hash, await_attempts, await_attempt_interval)
   end
 
   @doc """
@@ -604,13 +604,13 @@ defmodule Core.Chain do
     end
   end
 
-  defp await_tx(_connection, tx_hash, 0, _interval),
+  defp await_transaction(_connection, tx_hash, 0, _interval),
     do: {:error, "Transaction #{tx_hash} wasn't mined"}
 
-  defp await_tx(connection, tx_hash, attempts, interval) do
+  defp await_transaction(connection, tx_hash, attempts, interval) do
     case TransactionApi.get_transaction_by_hash(connection, tx_hash) do
       {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
-        await_tx(connection, tx_hash, attempts - 1, interval)
+        await_transaction(connection, tx_hash, attempts - 1, interval)
 
       {:ok, %GenericSignedTx{}} ->
         :ok
