@@ -21,7 +21,8 @@ defmodule Utils.Transaction do
     NameRevokeTx,
     NameUpdateTx,
     ContractCallTx,
-    ContractCreateTx
+    ContractCreateTx,
+    TxInfoObject
   }
 
   alias Utils.{Keys, Encoding, Serialization, Governance}
@@ -136,6 +137,7 @@ defmodule Utils.Transaction do
         tx,
         height
       ) do
+    IO.puts("A")
     try_post(connection, secret_key, network_id, gas_price, tx, height, @tx_posting_attempts)
   end
 
@@ -378,7 +380,7 @@ defmodule Utils.Transaction do
       {:ok, _} = response ->
         response
 
-      {:error, _} ->
+      {:error, a} ->
         try_post(
           connection,
           secret_key,
@@ -451,7 +453,10 @@ defmodule Utils.Transaction do
       {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
         {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
 
-      {:ok, %ContractCallObject{return_value: return_value, return_type: return_type}} ->
+      {:ok,
+       %TxInfoObject{
+         call_info: %ContractCallObject{return_value: return_value, return_type: return_type}
+       }} ->
         {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
 
@@ -464,7 +469,7 @@ defmodule Utils.Transaction do
            return_type: return_type
          }}
 
-      {:ok, %Error{}} ->
+      {:ok, %Error{} = err} ->
         await_mining(connection, tx_hash, attempts - 1, type)
 
       {:error, %Env{} = env} ->

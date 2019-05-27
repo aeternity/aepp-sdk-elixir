@@ -606,7 +606,6 @@ defmodule Core.Oracle do
       end
 
     if height + relative_query_ttl + response_ttl <= oracle_ttl do
-      IO.inspect({height + relative_query_ttl + response_ttl, oracle_ttl})
       :ok
     else
       {:error, "Query objects can't outlive oracle - query and response TTL too high"}
