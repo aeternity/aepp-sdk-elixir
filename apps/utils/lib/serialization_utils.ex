@@ -373,6 +373,34 @@ defmodule Utils.SerializationUtils do
      ], :contract_call_tx}
   end
 
+  def process_tx_fields(%{
+        owner_id: owner_id,
+        nonce: nonce,
+        code: code,
+        auth_fun: auth_fun,
+        ct_version: ct_version,
+        fee: fee,
+        ttl: ttl,
+        gas: gas,
+        gas_price: gas_price,
+        call_data: call_data
+      }) do
+    owner_id_record = proccess_id_to_record(owner_id)
+
+    {:ok,
+     [
+       owner_id_record,
+       nonce,
+       code,
+       auth_fun,
+       ct_version,
+       fee,
+       gas,
+       gas_price,
+       call_data
+     ], :ga_attach_tx}
+  end
+
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end

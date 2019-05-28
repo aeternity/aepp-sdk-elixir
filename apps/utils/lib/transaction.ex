@@ -162,8 +162,7 @@ defmodule Utils.Transaction do
           String.t(),
           atom() | non_neg_integer(),
           non_neg_integer()
-        ) ::
-          non_neg_integer()
+        ) :: non_neg_integer()
   def calculate_fee(tx, height, _network_id, @dummy_fee, gas_price) when gas_price > 0 do
     min_gas(tx, height) * gas_price
   end
@@ -395,6 +394,38 @@ defmodule Utils.Transaction do
   end
 
   defp post(connection, secret_key, network_id, %type{} = tx) do
+    serialized_tx = Serialization.serialize(tx)
+
+    signature =
+      Keys.sign(
+        serialized_tx,
+        Keys.secret_key_to_binary(secret_key),
+        network_id
+      )
+
+    signed_tx_fields = [[signature], serialized_tx]
+    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
+
+    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+           TransactionApi.post_transaction(connection, %Tx{
+             tx: encoded_signed_tx
+           }),
+         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
+      response
+    else
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, %Env{} = env} ->
+        {:error, env}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp post(connection, secret_key, network_id, tx) when is_list(tx) do
     serialized_tx = Serialization.serialize(tx)
 
     signature =
