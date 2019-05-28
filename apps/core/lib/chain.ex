@@ -627,7 +627,7 @@ defmodule Core.Chain do
   end
 
   defp await_height(_client, height, 0, _interval),
-    do: {:error, "Chain didn't reach height #{height}"}
+    do: {:error, "Timeout: chain didn't reach height #{height}"}
 
   defp await_height(client, height, attempts, interval) do
     Process.sleep(interval)
