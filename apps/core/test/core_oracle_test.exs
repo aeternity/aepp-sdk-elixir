@@ -20,15 +20,16 @@ defmodule CoreOracleTest do
   end
 
   @tag :travis_test
-  test "register, query, respond, extend, get oracle", setup_data do
+  test "register, query, respond, extend, get oracle, get queries", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
       Oracle.register(
         setup_data.client,
         "map(string, int)",
         "map(string, int)",
-        %{type: :relative, value: 30},
-        30
+        %{type: :relative, value: 3},
+        30,
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:ok, _}, register)
@@ -39,9 +40,19 @@ defmodule CoreOracleTest do
         setup_data.client,
         oracle_id,
         %{"a" => 1},
-        %{type: :relative, value: 10},
-        10
+        %{type: :relative, value: 1},
+        1,
+        fee: 10_000_000_000_000_000
       )
+
+    {:ok, queries} = Oracle.get_queries(setup_data.client, oracle_id)
+
+    assert length(queries) == 1
+
+    assert match?(
+             {:ok, %{query: %{"a" => 1}}},
+             Oracle.get_query(setup_data.client, oracle_id, query_id)
+           )
 
     assert match?({:ok, _}, query)
 
@@ -52,20 +63,37 @@ defmodule CoreOracleTest do
                oracle_id,
                query_id,
                %{"b" => 2},
-               10
+               1,
+               fee: 10_000_000_000_000_000
              )
            )
 
     assert match?(
              {:ok, _},
-             Oracle.extend(
-               setup_data.client,
-               oracle_id,
-               10
-             )
+             Oracle.extend(setup_data.client, oracle_id, 10, fee: 10_000_000_000_000_000)
            )
 
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
+  end
+
+  @tag :travis_test
+  test "get oracle queries with bad oracle_id", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.get_queries(setup_data.client, setup_data.client.keypair.public)
+           )
+  end
+
+  @tag :travis_test
+  test "get oracle query with bad query_id", setup_data do
+    assert match?(
+             {:error, _},
+             Oracle.get_query(
+               setup_data.client,
+               String.replace_prefix(setup_data.client.keypair.public, "ak", "ok"),
+               "oq_123"
+             )
+           )
   end
 
   @tag :travis_test

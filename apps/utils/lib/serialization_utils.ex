@@ -313,7 +313,6 @@ defmodule Utils.SerializationUtils do
         owner_id: tx_owner_id,
         nonce: nonce,
         code: code,
-        vm_version: _vm_version,
         abi_version: _abi_version,
         deposit: deposit,
         amount: amount,

@@ -99,8 +99,7 @@ defmodule Core.AENS do
           tx: %AeternityNode.Model.GenericTx{type: "NameClaimTx", version: 1}
       }}
   """
-  @spec claim(Client.t(), String.t(), integer(), list()) ::
-          {:error, String.t()} | {:ok, map()}
+  @spec claim(Client.t(), String.t(), integer(), list()) :: {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
           keypair: %{
@@ -183,8 +182,8 @@ defmodule Core.AENS do
         client_ttl,
         opts \\ []
       )
-      when is_integer(name_ttl) and is_integer(client_ttl) and
-             is_list(pointers) and sender_prefix == "ak" do
+      when is_integer(name_ttl) and is_integer(client_ttl) and is_list(pointers) and
+             sender_prefix == "ak" do
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, update_tx} <-
            build_update_tx(
@@ -228,8 +227,7 @@ defmodule Core.AENS do
           tx: %AeternityNode.Model.GenericTx{type: "NameTransferTx", version: 1}
         }}
   """
-  @spec transfer(Client.t(), String.t(), binary(), list()) ::
-          {:error, String.t()} | {:ok, map()}
+  @spec transfer(Client.t(), String.t(), binary(), list()) :: {:error, String.t()} | {:ok, map()}
   def transfer(
         %Client{
           keypair: %{
@@ -338,10 +336,10 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       preclaim_tx =
-        struct(NamePreclaimTx,
+        struct(
+          NamePreclaimTx,
           account_id: sender_pubkey,
           nonce: nonce,
           commitment_id: commitment_id,
@@ -374,10 +372,10 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       claim_tx =
-        struct(NameClaimTx,
+        struct(
+          NameClaimTx,
           account_id: sender_pubkey,
           nonce: nonce,
           name: name,
@@ -408,10 +406,10 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       transfer_tx =
-        struct(NameTransferTx,
+        struct(
+          NameTransferTx,
           account_id: sender_pubkey,
           nonce: nonce,
           name_id: name_id,
@@ -447,10 +445,10 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       name_update_tx =
-        struct(NameUpdateTx,
+        struct(
+          NameUpdateTx,
           account_id: sender_pubkey,
           nonce: nonce,
           name_id: name_id,
@@ -485,10 +483,10 @@ defmodule Core.AENS do
          ttl
        ) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <-
-           Chain.get_current_key_block_height(connection) do
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       revoke_tx =
-        struct(NameRevokeTx,
+        struct(
+          NameRevokeTx,
           account_id: sender_pubkey,
           nonce: nonce,
           name_id: name_id,
