@@ -295,7 +295,7 @@ defmodule TestUtils do
         "http://localhost:3113/v2"
       )
 
-    valid_pub_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+    valid_pub_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
     amount = 40_000_000
 
     [

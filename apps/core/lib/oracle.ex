@@ -15,7 +15,9 @@ defmodule Core.Oracle do
     OracleExtendTx,
     Ttl,
     RelativeTtl,
-    Error
+    Error,
+    OracleQueries,
+    OracleQuery
   }
 
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -334,31 +336,15 @@ defmodule Core.Oracle do
   Get an oracle object.
 
   ## Examples
-      iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
+      iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> Core.Oracle.get_oracle(client, oracle_id)
       {:ok,
        %{
          abi_version: 1,
-         id: "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM",
+         id: "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
          query_fee: 30,
-         query_format: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           239, 191, 189, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 239, 191, 189, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0>>,
-         response_format: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 239, 191, 189, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 239, 191, 189, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0>>,
+         query_format: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==",
+         response_format: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==",
          ttl: 77316
        }}
   """
@@ -370,7 +356,7 @@ defmodule Core.Oracle do
              response_format: binary(),
              query_fee: non_neg_integer(),
              ttl: non_neg_integer(),
-             abi_version: non_neg_integer()
+             abi_version: 0 | 1
            }}
           | {:error, String.t()}
           | {:error, Env.t()}
@@ -408,6 +394,164 @@ defmodule Core.Oracle do
     end
   end
 
+  @doc """
+  Get all queries of an oracle.
+
+  ## Examples
+      iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> Core.Oracle.get_queries(client, oracle_id)
+      {:ok,
+       [%{
+         fee: 30,
+         id: "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP",
+         oracle_id: "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         query: %{"a" => 1},
+         query_ttl: 83952,
+         response: "",
+         response_ttl: 1,
+         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         sender_nonce: 11662
+       }]
+     }
+  """
+  @spec get_queries(Client.t(), Encoding.base58c()) ::
+          {:ok,
+           list(%{
+             fee: non_neg_integer(),
+             id: Encoding.base58c(),
+             oracle_id: Encoding.base58c(),
+             query: any(),
+             response: any(),
+             response_ttl: non_neg_integer(),
+             sender_id: Encoding.base58c(),
+             sender_nonce: non_neg_integer(),
+             ttl: non_neg_integer()
+           })}
+          | {:error, String.t()}
+          | {:error, Env.t()}
+  def get_queries(
+        %Client{
+          connection: connection
+        } = client,
+        oracle_id
+      ) do
+    with {:ok,
+          %{
+            query_format: query_format,
+            response_format: response_format,
+            abi_version: abi_version
+          }} <- get_oracle(client, oracle_id),
+         {:ok, %OracleQueries{oracle_queries: queries}} <-
+           OracleApi.get_oracle_queries_by_pubkey(connection, oracle_id) do
+      {:ok, decode_queries(queries, query_format, response_format, abi_version)}
+    else
+      {:ok, %Error{reason: reason}} ->
+        {:error, reason}
+
+      {:error, _} = err ->
+        err
+    end
+  end
+
+  @doc """
+  Get an oracle query by its ID.
+
+  ## Examples
+      iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> query_id = "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP"
+      iex> Core.Oracle.get_query(client, oracle_id, query_id)
+      {:ok,
+       %{
+         fee: 30,
+         id: "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP",
+         oracle_id: "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         query: %{"a" => 1},
+         query_ttl: 83952,
+         response: "",
+         response_ttl: 1,
+         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         sender_nonce: 11662
+       }
+     }
+  """
+  @spec get_query(Client.t(), Encoding.base58c(), Encoding.base58c()) ::
+          {:ok,
+           %{
+             fee: non_neg_integer(),
+             id: Encoding.base58c(),
+             oracle_id: Encoding.base58c(),
+             query: any(),
+             response: any(),
+             response_ttl: non_neg_integer(),
+             sender_id: Encoding.base58c(),
+             sender_nonce: non_neg_integer(),
+             ttl: non_neg_integer()
+           }}
+          | {:error, String.t()}
+          | {:error, Env.t()}
+  def get_query(
+        %Client{
+          connection: connection
+        } = client,
+        oracle_id,
+        query_id
+      ) do
+    with {:ok,
+          %{
+            query_format: query_format,
+            response_format: response_format,
+            abi_version: abi_version
+          }} <- get_oracle(client, oracle_id),
+         {:ok, %OracleQuery{} = query} <-
+           OracleApi.get_oracle_query_by_pubkey_and_query_id(connection, oracle_id, query_id) do
+      [decoded_query] = decode_queries([query], query_format, response_format, abi_version)
+      {:ok, decoded_query}
+    else
+      {:ok, %Error{reason: reason}} ->
+        {:error, reason}
+
+      {:error, _} = err ->
+        err
+    end
+  end
+
+  defp decode_queries(queries, query_format, response_format, abi_version) do
+    Enum.map(queries, fn %OracleQuery{
+                           fee: fee,
+                           id: id,
+                           oracle_id: oracle_id,
+                           query: query,
+                           response: response,
+                           response_ttl: %Ttl{value: response_ttl},
+                           sender_id: sender_id,
+                           sender_nonce: nonce,
+                           ttl: ttl
+                         } ->
+      # decode query/response only when the oracle is typed
+      {decoded_query, decoded_response} =
+        case abi_version do
+          0 ->
+            {query, response}
+
+          1 ->
+            {sophia_data_from_binary(query, query_format),
+             sophia_data_from_binary(response, response_format)}
+        end
+
+      %{
+        fee: fee,
+        id: id,
+        oracle_id: oracle_id,
+        query: decoded_query,
+        response: decoded_response,
+        response_ttl: response_ttl,
+        sender_id: sender_id,
+        sender_nonce: nonce,
+        query_ttl: ttl
+      }
+    end)
+  end
+
   defp calculate_query_id(sender, nonce, oracle_id) do
     binary_sender = Keys.public_key_to_binary(sender)
     binary_oracle_id = Keys.public_key_to_binary(oracle_id)
@@ -434,6 +578,20 @@ defmodule Core.Oracle do
       {:ok, :aeb_heap.to_binary(data)}
     rescue
       _ -> {:error, "Bad Sophia data: #{data}"}
+    end
+  end
+
+  defp sophia_data_from_binary(data, format) do
+    binary_format = Encoding.prefix_decode_base64(format)
+
+    case Encoding.prefix_decode_base64(data) do
+      "" ->
+        ""
+
+      binary_data ->
+        {:ok, format_typerep} = :aeb_heap.from_binary(:typerep, binary_format)
+        {:ok, decoded_data} = :aeb_heap.from_binary(format_typerep, binary_data)
+        decoded_data
     end
   end
 
