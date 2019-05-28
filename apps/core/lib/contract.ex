@@ -39,7 +39,16 @@ defmodule Core.Contract do
       iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
       iex> init_args = ["42"]
       iex> Core.Contract.deploy(client, source_code, init_args)
-      {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
+      {:ok,
+       %{
+         block_hash: "mh_6fEZ9CCPNXxyjpKwSjkihv2UA5voRKCBpvrK24gK38zkZZB5Q",
+         block_height: 86362,
+         contract_id: "ct_2XphkkmsJAbR4NbSpYFgHPgzfpveKRA9FFTJmp6jX8JRqnveeD",
+         log: [],
+         return_type: "ok",
+         return_value: "cb_Xfbg4g==",
+         tx_hash: "th_CGCF321Sz8zWPMpSpa28gk3jDvvzeda8edhNhmnLgUvFYi14U"
+       }}
   """
   @spec deploy(Client.t(), String.t(), list(String.t()), list()) ::
           {:ok,
@@ -47,7 +56,13 @@ defmodule Core.Contract do
              block_hash: Encoding.base58c(),
              block_height: non_neg_integer(),
              tx_hash: Encoding.base58c(),
-             contract_id: Encoding.base58c()
+             contract_id: Encoding.base58c(),
+             log:
+               list(%{
+                 address: Encoding.base58c(),
+                 data: String.t(),
+                 topics: list(non_neg_integer())
+               })
            }}
           | {:error, String.t()}
           | {:error, Env.t()}
@@ -79,7 +94,6 @@ defmodule Core.Contract do
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
-           vm_version: :unused,
            abi_version: :unused,
            deposit: Keyword.get(opts, :deposit, @default_deposit),
            amount: Keyword.get(opts, :amount, @default_amount),
@@ -89,8 +103,7 @@ defmodule Core.Contract do
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -101,7 +114,7 @@ defmodule Core.Contract do
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok, Map.put(response, :contract_id, contract_account)}
+      {:ok, Map.merge(response, %{contract_id: contract_account, log: decode_logs(response.log)})}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -116,15 +129,37 @@ defmodule Core.Contract do
 
   ## Examples
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+      iex> source_code = "contract Identity =
+        datatype event = AddedNumberEvent(indexed int, string)
+
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          Chain.event(AddedNumberEvent(x, \"Added a number\"))
+          state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
       iex> Core.Contract.call(client, contract_address, source_code, function_name, function_args)
       {:ok,
-        %{
+       %{
+         block_hash: "mh_2uzSrRdURXy4ATwCo3XpeSngH9ECXhkBj3MWEYFatqK4pJgFWG",
+         block_height: 86362,
+         log: [
+           %{
+             address: "ct_2XphkkmsJAbR4NbSpYFgHPgzfpveKRA9FFTJmp6jX8JRqnveeD",
+             data: "Added a number",
+             topics: [100006271334006235721916574864225776454052674644157840164656436983196903186403,
+              33]
+           }
+         ],
          return_type: "ok",
-         return_value: 75
-        }}
+         return_value: 75,
+         tx_hash: "th_CpexcQGiM86HVtHR6HTzYc3HoakXW2Xjm77wVKctoZmxTH52u"
+       }}
+
   """
   @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
           {:ok,
@@ -133,7 +168,13 @@ defmodule Core.Contract do
              block_height: non_neg_integer(),
              tx_hash: Encoding.base58c(),
              return_value: String.t(),
-             return_type: String.t()
+             return_type: String.t(),
+             log:
+               list(%{
+                 address: Encoding.base58c(),
+                 data: String.t(),
+                 topics: list(non_neg_integer())
+               })
            }}
           | {:error, String.t()}
           | {:error, Env.t()}
@@ -161,8 +202,7 @@ defmodule Core.Contract do
              function_args,
              opts
            ),
-         {:ok, %{height: height}} <-
-           ChainApi.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
              connection,
@@ -175,7 +215,7 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, response.return_value, response.return_type) do
-      {:ok, %{response | return_value: decoded_return_value}}
+      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
     else
       {:error, _} = error ->
         error
@@ -194,12 +234,23 @@ defmodule Core.Contract do
       iex> Core.Contract.call_static(client, contract_address, source_code, function_name, function_args, [top: top_block_hash])
       {:ok,
         %{
-         return_type: "ok",
-         return_value: 75
+          return_type: "ok",
+          return_value: 75,
+          log: []
         }}
   """
   @spec call_static(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
-          {:ok, %{return_value: String.t(), return_type: String.t()}}
+          {:ok,
+           %{
+             return_value: String.t(),
+             return_type: String.t(),
+             log:
+               list(%{
+                 address: Encoding.base58c(),
+                 data: String.t(),
+                 topics: list(non_neg_integer())
+               })
+           }}
           | {:error, String.t()}
           | {:error, Env.t()}
   def call_static(
@@ -234,7 +285,8 @@ defmodule Core.Contract do
               %DryRunResult{
                 call_obj: %ContractCallObject{
                   return_type: return_type,
-                  return_value: return_value
+                  return_value: return_value,
+                  log: log
                 }
               }
             ]
@@ -247,7 +299,8 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, return_value, return_type) do
-      {:ok, %{return_value: decoded_return_value, return_type: return_type}}
+      {:ok,
+       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
     else
       {:ok,
        %DryRunResults{
@@ -490,6 +543,13 @@ defmodule Core.Contract do
     end
   end
 
+  defp decode_logs(logs) do
+    Enum.map(logs, fn log ->
+      string_data = Encoding.prefix_decode_base64(log.data)
+      log |> Map.from_struct() |> Map.replace!(:data, string_data)
+    end)
+  end
+
   defp aci_to_sophia_type(type) do
     case type do
       %{} ->
@@ -568,7 +628,6 @@ defmodule Core.Contract do
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
-           vm_version: :unused,
            abi_version: @abi_version,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),

@@ -52,7 +52,8 @@ defmodule Core.Account do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
-           struct(SpendTx,
+           struct(
+             SpendTx,
              sender_id: sender_id,
              recipient_id: recipient_id,
              amount: amount,

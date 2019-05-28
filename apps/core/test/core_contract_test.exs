@@ -17,12 +17,16 @@ defmodule CoreContractTest do
       )
 
     source_code = "contract Identity =
-        record state = { number : int }
+      datatype event = AddedNumberEvent(indexed int, string)
 
-        function init(x : int) =
-          { number = x }
+      record state = { number : int }
 
-        function add_to_number(x : int) = state.number + x"
+      function init(x : int) =
+        { number = x }
+
+      function add_to_number(x : int) =
+        Chain.event(AddedNumberEvent(x, \"Added a number\"))
+        state.number + x"
     [client: client, source_code: source_code]
   end
 
@@ -51,6 +55,8 @@ defmodule CoreContractTest do
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
+
+    refute call_result |> elem(1) |> Map.get(:log) |> Enum.empty?()
 
     call_static_result =
       Contract.call_static(

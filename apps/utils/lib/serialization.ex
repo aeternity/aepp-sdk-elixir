@@ -130,7 +130,6 @@ defmodule Utils.Serialization do
            nonce: 37122,
            fee: 0,
            ttl: 10,
-           vm_version: 0x30001,
            abi_version: 0x30001
          })
        <<248, 77, 22, 1, 161, 1, 9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234,
