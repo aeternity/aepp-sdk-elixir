@@ -374,15 +374,6 @@ defmodule Utils.SerializationUtils do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end
 
-  # defp calculate_ct_version(abi, _vm) when abi <= @abi_solidity_1 do
-  #   abi
-  # end
-
-  # defp calculate_ct_version(abi, vm) do
-  #   <<ct_version::32>> = <<abi::16, vm::16>>
-  #   ct_version
-  # end
-
   defp proccess_id_to_record(tx_public_key) when is_binary(tx_public_key) do
     {type, public_key} =
       tx_public_key

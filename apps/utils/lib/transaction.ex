@@ -42,7 +42,6 @@ defmodule Utils.Transaction do
     ContractCallTx,
     ContractCreateTx
   ]
-  @contract_types [ContractCreateTx, ContractCallTx]
 
   @type tx_types ::
           SpendTx.t()
