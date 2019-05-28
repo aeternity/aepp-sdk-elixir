@@ -2,6 +2,7 @@ defmodule CoreChainTest do
   use ExUnit.Case
 
   alias Core.{Chain, Client, Contract}
+  alias Tesla.Env
 
   setup_all do
     client =
@@ -42,7 +43,7 @@ defmodule CoreChainTest do
   end
 
   @tag :travis_test
-  test "transaction operations", setup_data do
+  test "transaction operations with valid input", setup_data do
     {:ok,
      %{
        block_hash: block_hash,
@@ -99,7 +100,18 @@ defmodule CoreChainTest do
   end
 
   @tag :travis_test
-  test "block operations", setup_data do
+  test "transaction operations with invalid input", setup_data do
+    assert {:error, "Invalid hash"} ==
+             Chain.await_transaction(setup_data.client, "invalid_tx_hash")
+
+    assert {:error, "Invalid hash"} == Chain.get_transaction(setup_data.client, "invalid_tx_hash")
+
+    assert {:error, "Invalid hash: hash"} ==
+             Chain.get_transaction_info(setup_data.client, "invalid_tx_hash")
+  end
+
+  @tag :travis_test
+  test "block operations with valid input", setup_data do
     {:ok,
      %{
        block_hash: block_hash,
@@ -154,6 +166,47 @@ defmodule CoreChainTest do
 
     micro_block_header_result = Chain.get_micro_block_header(setup_data.client, micro_block_hash)
     assert match?({:ok, %{hash: ^micro_block_hash}}, micro_block_header_result)
+  end
+
+  @tag :travis_test
+  test "block operations with invalid input", setup_data do
+    assert {:error, "Invalid hash"} ==
+             Chain.get_generation(setup_data.client, "invalid_key_block_hash")
+
+    {:ok, height} = Chain.height(setup_data.client)
+
+    assert {:error, "Chain too short"} == Chain.get_generation(setup_data.client, height + 10)
+
+    assert match?(
+             {:error,
+              %Env{
+                body:
+                  "{\"info\":{\"data\":-1,\"error\":\"not_in_range\"},\"parameter\":\"height\",\"reason\":\"validation_error\"}",
+                status: 400
+              }},
+             Chain.get_generation(setup_data.client, -1)
+           )
+
+    assert {:error, "Invalid hash"} ==
+             Chain.get_micro_block_transactions(setup_data.client, "invalid_micro_block_hash")
+
+    assert {:error, "Invalid hash"} ==
+             Chain.get_key_block(setup_data.client, "invalid_key_block_hash")
+
+    assert {:error, "Block not found"} == Chain.get_key_block(setup_data.client, height + 10)
+
+    assert match?(
+             {:error,
+              %Env{
+                body:
+                  "{\"info\":{\"data\":-1,\"error\":\"not_in_range\"},\"parameter\":\"height\",\"reason\":\"validation_error\"}",
+                status: 400
+              }},
+             Chain.get_key_block(setup_data.client, -1)
+           )
+
+    assert {:error, "Invalid hash"} ==
+             Chain.get_micro_block_header(setup_data.client, "invalid_micro_block_hash")
   end
 
   @tag :travis_test
