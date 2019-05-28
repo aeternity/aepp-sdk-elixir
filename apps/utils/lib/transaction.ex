@@ -441,6 +441,9 @@ defmodule Utils.Transaction do
         ContractCallTx ->
           TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
 
+        ContractCreateTx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
         _ ->
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
       end
@@ -454,7 +457,11 @@ defmodule Utils.Transaction do
 
       {:ok,
        %TxInfoObject{
-         call_info: %ContractCallObject{return_value: return_value, return_type: return_type}
+         call_info: %ContractCallObject{
+           log: log,
+           return_value: return_value,
+           return_type: return_type
+         }
        }} ->
         {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
           TransactionApi.get_transaction_by_hash(connection, tx_hash)
@@ -465,7 +472,8 @@ defmodule Utils.Transaction do
            block_height: block_height,
            tx_hash: tx_hash,
            return_value: return_value,
-           return_type: return_type
+           return_type: return_type,
+           log: log
          }}
 
       {:ok, %Error{}} ->
