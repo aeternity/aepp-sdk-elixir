@@ -72,8 +72,7 @@ defmodule Core.Client do
         gas_price \\ @default_gas_price
       )
       when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
-             is_binary(url) and
-             is_binary(internal_url) do
+             is_binary(url) and is_binary(internal_url) do
     connection = Connection.new(url)
     internal_connection = Connection.new(internal_url)
 

@@ -174,7 +174,6 @@ defmodule TestUtils do
       nonce: 37122,
       fee: 0,
       ttl: 10,
-      # vm_version: 0x30001,
       abi_version: 0x30001
     }
 
@@ -261,7 +260,6 @@ defmodule TestUtils do
                function init(x : int) =
                  { number = x }
                function add_to_number(x : int) = state.number + x",
-      # vm_version: 0x30001,
       abi_version: 0x30001,
       deposit: 1000,
       amount: 1000,
@@ -276,7 +274,6 @@ defmodule TestUtils do
       caller_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0,
       contract_id: "ct_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-      # vm_version: 0x30001,
       abi_version: 0x30001,
       fee: 0,
       ttl: 0,
