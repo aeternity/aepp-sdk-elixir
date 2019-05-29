@@ -30,7 +30,7 @@ defmodule Core.NamingTest do
     ]
 
     update =
-      AENS.update(
+      AENS.update_name(
         setup.client,
         "test.test",
         49_999,
@@ -50,7 +50,7 @@ defmodule Core.NamingTest do
     assert match?({:ok, _}, spend)
 
     # Transfer a name to another account
-    transfer = AENS.transfer(setup.client, "test.test", setup.valid_pub_key)
+    transfer = AENS.transfer_name(setup.client, "test.test", setup.valid_pub_key)
 
     assert match?({:ok, _}, transfer)
     Process.sleep(1000)
@@ -66,7 +66,7 @@ defmodule Core.NamingTest do
     Process.sleep(1000)
 
     # Revoke a new name
-    revoke = AENS.revoke(setup.client, "newtest.test")
+    revoke = AENS.revoke_name(setup.client, "newtest.test")
     assert match?({:ok, _}, revoke)
   end
 end

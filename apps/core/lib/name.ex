@@ -24,6 +24,10 @@ defmodule Core.AENS do
 
   @prefix_byte_size 2
 
+  @max_name_ttl 50_000
+  @max_client_ttl 86_000
+  @random_upper_limit 1_000_000
+
   @doc """
   Preclaims a name.
 
@@ -74,7 +78,7 @@ defmodule Core.AENS do
           gas_price: gas_price
         } = client,
         name,
-        name_salt,
+        name_salt \\ :rand.uniform(@random_upper_limit),
         opts \\ []
       )
       when sender_prefix == "ak" do
@@ -113,7 +117,7 @@ defmodule Core.AENS do
   Claims a name.
 
   ## Examples
-      iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim()
+      iex> client |> Core.AENS.preclaim("a123.test") |> Core.AENS.claim()
       {:ok,
        %{
          block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
@@ -233,16 +237,43 @@ defmodule Core.AENS do
   Updates a name.
 
   ## Examples
+
+      iex> name = "a123.test"
+      iex> name_salt = 7
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim() |> Core.AENS.update(name_ttl, pointers, client_ttl)
-      {:ok,
-       %{
-         block_hash: "mh_Ssw5f2cta5Dv1i6PvSSRf7FnzyCVRq2Mfkefmnu8Egagyg5Eg",
-         block_height: 134,
-         tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
-       }}
+      iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim() |> Core.AENS.update(pointers, name_ttl,  client_ttl)
+       {:ok,
+          %{
+            block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
+            block_height: 41,
+            client: %Core.Client{
+              connection: %Tesla.Client{
+                adapter: nil,
+                fun: nil,
+                post: [],
+                pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+              },
+              gas_price: 1000000,
+              internal_connection: %Tesla.Client{
+                adapter: nil,
+                fun: nil,
+                post: [],
+                pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+              },
+              keypair: %{
+                public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              },
+              network_id: "my_test"
+            },
+            client_ttl: 50000,
+            name: "a123.test",
+            name_ttl: 49999,
+            pointers: [],
+            tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
+          }}
   """
 
   @spec update(
@@ -255,8 +286,8 @@ defmodule Core.AENS do
   def update(
         {:ok, %{client: client, name: name}},
         pointers \\ [],
-        name_ttl \\ 50_000,
-        client_ttl \\ 86_000,
+        name_ttl \\ @max_name_ttl,
+        client_ttl \\ @max_client_ttl,
         opts \\ []
       ) do
     update_name(client, name, name_ttl, pointers, client_ttl, opts)
@@ -270,15 +301,37 @@ defmodule Core.AENS do
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> Core.AENS.update(client, name, name_ttl, pointers, client_ttl)
+      iex> Core.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
        {:ok,
-        %{
-          block_hash: "mh_KaN4zRfCqsm2pKKBq7NShMQWV2Mt3sL4VPEszc7ZwJb2s7CZZ",
-          block_height: 74971,
-          hash: "th_29YCfGGaarxy322azZrYuBDZAABWrMP1CuMsAFiUDoshzXkVjc",
-          signatures: ["sg_GnAPiuQmNwwRBtY7zgoN3ihaFz5XH4KsjTzuJgViFyCkZVE3Qgvw56HfymZL4LvFxPWwmkGf3UvhzPmak1nFinFFn3yAG"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameUpdateTx", version: 1}
-        }}
+       %{
+         block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
+         block_height: 41,
+         client: %Core.Client{
+           connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+           },
+           gas_price: 1000000,
+           internal_connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+           },
+           keypair: %{
+             public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+           },
+           network_id: "my_test"
+         },
+         client_ttl: 50000,
+         name: "a123.test",
+         name_ttl: 49999,
+         pointers: [],
+         tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
+       }}
   """
 
   @spec update_name(
@@ -319,7 +372,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -328,12 +381,58 @@ defmodule Core.AENS do
              update_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:client, client)
+        |> Map.put(:name, name)
+        |> Map.put(:pointers, pointers)
+        |> Map.put(:client_ttl, client_ttl)
+        |> Map.put(:name_ttl, name_ttl)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx: #{inspect(error)}"}
     end
   end
 
+  @doc """
+    Transfers a name.
+
+    ## Examples
+        iex> name = "a123.test"
+        iex> name_salt = 7
+        iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
+        iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
+         {:ok,
+         %{
+           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
+           block_height: 35,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
+         }}
+
+  """
   @spec transfer({:ok, %{client: Core.Client.t(), name: binary()}}, binary(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def transfer({:ok, %{client: client, name: name}}, recipient_pub_key, opts \\ []) do
@@ -346,15 +445,35 @@ defmodule Core.AENS do
   ## Examples
       iex> name = "a123.test"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> Core.AENS.transfer(client, name, recipient_key, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.transfer_name(client, name, recipient_key)
        {:ok,
-        %{
-          block_hash: "mh_mhmJEB3W8uQQsGzprNSZenC783FWAihP1miKW8qi3qDqkQAi9",
-          block_height: 74934,
-          hash: "th_XpwwJqW4S5oVLDRbgouPWo3nF1u8oon9KDmM944aKEJgr63az",
-          signatures: ["sg_P6mPiWpa7yN3N2Q4ZuXMhxaJ1YruHHAfDZAQCBkyd4MM8peeffK3mEoZp4Wuote8ZmkLSCF3fzxdZLkE1BDz2SDXYu3CX"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameTransferTx", version: 1}
-        }}
+         %{
+           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
+           block_height: 35,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
+         }}
   """
   @spec transfer_name(Client.t(), String.t(), binary(), list()) ::
           {:error, String.t()} | {:ok, map()}
@@ -404,6 +523,41 @@ defmodule Core.AENS do
     end
   end
 
+  @doc """
+  Revokes a name.
+
+  ## Examples
+      iex> name = "a123.test"
+      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.revoke()
+       {:ok,
+         %{
+           block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
+           block_height: 24,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
+         }}
+  """
+
   @spec revoke({:ok, map()}, list()) :: {:error, String.t()} | {:ok, map()}
   def revoke({:ok, %{client: client, name: name}}, opts \\ []) do
     revoke_name(client, name, opts)
@@ -414,14 +568,33 @@ defmodule Core.AENS do
 
   ## Examples
       iex> name = "a123.test"
-      iex> Core.AENS.revoke(client, name, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.revoke_name(client, name)
        {:ok,
         %{
-          block_hash: "mh_2TeNu2CF1rjyCzk9FYqhBfBBH4LqfSvj3qx3hpKuPGrMUDGpXU",
-          block_height: 74973,
-          hash: "th_G4s1Befn1JLws54ZTSAxVidEqJ4vqVPaowzeqELf7u4DPfHks",
-          signatures: ["sg_3kPx3pDu4CFDYZQdSQ2RrNU7wFuqcB2M83u8CxHXoRnN3xHQVgnpAmQvcbHT2ANpRCxvEKRA1r2JfA9rwkC9nDcnbQUve"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameRevokeTx", version: 1}
+          block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
+          block_height: 24,
+          client: %Core.Client{
+            connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+            },
+            gas_price: 1000000,
+            internal_connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+            },
+            keypair: %{
+              public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+            },
+            network_id: "my_test"
+          },
+          name: "a123.test",
+          tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
 
