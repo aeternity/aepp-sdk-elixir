@@ -33,6 +33,7 @@ defmodule Utils.Governance do
   @expected_block_mine_rate_minutes 3
   @expected_blocks_in_a_year_floor 175_200 = div(60 * 24 * 365, @expected_block_mine_rate_minutes)
 
+  @spec tx_base_gas(struct()) :: non_neg_integer()
   def tx_base_gas(%SpendTx{}), do: @tx_base_gas
   def tx_base_gas(%NamePreclaimTx{}), do: @tx_base_gas
   def tx_base_gas(%NameClaimTx{}), do: @tx_base_gas
@@ -55,6 +56,7 @@ defmodule Utils.Governance do
   def tx_base_gas(%ChannelSnapshotSoloTx{}), do: @tx_base_gas
   def tx_base_gas(%ChannelWithdrawTx{}), do: @tx_base_gas
 
+  @spec gas(struct()) :: non_neg_integer()
   def gas(%SpendTx{}), do: 0
   def gas(%NamePreclaimTx{}), do: 0
   def gas(%NameClaimTx{}), do: 0
@@ -77,26 +79,6 @@ defmodule Utils.Governance do
   def gas(%ChannelSettleTx{}), do: 0
   def gas(%ChannelSnapshotSoloTx{}), do: 0
   def gas(%ChannelWithdrawTx{}), do: 0
-
-  def gas_price(%ContractCallTx{gas_price: gas_price}), do: gas_price
-  def gas_price(%ContractCreateTx{gas_price: gas_price}), do: gas_price
-
-  def fee(%SpendTx{fee: fee}), do: fee
-  def fee(%NamePreclaimTx{fee: fee}), do: fee
-  def fee(%NameClaimTx{fee: fee}), do: fee
-  def fee(%NameTransferTx{fee: fee}), do: fee
-  def fee(%NameRevokeTx{fee: fee}), do: fee
-  def fee(%NameUpdateTx{fee: fee}), do: fee
-  def fee(%OracleRegisterTx{fee: fee}), do: fee
-  def fee(%OracleQueryTx{fee: fee}), do: fee
-  def fee(%OracleRespondTx{fee: fee}), do: fee
-  def fee(%OracleExtendTx{fee: fee}), do: fee
-  def fee(%ContractCallTx{fee: fee}), do: fee
-  def fee(%ContractCreateTx{fee: fee}), do: fee
-  def fee(%ChannelDepositTx{fee: fee}), do: fee
-  def fee(%ChannelCloseMutualTx{fee: fee}), do: fee
-  def fee(%ChannelCloseSoloTx{fee: fee}), do: fee
-  def fee(%ChannelCreateTx{fee: fee}), do: fee
 
   @spec byte_gas() :: non_neg_integer()
   def byte_gas(), do: @byte_gas
