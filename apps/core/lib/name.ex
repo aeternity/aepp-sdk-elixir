@@ -30,7 +30,7 @@ defmodule Core.AENS do
   ## Examples
       iex> name = "a123.test"
       iex> name_salt = 7
-      iex> Core.AENS.preclaim(client, name, name_salt, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.preclaim(client, name, name_salt)
       {:ok,
        %{
          block_hash: "mh_2aBYJJkAKWUrLgfuYMtzuwe664qcJmKTg9nZbJKJqCZCP45qXx",

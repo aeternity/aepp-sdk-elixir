@@ -51,8 +51,7 @@ defmodule TransactionUtilTest do
              Account.spend(
                fields.client,
                fields.valid_pub_key,
-               fields.amount,
-               fee: 1_000_000_000_000_000
+               fields.amount
              )
            )
   end

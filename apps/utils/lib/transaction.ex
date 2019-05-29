@@ -316,7 +316,9 @@ defmodule Utils.Transaction do
              ChannelSettleTx,
              ChannelSlashTx,
              ChannelSnapshotSoloTx,
-             ChannelWithdrawTx
+             ChannelWithdrawTx,
+             ContractCreateTx,
+             ContractCallTx
            ] do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
       Governance.gas(tx)

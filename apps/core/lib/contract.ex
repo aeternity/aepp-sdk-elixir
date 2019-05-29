@@ -50,7 +50,12 @@ defmodule Core.Contract do
          tx_hash: "th_CGCF321Sz8zWPMpSpa28gk3jDvvzeda8edhNhmnLgUvFYi14U"
        }}
   """
-  @spec deploy(Client.t(), String.t(), list(String.t()), list()) ::
+  @spec deploy(
+          Client.t(),
+          String.t(),
+          list(String.t()),
+          list()
+        ) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
