@@ -26,15 +26,13 @@ defmodule Core.AENS do
 
   @max_name_ttl 50_000
   @max_client_ttl 86_000
-  @random_upper_limit 1_000_000
 
   @doc """
   Preclaims a name.
 
   ## Examples
       iex> name = "a123.test"
-      iex> name_salt = 7
-      iex> Core.AENS.preclaim(client, name, name_salt)
+      iex> Core.AENS.preclaim(client, name)
       {:ok,
         %{
           block_hash: "mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d",
@@ -60,11 +58,11 @@ defmodule Core.AENS do
             network_id: "my_test"
           },
           name: "a123.test",
-          name_salt: 7,
+          name_salt: 149218901844062129,,
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
   """
-  @spec preclaim(Client.t(), String.t(), non_neg_integer(), list()) ::
+  @spec preclaim(Client.t(), String.t(), non_neg_integer() | atom(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
@@ -78,10 +76,21 @@ defmodule Core.AENS do
           gas_price: gas_price
         } = client,
         name,
-        name_salt \\ :rand.uniform(@random_upper_limit),
+        salt \\ :auto,
         opts \\ []
       )
       when sender_prefix == "ak" do
+    name_salt =
+      case salt do
+        :auto ->
+          <<a::32, b::32, c::32>> = :crypto.strong_rand_bytes(12)
+          {state, _} = :rand.seed(:exsplus, {a, b, c})
+          :rand.uniform(state.max)
+
+        num when num > 0 ->
+          num
+      end
+
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
            NameService.get_commitment_id(internal_connection, name, name_salt),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
@@ -157,7 +166,7 @@ defmodule Core.AENS do
 
   ## Examples
       iex> name = "a123.test"
-      iex> name_salt = 7
+      iex> name_salt = 149218901844062129,
       iex> Core.AENS.claim(client, name, name_salt)
        {:ok,
          %{
@@ -239,11 +248,10 @@ defmodule Core.AENS do
   ## Examples
 
       iex> name = "a123.test"
-      iex> name_salt = 7
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim() |> Core.AENS.update(pointers, name_ttl,  client_ttl)
+      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.update(pointers, name_ttl,  client_ttl)
        {:ok,
           %{
             block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
@@ -400,9 +408,8 @@ defmodule Core.AENS do
 
     ## Examples
         iex> name = "a123.test"
-        iex> name_salt = 7
         iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-        iex> client |> Core.AENS.preclaim(name, name_salt) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
+        iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
          {:ok,
          %{
            block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
