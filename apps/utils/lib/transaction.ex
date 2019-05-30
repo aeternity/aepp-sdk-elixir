@@ -316,7 +316,9 @@ defmodule Utils.Transaction do
              ChannelSettleTx,
              ChannelSlashTx,
              ChannelSnapshotSoloTx,
-             ChannelWithdrawTx
+             ChannelWithdrawTx,
+             ContractCreateTx,
+             ContractCallTx
            ] do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
       Governance.gas(tx)
@@ -325,6 +327,12 @@ defmodule Utils.Transaction do
   def gas_limit(tx, height) do
     {:error, "#{__MODULE__} Invalid #{inspect(tx)} and/or height #{inspect(height)}"}
   end
+
+  @spec default_await_attempts() :: non_neg_integer()
+  def default_await_attempts, do: @await_attempts
+
+  @spec default_await_attempt_interval() :: non_neg_integer()
+  def default_await_attempt_interval, do: @await_attempt_interval
 
   defp ttl_delta(_height, {:relative, _value} = ttl) do
     {:relative, oracle_ttl_delta(0, ttl)}

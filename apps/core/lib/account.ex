@@ -1,15 +1,22 @@
 defmodule Core.Account do
   @moduledoc """
    High-level module for Account-related activities.
+
+   In order for its functions to be used, a client must be defined first.
+   Client example can be found at: `Core.Client.new/4`
   """
   alias Core.Client
-  alias AeternityNode.Api.Chain
+  alias AeternityNode.Api.Account, as: AccountApi
+  alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Model.{Account, SpendTx, Error}
   alias Utils.{Transaction, Encoding}
   alias Utils.Account, as: AccountUtil
-  alias AeternityNode.Model.SpendTx
+  alias Tesla.Env
 
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
+
+  @type account :: %{id: String.t(), balance: non_neg_integer(), nonce: non_neg_integer()}
 
   @doc """
   Send tokens to an account.
@@ -50,7 +57,7 @@ defmodule Core.Account do
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_id),
-         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
            struct(
              SpendTx,
@@ -73,7 +80,132 @@ defmodule Core.Account do
            ) do
       response
     else
-      {:error, _} = err -> err
+      err -> prepare_result(err)
     end
+  end
+
+  @doc """
+  Get an account's balance
+
+  ## Example
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> Core.Account.balance(client, pubkey)
+      {:ok, 1652992279192254044805}
+  """
+  @spec balance(Client.t(), String.t()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
+    case AccountApi.get_account_by_pubkey(connection, pubkey) do
+      {:ok, %Account{balance: balance}} ->
+        {:ok, balance}
+
+      _ = response ->
+        prepare_result(response)
+    end
+  end
+
+  @doc """
+  Get an account's balance at a given height
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> height = 80000
+      iex> Core.Account.balance(client, pubkey, height)
+      {:ok, 1641606227460612819475}
+  """
+  @spec balance(Client.t(), String.t(), non_neg_integer()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
+    response = get(client, pubkey, height)
+
+    prepare_result(response)
+  end
+
+  @doc """
+  Get an account's balance at a given block hash
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+      iex> Core.Account.balance(client, pubkey, block_hash)
+      {:ok, 1653014562214254044805}
+  """
+  @spec balance(Client.t(), String.t(), String.t()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{} = client, pubkey, block_hash)
+      when is_binary(pubkey) and is_binary(block_hash) do
+    response = get(client, pubkey, block_hash)
+
+    prepare_result(response)
+  end
+
+  @doc """
+  Get an account at a given height
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> height = 80000
+      iex> Core.Account.get(client, pubkey, height)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 1641606227460612819475,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 11215
+       }}
+  """
+  @spec get(Client.t(), String.t(), non_neg_integer()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection}, pubkey, height)
+      when is_binary(pubkey) and is_integer(height) do
+    response = AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height)
+
+    prepare_result(response)
+  end
+
+  @doc """
+  Get an account at a given block hash
+
+  ## Examples
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+      iex> Core.Account.get(client, pubkey, block_hash)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 1653014562214254044805,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 11837
+       }}
+  """
+  @spec get(Client.t(), String.t(), String.t()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection}, pubkey, block_hash)
+      when is_binary(pubkey) and is_binary(block_hash) do
+    response = AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash)
+
+    prepare_result(response)
+  end
+
+  defp prepare_result({:ok, %Account{} = account}) do
+    account_map = Map.from_struct(account)
+
+    {:ok, account_map}
+  end
+
+  defp prepare_result({:ok, %{balance: balance}}) do
+    {:ok, balance}
+  end
+
+  defp prepare_result({:ok, %Error{reason: message}}) do
+    {:error, message}
+  end
+
+  defp prepare_result({:error, _} = error) do
+    error
   end
 end
