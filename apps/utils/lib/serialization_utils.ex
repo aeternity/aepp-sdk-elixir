@@ -19,7 +19,16 @@ defmodule Utils.SerializationUtils do
     ContractCreateTx,
     ContractCallTx,
     RelativeTtl,
-    Ttl
+    Ttl,
+    ChannelCreateTx,
+    ChannelCloseMutualTx,
+    ChannelCloseSoloTx,
+    ChannelDepositTx,
+    ChannelForceProgressTx,
+    ChannelSettleTx,
+    ChannelSlashTx,
+    ChannelSnapshotSoloTx,
+    ChannelWithdrawTx
   }
 
   @ct_version 0x30001
@@ -368,6 +377,44 @@ defmodule Utils.SerializationUtils do
        gas_price,
        call_data
      ], :contract_call_tx}
+  end
+
+  def process_tx_fields(%ChannelCreateTx{
+        initiator_id: initiator,
+        initiator_amount: initiator_amount,
+        responder_id: responder,
+        responder_amount: responder_amount,
+        channel_reserve: channel_reserve,
+        lock_period: lock_period,
+        ttl: ttl,
+        fee: fee,
+        # delegate_ids: delegate_ids,
+        state_hash: state_hash,
+        nonce: nonce
+      }) do
+    initiator_id = proccess_id_to_record(initiator)
+    responder_id = proccess_id_to_record(responder)
+
+    # list_delegate_ids =
+    #   for id <- delegate_ids do
+    #     proccess_id_to_record(id)
+    #   end
+
+    {:ok,
+     [
+       initiator_id,
+       initiator_amount,
+       responder_id,
+       responder_amount,
+       channel_reserve,
+       lock_period,
+       ttl,
+       fee,
+       #  list_delegate_ids,
+       # TODO: Have to be checked!!!
+       state_hash,
+       nonce
+     ], :channel_create_tx}
   end
 
   def process_tx_fields(tx) do
