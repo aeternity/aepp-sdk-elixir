@@ -11,8 +11,7 @@ defmodule Core.Channel do
     ChannelSettleTx,
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
-    ChannelWithdrawTx,
-    Error
+    ChannelWithdrawTx
   }
 
   alias Core.Client
@@ -20,6 +19,7 @@ defmodule Core.Channel do
   alias Utils.Transaction
 
   @prefix_byte_size 2
+  @state_hash_byte_size 32
 
   @spec get_by_pubkey(Core.Client.t(), binary()) ::
           {:error, Tesla.Env.t()} | {:ok, AeternityNode.Model.Channel.t()}
@@ -37,21 +37,22 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        initiator_id,
         initiator_amount,
-        responder_id,
+        <<responder_prefix::binary-size(@prefix_byte_size), _::binary>> = responder_id,
         responder_amount,
         push_amount,
         channel_reserve,
         lock_period,
         state_hash,
         opts \\ []
-      ) do
+      )
+      when sender_prefix == "ak" and responder_prefix == "ak" and
+             byte_size(state_hash) == @state_hash_byte_size do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, create_channel_tx} <-
            build_create_channel_tx(
-             initiator_id,
+             sender_pubkey,
              initiator_amount,
              responder_id,
              responder_amount,
@@ -78,7 +79,7 @@ defmodule Core.Channel do
     end
   end
 
-  def close_mutual_tx(
+  def close_mutual(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
@@ -88,12 +89,14 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
+        <<from_prefix::binary-size(@prefix_byte_size), _::binary>> = from_id,
         initiator_amount_final,
         responder_amount_final,
         opts \\ []
-      ) do
+      )
+      when sender_prefix == "ak" and initiator_amount_final >= 0 and responder_amount_final <= 0 and
+             channel_prefix == "ch" and from_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
@@ -122,7 +125,7 @@ defmodule Core.Channel do
     end
   end
 
-  def close_solo_tx(
+  def close_solo(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
@@ -137,7 +140,8 @@ defmodule Core.Channel do
         payload,
         poi,
         opts \\ []
-      ) do
+      )
+      when sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
@@ -166,7 +170,7 @@ defmodule Core.Channel do
     end
   end
 
-  def deposit_tx(
+  def deposit(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
@@ -182,7 +186,8 @@ defmodule Core.Channel do
         round,
         state_hash,
         opts \\ []
-      ) do
+      )
+      when sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, deposit_tx} <-
@@ -212,7 +217,7 @@ defmodule Core.Channel do
     end
   end
 
-  def force_progress_tx(
+  def force_progress(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
@@ -230,7 +235,8 @@ defmodule Core.Channel do
         state_hash,
         update,
         opts \\ []
-      ) do
+      )
+      when sender_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, force_progress_tx} <-
@@ -262,20 +268,184 @@ defmodule Core.Channel do
     end
   end
 
-  def settle_tx() do
-    :ok
+  def settle(
+        %Client{
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
+            secret: secret_key
+          },
+          network_id: network_id,
+          connection: connection,
+          gas_price: gas_price
+        },
+        channel_id,
+        from_id,
+        initiator_amount_final,
+        responder_amount_final,
+        opts \\ []
+      )
+      when sender_prefix == "ak" do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, settle_tx} <-
+           build_settle_tx(
+             channel_id,
+             Keyword.get(opts, :fee, 0),
+             from_id,
+             initiator_amount_final,
+             nonce,
+             responder_amount_final,
+             Keyword.get(opts, :ttl, 0)
+           ),
+         {:ok, _} = response <-
+           Transaction.try_post(
+             connection,
+             secret_key,
+             network_id,
+             gas_price,
+             settle_tx,
+             height
+           ) do
+      response
+    else
+      error ->
+        {:error, "#{__MODULE__}: Unsuccessful post of ChannelSettleTx : #{inspect(error)}"}
+    end
   end
 
-  def slash_tx() do
-    :ok
+  def slash(
+        %Client{
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
+            secret: secret_key
+          },
+          network_id: network_id,
+          connection: connection,
+          gas_price: gas_price
+        },
+        channel_id,
+        from_id,
+        payload,
+        poi,
+        opts \\ []
+      )
+      when sender_prefix == "ak" do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, slash_tx} <-
+           build_slash_tx(
+             channel_id,
+             Keyword.get(opts, :fee, 0),
+             from_id,
+             nonce,
+             payload,
+             poi,
+             Keyword.get(opts, :ttl, 0)
+           ),
+         {:ok, _} = response <-
+           Transaction.try_post(
+             connection,
+             secret_key,
+             network_id,
+             gas_price,
+             slash_tx,
+             height
+           ) do
+      response
+    else
+      error ->
+        {:error, "#{__MODULE__}: Unsuccessful post of ChannelSlashTx : #{inspect(error)}"}
+    end
   end
 
-  def snapshot_solo_tx() do
-    :ok
+  def snapshot_solo(
+        %Client{
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
+            secret: secret_key
+          },
+          network_id: network_id,
+          connection: connection,
+          gas_price: gas_price
+        },
+        channel_id,
+        from_id,
+        payload,
+        opts \\ []
+      )
+      when sender_prefix == "ak" do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, snapshot_solo_tx} <-
+           build_snapshot_solo_tx(
+             channel_id,
+             from_id,
+             payload,
+             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :fee, 0),
+             nonce
+           ),
+         {:ok, _} = response <-
+           Transaction.try_post(
+             connection,
+             secret_key,
+             network_id,
+             gas_price,
+             snapshot_solo_tx,
+             height
+           ) do
+      response
+    else
+      error ->
+        {:error, "#{__MODULE__}: Unsuccessful post of ChannelSnapshotSoloTx : #{inspect(error)}"}
+    end
   end
 
-  def withdraw_tx() do
-    :ok
+  def withdraw(
+        %Client{
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
+            secret: secret_key
+          },
+          network_id: network_id,
+          connection: connection,
+          gas_price: gas_price
+        },
+        channel_id,
+        to_id,
+        amount,
+        state_hash,
+        round,
+        opts \\ []
+      )
+      when sender_prefix == "ak" do
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         {:ok, withdraw_tx} <-
+           build_withdraw_tx(
+             channel_id,
+             to_id,
+             amount,
+             Keyword.get(opts, :ttl, 0),
+             Keyword.get(opts, :fee, 0),
+             nonce,
+             state_hash,
+             round
+           ),
+         {:ok, _} = response <-
+           Transaction.try_post(
+             connection,
+             secret_key,
+             network_id,
+             gas_price,
+             withdraw_tx,
+             height
+           ) do
+      response
+    else
+      error ->
+        {:error, "#{__MODULE__}: Unsuccessful post of ChannelWithdrawTx : #{inspect(error)}"}
+    end
   end
 
   defp build_create_channel_tx(
@@ -307,15 +477,15 @@ defmodule Core.Channel do
      }}
   end
 
-  def build_close_mutual_tx(
-        channel_id,
-        fee,
-        from_id,
-        initiator_amount_final,
-        nonce,
-        responder_amount_final,
-        ttl
-      ) do
+  defp build_close_mutual_tx(
+         channel_id,
+         fee,
+         from_id,
+         initiator_amount_final,
+         nonce,
+         responder_amount_final,
+         ttl
+       ) do
     {:ok,
      %ChannelCloseMutualTx{
        channel_id: channel_id,
@@ -349,16 +519,16 @@ defmodule Core.Channel do
      }}
   end
 
-  def build_deposit_tx(
-        amount,
-        channel_id,
-        fee,
-        from_id,
-        nonce,
-        round,
-        state_hash,
-        ttl
-      ) do
+  defp build_deposit_tx(
+         amount,
+         channel_id,
+         fee,
+         from_id,
+         nonce,
+         round,
+         state_hash,
+         ttl
+       ) do
     {:ok,
      %ChannelDepositTx{
        amount: amount,
@@ -372,18 +542,18 @@ defmodule Core.Channel do
      }}
   end
 
-  def build_force_progress_tx(
-        channel_id,
-        fee,
-        from_id,
-        nonce,
-        offchain_trees,
-        payload,
-        round,
-        state_hash,
-        ttl,
-        update
-      ) do
+  defp build_force_progress_tx(
+         channel_id,
+         fee,
+         from_id,
+         nonce,
+         offchain_trees,
+         payload,
+         round,
+         state_hash,
+         ttl,
+         update
+       ) do
     {:ok,
      %ChannelForceProgressTx{
        channel_id: channel_id,
@@ -396,6 +566,90 @@ defmodule Core.Channel do
        state_hash: state_hash,
        ttl: ttl,
        update: update
+     }}
+  end
+
+  defp build_settle_tx(
+         channel_id,
+         fee,
+         from_id,
+         initiator_amount_final,
+         nonce,
+         responder_amount_final,
+         ttl
+       ) do
+    {:ok,
+     %ChannelSettleTx{
+       channel_id: channel_id,
+       fee: fee,
+       from_id: from_id,
+       initiator_amount_final: initiator_amount_final,
+       nonce: nonce,
+       responder_amount_final: responder_amount_final,
+       ttl: ttl
+     }}
+  end
+
+  defp build_slash_tx(
+         channel_id,
+         fee,
+         from_id,
+         nonce,
+         payload,
+         poi,
+         ttl
+       ) do
+    {:ok,
+     %ChannelSlashTx{
+       channel_id: channel_id,
+       fee: fee,
+       from_id: from_id,
+       nonce: nonce,
+       payload: payload,
+       poi: poi,
+       ttl: ttl
+     }}
+  end
+
+  defp build_snapshot_solo_tx(
+         channel_id,
+         from_id,
+         payload,
+         ttl,
+         fee,
+         nonce
+       ) do
+    {:ok,
+     %ChannelSnapshotSoloTx{
+       channel_id: channel_id,
+       from_id: from_id,
+       payload: payload,
+       ttl: ttl,
+       fee: fee,
+       nonce: nonce
+     }}
+  end
+
+  defp build_withdraw_tx(
+         channel_id,
+         to_id,
+         amount,
+         ttl,
+         fee,
+         nonce,
+         state_hash,
+         round
+       ) do
+    {:ok,
+     %ChannelWithdrawTx{
+       channel_id: channel_id,
+       to_id: to_id,
+       amount: amount,
+       ttl: ttl,
+       fee: fee,
+       nonce: nonce,
+       state_hash: state_hash,
+       round: round
      }}
   end
 
