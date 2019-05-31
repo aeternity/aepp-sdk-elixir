@@ -411,19 +411,143 @@ defmodule Utils.SerializationUtils do
        ttl,
        fee,
        #  list_delegate_ids,
-       # TODO: Have to be checked!!!
+       # TODO: Have to be implemented/fixed when 3.1.0 aeternity node is out!!!
        state_hash,
        nonce
      ], :channel_create_tx}
+  end
+
+  # ChannelSnapshotSoloTx,
+  # ChannelWithdrawTx
+  def process_tx_fields(%ChannelCloseMutualTx{
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        initiator_amount_final: initiator_amount_final,
+        nonce: nonce,
+        responder_amount_final: responder_amount_final,
+        ttl: ttl
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok,
+     [
+       channel_id,
+       from_id,
+       initiator_amount_final,
+       responder_amount_final,
+       ttl,
+       fee,
+       nonce
+     ], :channel_close_mutual_tx}
+  end
+
+  def process_tx_fields(%ChannelCloseSoloTx{
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        nonce: nonce,
+        payload: payload,
+        poi: poi,
+        ttl: ttl
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok,
+     [
+       channel_id,
+       from_id,
+       payload,
+       # TODO: check if its needed to be preprocessed
+       poi,
+       ttl,
+       fee,
+       nonce
+     ], :channel_close_solo_tx}
+  end
+
+  def process_tx_fields(%ChannelDepositTx{
+        amount: amount,
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        nonce: nonce,
+        round: round,
+        state_hash: state_hash,
+        ttl: ttl
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok,
+     [
+       channel_id,
+       from_id,
+       amount,
+       ttl,
+       fee,
+       state_hash,
+       round,
+       nonce
+     ], :channel_deposit_tx}
+  end
+
+  def process_tx_fields(%ChannelForceProgressTx{
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        nonce: nonce,
+        offchain_trees: offchain_trees,
+        payload: payload,
+        round: round,
+        state_hash: state_hash,
+        ttl: ttl,
+        update: update
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok,
+     [channel_id, from_id, payload, round, update, state_hash, offchain_trees, ttl, fee, nonce],
+     :channel_force_progress_tx}
+  end
+
+  def process_tx_fields(%ChannelSettleTx{
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        initiator_amount_final: initiator_amount_final,
+        nonce: nonce,
+        responder_amount_final: responder_amount_final,
+        ttl: ttl
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok, [channel_id, from_id, initiator_amount_final, responder_amount_final, ttl, fee, nonce],
+     :channel_settle_tx}
+  end
+
+  def process_tx_fields(%ChannelSlashTx{
+        channel_id: channel,
+        fee: fee,
+        from_id: from,
+        nonce: nonce,
+        payload: payload,
+        poi: poi,
+        ttl: ttl
+      }) do
   end
 
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end
 
-  defp proccess_id_to_record(tx_public_key) when is_binary(tx_public_key) do
-    {type, public_key} =
-      tx_public_key
+  defp proccess_id_to_record(id) when is_binary(id) do
+    {type, binary_data} =
+      id
       |> Keys.public_key_to_binary(:with_prefix)
 
     id =
@@ -436,6 +560,6 @@ defmodule Utils.SerializationUtils do
         "ch_" -> :channel
       end
 
-    {:id, id, public_key}
+    {:id, id, binary_data}
   end
 end
