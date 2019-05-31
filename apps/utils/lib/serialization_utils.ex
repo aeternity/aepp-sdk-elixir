@@ -417,8 +417,6 @@ defmodule Utils.SerializationUtils do
      ], :channel_create_tx}
   end
 
-  # ChannelSnapshotSoloTx,
-  # ChannelWithdrawTx
   def process_tx_fields(%ChannelCloseMutualTx{
         channel_id: channel,
         fee: fee,
@@ -539,6 +537,49 @@ defmodule Utils.SerializationUtils do
         poi: poi,
         ttl: ttl
       }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok,
+     [
+       channel_id,
+       from_id,
+       payload,
+       # TODO: check if its needed to be preprocessed
+       poi,
+       ttl,
+       fee,
+       nonce
+     ], :channel_slash_tx}
+  end
+
+  def process_tx_fields(%ChannelSnapshotSoloTx{
+        channel_id: channel,
+        from_id: from,
+        payload: payload,
+        ttl: ttl,
+        fee: fee,
+        nonce: nonce
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    from_id = proccess_id_to_record(from)
+
+    {:ok, [channel_id, from_id, payload, ttl, fee, nonce], :channel_snapshot_solo_tx}
+  end
+
+  def process_tx_fields(%ChannelWithdrawTx{
+        channel_id: channel,
+        to_id: to,
+        amount: amount,
+        ttl: ttl,
+        fee: fee,
+        nonce: nonce,
+        state_hash: state_hash,
+        round: round
+      }) do
+    channel_id = proccess_id_to_record(channel)
+    to_id = proccess_id_to_record(to)
+    {:ok, [channel_id, to_id, amount, ttl, fee, state_hash, round, nonce], :channel_withdraw_tx}
   end
 
   def process_tx_fields(tx) do
