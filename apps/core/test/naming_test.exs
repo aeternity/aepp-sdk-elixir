@@ -110,13 +110,13 @@ defmodule Core.NamingTest do
     # Claim a new name
     assert {:ok, _claim_result} =
              setup.client
-             |> AENS.preclaim("name.test")
+             |> AENS.preclaim("name123.test")
              |> AENS.claim()
 
     # Try to claim again already claimed name
     assert {:error, _claim_result} =
              setup.client
-             |> AENS.preclaim("name.test")
+             |> AENS.preclaim("name123.test")
              |> AENS.claim()
   end
 end

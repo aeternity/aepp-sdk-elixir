@@ -587,7 +587,7 @@ defmodule Core.AENS do
          }}
   """
 
-  @spec revoke({:ok, map()}, list()) :: {:error, String.t()} | {:ok, map()}
+  @spec revoke({:ok, map()}, list() | {:error, String.t()}) :: {:error, String.t()} | {:ok, map()}
   def revoke(claim_result, opts \\ []) do
     case claim_result do
       {:ok, %{client: client, name: name}} ->
