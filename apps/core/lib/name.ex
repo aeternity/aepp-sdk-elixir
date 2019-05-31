@@ -156,9 +156,15 @@ defmodule Core.AENS do
        }}
 
   """
-  @spec claim({:ok, map()}, list) :: {:error, String.t()} | {:ok, map()}
-  def claim({:ok, %{client: client, name: name, name_salt: name_salt}}, opts \\ []) do
-    claim(client, name, name_salt, opts)
+  @spec claim({:ok, map()} | {:error, String.t()}, list) :: {:error, String.t()} | {:ok, map()}
+  def claim(preclaim_result, opts \\ []) do
+    case preclaim_result do
+      {:ok, %{client: client, name: name, name_salt: name_salt}} ->
+        claim(client, name, name_salt, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
   end
 
   @doc """
@@ -285,20 +291,26 @@ defmodule Core.AENS do
   """
 
   @spec update(
-          {:ok, %{client: Core.Client.t(), name: binary()}},
+          {:ok, %{client: Core.Client.t(), name: binary()}} | {:error, String.t()},
           list(),
           non_neg_integer(),
           non_neg_integer(),
           list()
         ) :: {:error, String.t()} | {:ok, map()}
   def update(
-        {:ok, %{client: client, name: name}},
+        claim_result,
         pointers \\ [],
         name_ttl \\ @max_name_ttl,
         client_ttl \\ @max_client_ttl,
         opts \\ []
       ) do
-    update_name(client, name, name_ttl, pointers, client_ttl, opts)
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        update_name(client, name, name_ttl, pointers, client_ttl, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
   end
 
   @doc """
@@ -361,9 +373,9 @@ defmodule Core.AENS do
           gas_price: gas_price
         } = client,
         name,
-        name_ttl,
-        pointers,
-        client_ttl,
+        name_ttl \\ @max_name_ttl,
+        pointers \\ [],
+        client_ttl \\ @max_client_ttl,
         opts \\ []
       )
       when is_integer(name_ttl) and is_integer(client_ttl) and is_list(pointers) and
@@ -440,10 +452,20 @@ defmodule Core.AENS do
          }}
 
   """
-  @spec transfer({:ok, %{client: Core.Client.t(), name: binary()}}, binary(), list()) ::
+  @spec transfer(
+          {:ok, %{client: Core.Client.t(), name: binary()} | {:error, String.t()}},
+          binary(),
+          list()
+        ) ::
           {:error, String.t()} | {:ok, map()}
-  def transfer({:ok, %{client: client, name: name}}, recipient_pub_key, opts \\ []) do
-    transfer_name(client, name, recipient_pub_key, opts)
+  def transfer(claim_result, recipient_pub_key, opts \\ []) do
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        transfer_name(client, name, recipient_pub_key, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
   end
 
   @doc """
@@ -566,8 +588,14 @@ defmodule Core.AENS do
   """
 
   @spec revoke({:ok, map()}, list()) :: {:error, String.t()} | {:ok, map()}
-  def revoke({:ok, %{client: client, name: name}}, opts \\ []) do
-    revoke_name(client, name, opts)
+  def revoke(claim_result, opts \\ []) do
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        revoke_name(client, name, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
   end
 
   @doc """

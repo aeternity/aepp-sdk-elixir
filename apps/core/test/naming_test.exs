@@ -104,4 +104,19 @@ defmodule Core.NamingTest do
              )
            )
   end
+
+  @tag :travis_test
+  test "test naming error handling", setup do
+    # Claim a new name
+    assert {:ok, _claim_result} =
+             setup.client
+             |> AENS.preclaim("name.test")
+             |> AENS.claim()
+
+    # Try to claim again already claimed name
+    assert {:error, _claim_result} =
+             setup.client
+             |> AENS.preclaim("name.test")
+             |> AENS.claim()
+  end
 end
