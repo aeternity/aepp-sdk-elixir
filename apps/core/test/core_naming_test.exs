@@ -1,4 +1,4 @@
-defmodule Core.NamingTest do
+defmodule CoreNamingTest do
   use ExUnit.Case
   alias Utils.{Keys, Serialization}
   alias Core.{AENS, Account}
@@ -9,7 +9,7 @@ defmodule Core.NamingTest do
   end
 
   @tag :travis_test
-  test "test naming workflow", setup do
+  test "naming workflow", setup do
     # Pre-claim a name
     pre_claim = AENS.preclaim(setup.client, "test.test", 777)
     assert match?({:ok, _}, pre_claim)
