@@ -1,4 +1,11 @@
 defmodule Core.Channel do
+  @moduledoc """
+  Aeternity Channel System: https://github.com/aeternity/protocol/blob/master/channels/README.md
+  Contains all channel-related functionality
+
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `Core.Client.new/4`
+  """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
 
@@ -21,12 +28,33 @@ defmodule Core.Channel do
   @prefix_byte_size 2
   @state_hash_byte_size 32
 
+  defguard valid_prefixes(sender_pubkey_prefix, channel_prefix)
+           when sender_pubkey_prefix == "ak" and channel_prefix == "ch"
+
   @spec get_by_pubkey(Core.Client.t(), binary()) ::
           {:error, Tesla.Env.t()} | {:ok, AeternityNode.Model.Channel.t()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
     prepare_result(ChannelAPI.get_channel_by_pubkey(connection, channel_pubkey))
   end
 
+  @doc """
+  Create a channel.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create
+
+  ## Examples
+      iex>
+  """
+  @spec create(
+          Client.t(),
+          non_neg_integer(),
+          binary(),
+          non_neg_integer(),
+          non_neg_integer(),
+          non_neg_integer(),
+          non_neg_integer(),
+          binary(),
+          list()
+        ) :: {:ok, map()} | {:error, String.t()}
   def create(
         %Client{
           keypair: %{
@@ -79,6 +107,15 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Closes a channel.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_mutual
+
+  ## Examples
+      iex>
+  """
+  @spec close_mutual(Client.t(), binary(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def close_mutual(
         %Client{
           keypair: %{
@@ -95,8 +132,8 @@ defmodule Core.Channel do
         responder_amount_final,
         opts \\ []
       )
-      when sender_prefix == "ak" and initiator_amount_final >= 0 and responder_amount_final <= 0 and
-             channel_prefix == "ch" and from_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) and initiator_amount_final >= 0 and
+             responder_amount_final <= 0 and from_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
@@ -125,6 +162,15 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Closes a channel.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_solo
+
+  ## Examples
+      iex>
+  """
+  @spec close_solo(Client.t(), binary(), String.t(), list(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def close_solo(
         %Client{
           keypair: %{
@@ -135,20 +181,19 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         poi,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
            build_close_solo_tx(
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              nonce,
              payload,
              poi,
@@ -170,6 +215,15 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Deposits funds into a channel after creation
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_deposit
+
+  ## Examples
+      iex>
+  """
+  @spec deposit(Client.t(), non_neg_integer(), binary(), non_neg_integer(), binary(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def deposit(
         %Client{
           keypair: %{
@@ -181,13 +235,13 @@ defmodule Core.Channel do
           gas_price: gas_price
         },
         amount,
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         round,
         state_hash,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) and
+             byte_size(state_hash) == @state_hash_byte_size do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, deposit_tx} <-
@@ -195,7 +249,7 @@ defmodule Core.Channel do
              amount,
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              nonce,
              round,
              state_hash,
@@ -217,6 +271,25 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Forcing progress is the mechanism to be used when a dispute arises between parties and
+  one of them wants to use the blockchain as an arbiter.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#forcing-progress
+
+  ## Examples
+      iex>
+  """
+  @spec force_progress(
+          Client.t(),
+          binary(),
+          list(binary()),
+          String.t(),
+          non_neg_integer(),
+          binary(),
+          binary(),
+          list()
+        ) ::
+          {:ok, map()} | {:error, String.t()}
   def force_progress(
         %Client{
           keypair: %{
@@ -227,8 +300,7 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         offchain_trees,
         payload,
         round,
@@ -236,14 +308,14 @@ defmodule Core.Channel do
         update,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, force_progress_tx} <-
            build_force_progress_tx(
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              nonce,
              offchain_trees,
              payload,
@@ -268,6 +340,17 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  The settlement transaction is the last one in the lifecycle of a channel,
+  but only required if the parties involved did not manage to cooperate when
+  trying to close the channel.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
+
+  ## Examples
+      iex>
+  """
+  @spec settle(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def settle(
         %Client{
           keypair: %{
@@ -278,20 +361,19 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         initiator_amount_final,
         responder_amount_final,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, settle_tx} <-
            build_settle_tx(
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              initiator_amount_final,
              nonce,
              responder_amount_final,
@@ -313,6 +395,16 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  If a malicious party sent a channel_close_solo or channel_force_progress_tx with an outdated state,
+  the honest party has the opportunity to issue a channel_slash transaction
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
+
+  ## Examples
+      iex>
+  """
+  @spec slash(Client.t(), binary(), String.t(), list(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def slash(
         %Client{
           keypair: %{
@@ -323,20 +415,19 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         poi,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
            build_slash_tx(
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              nonce,
              payload,
              poi,
@@ -358,6 +449,17 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  In order to make channels both secure and trustless even when one party goes offline,
+  we provide the functionality of snapshots. Snapshots provide a recent off-chain state
+  to be recorded on-chain.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
+
+  ## Examples
+      iex>
+  """
+  @spec snapshot_solo(Client.t(), binary(), String.t(), list()) ::
+          {:ok, map()} | {:error, String.t()}
   def snapshot_solo(
         %Client{
           keypair: %{
@@ -368,18 +470,17 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
-        from_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, snapshot_solo_tx} <-
            build_snapshot_solo_tx(
              channel_id,
-             from_id,
+             sender_pubkey,
              payload,
              Keyword.get(opts, :ttl, 0),
              Keyword.get(opts, :fee, 0),
@@ -401,6 +502,23 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Witdraws locked tokens from channel.
+  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
+
+  ## Examples
+      iex>
+  """
+  @spec withdraw(
+          Client.t(),
+          binary(),
+          binary(),
+          non_neg_integer(),
+          binary(),
+          non_neg_integer(),
+          list()
+        ) ::
+          {:ok, map()} | {:error, String.t()}
   def withdraw(
         %Client{
           keypair: %{
@@ -411,14 +529,15 @@ defmodule Core.Channel do
           connection: connection,
           gas_price: gas_price
         },
-        channel_id,
+        <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         to_id,
         amount,
         state_hash,
         round,
         opts \\ []
       )
-      when sender_prefix == "ak" do
+      when valid_prefixes(sender_prefix, channel_prefix) and
+             byte_size(state_hash) == @state_hash_byte_size do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, withdraw_tx} <-
