@@ -22,6 +22,15 @@ defmodule Utils.Transaction do
     NameUpdateTx,
     ContractCallTx,
     ContractCreateTx,
+    ChannelCreateTx,
+    ChannelCloseMutualTx,
+    ChannelCloseSoloTx,
+    ChannelDepositTx,
+    ChannelForceProgressTx,
+    ChannelSettleTx,
+    ChannelSlashTx,
+    ChannelSnapshotSoloTx,
+    ChannelWithdrawTx,
     TxInfoObject
   }
 
@@ -40,7 +49,16 @@ defmodule Utils.Transaction do
     NameRevokeTx,
     NameUpdateTx,
     ContractCallTx,
-    ContractCreateTx
+    ContractCreateTx,
+    ChannelCreateTx,
+    ChannelCloseMutualTx,
+    ChannelCloseSoloTx,
+    ChannelDepositTx,
+    ChannelForceProgressTx,
+    ChannelSettleTx,
+    ChannelSlashTx,
+    ChannelSnapshotSoloTx,
+    ChannelWithdrawTx
   ]
 
   @type tx_types ::
