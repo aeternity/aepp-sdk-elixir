@@ -24,23 +24,45 @@ defmodule Core.AENS do
 
   @prefix_byte_size 2
 
+  @max_name_ttl 50_000
+  @max_client_ttl 86_000
+
   @doc """
   Preclaims a name.
 
   ## Examples
       iex> name = "a123.test"
-      iex> name_salt = 7
-      iex> Core.AENS.preclaim(client, name, name_salt)
+      iex> Core.AENS.preclaim(client, name)
       {:ok,
-       %{
-         block_hash: "mh_2aBYJJkAKWUrLgfuYMtzuwe664qcJmKTg9nZbJKJqCZCP45qXx",
-         block_height: 74520,
-         hash: "th_2sSWCChUievTNvuuZXUGr3EdKmGdDiH3GVd9au7eaTYdTSFh85",
-         signatures: ["sg_CUjN52PbibG2US2KYowbkjqEvGauPie1rqcGPagFJ9CfnzCVrFTxaedRQpyqr1zvT9oGu9WP6hqZaVp7nDW1mzcuyEqPF"],
-         tx: %AeternityNode.Model.GenericTx{type: "NamePreclaimTx", version: 1}
-       }}
+        %{
+          block_hash: "mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d",
+          block_height: 86,
+          client: %Core.Client{
+            connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+            },
+            gas_price: 1000000,
+            internal_connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+            },
+            keypair: %{
+              public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+            },
+            network_id: "my_test"
+          },
+          name: "a123.test",
+          name_salt: 149218901844062129,,
+          tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
+        }}
   """
-  @spec preclaim(Client.t(), String.t(), non_neg_integer(), list()) ::
+  @spec preclaim(Client.t(), String.t(), non_neg_integer() | atom(), list()) ::
           {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
@@ -54,10 +76,21 @@ defmodule Core.AENS do
           gas_price: gas_price
         } = client,
         name,
-        name_salt,
+        salt \\ :auto,
         opts \\ []
       )
       when sender_prefix == "ak" do
+    name_salt =
+      case salt do
+        :auto ->
+          <<a::32, b::32, c::32>> = :crypto.strong_rand_bytes(12)
+          {state, _} = :rand.seed(:exsplus, {a, b, c})
+          :rand.uniform(state.max)
+
+        num when num > 0 ->
+          num
+      end
+
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
            NameService.get_commitment_id(internal_connection, name, name_salt),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
@@ -68,7 +101,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -77,7 +110,13 @@ defmodule Core.AENS do
              preclaim_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:name, name)
+        |> Map.put(:name_salt, name_salt)
+        |> Map.put(:client, client)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NamePreclaimTx : #{inspect(error)}"}
     end
@@ -87,18 +126,83 @@ defmodule Core.AENS do
   Claims a name.
 
   ## Examples
-      iex> name = "a123.test"
-      iex> name_salt = 7
-      iex> Core.AENS.claim(client, name, name_salt, [fee:  1_000_000_000_000_000])
-       {:ok,
-        %{
-          block_hash: "mh_7UU32yA7UFYKUXUeacuywogKgheJBmNrKCDRRXb6vqCzMrism",
-          block_height: 74932,
-          hash: "th_bRhCGSguVScR4V8KKjKiaaJPbvKthFZSB7nP2DLggyStcpQjQ",
-          signatures: ["sg_a4eaiajvEoh1ZC6cuHJLzXtfvRiVJwbnzLP5qpA8KYEgEZt6VxgXR8ZjcZGpoDDyYq5cH3LXkLDXRS4vqfu2BVEdChGJa"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameClaimTx", version: 1}
-      }}
+      iex> client |> Core.AENS.preclaim("a123.test") |> Core.AENS.claim()
+      {:ok,
+       %{
+         block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
+         block_height: 23,
+         client: %Core.Client{
+           connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+           },
+           gas_price: 1000000,
+           internal_connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+           },
+           keypair: %{
+             public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+           },
+           network_id: "my_test"
+         },
+         name: "a123.test",
+         tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
+       }}
+
   """
+  @spec claim({:ok, map()} | {:error, String.t()}, list) :: {:error, String.t()} | {:ok, map()}
+  def claim(preclaim_result, opts \\ []) do
+    case preclaim_result do
+      {:ok, %{client: client, name: name, name_salt: name_salt}} ->
+        claim(client, name, name_salt, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  @doc """
+  Claims a name.
+
+  ## Examples
+      iex> name = "a123.test"
+      iex> name_salt = 149218901844062129,
+      iex> Core.AENS.claim(client, name, name_salt)
+       {:ok,
+         %{
+           block_hash: "mh_41E9iE61koF8AQLMvjTkRJ3N23yne4UXmqn5jeUn1GDrScV7A",
+           block_height: 80,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
+         }}
+  """
+
   @spec claim(Client.t(), String.t(), integer(), list()) :: {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
@@ -124,7 +228,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -133,9 +237,79 @@ defmodule Core.AENS do
              claim_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:client, client)
+        |> Map.put(:name, name)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameClaimTx: #{inspect(error)} "}
+    end
+  end
+
+  @doc """
+  Updates a name.
+
+  ## Examples
+
+      iex> name = "a123.test"
+      iex> name_ttl = 49_999
+      iex> pointers = []
+      iex> client_ttl = 50_000
+      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.update(pointers, name_ttl,  client_ttl)
+       {:ok,
+          %{
+            block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
+            block_height: 41,
+            client: %Core.Client{
+              connection: %Tesla.Client{
+                adapter: nil,
+                fun: nil,
+                post: [],
+                pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+              },
+              gas_price: 1000000,
+              internal_connection: %Tesla.Client{
+                adapter: nil,
+                fun: nil,
+                post: [],
+                pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+              },
+              keypair: %{
+                public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              },
+              network_id: "my_test"
+            },
+            client_ttl: 50000,
+            name: "a123.test",
+            name_ttl: 49999,
+            pointers: [],
+            tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
+          }}
+  """
+
+  @spec update(
+          {:ok, %{client: Core.Client.t(), name: binary()}} | {:error, String.t()},
+          list(),
+          non_neg_integer(),
+          non_neg_integer(),
+          list()
+        ) :: {:error, String.t()} | {:ok, map()}
+  def update(
+        claim_result,
+        pointers \\ [],
+        name_ttl \\ @max_name_ttl,
+        client_ttl \\ @max_client_ttl,
+        opts \\ []
+      ) do
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        update_name(client, name, name_ttl, pointers, client_ttl, opts)
+
+      {:error, _reason} = error ->
+        error
     end
   end
 
@@ -147,26 +321,48 @@ defmodule Core.AENS do
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> Core.AENS.update(client, name, name_ttl, pointers, client_ttl, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
        {:ok,
-        %{
-          block_hash: "mh_KaN4zRfCqsm2pKKBq7NShMQWV2Mt3sL4VPEszc7ZwJb2s7CZZ",
-          block_height: 74971,
-          hash: "th_29YCfGGaarxy322azZrYuBDZAABWrMP1CuMsAFiUDoshzXkVjc",
-          signatures: ["sg_GnAPiuQmNwwRBtY7zgoN3ihaFz5XH4KsjTzuJgViFyCkZVE3Qgvw56HfymZL4LvFxPWwmkGf3UvhzPmak1nFinFFn3yAG"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameUpdateTx", version: 1}
-        }}
+       %{
+         block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
+         block_height: 41,
+         client: %Core.Client{
+           connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+           },
+           gas_price: 1000000,
+           internal_connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+           },
+           keypair: %{
+             public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+           },
+           network_id: "my_test"
+         },
+         client_ttl: 50000,
+         name: "a123.test",
+         name_ttl: 49999,
+         pointers: [],
+         tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
+       }}
   """
 
-  @spec update(
+  @spec update_name(
           Client.t(),
           String.t(),
-          integer(),
+          non_neg_integer(),
           list(),
-          integer(),
+          non_neg_integer(),
           list()
         ) :: {:error, String.t()} | {:ok, map()}
-  def update(
+  def update_name(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
@@ -177,9 +373,9 @@ defmodule Core.AENS do
           gas_price: gas_price
         } = client,
         name,
-        name_ttl,
-        pointers,
-        client_ttl,
+        name_ttl \\ @max_name_ttl,
+        pointers \\ [],
+        client_ttl \\ @max_client_ttl,
         opts \\ []
       )
       when is_integer(name_ttl) and is_integer(client_ttl) and is_list(pointers) and
@@ -196,7 +392,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -205,9 +401,70 @@ defmodule Core.AENS do
              update_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:client, client)
+        |> Map.put(:name, name)
+        |> Map.put(:pointers, pointers)
+        |> Map.put(:client_ttl, client_ttl)
+        |> Map.put(:name_ttl, name_ttl)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameUpdateTx: #{inspect(error)}"}
+    end
+  end
+
+  @doc """
+    Transfers a name.
+
+    ## Examples
+        iex> name = "a123.test"
+        iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
+        iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
+         {:ok,
+         %{
+           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
+           block_height: 35,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
+         }}
+
+  """
+  @spec transfer(
+          {:ok, %{client: Core.Client.t(), name: binary()} | {:error, String.t()}},
+          binary(),
+          list()
+        ) ::
+          {:error, String.t()} | {:ok, map()}
+  def transfer(claim_result, recipient_pub_key, opts \\ []) do
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        transfer_name(client, name, recipient_pub_key, opts)
+
+      {:error, _reason} = error ->
+        error
     end
   end
 
@@ -217,18 +474,39 @@ defmodule Core.AENS do
   ## Examples
       iex> name = "a123.test"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> Core.AENS.transfer(client, name, recipient_key, [fee:  1_000_000_000_000_000])
+      iex> Core.AENS.transfer_name(client, name, recipient_key)
        {:ok,
-        %{
-          block_hash: "mh_mhmJEB3W8uQQsGzprNSZenC783FWAihP1miKW8qi3qDqkQAi9",
-          block_height: 74934,
-          hash: "th_XpwwJqW4S5oVLDRbgouPWo3nF1u8oon9KDmM944aKEJgr63az",
-          signatures: ["sg_P6mPiWpa7yN3N2Q4ZuXMhxaJ1YruHHAfDZAQCBkyd4MM8peeffK3mEoZp4Wuote8ZmkLSCF3fzxdZLkE1BDz2SDXYu3CX"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameTransferTx", version: 1}
-        }}
+         %{
+           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
+           block_height: 35,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
+         }}
   """
-  @spec transfer(Client.t(), String.t(), binary(), list()) :: {:error, String.t()} | {:ok, map()}
-  def transfer(
+  @spec transfer_name(Client.t(), String.t(), binary(), list()) ::
+          {:error, String.t()} | {:ok, map()}
+  def transfer_name(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
@@ -253,7 +531,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -262,7 +540,13 @@ defmodule Core.AENS do
              transfer_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:client, client)
+        |> Map.put(:name, name)
+        |> Map.put(:recipient_id, recipient_id)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameTransferTx: #{inspect(error)}"}
     end
@@ -273,18 +557,84 @@ defmodule Core.AENS do
 
   ## Examples
       iex> name = "a123.test"
-      iex> Core.AENS.revoke(client, name, [fee:  1_000_000_000_000_000])
+      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.revoke()
+       {:ok,
+         %{
+           block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
+           block_height: 24,
+           client: %Core.Client{
+             connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+             },
+             gas_price: 1000000,
+             internal_connection: %Tesla.Client{
+               adapter: nil,
+               fun: nil,
+               post: [],
+               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+             },
+             keypair: %{
+               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             },
+             network_id: "my_test"
+           },
+           name: "a123.test",
+           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
+         }}
+  """
+
+  @spec revoke({:ok, map()}, list() | {:error, String.t()}) :: {:error, String.t()} | {:ok, map()}
+  def revoke(claim_result, opts \\ []) do
+    case claim_result do
+      {:ok, %{client: client, name: name}} ->
+        revoke_name(client, name, opts)
+
+      {:error, _reason} = error ->
+        error
+    end
+  end
+
+  @doc """
+  Revokes a name.
+
+  ## Examples
+      iex> name = "a123.test"
+      iex> Core.AENS.revoke_name(client, name)
        {:ok,
         %{
-          block_hash: "mh_2TeNu2CF1rjyCzk9FYqhBfBBH4LqfSvj3qx3hpKuPGrMUDGpXU",
-          block_height: 74973,
-          hash: "th_G4s1Befn1JLws54ZTSAxVidEqJ4vqVPaowzeqELf7u4DPfHks",
-          signatures: ["sg_3kPx3pDu4CFDYZQdSQ2RrNU7wFuqcB2M83u8CxHXoRnN3xHQVgnpAmQvcbHT2ANpRCxvEKRA1r2JfA9rwkC9nDcnbQUve"],
-          tx: %AeternityNode.Model.GenericTx{type: "NameRevokeTx", version: 1}
+          block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
+          block_height: 24,
+          client: %Core.Client{
+            connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
+            },
+            gas_price: 1000000,
+            internal_connection: %Tesla.Client{
+              adapter: nil,
+              fun: nil,
+              post: [],
+              pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+            },
+            keypair: %{
+              public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+            },
+            network_id: "my_test"
+          },
+          name: "a123.test",
+          tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
-  @spec revoke(Client.t(), String.t(), list()) :: {:error, String.t()} | {:ok, map()}
-  def revoke(
+
+  @spec revoke_name(Client.t(), String.t(), list()) :: {:error, String.t()} | {:ok, map()}
+  def revoke_name(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
@@ -307,7 +657,7 @@ defmodule Core.AENS do
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, _} = response <-
+         {:ok, response} <-
            Transaction.try_post(
              connection,
              secret_key,
@@ -316,7 +666,12 @@ defmodule Core.AENS do
              revoke_tx,
              height
            ) do
-      response
+      result =
+        response
+        |> Map.put(:client, client)
+        |> Map.put(:name, name)
+
+      {:ok, result}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of NameRevokeTx: #{inspect(error)}"}
     end
