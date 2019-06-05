@@ -43,6 +43,15 @@ defmodule Utils.Transaction do
     ContractCreateTx
   ]
 
+  @network_id_list ["ae_mainnet", "ae_uat"]
+
+  @await_attempts 25
+  @await_attempt_interval 200
+  @default_ttl 0
+  @dummy_fee 0
+  @tx_posting_attempts 5
+  @default_payload ""
+
   @type tx_types ::
           SpendTx.t()
           | OracleRegisterTx.t()
@@ -56,15 +65,6 @@ defmodule Utils.Transaction do
           | NameUpdateTx.t()
           | ContractCallTx.t()
           | ContractCreateTx.t()
-
-  @network_id_list ["ae_mainnet", "ae_uat"]
-
-  @await_attempts 25
-  @await_attempt_interval 200
-  @default_ttl 0
-  @dummy_fee 0
-  @tx_posting_attempts 5
-  @default_payload ""
 
   @spec default_ttl :: non_neg_integer()
   def default_ttl, do: @default_ttl

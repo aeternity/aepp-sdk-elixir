@@ -27,6 +27,8 @@ defmodule Core.AENS do
   @max_name_ttl 50_000
   @max_client_ttl 86_000
 
+  @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
+
   @doc """
   Preclaims a name.
 
@@ -62,7 +64,7 @@ defmodule Core.AENS do
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
   """
-  @spec preclaim(Client.t(), String.t(), non_neg_integer() | atom(), list()) ::
+  @spec preclaim(Client.t(), String.t(), non_neg_integer() | atom(), aens_options()) ::
           {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
@@ -156,7 +158,8 @@ defmodule Core.AENS do
        }}
 
   """
-  @spec claim({:ok, map()} | {:error, String.t()}, list) :: {:error, String.t()} | {:ok, map()}
+  @spec claim({:ok, map()} | {:error, String.t()}, aens_options()) ::
+          {:error, String.t()} | {:ok, map()}
   def claim(preclaim_result, opts \\ []) do
     case preclaim_result do
       {:ok, %{client: client, name: name, name_salt: name_salt}} ->
@@ -203,7 +206,8 @@ defmodule Core.AENS do
          }}
   """
 
-  @spec claim(Client.t(), String.t(), integer(), list()) :: {:error, String.t()} | {:ok, map()}
+  @spec claim(Client.t(), String.t(), integer(), aens_options()) ::
+          {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
           keypair: %{
@@ -295,7 +299,7 @@ defmodule Core.AENS do
           list(),
           non_neg_integer(),
           non_neg_integer(),
-          list()
+          aens_options()
         ) :: {:error, String.t()} | {:ok, map()}
   def update(
         claim_result,
@@ -360,7 +364,7 @@ defmodule Core.AENS do
           non_neg_integer(),
           list(),
           non_neg_integer(),
-          list()
+          aens_options()
         ) :: {:error, String.t()} | {:ok, map()}
   def update_name(
         %Client{
@@ -455,7 +459,7 @@ defmodule Core.AENS do
   @spec transfer(
           {:ok, %{client: Core.Client.t(), name: binary()} | {:error, String.t()}},
           binary(),
-          list()
+          aens_options()
         ) ::
           {:error, String.t()} | {:ok, map()}
   def transfer(claim_result, recipient_pub_key, opts \\ []) do
@@ -504,7 +508,7 @@ defmodule Core.AENS do
            tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
          }}
   """
-  @spec transfer_name(Client.t(), String.t(), binary(), list()) ::
+  @spec transfer_name(Client.t(), String.t(), binary(), aens_options()) ::
           {:error, String.t()} | {:ok, map()}
   def transfer_name(
         %Client{
@@ -587,7 +591,8 @@ defmodule Core.AENS do
          }}
   """
 
-  @spec revoke({:ok, map()}, list() | {:error, String.t()}) :: {:error, String.t()} | {:ok, map()}
+  @spec revoke({:ok, map()} | {:error, String.t()}, aens_options()) ::
+          {:error, String.t()} | {:ok, map()}
   def revoke(claim_result, opts \\ []) do
     case claim_result do
       {:ok, %{client: client, name: name}} ->
@@ -633,7 +638,7 @@ defmodule Core.AENS do
         }}
   """
 
-  @spec revoke_name(Client.t(), String.t(), list()) :: {:error, String.t()} | {:ok, map()}
+  @spec revoke_name(Client.t(), String.t(), aens_options()) :: {:error, String.t()} | {:ok, map()}
   def revoke_name(
         %Client{
           keypair: %{
