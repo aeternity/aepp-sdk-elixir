@@ -37,6 +37,7 @@ defmodule Core.Chain do
   alias Core.Client
   alias Tesla.Env
 
+  @type await_options :: [attempts: non_neg_integer(), interval: non_neg_integer()]
   @type generic_transaction :: %{version: non_neg_integer(), type: String.t()}
   @type generic_signed_transaction :: %{
           tx: generic_transaction(),
@@ -146,7 +147,7 @@ defmodule Core.Chain do
       iex> Core.Chain.await_height(client, 84590)
       :ok
   """
-  @spec await_height(Client.t(), non_neg_integer(), list()) ::
+  @spec await_height(Client.t(), non_neg_integer(), await_options()) ::
           :ok | {:error, String.t()} | {:error, Env.t()}
   def await_height(%Client{} = client, height, opts \\ [])
       when is_integer(height) and height > 0 do
@@ -166,7 +167,7 @@ defmodule Core.Chain do
       iex> Core.Chain.await_transaction(client, transaction_hash)
       :ok
   """
-  @spec await_transaction(Client.t(), String.t(), list()) ::
+  @spec await_transaction(Client.t(), String.t(), await_options()) ::
           :ok | {:error, String.t()} | {:error, Env.t()}
   def await_transaction(%Client{connection: connection}, tx_hash, opts \\ [])
       when is_binary(tx_hash) do

@@ -32,6 +32,23 @@ defmodule Core.Contract do
   @init_function "init"
   @abi_version 0x01
 
+  @type deploy_options :: [
+          deposit: non_neg_integer(),
+          amount: non_neg_integer(),
+          gas: non_neg_integer(),
+          gas_price: non_neg_integer(),
+          fee: non_neg_integer(),
+          ttl: non_neg_integer()
+        ]
+
+  @type call_options :: [
+          fee: non_neg_integer(),
+          ttl: non_neg_integer(),
+          amount: non_neg_integer(),
+          gas: non_neg_integer(),
+          gas_price: non_neg_integer()
+        ]
+
   @doc """
   Deploy a contract
 
@@ -54,7 +71,7 @@ defmodule Core.Contract do
           Client.t(),
           String.t(),
           list(String.t()),
-          list()
+          deploy_options()
         ) ::
           {:ok,
            %{
@@ -166,7 +183,7 @@ defmodule Core.Contract do
        }}
 
   """
-  @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
+  @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), call_options()) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
@@ -244,7 +261,14 @@ defmodule Core.Contract do
           log: []
         }}
   """
-  @spec call_static(Client.t(), String.t(), String.t(), String.t(), list(String.t()), list()) ::
+  @spec call_static(
+          Client.t(),
+          String.t(),
+          String.t(),
+          String.t(),
+          list(String.t()),
+          call_options()
+        ) ::
           {:ok,
            %{
              return_value: String.t(),

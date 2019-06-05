@@ -17,6 +17,11 @@ defmodule Core.Account do
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
 
   @type account :: %{id: String.t(), balance: non_neg_integer(), nonce: non_neg_integer()}
+  @type spend_options :: [
+          fee: non_neg_integer(),
+          ttl: non_neg_integer(),
+          payload: non_neg_integer()
+        ]
 
   @doc """
   Send tokens to an account.
@@ -32,7 +37,7 @@ defmodule Core.Account do
           tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
         }}
   """
-  @spec spend(Client.t(), binary(), non_neg_integer(), list()) ::
+  @spec spend(Client.t(), binary(), non_neg_integer(), spend_options()) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
