@@ -20,7 +20,7 @@ defmodule Core.Account do
   @type spend_options :: [
           fee: non_neg_integer(),
           ttl: non_neg_integer(),
-          payload: non_neg_integer()
+          payload: String.t()
         ]
 
   @doc """
