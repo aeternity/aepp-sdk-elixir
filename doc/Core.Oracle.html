@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.20.2">
+    <meta name="project" content=" vdev">
+    <title>Core.Oracle —  vdev</title>
+    <link rel="stylesheet" href="dist/html-d9f58a6320b5bfa6dd77.css" />
+    <script src="dist/sidebar_items-23c8f2b01a.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-d9f58a6320b5bfa6dd77.js"></script>
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+      </a>
+      <h2 class="sidebar-projectVersion">
+        vdev
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="app-vsn"> vdev</small>
+Core.Oracle              </h1>
+
+
+        <section id="moduledoc">
+<p>Module for oracle interaction, see: https://github.com/aeternity/protocol/blob/master/oracles/oracles.md</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:oracle_options/0">oracle_options()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:query_options/0">query_options()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:sophia_data/0">sophia_data()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:sophia_type/0">sophia_type()</a>
+  </div>
+    <div class="summary-synopsis"><p>See https://github.com/aeternity/protocol/blob/master/contracts/sophia.md#types</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:ttl/0">ttl()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:ttl_type/0">ttl_type()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#extend/4">extend(client, oracle_id, oracle_ttl, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Extend the TTL of an oracle by a relative amount.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_oracle/2">get_oracle(client, oracle_id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an oracle object.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_queries/2">get_queries(client, oracle_id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get all queries of an oracle.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_query/3">get_query(client, oracle_id, query_id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an oracle query by its ID.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#query/6">query(client, oracle_id, query, query_ttl, response_ttl_value, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Query an oracle. Keep in mind that the response TTL is always relative,
+and that the sum of the relative query and response TTL can&#39;t be higher than the oracle&#39;s TTL.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#register/6">register(client, query_format, response_format, ttl, query_fee, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Register a typed oracle. Queries and responses that don&#39;t follow the oracle&#39;s respective formats are invalid.
+The query and response types are sophia types.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#respond/6">respond(client, oracle_id, query_id, response, response_ttl, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Respond to an oracle query. Only the oracle&#39;s owner can respond to its queries.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:oracle_options/0">
+    <div class="detail-header">
+    <a href="#t:oracle_options/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">oracle_options()</span>
+        
+      <div class="specs">
+          <pre>oracle_options() :: [fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:query_options/0">
+    <div class="detail-header">
+    <a href="#t:query_options/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">query_options()</span>
+        
+      <div class="specs">
+          <pre>query_options() :: [
+  fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  query_fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:sophia_data/0">
+    <div class="detail-header">
+    <a href="#t:sophia_data/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">sophia_data()</span>
+        
+      <div class="specs">
+          <pre>sophia_data() :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:sophia_type/0">
+    <div class="detail-header">
+    <a href="#t:sophia_type/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">sophia_type()</span>
+        
+      <div class="specs">
+          <pre>sophia_type() :: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>See https://github.com/aeternity/protocol/blob/master/contracts/sophia.md#types</p>
+  </section>
+</section>
+<section class="detail" id="t:ttl/0">
+    <div class="detail-header">
+    <a href="#t:ttl/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">ttl()</span>
+        
+      <div class="specs">
+          <pre>ttl() :: %{type: <a href="#t:ttl_type/0">ttl_type</a>(), value: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:ttl_type/0">
+    <div class="detail-header">
+    <a href="#t:ttl_type/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">ttl_type()</span>
+        
+      <div class="specs">
+          <pre>ttl_type() :: :relative | :absolute</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="extend/4">
+  
+    <span id="extend/3"></span>
+  <div class="detail-header">
+    <a href="#extend/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">extend(client, oracle_id, oracle_ttl, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>extend(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:oracle_options/0">oracle_options</a>()
+) ::
+  {:ok,
+   %{
+     block_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Extend the TTL of an oracle by a relative amount.</p>
+<h2 id="extend/4-examples" class="section-heading">
+  <a href="#extend/4-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">extend</span><span class="p" data-group-id="7137166295-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">ttl</span><span class="p" data-group-id="7137166295-1">)</span><span class="w">
+</span><span class="p" data-group-id="7137166295-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7137166295-3">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_21HxnSLJRhqB9S3aUfLDAqR3BMFKPj62vT1zuy1MsS7N4Ps94s&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_3911tboNbJWA6X57tejX8yGQALdeqAQECk1BwyS43pPtEXt4C&quot;</span><span class="w">
+ </span><span class="p" data-group-id="7137166295-3">}</span><span class="p" data-group-id="7137166295-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_oracle/2">
+    <div class="detail-header">
+    <a href="#get_oracle/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_oracle(client, oracle_id)</span>
+        
+      <div class="specs">
+          <pre>get_oracle(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()) ::
+  {:ok,
+   %{
+     id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     query_format: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(),
+     response_format: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(),
+     query_fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     abi_version: 0 | 1
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an oracle object.</p>
+<h2 id="get_oracle/2-examples" class="section-heading">
+  <a href="#get_oracle/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">get_oracle</span><span class="p" data-group-id="0991994872-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="0991994872-1">)</span><span class="w">
+</span><span class="p" data-group-id="0991994872-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0991994872-3">%{</span><span class="w">
+   </span><span class="ss">abi_version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query_fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">response_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">77316</span><span class="w">
+ </span><span class="p" data-group-id="0991994872-3">}</span><span class="p" data-group-id="0991994872-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_queries/2">
+    <div class="detail-header">
+    <a href="#get_queries/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_queries(client, oracle_id)</span>
+        
+      <div class="specs">
+          <pre>get_queries(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()) ::
+  {:ok,
+   [
+     %{
+       fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+       id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+       oracle_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+       query: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>(),
+       response: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>(),
+       response_ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+       sender_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+       sender_nonce: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+       ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+     }
+   ]}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get all queries of an oracle.</p>
+<h2 id="get_queries/2-examples" class="section-heading">
+  <a href="#get_queries/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">get_queries</span><span class="p" data-group-id="7184369600-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="7184369600-1">)</span><span class="w">
+</span><span class="err">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7184369600-2">[</span><span class="p" data-group-id="7184369600-3">%{</span><span class="w">
+   </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7184369600-4">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="7184369600-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">83952</span><span class="p">,</span><span class="w">
+   </span><span class="ss">response</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">response_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+   </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">sender_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11662</span><span class="w">
+ </span><span class="p" data-group-id="7184369600-3">}</span><span class="p" data-group-id="7184369600-2">]</span></code></pre>
+<p>   }</p>
+  </section>
+</section>
+<section class="detail" id="get_query/3">
+    <div class="detail-header">
+    <a href="#get_query/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_query(client, oracle_id, query_id)</span>
+        
+      <div class="specs">
+          <pre>get_query(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(), <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()) ::
+  {:ok,
+   %{
+     fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     oracle_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     query: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>(),
+     response: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>(),
+     response_ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     sender_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     sender_nonce: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an oracle query by its ID.</p>
+<h2 id="get_query/3-examples" class="section-heading">
+  <a href="#get_query/3-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">get_query</span><span class="p" data-group-id="3421578104-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query_id</span><span class="p" data-group-id="3421578104-1">)</span><span class="w">
+</span><span class="err">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="3421578104-2">%{</span><span class="w">
+   </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3421578104-3">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="3421578104-3">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">83952</span><span class="p">,</span><span class="w">
+   </span><span class="ss">response</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">response_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+   </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">sender_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11662</span><span class="w">
+ </span><span class="p" data-group-id="3421578104-2">}</span></code></pre>
+<p>   }</p>
+  </section>
+</section>
+<section class="detail" id="query/6">
+  
+    <span id="query/5"></span>
+  <div class="detail-header">
+    <a href="#query/6" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">query(client, oracle_id, query, query_ttl, response_ttl_value, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>query(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="#t:ttl/0">ttl</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:query_options/0">query_options</a>()
+) ::
+  {:ok,
+   %{
+     block_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     query_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Query an oracle. Keep in mind that the response TTL is always relative,
+and that the sum of the relative query and response TTL can&#39;t be higher than the oracle&#39;s TTL.</p>
+<h2 id="query/6-examples" class="section-heading">
+  <a href="#query/6-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a query&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0378644277-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p" data-group-id="0378644277-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">response_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">query</span><span class="p" data-group-id="0378644277-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="n">query_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="0378644277-2">)</span><span class="w">
+</span><span class="p" data-group-id="0378644277-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0378644277-4">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2SgSB1yeekq8JseSfkKhAPuvs7RF3YUjm896g4aj2GPpSa9AnJ&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2esUdavCBmW1oYSCichdQv3txyWXYsDSAum2jAvQfpgktJ4oEt&quot;</span><span class="w">
+ </span><span class="p" data-group-id="0378644277-4">}</span><span class="p" data-group-id="0378644277-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="register/6">
+  
+    <span id="register/5"></span>
+  <div class="detail-header">
+    <a href="#register/6" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">register(client, query_format, response_format, ttl, query_fee, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>register(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="#t:sophia_type/0">sophia_type</a>(),
+  <a href="#t:sophia_type/0">sophia_type</a>(),
+  <a href="#t:ttl/0">ttl</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:oracle_options/0">oracle_options</a>()
+) ::
+  {:ok,
+   %{
+     block_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     oracle_id: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Register a typed oracle. Queries and responses that don&#39;t follow the oracle&#39;s respective formats are invalid.
+The query and response types are sophia types.</p>
+<h2 id="register/6-examples" class="section-heading">
+  <a href="#register/6-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">query_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;string&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">response_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;map(string, string)&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">oracle_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8931157615-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p" data-group-id="8931157615-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_fee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">register</span><span class="p" data-group-id="8931157615-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">query_format</span><span class="p">,</span><span class="w"> </span><span class="n">response_format</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">query_fee</span><span class="p" data-group-id="8931157615-2">)</span><span class="w">
+</span><span class="p" data-group-id="8931157615-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+</span><span class="p" data-group-id="8931157615-4">%{</span><span class="w">
+  </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_5zfVXCDwsBRjukTPjKRaS7T3TCc4Mn5PMTS19cWbcjRjeXjcF&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
+  </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_21qrcDco5fL1cuaNqM1Ug1ojHiSzjnuEYzVEpwxVwuS2V95qBk&quot;</span><span class="w">
+</span><span class="p" data-group-id="8931157615-4">}</span><span class="p" data-group-id="8931157615-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="respond/6">
+  
+    <span id="respond/5"></span>
+  <div class="detail-header">
+    <a href="#respond/6" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">respond(client, oracle_id, query_id, response, response_ttl, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>respond(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+  <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+  <a href="#t:sophia_data/0">sophia_data</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:oracle_options/0">oracle_options</a>()
+) ::
+  {:ok,
+   %{
+     block_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="Utils.Encoding.html#t:base58c/0">Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Respond to an oracle query. Only the oracle&#39;s owner can respond to its queries.</p>
+<h2 id="respond/6-examples" class="section-heading">
+  <a href="#respond/6-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="1091660341-1">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="s">&quot;response&quot;</span><span class="p" data-group-id="1091660341-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="1091660341-2">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p" data-group-id="1091660341-2">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">response_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Oracle</span><span class="o">.</span><span class="n">respond</span><span class="p" data-group-id="1091660341-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="1091660341-3">)</span><span class="w">
+</span><span class="p" data-group-id="1091660341-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="1091660341-5">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_QTXMDn8Ln6fiBBXByXJkEeD6wq6QzQZHMVuApbouTFaqWMkSt&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2cBk9pBEwMSD3xtYMvrsFWJ3atuGN29XQUZfKV65KYMQuPJLiV&quot;</span><span class="w">
+ </span><span class="p" data-group-id="1091660341-5">}</span><span class="p" data-group-id="1091660341-4">}</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.20.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  
+  </body>
+</html>
+

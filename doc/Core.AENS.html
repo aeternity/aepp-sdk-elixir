@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.20.2">
+    <meta name="project" content=" vdev">
+    <title>Core.AENS —  vdev</title>
+    <link rel="stylesheet" href="dist/html-d9f58a6320b5bfa6dd77.css" />
+    <script src="dist/sidebar_items-23c8f2b01a.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-d9f58a6320b5bfa6dd77.js"></script>
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+      </a>
+      <h2 class="sidebar-projectVersion">
+        vdev
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="app-vsn"> vdev</small>
+Core.AENS              </h1>
+
+
+        <section id="moduledoc">
+<p>Aeternity Naming System: https://github.com/aeternity/protocol/blob/master/AENS.md
+Contains all name-related functionality</p>
+<p>In order for its functions to be used, a client must be defined first.
+Client example can be found at: <a href="Core.Client.html#new/4"><code class="inline">Core.Client.new/4</code></a></p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:aens_options/0">aens_options()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#claim/2">claim(preclaim_result, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Claims a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#claim/4">claim(client, name, name_salt, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Claims a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#preclaim/4">preclaim(client, name, salt \\ :auto, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Preclaims a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#revoke/2">revoke(claim_result, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Revokes a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#revoke_name/3">revoke_name(client, name, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Revokes a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#transfer/3">transfer(claim_result, recipient_pub_key, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Transfers a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#transfer_name/4">transfer_name(client, name, recipient_id, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Transfers a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#update/5">update(claim_result, pointers \\ [], name_ttl \\ 50000, client_ttl \\ 86000, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Updates a name.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#update_name/6">update_name(client, name, name_ttl \\ 50000, pointers \\ [], client_ttl \\ 86000, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Updates a name.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:aens_options/0">
+    <div class="detail-header">
+    <a href="#t:aens_options/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">aens_options()</span>
+        
+      <div class="specs">
+          <pre>aens_options() :: [fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="claim/2">
+  
+    <span id="claim/1"></span>
+  <div class="detail-header">
+    <a href="#claim/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">claim(preclaim_result, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>claim({:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}, <a href="#t:aens_options/0">aens_options</a>()) ::
+  {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Claims a name.</p>
+<h2 id="claim/2-examples" class="section-heading">
+  <a href="#claim/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">preclaim</span><span class="p" data-group-id="8943816644-1">(</span><span class="s">&quot;a123.test&quot;</span><span class="p" data-group-id="8943816644-1">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">claim</span><span class="p" data-group-id="8943816644-2">(</span><span class="p" data-group-id="8943816644-2">)</span><span class="w">
+</span><span class="p" data-group-id="8943816644-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="8943816644-4">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w">
+   </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-5">%</span><span class="nc" data-group-id="8943816644-5">Core.Client</span><span class="p" data-group-id="8943816644-5">{</span><span class="w">
+     </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-6">%</span><span class="nc" data-group-id="8943816644-6">Tesla.Client</span><span class="p" data-group-id="8943816644-6">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-7">[</span><span class="p" data-group-id="8943816644-7">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-8">[</span><span class="p" data-group-id="8943816644-9">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8943816644-10">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="8943816644-10">]</span><span class="p" data-group-id="8943816644-9">}</span><span class="p" data-group-id="8943816644-8">]</span><span class="w">
+     </span><span class="p" data-group-id="8943816644-6">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+     </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-11">%</span><span class="nc" data-group-id="8943816644-11">Tesla.Client</span><span class="p" data-group-id="8943816644-11">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-12">[</span><span class="p" data-group-id="8943816644-12">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-13">[</span><span class="p" data-group-id="8943816644-14">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8943816644-15">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="8943816644-15">]</span><span class="p" data-group-id="8943816644-14">}</span><span class="p" data-group-id="8943816644-13">]</span><span class="w">
+     </span><span class="p" data-group-id="8943816644-11">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8943816644-16">%{</span><span class="w">
+       </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+     </span><span class="p" data-group-id="8943816644-16">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+   </span><span class="p" data-group-id="8943816644-5">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4&quot;</span><span class="w">
+ </span><span class="p" data-group-id="8943816644-4">}</span><span class="p" data-group-id="8943816644-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="claim/4">
+  
+    <span id="claim/3"></span>
+  <div class="detail-header">
+    <a href="#claim/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">claim(client, name, name_salt, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>claim(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="#t:aens_options/0">aens_options</a>()) ::
+  {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Claims a name.</p>
+<h2 id="claim/4-examples" class="section-heading">
+  <a href="#claim/4-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">name_salt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">149218901844062129</span><span class="p">,</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">claim</span><span class="p" data-group-id="4291600338-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">name_salt</span><span class="p" data-group-id="4291600338-1">)</span><span class="w">
+ </span><span class="p" data-group-id="4291600338-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="4291600338-3">%{</span><span class="w">
+     </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_41E9iE61koF8AQLMvjTkRJ3N23yne4UXmqn5jeUn1GDrScV7A&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w">
+     </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-4">%</span><span class="nc" data-group-id="4291600338-4">Core.Client</span><span class="p" data-group-id="4291600338-4">{</span><span class="w">
+       </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-5">%</span><span class="nc" data-group-id="4291600338-5">Tesla.Client</span><span class="p" data-group-id="4291600338-5">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-6">[</span><span class="p" data-group-id="4291600338-6">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-7">[</span><span class="p" data-group-id="4291600338-8">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4291600338-9">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="4291600338-9">]</span><span class="p" data-group-id="4291600338-8">}</span><span class="p" data-group-id="4291600338-7">]</span><span class="w">
+       </span><span class="p" data-group-id="4291600338-5">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+       </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-10">%</span><span class="nc" data-group-id="4291600338-10">Tesla.Client</span><span class="p" data-group-id="4291600338-10">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-11">[</span><span class="p" data-group-id="4291600338-11">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-12">[</span><span class="p" data-group-id="4291600338-13">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4291600338-14">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="4291600338-14">]</span><span class="p" data-group-id="4291600338-13">}</span><span class="p" data-group-id="4291600338-12">]</span><span class="w">
+       </span><span class="p" data-group-id="4291600338-10">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4291600338-15">%{</span><span class="w">
+         </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+         </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+       </span><span class="p" data-group-id="4291600338-15">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+     </span><span class="p" data-group-id="4291600338-4">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4&quot;</span><span class="w">
+   </span><span class="p" data-group-id="4291600338-3">}</span><span class="p" data-group-id="4291600338-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="preclaim/4">
+  
+    <span id="preclaim/2"></span>
+
+    <span id="preclaim/3"></span>
+  <div class="detail-header">
+    <a href="#preclaim/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">preclaim(client, name, salt \\ :auto, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>preclaim(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(),
+  <a href="#t:aens_options/0">aens_options</a>()
+) :: {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Preclaims a name.</p>
+<h2 id="preclaim/4-examples" class="section-heading">
+  <a href="#preclaim/4-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">preclaim</span><span class="p" data-group-id="9420114340-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p" data-group-id="9420114340-1">)</span><span class="w">
+</span><span class="p" data-group-id="9420114340-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="9420114340-3">%{</span><span class="w">
+    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">86</span><span class="p">,</span><span class="w">
+    </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-4">%</span><span class="nc" data-group-id="9420114340-4">Core.Client</span><span class="p" data-group-id="9420114340-4">{</span><span class="w">
+      </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-5">%</span><span class="nc" data-group-id="9420114340-5">Tesla.Client</span><span class="p" data-group-id="9420114340-5">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-6">[</span><span class="p" data-group-id="9420114340-6">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-7">[</span><span class="p" data-group-id="9420114340-8">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9420114340-9">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="9420114340-9">]</span><span class="p" data-group-id="9420114340-8">}</span><span class="p" data-group-id="9420114340-7">]</span><span class="w">
+      </span><span class="p" data-group-id="9420114340-5">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+      </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-10">%</span><span class="nc" data-group-id="9420114340-10">Tesla.Client</span><span class="p" data-group-id="9420114340-10">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-11">[</span><span class="p" data-group-id="9420114340-11">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-12">[</span><span class="p" data-group-id="9420114340-13">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9420114340-14">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="9420114340-14">]</span><span class="p" data-group-id="9420114340-13">}</span><span class="p" data-group-id="9420114340-12">]</span><span class="w">
+      </span><span class="p" data-group-id="9420114340-10">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9420114340-15">%{</span><span class="w">
+        </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+        </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+      </span><span class="p" data-group-id="9420114340-15">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+    </span><span class="p" data-group-id="9420114340-4">}</span><span class="p">,</span><span class="w">
+    </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">name_salt</span><span class="p">:</span><span class="w"> </span><span class="mi">149218901844062129</span><span class="p">,</span><span class="p">,</span><span class="w">
+    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd&quot;</span><span class="w">
+  </span><span class="p" data-group-id="9420114340-3">}</span><span class="p" data-group-id="9420114340-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="revoke/2">
+  
+    <span id="revoke/1"></span>
+  <div class="detail-header">
+    <a href="#revoke/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">revoke(claim_result, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>revoke({:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}, <a href="#t:aens_options/0">aens_options</a>()) ::
+  {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Revokes a name.</p>
+<h2 id="revoke/2-examples" class="section-heading">
+  <a href="#revoke/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">preclaim</span><span class="p" data-group-id="3396974878-1">(</span><span class="n">name</span><span class="p" data-group-id="3396974878-1">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">claim</span><span class="p" data-group-id="3396974878-2">(</span><span class="p" data-group-id="3396974878-2">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">revoke</span><span class="p" data-group-id="3396974878-3">(</span><span class="p" data-group-id="3396974878-3">)</span><span class="w">
+ </span><span class="p" data-group-id="3396974878-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="3396974878-5">%{</span><span class="w">
+     </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w">
+     </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-6">%</span><span class="nc" data-group-id="3396974878-6">Core.Client</span><span class="p" data-group-id="3396974878-6">{</span><span class="w">
+       </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-7">%</span><span class="nc" data-group-id="3396974878-7">Tesla.Client</span><span class="p" data-group-id="3396974878-7">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-8">[</span><span class="p" data-group-id="3396974878-8">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-9">[</span><span class="p" data-group-id="3396974878-10">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3396974878-11">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="3396974878-11">]</span><span class="p" data-group-id="3396974878-10">}</span><span class="p" data-group-id="3396974878-9">]</span><span class="w">
+       </span><span class="p" data-group-id="3396974878-7">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+       </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-12">%</span><span class="nc" data-group-id="3396974878-12">Tesla.Client</span><span class="p" data-group-id="3396974878-12">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-13">[</span><span class="p" data-group-id="3396974878-13">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-14">[</span><span class="p" data-group-id="3396974878-15">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3396974878-16">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="3396974878-16">]</span><span class="p" data-group-id="3396974878-15">}</span><span class="p" data-group-id="3396974878-14">]</span><span class="w">
+       </span><span class="p" data-group-id="3396974878-12">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3396974878-17">%{</span><span class="w">
+         </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+         </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+       </span><span class="p" data-group-id="3396974878-17">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+     </span><span class="p" data-group-id="3396974878-6">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW&quot;</span><span class="w">
+   </span><span class="p" data-group-id="3396974878-5">}</span><span class="p" data-group-id="3396974878-4">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="revoke_name/3">
+  
+    <span id="revoke_name/2"></span>
+  <div class="detail-header">
+    <a href="#revoke_name/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">revoke_name(client, name, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>revoke_name(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="#t:aens_options/0">aens_options</a>()) ::
+  {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Revokes a name.</p>
+<h2 id="revoke_name/3-examples" class="section-heading">
+  <a href="#revoke_name/3-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">revoke_name</span><span class="p" data-group-id="7117881079-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p" data-group-id="7117881079-1">)</span><span class="w">
+ </span><span class="p" data-group-id="7117881079-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="7117881079-3">%{</span><span class="w">
+    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w">
+    </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-4">%</span><span class="nc" data-group-id="7117881079-4">Core.Client</span><span class="p" data-group-id="7117881079-4">{</span><span class="w">
+      </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-5">%</span><span class="nc" data-group-id="7117881079-5">Tesla.Client</span><span class="p" data-group-id="7117881079-5">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-6">[</span><span class="p" data-group-id="7117881079-6">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-7">[</span><span class="p" data-group-id="7117881079-8">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7117881079-9">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="7117881079-9">]</span><span class="p" data-group-id="7117881079-8">}</span><span class="p" data-group-id="7117881079-7">]</span><span class="w">
+      </span><span class="p" data-group-id="7117881079-5">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+      </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-10">%</span><span class="nc" data-group-id="7117881079-10">Tesla.Client</span><span class="p" data-group-id="7117881079-10">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-11">[</span><span class="p" data-group-id="7117881079-11">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-12">[</span><span class="p" data-group-id="7117881079-13">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7117881079-14">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="7117881079-14">]</span><span class="p" data-group-id="7117881079-13">}</span><span class="p" data-group-id="7117881079-12">]</span><span class="w">
+      </span><span class="p" data-group-id="7117881079-10">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7117881079-15">%{</span><span class="w">
+        </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+        </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+      </span><span class="p" data-group-id="7117881079-15">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+    </span><span class="p" data-group-id="7117881079-4">}</span><span class="p">,</span><span class="w">
+    </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW&quot;</span><span class="w">
+  </span><span class="p" data-group-id="7117881079-3">}</span><span class="p" data-group-id="7117881079-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="transfer/3">
+  
+    <span id="transfer/2"></span>
+  <div class="detail-header">
+    <a href="#transfer/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">transfer(claim_result, recipient_pub_key, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>transfer(
+  {:ok, %{client: <a href="Core.Client.html#t:t/0">Core.Client.t</a>(), name: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}},
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(),
+  <a href="#t:aens_options/0">aens_options</a>()
+) :: {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Transfers a name.</p>
+<h2 id="transfer/3-examples" class="section-heading">
+  <a href="#transfer/3-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">recipient_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">preclaim</span><span class="p" data-group-id="4729560232-1">(</span><span class="n">name</span><span class="p" data-group-id="4729560232-1">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">claim</span><span class="p" data-group-id="4729560232-2">(</span><span class="p" data-group-id="4729560232-2">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w">  </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">transfer</span><span class="p" data-group-id="4729560232-3">(</span><span class="n">recipient_key</span><span class="p" data-group-id="4729560232-3">)</span><span class="w">
+ </span><span class="p" data-group-id="4729560232-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4729560232-5">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w">
+   </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-6">%</span><span class="nc" data-group-id="4729560232-6">Core.Client</span><span class="p" data-group-id="4729560232-6">{</span><span class="w">
+     </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-7">%</span><span class="nc" data-group-id="4729560232-7">Tesla.Client</span><span class="p" data-group-id="4729560232-7">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-8">[</span><span class="p" data-group-id="4729560232-8">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-9">[</span><span class="p" data-group-id="4729560232-10">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4729560232-11">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="4729560232-11">]</span><span class="p" data-group-id="4729560232-10">}</span><span class="p" data-group-id="4729560232-9">]</span><span class="w">
+     </span><span class="p" data-group-id="4729560232-7">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+     </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-12">%</span><span class="nc" data-group-id="4729560232-12">Tesla.Client</span><span class="p" data-group-id="4729560232-12">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-13">[</span><span class="p" data-group-id="4729560232-13">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-14">[</span><span class="p" data-group-id="4729560232-15">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4729560232-16">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="4729560232-16">]</span><span class="p" data-group-id="4729560232-15">}</span><span class="p" data-group-id="4729560232-14">]</span><span class="w">
+     </span><span class="p" data-group-id="4729560232-12">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4729560232-17">%{</span><span class="w">
+       </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+     </span><span class="p" data-group-id="4729560232-17">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+   </span><span class="p" data-group-id="4729560232-6">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi&quot;</span><span class="w">
+ </span><span class="p" data-group-id="4729560232-5">}</span><span class="p" data-group-id="4729560232-4">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="transfer_name/4">
+  
+    <span id="transfer_name/3"></span>
+  <div class="detail-header">
+    <a href="#transfer_name/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">transfer_name(client, name, recipient_id, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>transfer_name(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>(), <a href="#t:aens_options/0">aens_options</a>()) ::
+  {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Transfers a name.</p>
+<h2 id="transfer_name/4-examples" class="section-heading">
+  <a href="#transfer_name/4-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">recipient_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">transfer_name</span><span class="p" data-group-id="3432709327-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">recipient_key</span><span class="p" data-group-id="3432709327-1">)</span><span class="w">
+ </span><span class="p" data-group-id="3432709327-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="3432709327-3">%{</span><span class="w">
+     </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w">
+     </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-4">%</span><span class="nc" data-group-id="3432709327-4">Core.Client</span><span class="p" data-group-id="3432709327-4">{</span><span class="w">
+       </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-5">%</span><span class="nc" data-group-id="3432709327-5">Tesla.Client</span><span class="p" data-group-id="3432709327-5">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-6">[</span><span class="p" data-group-id="3432709327-6">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-7">[</span><span class="p" data-group-id="3432709327-8">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3432709327-9">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="3432709327-9">]</span><span class="p" data-group-id="3432709327-8">}</span><span class="p" data-group-id="3432709327-7">]</span><span class="w">
+       </span><span class="p" data-group-id="3432709327-5">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+       </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-10">%</span><span class="nc" data-group-id="3432709327-10">Tesla.Client</span><span class="p" data-group-id="3432709327-10">{</span><span class="w">
+         </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+         </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-11">[</span><span class="p" data-group-id="3432709327-11">]</span><span class="p">,</span><span class="w">
+         </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-12">[</span><span class="p" data-group-id="3432709327-13">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3432709327-14">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="3432709327-14">]</span><span class="p" data-group-id="3432709327-13">}</span><span class="p" data-group-id="3432709327-12">]</span><span class="w">
+       </span><span class="p" data-group-id="3432709327-10">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3432709327-15">%{</span><span class="w">
+         </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+         </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+       </span><span class="p" data-group-id="3432709327-15">}</span><span class="p">,</span><span class="w">
+       </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+     </span><span class="p" data-group-id="3432709327-4">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi&quot;</span><span class="w">
+   </span><span class="p" data-group-id="3432709327-3">}</span><span class="p" data-group-id="3432709327-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="update/5">
+  
+    <span id="update/1"></span>
+
+    <span id="update/2"></span>
+
+    <span id="update/3"></span>
+
+    <span id="update/4"></span>
+  <div class="detail-header">
+    <a href="#update/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">update(claim_result, pointers \\ [], name_ttl \\ 50000, client_ttl \\ 86000, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>update(
+  {:ok, %{client: <a href="Core.Client.html#t:t/0">Core.Client.t</a>(), name: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()}} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()},
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:aens_options/0">aens_options</a>()
+) :: {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Updates a name.</p>
+<h2 id="update/5-examples" class="section-heading">
+  <a href="#update/5-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">name_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">49_999</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">pointers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5240329206-1">[</span><span class="p" data-group-id="5240329206-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">client_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50_000</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">preclaim</span><span class="p" data-group-id="5240329206-2">(</span><span class="n">name</span><span class="p" data-group-id="5240329206-2">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">claim</span><span class="p" data-group-id="5240329206-3">(</span><span class="p" data-group-id="5240329206-3">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">update</span><span class="p" data-group-id="5240329206-4">(</span><span class="n">pointers</span><span class="p">,</span><span class="w"> </span><span class="n">name_ttl</span><span class="p">,</span><span class="w">  </span><span class="n">client_ttl</span><span class="p" data-group-id="5240329206-4">)</span><span class="w">
+ </span><span class="p" data-group-id="5240329206-5">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="5240329206-6">%{</span><span class="w">
+      </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">41</span><span class="p">,</span><span class="w">
+      </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-7">%</span><span class="nc" data-group-id="5240329206-7">Core.Client</span><span class="p" data-group-id="5240329206-7">{</span><span class="w">
+        </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-8">%</span><span class="nc" data-group-id="5240329206-8">Tesla.Client</span><span class="p" data-group-id="5240329206-8">{</span><span class="w">
+          </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+          </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+          </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-9">[</span><span class="p" data-group-id="5240329206-9">]</span><span class="p">,</span><span class="w">
+          </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-10">[</span><span class="p" data-group-id="5240329206-11">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5240329206-12">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="5240329206-12">]</span><span class="p" data-group-id="5240329206-11">}</span><span class="p" data-group-id="5240329206-10">]</span><span class="w">
+        </span><span class="p" data-group-id="5240329206-8">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+        </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-13">%</span><span class="nc" data-group-id="5240329206-13">Tesla.Client</span><span class="p" data-group-id="5240329206-13">{</span><span class="w">
+          </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+          </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+          </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-14">[</span><span class="p" data-group-id="5240329206-14">]</span><span class="p">,</span><span class="w">
+          </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-15">[</span><span class="p" data-group-id="5240329206-16">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5240329206-17">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="5240329206-17">]</span><span class="p" data-group-id="5240329206-16">}</span><span class="p" data-group-id="5240329206-15">]</span><span class="w">
+        </span><span class="p" data-group-id="5240329206-13">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-18">%{</span><span class="w">
+          </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+          </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+        </span><span class="p" data-group-id="5240329206-18">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+      </span><span class="p" data-group-id="5240329206-7">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">client_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">50000</span><span class="p">,</span><span class="w">
+      </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">name_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">49999</span><span class="p">,</span><span class="w">
+      </span><span class="ss">pointers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5240329206-19">[</span><span class="p" data-group-id="5240329206-19">]</span><span class="p">,</span><span class="w">
+      </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB&quot;</span><span class="w">
+    </span><span class="p" data-group-id="5240329206-6">}</span><span class="p" data-group-id="5240329206-5">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="update_name/6">
+  
+    <span id="update_name/2"></span>
+
+    <span id="update_name/3"></span>
+
+    <span id="update_name/4"></span>
+
+    <span id="update_name/5"></span>
+  <div class="detail-header">
+    <a href="#update_name/6" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">update_name(client, name, name_ttl \\ 50000, pointers \\ [], client_ttl \\ 86000, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>update_name(
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="#t:aens_options/0">aens_options</a>()
+) :: {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Updates a name.</p>
+<h2 id="update_name/6-examples" class="section-heading">
+  <a href="#update_name/6-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">name_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">49_999</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">pointers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8538173662-1">[</span><span class="p" data-group-id="8538173662-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">client_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">50_000</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.AENS</span><span class="o">.</span><span class="n">update_name</span><span class="p" data-group-id="8538173662-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">name_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">pointers</span><span class="p">,</span><span class="w"> </span><span class="n">client_ttl</span><span class="p" data-group-id="8538173662-2">)</span><span class="w">
+ </span><span class="p" data-group-id="8538173662-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="8538173662-4">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">41</span><span class="p">,</span><span class="w">
+   </span><span class="ss">client</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-5">%</span><span class="nc" data-group-id="8538173662-5">Core.Client</span><span class="p" data-group-id="8538173662-5">{</span><span class="w">
+     </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-6">%</span><span class="nc" data-group-id="8538173662-6">Tesla.Client</span><span class="p" data-group-id="8538173662-6">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-7">[</span><span class="p" data-group-id="8538173662-7">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-8">[</span><span class="p" data-group-id="8538173662-9">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8538173662-10">[</span><span class="s">&quot;http://localhost:3013/v2&quot;</span><span class="p" data-group-id="8538173662-10">]</span><span class="p" data-group-id="8538173662-9">}</span><span class="p" data-group-id="8538173662-8">]</span><span class="w">
+     </span><span class="p" data-group-id="8538173662-6">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+     </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-11">%</span><span class="nc" data-group-id="8538173662-11">Tesla.Client</span><span class="p" data-group-id="8538173662-11">{</span><span class="w">
+       </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+       </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-12">[</span><span class="p" data-group-id="8538173662-12">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-13">[</span><span class="p" data-group-id="8538173662-14">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8538173662-15">[</span><span class="s">&quot;http://localhost:3113/v2&quot;</span><span class="p" data-group-id="8538173662-15">]</span><span class="p" data-group-id="8538173662-14">}</span><span class="p" data-group-id="8538173662-13">]</span><span class="w">
+     </span><span class="p" data-group-id="8538173662-11">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-16">%{</span><span class="w">
+       </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+     </span><span class="p" data-group-id="8538173662-16">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_test&quot;</span><span class="w">
+   </span><span class="p" data-group-id="8538173662-5">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">client_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">50000</span><span class="p">,</span><span class="w">
+   </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a123.test&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">name_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">49999</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pointers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8538173662-17">[</span><span class="p" data-group-id="8538173662-17">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB&quot;</span><span class="w">
+ </span><span class="p" data-group-id="8538173662-4">}</span><span class="p" data-group-id="8538173662-3">}</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.20.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  
+  </body>
+</html>
+

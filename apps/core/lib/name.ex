@@ -420,41 +420,40 @@ defmodule Core.AENS do
   end
 
   @doc """
-    Transfers a name.
+  Transfers a name.
 
-    ## Examples
-        iex> name = "a123.test"
-        iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-        iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
-         {:ok,
-         %{
-           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
-           block_height: 35,
-           client: %Core.Client{
-             connection: %Tesla.Client{
-               adapter: nil,
-               fun: nil,
-               post: [],
-               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
-             },
-             gas_price: 1000000,
-             internal_connection: %Tesla.Client{
-               adapter: nil,
-               fun: nil,
-               post: [],
-               pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
-             },
-             keypair: %{
-               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-               secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-             },
-             network_id: "my_test"
+  ## Examples
+      iex> name = "a123.test"
+      iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
+      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
+       {:ok,
+       %{
+         block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
+         block_height: 35,
+         client: %Core.Client{
+           connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3013/v2"]}]
            },
-           name: "a123.test",
-           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
-           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
-         }}
-
+           gas_price: 1000000,
+           internal_connection: %Tesla.Client{
+             adapter: nil,
+             fun: nil,
+             post: [],
+             pre: [{Tesla.Middleware.BaseUrl, :call, ["http://localhost:3113/v2"]}]
+           },
+           keypair: %{
+             public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+           },
+           network_id: "my_test"
+         },
+         name: "a123.test",
+         recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+         tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
+       }}
   """
   @spec transfer(
           {:ok, %{client: Core.Client.t(), name: binary()} | {:error, String.t()}},

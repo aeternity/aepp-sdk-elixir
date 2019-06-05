@@ -239,19 +239,19 @@ defmodule Utils.Transaction do
   Returns gas limit for given transaction, depends on height.
 
   ##  Examples:
-        iex> oracle_register_tx =
-            %AeternityNode.Model.OracleRegisterTx{
-              abi_version: 196609,
-              account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-              fee: 0,
-              nonce: 37122,
-              oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
-              query_fee: 10,
-              query_format: "query_format",
-              response_format: "response_format",
-              ttl: 10
-            }
-        iex> Utils.Transaction.gas_limit oracle_register_tx, 5
+       iex> oracle_register_tx =
+           %AeternityNode.Model.OracleRegisterTx{
+             abi_version: 196609,
+             account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+             fee: 0,
+             nonce: 37122,
+             oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
+             query_fee: 10,
+             query_format: "query_format",
+             response_format: "response_format",
+             ttl: 10
+           }
+       iex> Utils.Transaction.gas_limit oracle_register_tx, 5
           16581
 
   """

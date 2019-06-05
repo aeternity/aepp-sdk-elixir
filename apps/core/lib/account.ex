@@ -27,15 +27,13 @@ defmodule Core.Account do
   Send tokens to an account.
 
   ## Examples:
-
-   Client example can be found at: `Core.Client.new/4`
-   iex> Core.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
-      {:ok,
-        %{
-          block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
-          block_height: 74871,
-          tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
-        }}
+      iex> Core.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
+         {:ok,
+           %{
+             block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
+             block_height: 74871,
+             tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
+           }}
   """
   @spec spend(Client.t(), binary(), non_neg_integer(), spend_options()) ::
           {:ok,
