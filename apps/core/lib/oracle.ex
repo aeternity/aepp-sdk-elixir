@@ -33,6 +33,12 @@ defmodule Core.Oracle do
   @type sophia_data :: any()
   @type ttl_type :: :relative | :absolute
   @type ttl :: %{type: ttl_type(), value: non_neg_integer()}
+  @type oracle_options() :: [fee: non_neg_integer(), ttl: non_neg_integer()]
+  @type query_options() :: [
+          fee: non_neg_integer(),
+          ttl: non_neg_integer(),
+          query_fee: non_neg_integer()
+        ]
 
   @doc """
   Register a typed oracle. Queries and responses that don't follow the oracle's respective formats are invalid.
@@ -58,7 +64,7 @@ defmodule Core.Oracle do
           sophia_type(),
           ttl(),
           non_neg_integer(),
-          list()
+          oracle_options()
         ) ::
           {:ok,
            %{
@@ -134,7 +140,14 @@ defmodule Core.Oracle do
          tx_hash: "th_2esUdavCBmW1oYSCichdQv3txyWXYsDSAum2jAvQfpgktJ4oEt"
        }}
   """
-  @spec query(Client.t(), Encoding.base58c(), String.t(), ttl(), non_neg_integer(), list()) ::
+  @spec query(
+          Client.t(),
+          Encoding.base58c(),
+          String.t(),
+          ttl(),
+          non_neg_integer(),
+          query_options()
+        ) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
@@ -221,7 +234,7 @@ defmodule Core.Oracle do
           Encoding.base58c(),
           sophia_data(),
           non_neg_integer(),
-          list()
+          oracle_options()
         ) ::
           {:ok,
            %{
@@ -287,7 +300,7 @@ defmodule Core.Oracle do
          tx_hash: "th_3911tboNbJWA6X57tejX8yGQALdeqAQECk1BwyS43pPtEXt4C"
        }}
   """
-  @spec extend(Client.t(), Encoding.base58c(), non_neg_integer(), list()) ::
+  @spec extend(Client.t(), Encoding.base58c(), non_neg_integer(), oracle_options()) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
