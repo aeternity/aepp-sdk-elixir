@@ -72,7 +72,7 @@ defmodule Utils.Serialization do
   @doc """
   Serializes a list of fields with the template corresponding to the given type
 
-  ## Examples
+  ## Example
       iex> fields = [{:id, :account,
           <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
             91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>},
@@ -115,7 +115,7 @@ defmodule Utils.Serialization do
   @doc """
   Serializes a transaction to a binary.
 
-  ## Examples
+  ## Example
       iex> alias AeternityNode.Model.{Ttl,OracleRegisterTx}
       iex> Utils.Serialization.serialize( %OracleRegisterTx{
            query_format: <<"query_format">>,
@@ -142,7 +142,7 @@ defmodule Utils.Serialization do
   @doc """
   Deserialize an RLP binary payload with the template corresponding to the given type
 
-  ## Examples
+  ## Example
       iex> payload = <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
           225, 52, 13, 18, 51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57,
           212, 30, 97, 130, 33, 131, 161, 5, 64, 216, 143, 81, 41, 52, 245, 89, 135,

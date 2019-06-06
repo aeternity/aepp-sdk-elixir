@@ -44,19 +44,19 @@ defmodule Core.Oracle do
   Register a typed oracle. Queries and responses that don't follow the oracle's respective formats are invalid.
   The query and response types are sophia types.
 
-  ## Examples
+  ## Example
       iex> query_format = "string"
       iex> response_format = "map(string, string)"
       iex> oracle_ttl = %{type: :relative, value: 10}
       iex> query_fee = 100
       iex> Core.Oracle.register(client, query_format, response_format, oracle_ttl, query_fee)
       {:ok,
-      %{
-        block_hash: "mh_5zfVXCDwsBRjukTPjKRaS7T3TCc4Mn5PMTS19cWbcjRjeXjcF",
-        block_height: 77276,
-        oracle_id: "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM",
-        tx_hash: "th_21qrcDco5fL1cuaNqM1Ug1ojHiSzjnuEYzVEpwxVwuS2V95qBk"
-      }}
+        %{
+          block_hash: "mh_5zfVXCDwsBRjukTPjKRaS7T3TCc4Mn5PMTS19cWbcjRjeXjcF",
+          block_height: 77276,
+          oracle_id: "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM",
+          tx_hash: "th_21qrcDco5fL1cuaNqM1Ug1ojHiSzjnuEYzVEpwxVwuS2V95qBk"
+        }}
   """
   @spec register(
           Client.t(),
@@ -126,7 +126,7 @@ defmodule Core.Oracle do
   Query an oracle. Keep in mind that the response TTL is always relative,
   and that the sum of the relative query and response TTL can't be higher than the oracle's TTL.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query = "a query"
       iex> query_ttl = %{type: :relative, value: 10}
@@ -214,7 +214,7 @@ defmodule Core.Oracle do
   @doc """
   Respond to an oracle query. Only the oracle's owner can respond to its queries.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
@@ -289,7 +289,7 @@ defmodule Core.Oracle do
   @doc """
   Extend the TTL of an oracle by a relative amount.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> ttl = 10
       iex> Core.Oracle.extend(client, oracle_id, ttl)
@@ -348,7 +348,7 @@ defmodule Core.Oracle do
   @doc """
   Get an oracle object.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> Core.Oracle.get_oracle(client, oracle_id)
       {:ok,
@@ -410,22 +410,23 @@ defmodule Core.Oracle do
   @doc """
   Get all queries of an oracle.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> Core.Oracle.get_queries(client, oracle_id)
       {:ok,
-       [%{
-         fee: 30,
-         id: "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP",
-         oracle_id: "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-         query: %{"a" => 1},
-         query_ttl: 83952,
-         response: "",
-         response_ttl: 1,
-         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-         sender_nonce: 11662
-       }]
-     }
+       [
+         %{
+           fee: 30,
+           id: "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP",
+           oracle_id: "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+           query: %{"a" => 1},
+           query_ttl: 83952,
+           response: "",
+           response_ttl: 1,
+           sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+           sender_nonce: 11662
+         }
+       ]}
   """
   @spec get_queries(Client.t(), Encoding.base58c()) ::
           {:ok,
@@ -469,7 +470,7 @@ defmodule Core.Oracle do
   @doc """
   Get an oracle query by its ID.
 
-  ## Examples
+  ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> query_id = "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP"
       iex> Core.Oracle.get_query(client, oracle_id, query_id)
@@ -484,8 +485,7 @@ defmodule Core.Oracle do
          response_ttl: 1,
          sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
          sender_nonce: 11662
-       }
-     }
+       }}
   """
   @spec get_query(Client.t(), Encoding.base58c(), Encoding.base58c()) ::
           {:ok,

@@ -52,8 +52,15 @@ defmodule Core.Contract do
   @doc """
   Deploy a contract
 
-  ## Examples
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+  ## Example
+      iex> source_code = "contract Number =
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          state.number + x"
       iex> init_args = ["42"]
       iex> Core.Contract.deploy(client, source_code, init_args)
       {:ok,
@@ -149,7 +156,7 @@ defmodule Core.Contract do
   @doc """
   Call a contract
 
-  ## Examples
+  ## Example
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
       iex> source_code = "contract Identity =
         datatype event = AddedNumberEvent(indexed int, string)
@@ -237,6 +244,7 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, response.return_value, response.return_type) do
+             IO.inspect(response.log)
       {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
     else
       {:error, _} = error ->
@@ -247,9 +255,16 @@ defmodule Core.Contract do
   @doc """
   Call a contract without posting a transaction (execute off-chain)
 
-  ## Examples
+  ## Example
       iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+      iex> source_code = "contract Number =
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
       iex> top_block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
@@ -347,14 +362,11 @@ defmodule Core.Contract do
   @doc """
   Decode a return value
 
-  ## Examples
-      iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
-      iex> function_name = "add_to_number"
-      iex> function_args = ["33"]
-      iex> {:ok, %{return_value: data, return_type: return_type}} = Core.Contract.call(client, contract_address, source_code, function_name, function_args)
-      iex> data_type = "int"
-      iex> Core.Contract.decode_return_value(data_type, data, return_type)
+  ## Example
+      iex> sophia_type = "int"
+      iex> return_value = "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+      iex> return_type = "ok"
+      iex> Core.Contract.decode_return_value(sophia_type, return_value, return_type)
       {:ok, 75}
   """
   @spec decode_return_value(String.t(), String.t(), String.t()) ::
@@ -364,7 +376,7 @@ defmodule Core.Contract do
         return_value,
         return_type
       )
-      when is_binary(sophia_type) and is_binary(return_value) do
+      when is_binary(sophia_type) and is_binary(return_value) and is_binary(return_type) do
     sophia_type_charlist = String.to_charlist(sophia_type)
 
     with "ok" <- return_type,
@@ -388,8 +400,15 @@ defmodule Core.Contract do
   @doc """
   Compile a contract
 
-  ## Examples
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+  ## Example
+      iex> source_code = "contract Number =
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          state.number + x"
       iex> Core.Contract.compile(source_code)
       {:ok,
        %{
@@ -408,8 +427,15 @@ defmodule Core.Contract do
            96, 32, 144, 3, 96, 0, 89, 144, 129, 82, 129, 82, 89, 96, 32, 1, 144, 129,
            82, 96, 32, 144, 3, 96, 3, 129, 82, 129, 82, 144, 80, 144, 86, 91, 96, 32,
            1, 81, 81, 144, 80, 89, 80, 128, 145, 80, 80, 98, 0, 0, 159, 86>>,
-         compiler_version: "2.1.0",
-         contract_source: 'contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x',
+         compiler_version: "3.0.0",
+         contract_source: 'contract Number =
+           record state = { number : int }
+
+           function init(x : int) =
+             { number = x }
+
+           function add_to_number(x : int) =
+             state.number + x',
          type_info: [
            {<<112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2,
               111, 12, 11, 11, 82, 86, 82, 53, 206, 145, 155, 60, 13, 206, 214, 183,
@@ -478,8 +504,15 @@ defmodule Core.Contract do
   @doc """
   Create contract calldata
 
-  ## Examples
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+  ## Example
+      iex> source_code = "contract Number =
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
       iex> Core.Contract.create_calldata(source_code, function_name, function_args)
@@ -534,14 +567,15 @@ defmodule Core.Contract do
   @doc """
   Get the return type of a function in a contract
 
-  ## Examples
+  ## Example
       iex> source_code = "contract Identity =
-          record state = { number : int }
+        record state = { number : int }
 
-          function init(x : int) =
-            { number = x }
+        function init(x : int) =
+          { number = x }
 
-          function add_to_number(x : int) = state.number + x"
+        function add_to_number(x : int) =
+          state.number + x"
       iex> function_name = "add_to_number"
       iex> Core.Contract.get_function_return_type(source_code, function_name)
       {:ok, "int"}

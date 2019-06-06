@@ -27,7 +27,7 @@ defmodule Utils.SerializationUtils do
   @doc """
   Serializes a transaction to a tuple of list of fields and type, depending on its structure.
 
-  ## Examples
+  ## Example
       iex> alias AeternityNode.Model.SpendTx
       iex> spend_tx = %SpendTx{
           amount: 5_018_857_520_000_000_000,
@@ -39,21 +39,20 @@ defmodule Utils.SerializationUtils do
           ttl: 0
         }
       iex> Utils.SerializationUtils.process_tx_fields(spend_tx)
-        {:ok,
-          [{:id, :account,
-          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141,
-            224, 214, 250, 79, 248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216,
-            129>>},
+      {:ok,
+       [
          {:id, :account,
-          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141,
-            224, 214, 250, 79, 248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216,
-            129>>},
-         5018857520000000000,
+          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141, 224, 214, 250, 79,
+            248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216, 129>>},
+         {:id, :account,
+          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141, 224, 214, 250, 79,
+            248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216, 129>>},
+         5_018_857_520_000_000_000,
          0,
          0,
          37181,
-         ""], :spend_tx}
-
+         ""
+       ], :spend_tx}
   """
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
