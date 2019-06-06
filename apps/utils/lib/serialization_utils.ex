@@ -392,6 +392,7 @@ defmodule Utils.SerializationUtils do
        auth_fun,
        ct_version,
        fee,
+       ttl,
        gas,
        gas_price,
        call_data

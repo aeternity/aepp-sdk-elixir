@@ -3,8 +3,11 @@ defmodule Utils.Transaction do
   Transaction utils
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias AeternityNode.Api.Account, as: AccountApi
+  alias Core.{Contract, Client}
 
   alias AeternityNode.Model.{
+    Account,
     PostTxResponse,
     Tx,
     Error,
@@ -122,22 +125,24 @@ defmodule Utils.Transaction do
        }}
   """
   @spec try_post(
-          struct(),
-          String.t(),
-          String.t(),
+          Client.t(),
           non_neg_integer(),
           tx_types(),
           non_neg_integer()
         ) :: {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def try_post(
-        connection,
-        secret_key,
-        network_id,
-        gas_price,
+        %Client{} = client,
         tx,
-        height
+        height,
+        auth_options
       ) do
-    try_post(connection, secret_key, network_id, gas_price, tx, height, @tx_posting_attempts)
+    try_post(
+      client,
+      tx,
+      height,
+      auth_options,
+      @tx_posting_attempts
+    )
   end
 
   @doc """
@@ -322,8 +327,9 @@ defmodule Utils.Transaction do
       Governance.gas(tx)
   end
 
-  def gas_limit(tx, height) do
-    {:error, "#{__MODULE__} Invalid #{inspect(tx)} and/or height #{inspect(height)}"}
+  def gas_limit(tx, _height) do
+    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
+      Governance.gas(tx)
   end
 
   defp ttl_delta(_height, {:relative, _value} = ttl) do
@@ -355,64 +361,86 @@ defmodule Utils.Transaction do
   end
 
   defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         _gas_price,
+         %Client{} = client,
          tx,
          _height,
+         auth_options,
          0
        ) do
-    post(connection, secret_key, network_id, tx)
+    post(client, tx, auth_options)
   end
 
   defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         gas_price,
+         %Client{network_id: network_id, gas_price: gas_price} = client,
          tx,
          height,
+         auth_options,
          attempts
        ) do
-    case post(connection, secret_key, network_id, tx) do
+    case post(client, tx, auth_options) do
       {:ok, _} = response ->
         response
 
       {:error, _} ->
         try_post(
-          connection,
-          secret_key,
-          network_id,
-          gas_price,
+          client,
           %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
           height,
+          auth_options,
           attempts - 1
         )
     end
   end
 
-  defp post(connection, secret_key, network_id, %type{} = tx) do
-    serialized_tx = Serialization.serialize(tx)
+  defp post(
+         %Client{
+           connection: connection,
+           keypair: %{public: public_key},
+           gas_price: gas_price
+         },
+         tx,
+         %{
+           auth_contract_source: source_code,
+           auth_args: auth_args,
+           fee: fee,
+           gas: gas,
+           gas_price: gas_price,
+           ttl: ttl
+         }
+       ) do
+    type = Map.get(tx, :__struct__, :no_type)
 
-    signature =
-      Keys.sign(
-        serialized_tx,
-        Keys.secret_key_to_binary(secret_key),
-        network_id
-      )
-
-    signed_tx_fields = [[signature], serialized_tx]
-    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
-    encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
-
-    with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+           AccountApi.get_account_by_pubkey(connection, public_key),
+         {:ok, calldata} = Contract.create_calldata(source_code, auth_fun, auth_args),
+         serialized_tx = Serialization.serialize(tx),
+         binary_public_key = Keys.public_key_to_binary(public_key),
+         signed_tx_fields = [[], serialized_tx],
+         serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx),
+         ga_meta_tx_fields = [
+           {:id, :account, binary_public_key},
+           calldata,
+           Contract.abi_version(),
+           fee,
+           gas,
+           gas_price,
+           ttl,
+           serialized_signed_tx
+         ],
+         serialized_ga_meta_tx = Serialization.serialize(ga_meta_tx_fields, :ga_meta_tx),
+         signed_meta_tx_fields = [[], serialized_ga_meta_tx],
+         serialized_signed_meta_tx = Serialization.serialize(signed_meta_tx_fields, :signed_tx),
+         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_meta_tx),
+         {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
            TransactionApi.post_transaction(connection, %Tx{
              tx: encoded_signed_tx
            }),
          {:ok, _} = response <- await_mining(connection, tx_hash, type) do
       response
     else
+      {:ok, %Account{kind: "basic"}} ->
+        {:error, "Account isn't generalized"}
+
       {:ok, %Error{reason: message}} ->
         {:error, message}
 
@@ -424,7 +452,16 @@ defmodule Utils.Transaction do
     end
   end
 
-  defp post(connection, secret_key, network_id, tx) when is_list(tx) do
+  defp post(
+         %Client{
+           connection: connection,
+           keypair: %{secret: secret_key},
+           network_id: network_id
+         },
+         tx,
+         nil
+       ) do
+    type = Map.get(tx, :__struct__, :no_type)
     serialized_tx = Serialization.serialize(tx)
 
     signature =
@@ -436,6 +473,7 @@ defmodule Utils.Transaction do
 
     signed_tx_fields = [[signature], serialized_tx]
     serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+
     encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
 
     with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-

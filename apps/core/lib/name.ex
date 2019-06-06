@@ -45,13 +45,10 @@ defmodule Core.AENS do
   def preclaim(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          network_id: network_id,
           connection: connection,
-          internal_connection: internal_connection,
-          gas_price: gas_price
+          internal_connection: internal_connection
         } = client,
         name,
         name_salt,
@@ -70,11 +67,9 @@ defmodule Core.AENS do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              preclaim_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response
@@ -103,12 +98,9 @@ defmodule Core.AENS do
   def claim(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
+          connection: connection
         } = client,
         name,
         name_salt,
@@ -126,11 +118,9 @@ defmodule Core.AENS do
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              claim_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response
@@ -169,12 +159,9 @@ defmodule Core.AENS do
   def update(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
+          connection: connection
         } = client,
         name,
         name_ttl,
@@ -198,11 +185,9 @@ defmodule Core.AENS do
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              update_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response
@@ -231,12 +216,9 @@ defmodule Core.AENS do
   def transfer(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
+          connection: connection
         } = client,
         name,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
@@ -255,11 +237,9 @@ defmodule Core.AENS do
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              transfer_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response
@@ -287,12 +267,9 @@ defmodule Core.AENS do
   def revoke(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
+          connection: connection
         } = client,
         name,
         opts \\ []
@@ -309,11 +286,9 @@ defmodule Core.AENS do
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              revoke_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response

@@ -68,11 +68,9 @@ defmodule Core.Contract do
           | {:error, Env.t()}
   def deploy(
         %Client{
-          keypair: %{public: public_key, secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          keypair: %{public: public_key},
+          connection: connection
+        } = client,
         source_code,
         init_args,
         opts \\ []
@@ -106,11 +104,9 @@ defmodule Core.Contract do
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              contract_create_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
@@ -180,10 +176,7 @@ defmodule Core.Contract do
           | {:error, Env.t()}
   def call(
         %Client{
-          keypair: %{secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
+          connection: connection
         } = client,
         contract_address,
         source_code,
@@ -205,11 +198,9 @@ defmodule Core.Contract do
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              contract_call_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ),
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
@@ -542,6 +533,8 @@ defmodule Core.Contract do
         error
     end
   end
+
+  def abi_version(), do: @abi_version
 
   defp decode_logs(logs) do
     Enum.map(logs, fn log ->
