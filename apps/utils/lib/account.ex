@@ -10,7 +10,7 @@ defmodule Utils.Account do
   @doc """
   Get the next valid nonce for a public key
 
-  ## Examples
+  ## Example
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> Utils.Account.next_valid_nonce(connection, public_key)
@@ -27,7 +27,7 @@ defmodule Utils.Account do
   @doc """
   Get the nonce after a block indicated by hash
 
-  ## Examples
+  ## Example
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"

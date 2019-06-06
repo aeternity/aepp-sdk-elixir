@@ -26,16 +26,15 @@ defmodule Core.Account do
   @doc """
   Send tokens to an account.
 
-  ## Examples:
-
-   Client example can be found at: `Core.Client.new/4`
-   iex> Core.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
+  ## Example
+      iex> public_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
+      iex> Core.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
       {:ok,
         %{
-          block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
-          block_height: 74871,
-          tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
-        }}
+        block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
+        block_height: 74871,
+        tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
+      }}
   """
   @spec spend(Client.t(), binary(), non_neg_integer(), spend_options()) ::
           {:ok,
@@ -112,7 +111,7 @@ defmodule Core.Account do
   @doc """
   Get an account's balance at a given height
 
-  ## Examples
+  ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> height = 80000
       iex> Core.Account.balance(client, pubkey, height)
@@ -129,7 +128,7 @@ defmodule Core.Account do
   @doc """
   Get an account's balance at a given block hash
 
-  ## Examples
+  ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
       iex> Core.Account.balance(client, pubkey, block_hash)
@@ -147,7 +146,7 @@ defmodule Core.Account do
   @doc """
   Get an account at a given height
 
-  ## Examples
+  ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> height = 80000
       iex> Core.Account.get(client, pubkey, height)
@@ -173,7 +172,7 @@ defmodule Core.Account do
   @doc """
   Get an account at a given block hash
 
-  ## Examples
+  ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
       iex> Core.Account.get(client, pubkey, block_hash)

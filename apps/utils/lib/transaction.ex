@@ -79,14 +79,21 @@ defmodule Utils.Transaction do
   Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID,
   add calculated minimum fee and post it to the node
 
-  ## Examples
+  ## Example
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
       iex> network_id = "ae_uat"
       iex> gas_price = 1_000_000_000_000
       iex> {:ok, nonce} = Utils.Account.next_valid_nonce(connection, public_key)
-      iex> source_code = "contract Number =\n  record state = { number : int }\n\n  function init(x : int) =\n    { number = x }\n\n  function add_to_number(x : int) = state.number + x"
+      iex> source_code = "contract Number =
+        record state = { number : int }
+
+        function init(x : int) =
+          { number = x }
+
+        function add_to_number(x : int) =
+          state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
       iex> {:ok, calldata} = Core.Contract.create_calldata(source_code, function_name, function_args)
@@ -143,7 +150,7 @@ defmodule Utils.Transaction do
   @doc """
   Calculate the fee of the transaction.
 
-  ## Examples
+  ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
         amount: 40000000,
         fee: 0,
@@ -152,7 +159,7 @@ defmodule Utils.Transaction do
         recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
-        }
+      }
       iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
       16660000000
   """
@@ -178,17 +185,16 @@ defmodule Utils.Transaction do
   @doc """
   Calculates minimum fee of given transaction, depends on height and network_id
 
-  ##  Examples:
-       iex> name_pre_claim_tx =
-              %AeternityNode.Model.NamePreclaimTx{
-              account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-              commitment_id: "cm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-              fee: 0,
-              nonce: 0,
-              ttl: 0
-            }
-       iex> Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
-         16500000000
+  ## Example
+      iex> name_pre_claim_tx = %AeternityNode.Model.NamePreclaimTx{
+        account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+        commitment_id: "cm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+        fee: 0,
+        nonce: 0,
+        ttl: 0
+      }
+      iex> Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
+      16500000000
   """
 
   @spec calculate_min_fee(struct(), non_neg_integer(), String.t()) ::
@@ -208,19 +214,18 @@ defmodule Utils.Transaction do
   @doc """
   Calculates minimum gas needed for given transaction, also depends on height.
 
-  ##  Examples:
-       iex> spend_tx =
-              %AeternityNode.Model.SpendTx{
-               amount: 5018857520000000000,
-               fee: 0,
-               nonce: 37181,
-               payload: "",
-               recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-               sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-               ttl: 0
-              }
-       iex> Utils.Transaction.min_gas spend_tx, 50000
-         16740
+  ## Example
+      iex> spend_tx = %AeternityNode.Model.SpendTx{
+        amount: 5018857520000000000,
+        fee: 0,
+        nonce: 37181,
+        payload: "",
+        recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+        sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+        ttl: 0
+      }
+      iex> Utils.Transaction.min_gas(spend_tx, 50000)
+      16740
   """
   @spec min_gas(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
   def min_gas(%ContractCallTx{} = tx, _height) do
@@ -238,22 +243,20 @@ defmodule Utils.Transaction do
   @doc """
   Returns gas limit for given transaction, depends on height.
 
-  ##  Examples:
-        iex> oracle_register_tx =
-            %AeternityNode.Model.OracleRegisterTx{
-              abi_version: 196609,
-              account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-              fee: 0,
-              nonce: 37122,
-              oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
-              query_fee: 10,
-              query_format: "query_format",
-              response_format: "response_format",
-              ttl: 10
-            }
-        iex> Utils.Transaction.gas_limit oracle_register_tx, 5
-          16581
-
+  ## Example
+      iex> oracle_register_tx = %AeternityNode.Model.OracleRegisterTx{
+        abi_version: 196609,
+        account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+        fee: 0,
+        nonce: 37122,
+        oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
+        query_fee: 10,
+        query_format: "query_format",
+        response_format: "response_format",
+        ttl: 10
+      }
+      iex> Utils.Transaction.gas_limit(oracle_register_tx, 5)
+      16581
   """
   @spec gas_limit(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
   def gas_limit(%OracleRegisterTx{oracle_ttl: oracle_ttl} = tx, height) do
