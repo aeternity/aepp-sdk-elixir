@@ -47,9 +47,9 @@ defmodule Core.GeneralizedAccounts do
            auth_fun: function_hash,
            ct_version: @ct_version,
            fee: Keyword.get(opts, :fee, 0),
-           ttl: Keyword.get(opts, :ttl, 0),
-           gas: Keyword.get(opts, :gas, 1_000_000),
-           gas_price: Keyword.get(opts, :gas_price, 1_000_000_000),
+           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+           gas: Keyword.get(opts, :gas, Contract.default_gas()),
+           gas_price: Keyword.get(opts, :gas_price, Contract.default_gas_price()),
            call_data: calldata
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),

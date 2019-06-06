@@ -565,6 +565,14 @@ defmodule Core.Contract do
 
   def abi_version(), do: @abi_version
 
+  def default_amount(), do: @default_amount
+
+  def default_deposit(), do: @default_deposit
+
+  def default_gas(), do: @default_gas
+
+  def default_gas_price(), do: @default_gas_price
+
   defp decode_logs(logs) do
     Enum.map(logs, fn log ->
       string_data = Encoding.prefix_decode_base64(log.data)
