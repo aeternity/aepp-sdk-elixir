@@ -46,6 +46,15 @@ defmodule Utils.Transaction do
     ContractCreateTx
   ]
 
+  @network_id_list ["ae_mainnet", "ae_uat"]
+
+  @await_attempts 25
+  @await_attempt_interval 200
+  @default_ttl 0
+  @dummy_fee 0
+  @tx_posting_attempts 5
+  @default_payload ""
+
   @type tx_types ::
           SpendTx.t()
           | OracleRegisterTx.t()
@@ -59,15 +68,6 @@ defmodule Utils.Transaction do
           | NameUpdateTx.t()
           | ContractCallTx.t()
           | ContractCreateTx.t()
-
-  @network_id_list ["ae_mainnet", "ae_uat"]
-
-  @await_attempts 25
-  @await_attempt_interval 200
-  @default_ttl 0
-  @dummy_fee 0
-  @tx_posting_attempts 5
-  @default_payload ""
 
   @spec default_ttl :: non_neg_integer()
   def default_ttl, do: @default_ttl
@@ -321,7 +321,9 @@ defmodule Utils.Transaction do
              ChannelSettleTx,
              ChannelSlashTx,
              ChannelSnapshotSoloTx,
-             ChannelWithdrawTx
+             ChannelWithdrawTx,
+             ContractCreateTx,
+             ContractCallTx
            ] do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
       Governance.gas(tx)
@@ -331,6 +333,12 @@ defmodule Utils.Transaction do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
       Governance.gas(tx)
   end
+
+  @spec default_await_attempts() :: non_neg_integer()
+  def default_await_attempts, do: @await_attempts
+
+  @spec default_await_attempt_interval() :: non_neg_integer()
+  def default_await_attempt_interval, do: @await_attempt_interval
 
   defp ttl_delta(_height, {:relative, _value} = ttl) do
     {:relative, oracle_ttl_delta(0, ttl)}

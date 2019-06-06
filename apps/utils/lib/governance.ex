@@ -33,6 +33,7 @@ defmodule Utils.Governance do
   @expected_block_mine_rate_minutes 3
   @expected_blocks_in_a_year_floor 175_200 = div(60 * 24 * 365, @expected_block_mine_rate_minutes)
 
+  @spec tx_base_gas(struct()) :: non_neg_integer()
   def tx_base_gas(%SpendTx{}), do: @tx_base_gas
   def tx_base_gas(%NamePreclaimTx{}), do: @tx_base_gas
   def tx_base_gas(%NameClaimTx{}), do: @tx_base_gas
@@ -56,6 +57,7 @@ defmodule Utils.Governance do
   def tx_base_gas(%ChannelWithdrawTx{}), do: @tx_base_gas
   def tx_base_gas(_), do: @tx_base_gas
 
+  @spec gas(struct()) :: non_neg_integer()
   def gas(%SpendTx{}), do: 0
   def gas(%NamePreclaimTx{}), do: 0
   def gas(%NameClaimTx{}), do: 0
