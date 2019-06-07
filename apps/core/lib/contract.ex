@@ -244,7 +244,6 @@ defmodule Core.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, response.return_value, response.return_type) do
-             IO.inspect(response.log)
       {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
     else
       {:error, _} = error ->

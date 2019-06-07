@@ -29,7 +29,8 @@ defmodule AeppSdkElixir.MixProject do
       {:aesophia,
        git: "https://github.com/aeternity/aesophia.git",
        manager: :rebar,
-       ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"}
+       ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"},
+       {:distillery, "~> 2.0"}
     ]
   end
 
