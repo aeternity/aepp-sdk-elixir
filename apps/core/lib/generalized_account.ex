@@ -1,4 +1,4 @@
-defmodule Core.GeneralizedAccounts do
+defmodule Core.GeneralizedAccount do
   @moduledoc """
   Contains all generalized accounts functionalities.
 
@@ -8,15 +8,15 @@ defmodule Core.GeneralizedAccounts do
   For more information: https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md
   """
 
-  alias Utils.{Hash, Serialization}
+  alias Utils.{Hash, Serialization, Transaction}
   alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Model.Error
   alias Utils.Account, as: AccountUtils
-
-  alias Utils.Transaction
   alias Core.{Client, Contract}
 
   @ct_version 0x40001
   @init_function "init"
+  @default_gas 50000
 
   def attach(
         %Client{
@@ -60,9 +60,15 @@ defmodule Core.GeneralizedAccounts do
              Keyword.get(opts, :auth, nil),
              height
            ) do
-      response
+      {:ok, response}
     else
-      e -> e
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, _} = error ->
+        error
     end
   end
+
+  def default_gas(), do: @default_gas
 end

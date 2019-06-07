@@ -48,12 +48,11 @@ defmodule Core.Account do
           | {:error, Env.t()}
   def spend(
         %Client{
-          keypair:
-            %{
-              public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
-            } = client,
+          keypair: %{
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
+          },
           connection: connection
-        },
+        } = client,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []

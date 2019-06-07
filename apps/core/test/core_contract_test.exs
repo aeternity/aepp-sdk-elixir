@@ -62,8 +62,7 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "add_to_number",
-        ["33"],
-        fee: 10_000_000_000_000_000
+        ["33"]
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)

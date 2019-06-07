@@ -399,6 +399,31 @@ defmodule Utils.SerializationUtils do
      ], :ga_attach_tx}
   end
 
+  def process_tx_fields(%{
+        ga_id: ga_id,
+        auth_data: auth_data,
+        abi_version: abi_version,
+        fee: fee,
+        gas: gas,
+        gas_price: gas_price,
+        ttl: ttl,
+        tx: tx
+      }) do
+    ga_id_record = proccess_id_to_record(ga_id)
+
+    {:ok,
+     [
+       ga_id_record,
+       auth_data,
+       abi_version,
+       fee,
+       gas,
+       gas_price,
+       ttl,
+       tx
+     ], :ga_meta_tx}
+  end
+
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end

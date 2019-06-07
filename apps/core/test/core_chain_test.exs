@@ -57,8 +57,7 @@ defmodule CoreChainTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"],
-        fee: 10_000_000_000_000_000
+        ["42"]
       )
 
     assert :ok == Chain.await_transaction(setup_data.client, tx_hash)
@@ -121,8 +120,7 @@ defmodule CoreChainTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"],
-        fee: 10_000_000_000_000_000
+        ["42"]
       )
 
     current_generation_result = Chain.get_current_generation(setup_data.client)

@@ -55,7 +55,7 @@ defmodule Utils.Governance do
   def tx_base_gas(%ChannelSettleTx{}), do: @tx_base_gas
   def tx_base_gas(%ChannelSnapshotSoloTx{}), do: @tx_base_gas
   def tx_base_gas(%ChannelWithdrawTx{}), do: @tx_base_gas
-  def tx_base_gas(_), do: @tx_base_gas
+  def tx_base_gas(_), do: 5 * @tx_base_gas
 
   @spec gas(struct()) :: non_neg_integer()
   def gas(%SpendTx{}), do: 0
