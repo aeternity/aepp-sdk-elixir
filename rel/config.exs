@@ -50,8 +50,8 @@ release :aepp_sdk_elixir do
   set version: "0.1.0"
   set applications: [
     :runtime_tools,
+    :core,
     aeternity_node: :permanent,
-    core: :permanent,
     utils: :permanent
   ]
 end
