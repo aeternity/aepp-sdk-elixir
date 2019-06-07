@@ -51,8 +51,8 @@ release :aepp_sdk_elixir do
   set applications: [
     :runtime_tools,
     :core,
-    aeternity_node: :permanent,
-    utils: :permanent
+    :utils,
+    :aeternity_node
   ]
 end
 
