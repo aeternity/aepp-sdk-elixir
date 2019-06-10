@@ -465,9 +465,7 @@ defmodule Utils.Transaction do
              auth_fun,
              Keyword.get(auth_opts, :auth_args)
            ),
-         serialized_tx = Serialization.serialize(tx),
-         signed_tx_fields = [[], serialized_tx],
-         serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx),
+         serialized_tx = wrap_in_empty_signed_tx(tx),
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
@@ -476,7 +474,7 @@ defmodule Utils.Transaction do
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
-           tx: serialized_signed_tx
+           tx: serialized_tx
          },
          meta_tx = %{
            meta_tx_dummy_fee
@@ -493,10 +491,8 @@ defmodule Utils.Transaction do
                  )
                )
          },
-         serialized_meta_tx = Serialization.serialize(meta_tx),
-         signed_meta_tx_fields = [[], serialized_meta_tx],
-         serialized_signed_meta_tx = Serialization.serialize(signed_meta_tx_fields, :signed_tx),
-         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_meta_tx),
+         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
+         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx),
          {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
            TransactionApi.post_transaction(connection, %Tx{
              tx: encoded_signed_tx
@@ -513,6 +509,12 @@ defmodule Utils.Transaction do
       {:error, _} = error ->
         error
     end
+  end
+
+  defp wrap_in_empty_signed_tx(tx) do
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [[], serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
 
   defp ensure_auth_opts(auth_opts) do
