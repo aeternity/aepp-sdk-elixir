@@ -8,7 +8,7 @@ defmodule Core.GeneralizedAccount do
   For more information: https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md
   """
 
-  alias Utils.{Hash, Serialization, Transaction}
+  alias Utils.{Hash, Serialization, Transaction, Encoding}
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.Error
   alias Utils.Account, as: AccountUtils
@@ -18,6 +18,49 @@ defmodule Core.GeneralizedAccount do
   @init_function "init"
   @default_gas 50000
 
+  @doc """
+  Attach a generalized account to a basic account. After a generalized account has been attached, it's possible
+  pass an :auth option to transaction related functions in order to authorize them through the attached contract.
+  A transaction is authorized whenever the call to the auth function returns true (and unauthorized when false).
+
+  The option looks like this:
+  auth: [
+    auth_contract_source: "contract Authorization =
+
+      function auth(auth_value : bool) =
+        auth_value",
+    auth_args: ["true"],
+    fee: 1_000_000_000_000_00,
+    gas: 50_000,
+    gas_price: 1_000_000_000,
+    ttl: 0
+  ]
+  where gas, gas_price and ttl are optional.
+
+  ## Examples
+      iex> source_code = "contract Authorization =
+
+        function auth(auth_value : bool) =
+          auth_value"
+      iex> auth_fun = "auth"
+      iex> init_args = []
+      iex> Core.GeneralizedAccount.attach(client, source_code, auth_fun, init_args)
+      {:ok,
+       %{
+         block_hash: "mh_CfEuHm4V2omAQGNAxcdPARrkfnYbKuuF1HpGhG5oQvoVC34nD",
+         block_height: 92967,
+         tx_hash: "th_9LutrWD1FuFyx4MUUeMcfyF3uebfaP8t5gzatWDLyFYsqK744"
+       }}
+  """
+  @spec attach(Client.t(), String.t(), String.t(), list(String.t()), list()) ::
+          {:ok,
+           %{
+             block_hash: Encoding.base58c(),
+             block_height: non_neg_integer(),
+             tx_hash: Encoding.base58c()
+           }}
+          | {:error, String.t()}
+          | {:error, Env.t()}
   def attach(
         %Client{
           keypair: %{public: public_key},
@@ -70,5 +113,8 @@ defmodule Core.GeneralizedAccount do
     end
   end
 
+  @doc """
+  false
+  """
   def default_gas(), do: @default_gas
 end

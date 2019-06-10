@@ -54,6 +54,7 @@ defmodule Utils.Transaction do
   @dummy_fee 0
   @tx_posting_attempts 5
   @default_payload ""
+  @fortuna_height 90800
 
   @type tx_types ::
           SpendTx.t()
@@ -397,6 +398,9 @@ defmodule Utils.Transaction do
           height,
           attempts - 1
         )
+
+      {:error, _} = err ->
+        err
     end
   end
 
@@ -474,7 +478,6 @@ defmodule Utils.Transaction do
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
            tx: serialized_signed_tx
          },
-         fortuna_height = 90800,
          meta_tx = %{
            meta_tx_dummy_fee
            | fee:
@@ -483,7 +486,7 @@ defmodule Utils.Transaction do
                  :fee,
                  calculate_fee(
                    tx,
-                   fortuna_height,
+                   @fortuna_height,
                    network_id,
                    @dummy_fee,
                    meta_tx_dummy_fee.gas_price

@@ -563,14 +563,29 @@ defmodule Core.Contract do
     end
   end
 
+  @doc """
+  false
+  """
   def abi_version(), do: @abi_version
 
+  @doc """
+  false
+  """
   def default_amount(), do: @default_amount
 
+  @doc """
+  false
+  """
   def default_deposit(), do: @default_deposit
 
+  @doc """
+  false
+  """
   def default_gas(), do: @default_gas
 
+  @doc """
+  false
+  """
   def default_gas_price(), do: @default_gas_price
 
   defp decode_logs(logs) do

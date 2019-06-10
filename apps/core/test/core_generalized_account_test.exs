@@ -11,9 +11,10 @@ defmodule CoreGeneralizedAccountTest do
           secret:
             "7c0bc9da525c33c24b3ff7bd439a1889e5b550e5688806091064e8e8c215881cf789b41a34b4e9381544a1f6eb04a8ae1a46ba968d74468446d5dae32462f163"
         },
-        "my_test",
-        "http://localhost:3013/v2",
-        "http://localhost:3113/v2"
+        "ae_uat",
+        "https://sdk-testnet.aepps.com/v2",
+        "https://sdk-testnet.aepps.com/v2",
+        1_000_000_000
       )
 
     source_code = "contract Authorization =
@@ -25,7 +26,18 @@ defmodule CoreGeneralizedAccountTest do
   end
 
   @tag :travis_test
-  test "attach and spend with auth", setup_data do
+  test "attach and spend with auth, attempt to spend with failing auth", setup_data do
+    assert match?(
+             {:error, "Account isn't generalized"},
+             Account.spend(setup_data.client, setup_data.client.keypair.public, 100,
+               auth: [
+                 auth_contract_source: setup_data.source_code,
+                 auth_args: ["true"],
+                 fee: 1_000_000_000_000_00
+               ]
+             )
+           )
+
     assert match?(
              {:ok, _},
              GeneralizedAccount.attach(
@@ -42,6 +54,17 @@ defmodule CoreGeneralizedAccountTest do
                auth: [
                  auth_contract_source: setup_data.source_code,
                  auth_args: ["true"],
+                 fee: 1_000_000_000_000_00
+               ]
+             )
+           )
+
+    assert match?(
+             {:error, _},
+             Account.spend(setup_data.client, setup_data.client.keypair.public, 100,
+               auth: [
+                 auth_contract_source: setup_data.source_code,
+                 auth_args: ["false"],
                  fee: 1_000_000_000_000_00
                ]
              )
