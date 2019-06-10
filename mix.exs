@@ -41,8 +41,7 @@ defmodule AeppSdkElixir.MixProject do
     ]
   end
 
-  defp description(), do:
-  "Elixir SDK targeting the Æternity node implementation."
+  defp description(), do: "Elixir SDK targeting the Æternity node implementation."
 
   defp aliases do
     [build_api: &build_api/1]
@@ -79,7 +78,7 @@ defmodule AeppSdkElixir.MixProject do
            "-g",
            "elixir",
            "-o",
-           "./apps/aeternity_node/"
+           "./lib/aeternity_node/"
          ]},
         {"mix", ["format"]},
         {"rm", ["-f", "#{get_file_name(:generator)}.jar"]},
