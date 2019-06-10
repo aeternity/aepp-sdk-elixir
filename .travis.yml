@@ -52,4 +52,3 @@ install:
 script:
   - ./bin/aeternity start
   - mix format --check-formatted
-  - mix coveralls -u --exclude disabled
