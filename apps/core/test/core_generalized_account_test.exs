@@ -7,14 +7,13 @@ defmodule CoreGeneralizedAccountTest do
     client =
       Client.new(
         %{
-          public: "ak_2t22NBJRGK4EC7Rvp5f56rzVpmJmhBsP7qUuUf3EJUjt1yS29C",
+          public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
           secret:
-            "7c0bc9da525c33c24b3ff7bd439a1889e5b550e5688806091064e8e8c215881cf789b41a34b4e9381544a1f6eb04a8ae1a46ba968d74468446d5dae32462f163"
+            "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
         },
-        "ae_uat",
-        "https://sdk-testnet.aepps.com/v2",
-        "https://sdk-testnet.aepps.com/v2",
-        1_000_000_000
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
       )
 
     source_code = "contract Authorization =
