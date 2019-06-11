@@ -3,10 +3,13 @@ defmodule AeppSdkElixir.MixProject do
 
   def project do
     [
-      apps_path: "apps",
+      app: :aepp_sdk_elixir,
+      version: "0.1.0",
       start_permanent: Mix.env() == :prod,
+      description: description(),
       deps: deps(),
       aliases: aliases(),
+      elixir: "~> 1.8",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -29,9 +32,16 @@ defmodule AeppSdkElixir.MixProject do
       {:aesophia,
        git: "https://github.com/aeternity/aesophia.git",
        manager: :rebar,
-       ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"}
+       ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"},
+      {:distillery, "~> 2.0"},
+      {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
+      {:erl_base58, "~> 0.0.1"},
+      {:tesla, "~> 1.2.1"},
+      {:poison, "~> 3.0.0"}
     ]
   end
+
+  defp description(), do: "Elixir SDK targeting the Æternity node implementation."
 
   defp aliases do
     [build_api: &build_api/1]
@@ -68,7 +78,7 @@ defmodule AeppSdkElixir.MixProject do
            "-g",
            "elixir",
            "-o",
-           "./apps/aeternity_node/"
+           "./lib/aeternity_node/"
          ]},
         {"mix", ["format"]},
         {"rm", ["-f", "#{get_file_name(:generator)}.jar"]},
