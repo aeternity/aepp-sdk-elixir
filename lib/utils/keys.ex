@@ -1,6 +1,6 @@
 defmodule Utils.Keys do
   @moduledoc """
-  Key generation, handling, encoding and crypto
+  Key generation, handling, encoding and crypto.
   """
   alias Utils.Encoding
 
