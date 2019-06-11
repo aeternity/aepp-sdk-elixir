@@ -1,6 +1,6 @@
 defmodule Core.Oracle do
   @moduledoc """
-  Module for oracle interaction, see: https://github.com/aeternity/protocol/blob/master/oracles/oracles.md
+  Module for oracle interaction, see: [https://github.com/aeternity/protocol/blob/master/oracles/oracles.md](https://github.com/aeternity/protocol/blob/master/oracles/oracles.md).
   """
   alias Utils.Transaction
   alias Utils.Account, as: AccountUtils

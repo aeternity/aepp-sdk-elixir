@@ -1,10 +1,10 @@
 defmodule Core.AENS do
   @moduledoc """
-  Aeternity Naming System: https://github.com/aeternity/protocol/blob/master/AENS.md
-  Contains all name-related functionality
+  Module for Aeternity Naming System, see: [https://github.com/aeternity/protocol/blob/master/AENS.md](https://github.com/aeternity/protocol/blob/master/AENS.md).
+  Contains all naming-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Model.{
     NamePreclaimTx,

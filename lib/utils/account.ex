@@ -1,6 +1,6 @@
 defmodule Utils.Account do
   @moduledoc """
-  Account utils
+  Account utils.
   """
 
   alias AeternityNode.Api.Account, as: AccountApi

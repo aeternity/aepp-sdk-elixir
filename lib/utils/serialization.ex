@@ -1,6 +1,6 @@
 defmodule Utils.Serialization do
   @moduledoc """
-  Transaction serialization
+  Transaction serialization.
   """
   alias Utils.SerializationUtils
 

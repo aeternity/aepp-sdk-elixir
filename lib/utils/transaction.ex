@@ -1,6 +1,6 @@
 defmodule Utils.Transaction do
   @moduledoc """
-  Transaction utils
+  Transaction utils.
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
 

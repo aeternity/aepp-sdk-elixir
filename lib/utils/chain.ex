@@ -1,6 +1,6 @@
 defmodule Utils.Chain do
   @moduledoc """
-  Chain utils
+  Chain utils.
   """
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.{KeyBlockOrMicroBlockHeader, KeyBlock, MicroBlockHeader, Error}
