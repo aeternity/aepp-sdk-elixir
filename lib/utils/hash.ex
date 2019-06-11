@@ -1,4 +1,7 @@
 defmodule Utils.Hash do
+  @moduledoc """
+  Contains hash-related functions.
+  """
   @hash_bytes 32
   @type hash :: binary()
 

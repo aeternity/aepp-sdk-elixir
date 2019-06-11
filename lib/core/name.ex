@@ -353,7 +353,6 @@ defmodule Core.AENS do
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
-
   @spec update_name(
           Client.t(),
           String.t(),
@@ -631,7 +630,6 @@ defmodule Core.AENS do
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
-
   @spec revoke_name(Client.t(), String.t(), aens_options()) :: {:error, String.t()} | {:ok, map()}
   def revoke_name(
         %Client{
