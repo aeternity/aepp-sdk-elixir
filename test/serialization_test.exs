@@ -4,7 +4,7 @@ defmodule UtilsSerializationTest do
   alias Utils.Serialization
 
   setup_all do
-    Code.require_file("test_utils.ex", "./test")
+    Code.require_file("test_utils.ex", "test/")
     TestUtils.get_test_data()
   end
 

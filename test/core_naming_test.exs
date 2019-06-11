@@ -4,7 +4,7 @@ defmodule CoreNamingTest do
   alias Core.{AENS, Account}
 
   setup_all do
-    Code.require_file("test_utils.ex", "../utils/test")
+    Code.require_file("test_utils.ex", "test/")
     TestUtils.get_test_data()
   end
 
