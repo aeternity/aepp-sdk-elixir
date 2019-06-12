@@ -13,8 +13,7 @@ defmodule CoreGeneralizedAccountTest do
         },
         "my_test",
         "http://localhost:3013/v2",
-        "http://localhost:3113/v2",
-        1_000_000_000
+        "http://localhost:3113/v2"
       )
 
     source_code = "contract Authorization =
