@@ -114,8 +114,8 @@ defmodule CoreChainTest do
   test "block operations with valid input", setup_data do
     {:ok,
      %{
-       block_hash: block_hash,
-       block_height: block_height,
+       block_hash: micro_block_hash,
+       block_height: height,
        tx_hash: tx_hash
      }} =
       Contract.deploy(
@@ -125,15 +125,17 @@ defmodule CoreChainTest do
         fee: 10_000_000_000_000_000
       )
 
+    micro_block_header_result = Chain.get_micro_block_header(setup_data.client, micro_block_hash)
+    assert match?({:ok, %{hash: ^micro_block_hash}}, micro_block_header_result)
+
+    generation_result = Chain.get_generation(setup_data.client, height)
+    assert match?({:ok, %{key_block: %{height: ^height}}}, generation_result)
+
     current_generation_result = Chain.get_current_generation(setup_data.client)
+    assert match?({:ok, %{key_block: %{}}}, current_generation_result)
 
-    assert match?(
-             {:ok, %{key_block: %{}}},
-             current_generation_result
-           )
-
-    {:ok, %{key_block: %{hash: key_block_hash, height: height}, micro_blocks: micro_blocks}} =
-      current_generation_result
+    {:ok, %{key_block: %{hash: key_block_hash, height: ^height}, micro_blocks: _}} =
+      generation_result
 
     generation_result = Chain.get_generation(setup_data.client, key_block_hash)
 
@@ -142,30 +144,19 @@ defmodule CoreChainTest do
              generation_result
            )
 
-    generation_result = Chain.get_generation(setup_data.client, height)
-
-    assert match?(
-             {:ok, %{key_block: %{hash: ^key_block_hash, height: ^height}}},
-             generation_result
-           )
-
-    micro_block_hash = List.last(micro_blocks)
-
     micro_block_transactions_result =
       Chain.get_micro_block_transactions(setup_data.client, micro_block_hash)
 
     assert match?(
-             {:ok, [%{block_hash: ^block_hash, block_height: ^block_height, hash: ^tx_hash}]},
+             {:ok, [%{block_hash: ^micro_block_hash, block_height: ^height, hash: ^tx_hash}]},
              micro_block_transactions_result
            )
 
     key_block_result = Chain.get_key_block(setup_data.client, key_block_hash)
     assert match?({:ok, %{hash: ^key_block_hash, height: ^height}}, key_block_result)
+
     key_block_result = Chain.get_key_block(setup_data.client, height)
     assert match?({:ok, %{hash: ^key_block_hash, height: ^height}}, key_block_result)
-
-    micro_block_header_result = Chain.get_micro_block_header(setup_data.client, micro_block_hash)
-    assert match?({:ok, %{hash: ^micro_block_hash}}, micro_block_header_result)
   end
 
   @tag :travis_test

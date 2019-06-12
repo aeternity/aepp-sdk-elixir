@@ -36,7 +36,6 @@ defmodule AeppSdkElixir.MixProject do
        ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"},
       {:distillery, "~> 2.0"},
       {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
-      {:erl_base58, "~> 0.0.1"},
       {:tesla, "~> 1.2.1"},
       {:poison, "~> 3.0.0"}
     ]
