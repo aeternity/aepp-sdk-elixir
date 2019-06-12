@@ -7,6 +7,7 @@ defmodule AeppSdkElixir.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       description: description(),
+      package: package(),
       deps: deps(),
       aliases: aliases(),
       elixir: "~> 1.8",
@@ -42,6 +43,13 @@ defmodule AeppSdkElixir.MixProject do
   end
 
   defp description(), do: "Elixir SDK targeting the Æternity node implementation."
+
+  defp package() do
+    [
+      licenses: ["ISC License"],
+      links: %{"GitHub" => "https://github.com/aeternity/aepp-sdk-elixir"}
+    ]
+  end
 
   defp aliases do
     [build_api: &build_api/1]
