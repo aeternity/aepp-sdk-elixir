@@ -11,10 +11,11 @@ defmodule CoreNamingTest do
   @tag :travis_test
   test "naming workflow", setup do
     # Pre-claim a name
-    pre_claim = {:ok, pre_claim_info} = AENS.preclaim(setup.client, "test.test")
+    pre_claim = AENS.preclaim(setup.client, "test.test")
     assert match?({:ok, _}, pre_claim)
 
     # Claim a name
+    {:ok, pre_claim_info} = pre_claim
     claim = AENS.claim(setup.client, "test.test", pre_claim_info.name_salt)
     assert match?({:ok, _}, claim)
 
