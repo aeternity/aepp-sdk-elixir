@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.20.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>Core.Client — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-d9f58a6320b5bfa6dd77.css" />
+    <script src="dist/sidebar_items-c48994cd8b.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-d9f58a6320b5bfa6dd77.js"></script>
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+Core.Client              </h1>
+
+
+        <section id="moduledoc">
+<p>Contains the Client structure, holding all the data that is needed in order to use the SDK.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:keypair/0">keypair()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:t/0">t()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#new/5">new(keypair, network_id, url, internal_url, gas_price \\ 1000000)</a>
+  </div>
+    <div class="summary-synopsis"><p>Client constructor</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:keypair/0">
+    <div class="detail-header">
+    <a href="#t:keypair/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">keypair()</span>
+        
+      <div class="specs">
+          <pre>keypair() :: %{public: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), secret: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:t/0">
+    <div class="detail-header">
+    <a href="#t:t/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">t()</span>
+        
+      <div class="specs">
+          <pre>t() :: %Core.Client{
+  connection: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">struct</a>(),
+  gas_price: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  internal_connection: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">struct</a>(),
+  keypair: <a href="#t:keypair/0">keypair</a>(),
+  network_id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="new/5">
+  
+    <span id="new/4"></span>
+  <div class="detail-header">
+    <a href="#new/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">new(keypair, network_id, url, internal_url, gas_price \\ 1000000)</span>
+        
+      <div class="specs">
+          <pre>new(<a href="#t:keypair/0">keypair</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) ::
+  <a href="Core.Client.html#t:t/0">Core.Client.t</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Client constructor</p>
+<h2 id="new/5-example" class="section-heading">
+  <a href="#new/5-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">public_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">network_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">internal_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="7025038094-1">(</span><span class="p" data-group-id="7025038094-2">%{</span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="n">public_key</span><span class="p">,</span><span class="w"> </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="n">secret_key</span><span class="p" data-group-id="7025038094-2">}</span><span class="p">,</span><span class="w"> </span><span class="n">network_id</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">internal_url</span><span class="p" data-group-id="7025038094-1">)</span><span class="w">
+</span><span class="p" data-group-id="7025038094-3">%</span><span class="nc" data-group-id="7025038094-3">Core.Client</span><span class="p" data-group-id="7025038094-3">{</span><span class="w">
+  </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-4">%</span><span class="nc" data-group-id="7025038094-4">Tesla.Client</span><span class="p" data-group-id="7025038094-4">{</span><span class="w">
+    </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-5">[</span><span class="p" data-group-id="7025038094-5">]</span><span class="p">,</span><span class="w">
+    </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-6">[</span><span class="w">
+      </span><span class="p" data-group-id="7025038094-7">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7025038094-8">[</span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p" data-group-id="7025038094-8">]</span><span class="p" data-group-id="7025038094-7">}</span><span class="w">
+    </span><span class="p" data-group-id="7025038094-6">]</span><span class="w">
+  </span><span class="p" data-group-id="7025038094-4">}</span><span class="p">,</span><span class="w">
+  </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+  </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-9">%</span><span class="nc" data-group-id="7025038094-9">Tesla.Client</span><span class="p" data-group-id="7025038094-9">{</span><span class="w">
+    </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-10">[</span><span class="p" data-group-id="7025038094-10">]</span><span class="p">,</span><span class="w">
+    </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-11">[</span><span class="w">
+      </span><span class="p" data-group-id="7025038094-12">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7025038094-13">[</span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p" data-group-id="7025038094-13">]</span><span class="p" data-group-id="7025038094-12">}</span><span class="w">
+    </span><span class="p" data-group-id="7025038094-11">]</span><span class="w">
+  </span><span class="p" data-group-id="7025038094-9">}</span><span class="p">,</span><span class="w">
+  </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7025038094-14">%{</span><span class="w">
+    </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+  </span><span class="p" data-group-id="7025038094-14">}</span><span class="p">,</span><span class="w">
+  </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="w">
+</span><span class="p" data-group-id="7025038094-3">}</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.20.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  
+  </body>
+</html>
+

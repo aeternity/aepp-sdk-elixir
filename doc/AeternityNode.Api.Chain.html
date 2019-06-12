@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.20.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeternityNode.Api.Chain — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-d9f58a6320b5bfa6dd77.css" />
+    <script src="dist/sidebar_items-c48994cd8b.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-d9f58a6320b5bfa6dd77.js"></script>
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeternityNode.Api.Chain              </h1>
+
+
+        <section id="moduledoc">
+<p>API calls for all endpoints tagged <code class="inline">Chain</code>.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_current_generation/2">get_current_generation(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the current generation</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_current_key_block/2">get_current_key_block(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the current key block</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_current_key_block_hash/2">get_current_key_block_hash(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the hash of the current key block</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_current_key_block_height/2">get_current_key_block_height(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the height of the current key block</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_generation_by_hash/3">get_generation_by_hash(connection, hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a generation by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_generation_by_height/3">get_generation_by_height(connection, height, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a generation by height</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_key_block_by_hash/3">get_key_block_by_hash(connection, hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a key block by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_key_block_by_height/3">get_key_block_by_height(connection, height, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a key block by height</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_header_by_hash/3">get_micro_block_header_by_hash(connection, hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a micro block header by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_transaction_by_hash_and_index/4">get_micro_block_transaction_by_hash_and_index(connection, hash, index, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a micro block transaction by hash and index</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_transactions_by_hash/3">get_micro_block_transactions_by_hash(connection, hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get micro block transactions by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_transactions_count_by_hash/3">get_micro_block_transactions_count_by_hash(connection, hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get micro block transaction count by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_pending_key_block/2">get_pending_key_block(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the pending key block</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_top_block/2">get_top_block(connection, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the top block (either key or micro block)</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#post_key_block/3">post_key_block(connection, body, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Post a mined key block</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="get_current_generation/2">
+  
+    <span id="get_current_generation/1"></span>
+  <div class="detail-header">
+    <a href="#get_current_generation/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_current_generation(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_current_generation(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.Generation.html#t:t/0">AeternityNode.Model.Generation.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the current generation</p>
+<h2 id="get_current_generation/2-parameters" class="section-heading">
+  <a href="#get_current_generation/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_current_generation/2-returns" class="section-heading">
+  <a href="#get_current_generation/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.Generation{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_current_key_block/2">
+  
+    <span id="get_current_key_block/1"></span>
+  <div class="detail-header">
+    <a href="#get_current_key_block/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_current_key_block(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_current_key_block(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.KeyBlock.html#t:t/0">AeternityNode.Model.KeyBlock.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the current key block</p>
+<h2 id="get_current_key_block/2-parameters" class="section-heading">
+  <a href="#get_current_key_block/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_current_key_block/2-returns" class="section-heading">
+  <a href="#get_current_key_block/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.KeyBlock{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_current_key_block_hash/2">
+  
+    <span id="get_current_key_block_hash/1"></span>
+  <div class="detail-header">
+    <a href="#get_current_key_block_hash/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_current_key_block_hash(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_current_key_block_hash(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.InlineResponse200.html#t:t/0">AeternityNode.Model.InlineResponse200.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the hash of the current key block</p>
+<h2 id="get_current_key_block_hash/2-parameters" class="section-heading">
+  <a href="#get_current_key_block_hash/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_current_key_block_hash/2-returns" class="section-heading">
+  <a href="#get_current_key_block_hash/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.InlineResponse200{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_current_key_block_height/2">
+  
+    <span id="get_current_key_block_height/1"></span>
+  <div class="detail-header">
+    <a href="#get_current_key_block_height/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_current_key_block_height(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_current_key_block_height(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.InlineResponse2001.html#t:t/0">AeternityNode.Model.InlineResponse2001.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the height of the current key block</p>
+<h2 id="get_current_key_block_height/2-parameters" class="section-heading">
+  <a href="#get_current_key_block_height/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_current_key_block_height/2-returns" class="section-heading">
+  <a href="#get_current_key_block_height/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.InlineResponse2001{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_generation_by_hash/3">
+  
+    <span id="get_generation_by_hash/2"></span>
+  <div class="detail-header">
+    <a href="#get_generation_by_hash/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_generation_by_hash(connection, hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_generation_by_hash(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.Generation.html#t:t/0">AeternityNode.Model.Generation.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a generation by hash</p>
+<h2 id="get_generation_by_hash/3-parameters" class="section-heading">
+  <a href="#get_generation_by_hash/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the generation
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_generation_by_hash/3-returns" class="section-heading">
+  <a href="#get_generation_by_hash/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.Generation{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_generation_by_height/3">
+  
+    <span id="get_generation_by_height/2"></span>
+  <div class="detail-header">
+    <a href="#get_generation_by_height/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_generation_by_height(connection, height, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_generation_by_height(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.Generation.html#t:t/0">AeternityNode.Model.Generation.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a generation by height</p>
+<h2 id="get_generation_by_height/3-parameters" class="section-heading">
+  <a href="#get_generation_by_height/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>height (integer()): The height
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_generation_by_height/3-returns" class="section-heading">
+  <a href="#get_generation_by_height/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.Generation{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_key_block_by_hash/3">
+  
+    <span id="get_key_block_by_hash/2"></span>
+  <div class="detail-header">
+    <a href="#get_key_block_by_hash/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_key_block_by_hash(connection, hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_key_block_by_hash(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.KeyBlock.html#t:t/0">AeternityNode.Model.KeyBlock.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a key block by hash</p>
+<h2 id="get_key_block_by_hash/3-parameters" class="section-heading">
+  <a href="#get_key_block_by_hash/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_key_block_by_hash/3-returns" class="section-heading">
+  <a href="#get_key_block_by_hash/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.KeyBlock{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_key_block_by_height/3">
+  
+    <span id="get_key_block_by_height/2"></span>
+  <div class="detail-header">
+    <a href="#get_key_block_by_height/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_key_block_by_height(connection, height, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_key_block_by_height(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.KeyBlock.html#t:t/0">AeternityNode.Model.KeyBlock.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a key block by height</p>
+<h2 id="get_key_block_by_height/3-parameters" class="section-heading">
+  <a href="#get_key_block_by_height/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>height (integer()): The height
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_key_block_by_height/3-returns" class="section-heading">
+  <a href="#get_key_block_by_height/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.KeyBlock{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_header_by_hash/3">
+  
+    <span id="get_micro_block_header_by_hash/2"></span>
+  <div class="detail-header">
+    <a href="#get_micro_block_header_by_hash/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_header_by_hash(connection, hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_header_by_hash(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.MicroBlockHeader.html#t:t/0">AeternityNode.Model.MicroBlockHeader.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a micro block header by hash</p>
+<h2 id="get_micro_block_header_by_hash/3-parameters" class="section-heading">
+  <a href="#get_micro_block_header_by_hash/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_micro_block_header_by_hash/3-returns" class="section-heading">
+  <a href="#get_micro_block_header_by_hash/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.MicroBlockHeader{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_transaction_by_hash_and_index/4">
+  
+    <span id="get_micro_block_transaction_by_hash_and_index/3"></span>
+  <div class="detail-header">
+    <a href="#get_micro_block_transaction_by_hash_and_index/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_transaction_by_hash_and_index(connection, hash, index, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_transaction_by_hash_and_index(
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()
+) :: {:ok, <a href="AeternityNode.Model.GenericSignedTx.html#t:t/0">AeternityNode.Model.GenericSignedTx.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a micro block transaction by hash and index</p>
+<h2 id="get_micro_block_transaction_by_hash_and_index/4-parameters" class="section-heading">
+  <a href="#get_micro_block_transaction_by_hash_and_index/4-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the block
+</li>
+<li>index (integer()): The index of the transaction in a block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_micro_block_transaction_by_hash_and_index/4-returns" class="section-heading">
+  <a href="#get_micro_block_transaction_by_hash_and_index/4-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.GenericSignedTx{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_transactions_by_hash/3">
+  
+    <span id="get_micro_block_transactions_by_hash/2"></span>
+  <div class="detail-header">
+    <a href="#get_micro_block_transactions_by_hash/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_transactions_by_hash(connection, hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_transactions_by_hash(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.GenericTxs.html#t:t/0">AeternityNode.Model.GenericTxs.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get micro block transactions by hash</p>
+<h2 id="get_micro_block_transactions_by_hash/3-parameters" class="section-heading">
+  <a href="#get_micro_block_transactions_by_hash/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_micro_block_transactions_by_hash/3-returns" class="section-heading">
+  <a href="#get_micro_block_transactions_by_hash/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.GenericTxs{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_transactions_count_by_hash/3">
+  
+    <span id="get_micro_block_transactions_count_by_hash/2"></span>
+  <div class="detail-header">
+    <a href="#get_micro_block_transactions_count_by_hash/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_transactions_count_by_hash(connection, hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_transactions_count_by_hash(
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()
+) :: {:ok, <a href="AeternityNode.Model.InlineResponse2002.html#t:t/0">AeternityNode.Model.InlineResponse2002.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get micro block transaction count by hash</p>
+<h2 id="get_micro_block_transactions_count_by_hash/3-parameters" class="section-heading">
+  <a href="#get_micro_block_transactions_count_by_hash/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>hash (String.t): The hash of the block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_micro_block_transactions_count_by_hash/3-returns" class="section-heading">
+  <a href="#get_micro_block_transactions_count_by_hash/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.InlineResponse2002{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_pending_key_block/2">
+  
+    <span id="get_pending_key_block/1"></span>
+  <div class="detail-header">
+    <a href="#get_pending_key_block/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_pending_key_block(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_pending_key_block(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.KeyBlock.html#t:t/0">AeternityNode.Model.KeyBlock.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the pending key block</p>
+<h2 id="get_pending_key_block/2-parameters" class="section-heading">
+  <a href="#get_pending_key_block/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_pending_key_block/2-returns" class="section-heading">
+  <a href="#get_pending_key_block/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.KeyBlock{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="get_top_block/2">
+  
+    <span id="get_top_block/1"></span>
+  <div class="detail-header">
+    <a href="#get_top_block/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_top_block(connection, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>get_top_block(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, <a href="AeternityNode.Model.KeyBlockOrMicroBlockHeader.html#t:t/0">AeternityNode.Model.KeyBlockOrMicroBlockHeader.t</a>()}
+  | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the top block (either key or micro block)</p>
+<h2 id="get_top_block/2-parameters" class="section-heading">
+  <a href="#get_top_block/2-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="get_top_block/2-returns" class="section-heading">
+  <a href="#get_top_block/2-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %AeternityNode.Model.KeyBlockOrMicroBlockHeader{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+<section class="detail" id="post_key_block/3">
+  
+    <span id="post_key_block/2"></span>
+  <div class="detail-header">
+    <a href="#post_key_block/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">post_key_block(connection, body, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>post_key_block(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="AeternityNode.Model.KeyBlock.html#t:t/0">AeternityNode.Model.KeyBlock.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()) ::
+  {:ok, nil} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Post a mined key block</p>
+<h2 id="post_key_block/3-parameters" class="section-heading">
+  <a href="#post_key_block/3-parameters" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Parameters
+</h2>
+
+<ul>
+<li>connection (AeternityNode.Connection): Connection to server
+</li>
+<li>body (KeyBlock): Mined key block
+</li>
+<li>opts (KeywordList): [optional] Optional parameters
+</li>
+</ul>
+<h2 id="post_key_block/3-returns" class="section-heading">
+  <a href="#post_key_block/3-returns" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Returns
+</h2>
+
+<p>{:ok, %{}} on success
+{:error, info} on failure</p>
+  </section>
+</section>
+          </div>
+        </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.20.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  
+  </body>
+</html>
+

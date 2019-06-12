@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.20.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>Core.Chain — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-d9f58a6320b5bfa6dd77.css" />
+    <script src="dist/sidebar_items-c48994cd8b.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-d9f58a6320b5bfa6dd77.js"></script>
+    
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+Core.Chain              </h1>
+
+
+        <section id="moduledoc">
+<p>Contains all chain-related functionality.</p>
+<p>In order for its functions to be used, a client must be defined first.
+Client example can be found at: <a href="Core.Client.html#new/4"><code class="inline">Core.Client.new/4</code></a>.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:await_options/0">await_options()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:dry_run_account/0">dry_run_account()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:dry_run_result/0">dry_run_result()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:event/0">event()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:generation/0">generation()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:generic_signed_transaction/0">generic_signed_transaction()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:generic_transaction/0">generic_transaction()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:key_block/0">key_block()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:micro_block_header/0">micro_block_header()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:node_info/0">node_info()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:peers/0">peers()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:protocol/0">protocol()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:status/0">status()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:transaction_info/0">transaction_info()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#await_height/3">await_height(client, height, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Wait for the chain to reach specific height</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#await_transaction/3">await_transaction(client, tx_hash, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Wait for a transaction to be mined</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#dry_run/4">dry_run(client, transactions, accounts, block_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Dry-run transactions on top of a given block</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_current_generation/1">get_current_generation(client)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get current generation</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_generation/2">get_generation(client, hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a generation by height</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_key_block/2">get_key_block(client, key_block_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a key block by height</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_header/2">get_micro_block_header(client, micro_block_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a micro block&#39;s header</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_micro_block_transactions/2">get_micro_block_transactions(client, micro_block_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a micro block&#39;s transactions</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_node_info/1">get_node_info(client)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get node&#39;s info</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_pending_transactions/1">get_pending_transactions(client)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get all pending transactions</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_transaction/2">get_transaction(client, tx_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a transaction by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get_transaction_info/2">get_transaction_info(client, tx_hash)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get a transaction info by hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#height/1">height(client)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get the height of the current key block</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:await_options/0">
+    <div class="detail-header">
+    <a href="#t:await_options/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">await_options()</span>
+        
+      <div class="specs">
+          <pre>await_options() :: [attempts: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), interval: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:dry_run_account/0">
+    <div class="detail-header">
+    <a href="#t:dry_run_account/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">dry_run_account()</span>
+        
+      <div class="specs">
+          <pre>dry_run_account() :: %{pubkey: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), amount: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:dry_run_result/0">
+    <div class="detail-header">
+    <a href="#t:dry_run_result/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">dry_run_result()</span>
+        
+      <div class="specs">
+          <pre>dry_run_result() :: %{
+  type: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  result: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  reason: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>() | nil,
+  call_obj: <a href="#t:transaction_info/0">transaction_info</a>() | nil
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:event/0">
+    <div class="detail-header">
+    <a href="#t:event/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">event()</span>
+        
+      <div class="specs">
+          <pre>event() :: %{address: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), topics: [<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()], data: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:generation/0">
+    <div class="detail-header">
+    <a href="#t:generation/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">generation()</span>
+        
+      <div class="specs">
+          <pre>generation() :: %{key_block: <a href="#t:key_block/0">key_block</a>(), micro_blocks: [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:generic_signed_transaction/0">
+    <div class="detail-header">
+    <a href="#t:generic_signed_transaction/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">generic_signed_transaction()</span>
+        
+      <div class="specs">
+          <pre>generic_signed_transaction() :: %{
+  tx: <a href="#t:generic_transaction/0">generic_transaction</a>(),
+  block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  block_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  signatures: [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:generic_transaction/0">
+    <div class="detail-header">
+    <a href="#t:generic_transaction/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">generic_transaction()</span>
+        
+      <div class="specs">
+          <pre>generic_transaction() :: %{version: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), type: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:key_block/0">
+    <div class="detail-header">
+    <a href="#t:key_block/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">key_block()</span>
+        
+      <div class="specs">
+          <pre>key_block() :: %{
+  hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  prev_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  prev_key_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  state_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  miner: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  beneficiary: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  target: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  pow: [<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()] | nil,
+  nonce: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>() | nil,
+  time: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  version: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  info: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:micro_block_header/0">
+    <div class="detail-header">
+    <a href="#t:micro_block_header/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">micro_block_header()</span>
+        
+      <div class="specs">
+          <pre>micro_block_header() :: %{
+  hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  pof_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  prev_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  prev_key_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  state_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  txs_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  signature: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  time: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  version: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:node_info/0">
+    <div class="detail-header">
+    <a href="#t:node_info/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">node_info()</span>
+        
+      <div class="specs">
+          <pre>node_info() :: %{
+  peer_pubkey: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>() | nil,
+  status: <a href="#t:status/0">status</a>(),
+  node_beneficiary: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  node_pubkey: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  peers: <a href="#t:peers/0">peers</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:peers/0">
+    <div class="detail-header">
+    <a href="#t:peers/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">peers()</span>
+        
+      <div class="specs">
+          <pre>peers() :: %{peers: [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()], blocked: [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:protocol/0">
+    <div class="detail-header">
+    <a href="#t:protocol/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">protocol()</span>
+        
+      <div class="specs">
+          <pre>protocol() :: %{
+  version: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  effective_at_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:status/0">
+    <div class="detail-header">
+    <a href="#t:status/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">status()</span>
+        
+      <div class="specs">
+          <pre>status() :: %{
+  genesis_key_block_hash: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  solutions: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  difficulty: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">float</a>(),
+  syncing: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>(),
+  sync_progress: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">float</a>() | nil,
+  listening: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>(),
+  protocols: [<a href="#t:protocol/0">protocol</a>()],
+  node_version: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  node_revision: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  peer_count: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(),
+  pending_transactions_count: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  network_id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:transaction_info/0">
+    <div class="detail-header">
+    <a href="#t:transaction_info/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">transaction_info()</span>
+        
+      <div class="specs">
+          <pre>transaction_info() :: %{
+  caller_id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  caller_nonce: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  contract_id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  gas_price: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  gas_used: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  log: [<a href="#t:event/0">event</a>()],
+  return_value: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  return_type: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="await_height/3">
+  
+    <span id="await_height/2"></span>
+  <div class="detail-header">
+    <a href="#await_height/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">await_height(client, height, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>await_height(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), <a href="#t:await_options/0">await_options</a>()) ::
+  :ok | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Wait for the chain to reach specific height</p>
+<h2 id="await_height/3-example" class="section-heading">
+  <a href="#await_height/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">await_height</span><span class="p" data-group-id="3408735499-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="mi">84590</span><span class="p" data-group-id="3408735499-1">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="await_transaction/3">
+  
+    <span id="await_transaction/2"></span>
+  <div class="detail-header">
+    <a href="#await_transaction/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">await_transaction(client, tx_hash, opts \\ [])</span>
+        
+      <div class="specs">
+          <pre>await_transaction(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="#t:await_options/0">await_options</a>()) ::
+  :ok | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Wait for a transaction to be mined</p>
+<h2 id="await_transaction/3-example" class="section-heading">
+  <a href="#await_transaction/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">transaction_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_232gp9o5Lm1XZ8SMaDCAnLcvyj2CkDkf5tssfD5yVAoFAnPBm7&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">await_transaction</span><span class="p" data-group-id="7907652406-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">transaction_hash</span><span class="p" data-group-id="7907652406-1">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="dry_run/4">
+    <div class="detail-header">
+    <a href="#dry_run/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">dry_run(client, transactions, accounts, block_hash)</span>
+        
+      <div class="specs">
+          <pre>dry_run(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()], [<a href="#t:dry_run_account/0">dry_run_account</a>()], <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, [<a href="#t:dry_run_result/0">dry_run_result</a>()]} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Dry-run transactions on top of a given block</p>
+<h2 id="dry_run/4-example" class="section-heading">
+  <a href="#dry_run/4-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">transactions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7270997683-1">[</span><span class="s">&quot;tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw==&quot;</span><span class="p" data-group-id="7270997683-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">accounts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7270997683-2">[</span><span class="w">
+  </span><span class="p" data-group-id="7270997683-3">%{</span><span class="w">
+    </span><span class="ss">pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">1651002120672731042209</span><span class="w">
+  </span><span class="p" data-group-id="7270997683-3">}</span><span class="w">
+</span><span class="p" data-group-id="7270997683-2">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT&quot;</span><span class="w">
+</span><span class="p" data-group-id="7270997683-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7270997683-5">[</span><span class="w">
+   </span><span class="p" data-group-id="7270997683-6">%{</span><span class="w">
+     </span><span class="ss">call_obj</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7270997683-7">%{</span><span class="w">
+       </span><span class="ss">caller_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">caller_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">8327</span><span class="p">,</span><span class="w">
+       </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span><span class="w">
+       </span><span class="ss">gas_used</span><span class="p">:</span><span class="w"> </span><span class="mi">252</span><span class="p">,</span><span class="w">
+       </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">61481</span><span class="p">,</span><span class="w">
+       </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7270997683-8">[</span><span class="p" data-group-id="7270997683-8">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">return_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="ss">return_value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA&quot;</span><span class="w">
+     </span><span class="p" data-group-id="7270997683-7">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">reason</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+     </span><span class="ss">result</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;contract_call&quot;</span><span class="w">
+   </span><span class="p" data-group-id="7270997683-6">}</span><span class="w">
+ </span><span class="p" data-group-id="7270997683-5">]</span><span class="p" data-group-id="7270997683-4">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_current_generation/1">
+    <div class="detail-header">
+    <a href="#get_current_generation/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_current_generation(client)</span>
+        
+      <div class="specs">
+          <pre>get_current_generation(<a href="Core.Client.html#t:t/0">Core.Client.t</a>()) ::
+  {:ok, <a href="#t:generation/0">generation</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get current generation</p>
+<h2 id="get_current_generation/1-example" class="section-heading">
+  <a href="#get_current_generation/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_current_generation</span><span class="p" data-group-id="1067608862-1">(</span><span class="n">client</span><span class="p" data-group-id="1067608862-1">)</span><span class="w">
+</span><span class="p" data-group-id="1067608862-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="1067608862-3">%{</span><span class="w">
+   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1067608862-4">%{</span><span class="w">
+     </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_LVmMAyjcTtcLTh76STB9gJoAzpXdZBgwtiYX2rC98tkzRpUt8&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84552</span><span class="p">,</span><span class="w">
+     </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_rPG4k1G8MsbdVdgisDXAs95htP94eYeJHPdotCvdJUbNLXmVz&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1040728877473258350</span><span class="p">,</span><span class="w">
+     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1067608862-5">[</span><span class="mi">1816785</span><span class="p">,</span><span class="w"> </span><span class="mi">4563830</span><span class="p">,</span><span class="w"> </span><span class="mi">6535791</span><span class="p">,</span><span class="w"> </span><span class="mi">7371744</span><span class="p">,</span><span class="w"> </span><span class="mi">15431122</span><span class="p">,</span><span class="w"> </span><span class="mi">25810590</span><span class="p">,</span><span class="w"> </span><span class="mi">38354710</span><span class="p">,</span><span class="w">
+      </span><span class="mi">41068269</span><span class="p">,</span><span class="w"> </span><span class="mi">49508987</span><span class="p">,</span><span class="w"> </span><span class="mi">61851964</span><span class="p">,</span><span class="w"> </span><span class="mi">64661610</span><span class="p">,</span><span class="w"> </span><span class="mi">64916450</span><span class="p">,</span><span class="w"> </span><span class="mi">73480578</span><span class="p">,</span><span class="w"> </span><span class="mi">82460245</span><span class="p">,</span><span class="w">
+      </span><span class="mi">84205198</span><span class="p">,</span><span class="w"> </span><span class="mi">110560762</span><span class="p">,</span><span class="w"> </span><span class="mi">119763104</span><span class="p">,</span><span class="w"> </span><span class="mi">126778601</span><span class="p">,</span><span class="w"> </span><span class="mi">131361835</span><span class="p">,</span><span class="w"> </span><span class="mi">152044373</span><span class="p">,</span><span class="w">
+      </span><span class="mi">175440084</span><span class="p">,</span><span class="w"> </span><span class="mi">229990565</span><span class="p">,</span><span class="w"> </span><span class="mi">232441141</span><span class="p">,</span><span class="w"> </span><span class="mi">246507939</span><span class="p">,</span><span class="w"> </span><span class="mi">256839457</span><span class="p">,</span><span class="w"> </span><span class="mi">267089067</span><span class="p">,</span><span class="w">
+      </span><span class="mi">281126946</span><span class="p">,</span><span class="w"> </span><span class="mi">297684504</span><span class="p">,</span><span class="w"> </span><span class="mi">358409889</span><span class="p">,</span><span class="w"> </span><span class="mi">368048805</span><span class="p">,</span><span class="w"> </span><span class="mi">374727588</span><span class="p">,</span><span class="w"> </span><span class="mi">389428641</span><span class="p">,</span><span class="w">
+      </span><span class="mi">395353074</span><span class="p">,</span><span class="w"> </span><span class="mi">412257533</span><span class="p">,</span><span class="w"> </span><span class="mi">448812603</span><span class="p">,</span><span class="w"> </span><span class="mi">460866874</span><span class="p">,</span><span class="w"> </span><span class="mi">468707889</span><span class="p">,</span><span class="w"> </span><span class="mi">478197976</span><span class="p">,</span><span class="w">
+      </span><span class="mi">483791458</span><span class="p">,</span><span class="w"> </span><span class="mi">492777525</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="1067608862-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_ZAX9bfDJVRU4yBZVJBjYHrSpWqEfjvTmjhRReAxMH1Tb4aX6D&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_qPF68kYqsw3qNWscQX883gi4XSRvy8K1AyAo6xKmCe22wYiHq&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538023502</span><span class="p">,</span><span class="w">
+     </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614496897</span><span class="p">,</span><span class="w">
+     </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
+   </span><span class="p" data-group-id="1067608862-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1067608862-6">[</span><span class="p" data-group-id="1067608862-6">]</span><span class="w">
+ </span><span class="p" data-group-id="1067608862-3">}</span><span class="p" data-group-id="1067608862-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_generation/2">
+    <div class="detail-header">
+    <a href="#get_generation/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_generation(client, hash)</span>
+        
+      <div class="specs">
+          <pre>get_generation(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:generation/0">generation</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+          <pre>get_generation(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) ::
+  {:ok, <a href="#t:generation/0">generation</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a generation by height</p>
+<h2 id="get_generation/2-example" class="section-heading">
+  <a href="#get_generation/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">84551</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_generation</span><span class="p" data-group-id="3976574193-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p" data-group-id="3976574193-1">)</span><span class="w">
+</span><span class="p" data-group-id="3976574193-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="3976574193-3">%{</span><span class="w">
+   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3976574193-4">%{</span><span class="w">
+     </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_QFqo5LsvnCxdMK184Rf8aeuQa5JWGf3n8dex2iSGqYE3mzWFn&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84551</span><span class="p">,</span><span class="w">
+     </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_22cVmvsZq8vLxMTZjWcggZ5HQQi2RRF7UrAjMwQ5tCd1kCsNBb&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">8590250258</span><span class="p">,</span><span class="w">
+     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3976574193-5">[</span><span class="mi">4270548</span><span class="p">,</span><span class="w"> </span><span class="mi">4672365</span><span class="p">,</span><span class="w"> </span><span class="mi">26145245</span><span class="p">,</span><span class="w"> </span><span class="mi">46020752</span><span class="p">,</span><span class="w"> </span><span class="mi">50518165</span><span class="p">,</span><span class="w"> </span><span class="mi">61725479</span><span class="p">,</span><span class="w"> </span><span class="mi">82664155</span><span class="p">,</span><span class="w">
+      </span><span class="mi">101009367</span><span class="p">,</span><span class="w"> </span><span class="mi">123337852</span><span class="p">,</span><span class="w"> </span><span class="mi">136176634</span><span class="p">,</span><span class="w"> </span><span class="mi">152345694</span><span class="p">,</span><span class="w"> </span><span class="mi">154969206</span><span class="p">,</span><span class="w"> </span><span class="mi">180766968</span><span class="p">,</span><span class="w">
+      </span><span class="mi">182806912</span><span class="p">,</span><span class="w"> </span><span class="mi">197514003</span><span class="p">,</span><span class="w"> </span><span class="mi">198196883</span><span class="p">,</span><span class="w"> </span><span class="mi">199214273</span><span class="p">,</span><span class="w"> </span><span class="mi">202117489</span><span class="p">,</span><span class="w"> </span><span class="mi">202413040</span><span class="p">,</span><span class="w">
+      </span><span class="mi">237707860</span><span class="p">,</span><span class="w"> </span><span class="mi">261164171</span><span class="p">,</span><span class="w"> </span><span class="mi">288613351</span><span class="p">,</span><span class="w"> </span><span class="mi">298097639</span><span class="p">,</span><span class="w"> </span><span class="mi">304490763</span><span class="p">,</span><span class="w"> </span><span class="mi">314326968</span><span class="p">,</span><span class="w">
+      </span><span class="mi">348389855</span><span class="p">,</span><span class="w"> </span><span class="mi">355561157</span><span class="p">,</span><span class="w"> </span><span class="mi">363125716</span><span class="p">,</span><span class="w"> </span><span class="mi">364007441</span><span class="p">,</span><span class="w"> </span><span class="mi">382373111</span><span class="p">,</span><span class="w"> </span><span class="mi">384879255</span><span class="p">,</span><span class="w">
+      </span><span class="mi">393259024</span><span class="p">,</span><span class="w"> </span><span class="mi">411552709</span><span class="p">,</span><span class="w"> </span><span class="mi">427321732</span><span class="p">,</span><span class="w"> </span><span class="mi">430989208</span><span class="p">,</span><span class="w"> </span><span class="mi">440655342</span><span class="p">,</span><span class="w"> </span><span class="mi">468506638</span><span class="p">,</span><span class="w">
+      </span><span class="mi">482430386</span><span class="p">,</span><span class="w"> </span><span class="mi">488147407</span><span class="p">,</span><span class="w"> </span><span class="mi">504275453</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="3976574193-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2VZKBkQnR6JTo2WikRoUNtGNgfQD8FsqKAMXfrR8WKxrPd3Zdr&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2VZKBkQnR6JTo2WikRoUNtGNgfQD8FsqKAMXfrR8WKxrPd3Zdr&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_kWVRFL9VqTcBjsT56SHLsJWryemyTJnFwEBzaJ6aA7btYrKZ5&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538041170</span><span class="p">,</span><span class="w">
+     </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614345333</span><span class="p">,</span><span class="w">
+     </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
+   </span><span class="p" data-group-id="3976574193-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3976574193-6">[</span><span class="s">&quot;mh_NN4Tr4w6UBEobHucDNAFRn2sba12f9PFtvPDAAe2idBx3Ymsv&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;mh_cXozyVg6968P68cWcNGYHsHsGX9yVoZUGc56APx7z3wo2Vzh2&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;mh_2XDQytSS9v39aQdBLioXz3pvYrjWFeVcK2hL8xHzj79QL54Lz6&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;mh_GDkX5cqPgq4C2W9QpncMAfsUqbVXSh6nrMAKcPtHiAx9uGURf&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;mh_59ZnCtvjvp5nT6Q8QfZhnmRkjEy38BcJ3VS47wwMRCDxNYUQE&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="s">&quot;mh_ZAX9bfDJVRU4yBZVJBjYHrSpWqEfjvTmjhRReAxMH1Tb4aX6D&quot;</span><span class="p" data-group-id="3976574193-6">]</span><span class="w">
+ </span><span class="p" data-group-id="3976574193-3">}</span><span class="p" data-group-id="3976574193-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_key_block/2">
+    <div class="detail-header">
+    <a href="#get_key_block/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_key_block(client, key_block_hash)</span>
+        
+      <div class="specs">
+          <pre>get_key_block(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:key_block/0">key_block</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+          <pre>get_key_block(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) ::
+  {:ok, <a href="#t:key_block/0">key_block</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a key block by height</p>
+<h2 id="get_key_block/2-example" class="section-heading">
+  <a href="#get_key_block/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">key_block_height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">84547</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_key_block</span><span class="p" data-group-id="7511239398-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">key_block_height</span><span class="p" data-group-id="7511239398-1">)</span><span class="w">
+</span><span class="p" data-group-id="7511239398-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7511239398-3">%{</span><span class="w">
+   </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
+   </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_HvaKBash8o8FEKVdm5a8qo2j8vx5NKxH2P4RrQMQGokdjo5C2&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">2093870402648332570</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7511239398-4">[</span><span class="mi">1290617</span><span class="p">,</span><span class="w"> </span><span class="mi">3493169</span><span class="p">,</span><span class="w"> </span><span class="mi">6212474</span><span class="p">,</span><span class="w"> </span><span class="mi">17228667</span><span class="p">,</span><span class="w"> </span><span class="mi">52038371</span><span class="p">,</span><span class="w"> </span><span class="mi">120922973</span><span class="p">,</span><span class="w"> </span><span class="mi">138413619</span><span class="p">,</span><span class="w">
+    </span><span class="mi">159935660</span><span class="p">,</span><span class="w"> </span><span class="mi">177319436</span><span class="p">,</span><span class="w"> </span><span class="mi">178097802</span><span class="p">,</span><span class="w"> </span><span class="mi">207343351</span><span class="p">,</span><span class="w"> </span><span class="mi">226920891</span><span class="p">,</span><span class="w"> </span><span class="mi">291582142</span><span class="p">,</span><span class="w"> </span><span class="mi">313980921</span><span class="p">,</span><span class="w">
+    </span><span class="mi">320129338</span><span class="p">,</span><span class="w"> </span><span class="mi">320796969</span><span class="p">,</span><span class="w"> </span><span class="mi">332416956</span><span class="p">,</span><span class="w"> </span><span class="mi">346721320</span><span class="p">,</span><span class="w"> </span><span class="mi">348325254</span><span class="p">,</span><span class="w"> </span><span class="mi">351068507</span><span class="p">,</span><span class="w"> </span><span class="mi">362644921</span><span class="p">,</span><span class="w">
+    </span><span class="mi">374166089</span><span class="p">,</span><span class="w"> </span><span class="mi">393961637</span><span class="p">,</span><span class="w"> </span><span class="mi">393998472</span><span class="p">,</span><span class="w"> </span><span class="mi">398351923</span><span class="p">,</span><span class="w"> </span><span class="mi">398567840</span><span class="p">,</span><span class="w"> </span><span class="mi">405562469</span><span class="p">,</span><span class="w"> </span><span class="mi">408022294</span><span class="p">,</span><span class="w">
+    </span><span class="mi">408391855</span><span class="p">,</span><span class="w"> </span><span class="mi">450435185</span><span class="p">,</span><span class="w"> </span><span class="mi">451429065</span><span class="p">,</span><span class="w"> </span><span class="mi">451522379</span><span class="p">,</span><span class="w"> </span><span class="mi">462140541</span><span class="p">,</span><span class="w"> </span><span class="mi">490201848</span><span class="p">,</span><span class="w"> </span><span class="mi">500060148</span><span class="p">,</span><span class="w">
+    </span><span class="mi">508150414</span><span class="p">,</span><span class="w"> </span><span class="mi">508157410</span><span class="p">,</span><span class="w"> </span><span class="mi">508331280</span><span class="p">,</span><span class="w"> </span><span class="mi">510140909</span><span class="p">,</span><span class="w"> </span><span class="mi">516740832</span><span class="p">,</span><span class="w"> </span><span class="mi">523867648</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="7511239398-4">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_PP5rx6mi69FUhBCyDNtaFkitSaENZ1PTHpsmE5d5JGZCLAzZJ&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_PP5rx6mi69FUhBCyDNtaFkitSaENZ1PTHpsmE5d5JGZCLAzZJ&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_2V6HE7ZPTrJeA5tuhefgZZKmFAhRHtrE6CTnyB3THucfX3BPdC&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538124450</span><span class="p">,</span><span class="w">
+   </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614076955</span><span class="p">,</span><span class="w">
+   </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
+ </span><span class="p" data-group-id="7511239398-3">}</span><span class="p" data-group-id="7511239398-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_header/2">
+    <div class="detail-header">
+    <a href="#get_micro_block_header/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_header(client, micro_block_hash)</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_header(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:micro_block_header/0">micro_block_header</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a micro block&#39;s header</p>
+<h2 id="get_micro_block_header/2-example" class="section-heading">
+  <a href="#get_micro_block_header/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">micro_block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_micro_block_header</span><span class="p" data-group-id="8899554741-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="8899554741-1">)</span><span class="w">
+</span><span class="p" data-group-id="8899554741-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="8899554741-3">%{</span><span class="w">
+   </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pof_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;no_fraud&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">signature</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sg_RJN8idvktDbCMmFh1V3pmCaGBcvDNrv4vQ8X8Jbad8oxAuqzHm6Pe4VZxpvrDsopayfVjHDMNz36rPVg2iMTyuoaaxwLg&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_AJscRW9ArzMaWKHqPGGCiDhe7SxnF8a4AdWX2gdjhcEpFbS6x&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614125599</span><span class="p">,</span><span class="w">
+   </span><span class="ss">txs_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bx_22QhAmqifutmQ8g7x8kPPvxEANMqiqMwDBAsw7HqzWGxe93tHD&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
+ </span><span class="p" data-group-id="8899554741-3">}</span><span class="p" data-group-id="8899554741-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_micro_block_transactions/2">
+    <div class="detail-header">
+    <a href="#get_micro_block_transactions/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_micro_block_transactions(client, micro_block_hash)</span>
+        
+      <div class="specs">
+          <pre>get_micro_block_transactions(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, [<a href="#t:generic_signed_transaction/0">generic_signed_transaction</a>()]}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a micro block&#39;s transactions</p>
+<h2 id="get_micro_block_transactions/2-example" class="section-heading">
+  <a href="#get_micro_block_transactions/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">micro_block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_micro_block_transactions</span><span class="p" data-group-id="1906572153-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="1906572153-1">)</span><span class="w">
+</span><span class="p" data-group-id="1906572153-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="1906572153-3">[</span><span class="w">
+   </span><span class="p" data-group-id="1906572153-4">%{</span><span class="w">
+     </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
+     </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2J8Xshv3yR8Rf8mEmUSoT6fk4YJz5oGbpLLqJkPAvV1GWeTK6A&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1906572153-5">[</span><span class="s">&quot;sg_PQffTEQQkf2DPthE2QoeRqAUr53m5BszPBGRrdH21Nfbb1s6SFLyckb9TvNPcWy37sBY5YABNsvvJJFdvetHntAkiXrsM&quot;</span><span class="p" data-group-id="1906572153-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1906572153-6">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ContractCreateTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="1906572153-6">}</span><span class="w">
+   </span><span class="p" data-group-id="1906572153-4">}</span><span class="w">
+ </span><span class="p" data-group-id="1906572153-3">]</span><span class="p" data-group-id="1906572153-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_node_info/1">
+    <div class="detail-header">
+    <a href="#get_node_info/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_node_info(client)</span>
+        
+      <div class="specs">
+          <pre>get_node_info(<a href="Core.Client.html#t:t/0">Core.Client.t</a>()) ::
+  {:ok, <a href="#t:node_info/0">node_info</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get node&#39;s info</p>
+<h2 id="get_node_info/1-example" class="section-heading">
+  <a href="#get_node_info/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_node_info</span><span class="p" data-group-id="0477962846-1">(</span><span class="n">client</span><span class="p" data-group-id="0477962846-1">)</span><span class="w">
+</span><span class="p" data-group-id="0477962846-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0477962846-3">%{</span><span class="w">
+   </span><span class="ss">node_beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">node_pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_24eXUB8mKvfHWhLrRVYC8cx2GXqKqZcTDyAequLkhJiyxrhVcq&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">peer_pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pp_RK92f7wt27WbYijumNi69C1YvgRMfSZxBxn3KeGvGTF5sCFBq&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0477962846-4">%{</span><span class="w">
+     </span><span class="ss">blocked</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0477962846-5">[</span><span class="p" data-group-id="0477962846-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0477962846-6">[</span><span class="s">&quot;aenode://pp_DMLqy7Zuhoxe2FzpydyQTgwCJ52wouzxtHWsPGo51XDcxc5c8@13.53.161.215:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_FhecVAucSqWJuMKt8vwsrC14G6Cizet9TppFep1PpGLQwQSpw@13.229.148.230:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_RMzsjgNLZMabSns3gWykAUWQaz218zaUzcQqLCtkbH5mQDGp8@54.245.137.153:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_auNgNxce82JNFd33Z4UVoDvNUJEaSUowwW37v681wMnZgsPfw@34.212.120.93:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_27xmgQ4N1E3QwHyoutLtZsHW5DSW4zneQJ3CxT5JbUejxtFuAu@13.250.162.250:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_2JREXVhMur6RHVDPnEomoc8EP1cgmWdgrJMh9Z7j7a7yebAEKs@52.57.34.16:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_2aKzR7Bnz53amwA1oU55nkkKFD19THF3oxVDudLiksVh52Sypb@3.0.201.37:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_2beMZ7ULM3jye6hdSFVtWmBFRpG1mTevDZ4XNDPfKCgpzqH2Ns@3.122.192.245:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_2vFiJ3LMWVchceNnBPQV3p1fzj4Zd4voCQKNKaU16c3M4UCJok@18.236.142.145:3015&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015&quot;</span><span class="p" data-group-id="0477962846-6">]</span><span class="w">
+   </span><span class="p" data-group-id="0477962846-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">status</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0477962846-7">%{</span><span class="w">
+     </span><span class="ss">difficulty</span><span class="p">:</span><span class="w"> </span><span class="mi">252791033</span><span class="p">,</span><span class="w">
+     </span><span class="ss">genesis_key_block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_wUCideEB8aDtUaiHCtKcfywU6oHZW6gnyci8Mw6S1RSTCnCRu&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">listening</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="p">,</span><span class="w">
+     </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">node_revision</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a267159203252ddd6964f49e9125f32bce1efbb0&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">node_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.0.0-rc.1&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">peer_count</span><span class="p">:</span><span class="w"> </span><span class="mi">8841</span><span class="p">,</span><span class="w">
+     </span><span class="ss">pending_transactions_count</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+     </span><span class="ss">protocols</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0477962846-8">[</span><span class="w">
+       </span><span class="p" data-group-id="0477962846-9">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">82900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p" data-group-id="0477962846-9">}</span><span class="p">,</span><span class="w">
+       </span><span class="p" data-group-id="0477962846-10">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">40900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p" data-group-id="0477962846-10">}</span><span class="p">,</span><span class="w">
+       </span><span class="p" data-group-id="0477962846-11">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="0477962846-11">}</span><span class="w">
+     </span><span class="p" data-group-id="0477962846-8">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">solutions</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+     </span><span class="ss">sync_progress</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
+     </span><span class="ss">syncing</span><span class="p">:</span><span class="w"> </span><span class="no">false</span><span class="w">
+   </span><span class="p" data-group-id="0477962846-7">}</span><span class="w">
+ </span><span class="p" data-group-id="0477962846-3">}</span><span class="p" data-group-id="0477962846-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_pending_transactions/1">
+    <div class="detail-header">
+    <a href="#get_pending_transactions/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_pending_transactions(client)</span>
+        
+      <div class="specs">
+          <pre>get_pending_transactions(<a href="Core.Client.html#t:t/0">Core.Client.t</a>()) ::
+  {:ok, [<a href="#t:generic_signed_transaction/0">generic_signed_transaction</a>()]} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get all pending transactions</p>
+<h2 id="get_pending_transactions/1-example" class="section-heading">
+  <a href="#get_pending_transactions/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_pending_transactions</span><span class="p" data-group-id="2887856401-1">(</span><span class="n">client</span><span class="p" data-group-id="2887856401-1">)</span><span class="w">
+</span><span class="p" data-group-id="2887856401-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2887856401-3">[</span><span class="p" data-group-id="2887856401-3">]</span><span class="p" data-group-id="2887856401-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_transaction/2">
+    <div class="detail-header">
+    <a href="#get_transaction/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_transaction(client, tx_hash)</span>
+        
+      <div class="specs">
+          <pre>get_transaction(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:generic_signed_transaction/0">generic_signed_transaction</a>()}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a transaction by hash</p>
+<h2 id="get_transaction/2-example" class="section-heading">
+  <a href="#get_transaction/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_transaction</span><span class="p" data-group-id="6621944774-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="6621944774-1">)</span><span class="w">
+</span><span class="p" data-group-id="6621944774-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6621944774-3">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_bZUgGMEvu8kaAEv47xyatNfstvoH54VbrCb93y8J44gr2EsCJ&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">84531</span><span class="p">,</span><span class="w">
+   </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6621944774-4">[</span><span class="s">&quot;sg_R4q5gvb5c9VgwZPt7zLgPJLV4HFNv6ZHzwBVpKaA1ygApq6JBA1NSDsXPa9WLsrm2nGG5BrCy8iq11xGaSbsppzLZycts&quot;</span><span class="p" data-group-id="6621944774-4">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6621944774-5">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SpendTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="6621944774-5">}</span><span class="w">
+ </span><span class="p" data-group-id="6621944774-3">}</span><span class="p" data-group-id="6621944774-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get_transaction_info/2">
+    <div class="detail-header">
+    <a href="#get_transaction_info/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get_transaction_info(client, tx_hash)</span>
+        
+      <div class="specs">
+          <pre>get_transaction_info(<a href="Core.Client.html#t:t/0">Core.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:transaction_info/0">transaction_info</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get a transaction info by hash</p>
+<h2 id="get_transaction_info/2-example" class="section-heading">
+  <a href="#get_transaction_info/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_2jg2P41iGUgNif3Nu1vZ34P1aeSeZq4CWtKhEpr6jeLDoTL4mH&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">get_transaction_info</span><span class="p" data-group-id="4864557305-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="4864557305-1">)</span><span class="w">
+</span><span class="p" data-group-id="4864557305-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4864557305-3">%{</span><span class="w">
+   </span><span class="ss">call_info</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4864557305-4">%{</span><span class="w">
+     </span><span class="ss">caller_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">caller_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11837</span><span class="p">,</span><span class="w">
+     </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ct_Y5Fjymet5kcequZTNNMjMTUaTnYBWBFsVmoPUGnKCyPsfnDg8&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span><span class="w">
+     </span><span class="ss">gas_used</span><span class="p">:</span><span class="w"> </span><span class="mi">1252</span><span class="p">,</span><span class="w">
+     </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84513</span><span class="p">,</span><span class="w">
+     </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4864557305-5">[</span><span class="p" data-group-id="4864557305-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">return_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
+     </span><span class="ss">return_value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_Xfbg4g==&quot;</span><span class="w">
+   </span><span class="p" data-group-id="4864557305-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">ga_info</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_info</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="w">
+ </span><span class="p" data-group-id="4864557305-3">}</span><span class="p" data-group-id="4864557305-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="height/1">
+    <div class="detail-header">
+    <a href="#height/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">height(client)</span>
+        
+      <div class="specs">
+          <pre>height(<a href="Core.Client.html#t:t/0">Core.Client.t</a>()) :: {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get the height of the current key block</p>
+<h2 id="height/1-example" class="section-heading">
+  <a href="#height/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Core.Chain</span><span class="o">.</span><span class="n">height</span><span class="p" data-group-id="2318902240-1">(</span><span class="n">client</span><span class="p" data-group-id="2318902240-1">)</span><span class="w">
+</span><span class="p" data-group-id="2318902240-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">84535</span><span class="p" data-group-id="2318902240-2">}</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.20.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  
+  </body>
+</html>
+
