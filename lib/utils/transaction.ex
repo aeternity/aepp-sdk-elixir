@@ -393,7 +393,7 @@ defmodule Utils.Transaction do
       {:ok, _} = response ->
         response
 
-      {:error, "Invalid tx"} ->
+      _ ->
         try_post(
           client,
           %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
@@ -402,8 +402,17 @@ defmodule Utils.Transaction do
           attempts - 1
         )
 
-      {:error, _} = err ->
-        err
+        # {:error, "Invalid tx"} ->
+        #   try_post(
+        #     client,
+        #     %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
+        #     auth_options,
+        #     height,
+        #     attempts - 1
+        #   )
+        #
+        # {:error, _} = err ->
+        #   err
     end
   end
 
