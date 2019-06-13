@@ -17,7 +17,7 @@ http:
       debug_endpoints: true
 mining:
     autostart: true
-    expected_mine_rate: 500
+    expected_mine_rate: 1000
     beneficiary_reward_delay: 2
     min_miner_gas_price: 1000000
     # Public key of beneficiary account that will receive fees from mining on a node.
