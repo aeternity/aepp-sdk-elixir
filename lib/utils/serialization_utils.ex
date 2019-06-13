@@ -22,7 +22,7 @@ defmodule Utils.SerializationUtils do
     Ttl
   }
 
-  @ct_version 0x30001
+  @ct_version 0x40001
 
   @doc """
   Serializes a transaction to a tuple of list of fields and type, depending on its structure.
