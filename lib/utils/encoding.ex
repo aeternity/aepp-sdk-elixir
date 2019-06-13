@@ -1,7 +1,7 @@
 defmodule Utils.Encoding do
   @moduledoc """
   Contains encoding/decoding utils,
-  see: https://github.com/aeternity/protocol/blob/a1474c275ad36d1699378924e07bed7f5eb102be/node/api/api_encoding.md
+  see: [https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md](https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md).
   """
 
   @checksum_bytes 4
@@ -32,7 +32,6 @@ defmodule Utils.Encoding do
       iex> Utils.Encoding.prefix_encode_base58c(prefix, binary)
       "ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n"
   """
-
   @spec prefix_encode_base58c(String.t(), binary()) :: base58c()
   def prefix_encode_base58c(prefix, payload) when is_binary(payload),
     do: prefix <> "_" <> encode_base58c(payload)
@@ -44,7 +43,6 @@ defmodule Utils.Encoding do
       iex> Utils.Encoding.prefix_decode_base58c("ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
       <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
   """
-
   @spec prefix_decode_base58c(base58c()) :: binary()
   def prefix_decode_base58c(<<_prefix::@prefix_bits, payload::binary>>),
     do: decode_base58c(payload)
@@ -56,7 +54,6 @@ defmodule Utils.Encoding do
       iex> Utils.Encoding.encode_base58c(<<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>)
       "2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n"
   """
-
   @spec encode_base58c(binary()) :: base58c()
   def encode_base58c(payload) do
     checksum = generate_checksum(payload)
@@ -73,7 +70,6 @@ defmodule Utils.Encoding do
       iex> Utils.Encoding.decode_base58c("2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
       <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
   """
-
   @spec decode_base58c(base58c()) :: binary()
   def decode_base58c(payload) do
     decoded_payload =

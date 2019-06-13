@@ -1,6 +1,6 @@
 defmodule Utils.Transaction do
   @moduledoc """
-  Transaction utils
+  Transaction utils.
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Account, as: AccountApi
@@ -202,7 +202,6 @@ defmodule Utils.Transaction do
       iex> Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
       16500000000
   """
-
   @spec calculate_min_fee(struct(), non_neg_integer(), String.t()) ::
           non_neg_integer() | {:error, String.t()}
   def calculate_min_fee(%struct{} = tx, height, network_id)

@@ -1,4 +1,7 @@
 defmodule Core.Client do
+  @moduledoc """
+  Contains the Client structure, holding all the data that is needed in order to use the SDK.
+  """
   use Tesla
 
   alias __MODULE__
@@ -62,7 +65,6 @@ defmodule Core.Client do
         network_id: "ae_uat"
       }
   """
-
   @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()
   def new(
         %{public: public_key, secret: secret_key} = keypair,

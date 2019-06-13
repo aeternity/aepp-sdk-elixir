@@ -1,10 +1,10 @@
 defmodule Core.AENS do
   @moduledoc """
-  Aeternity Naming System: https://github.com/aeternity/protocol/blob/master/AENS.md
-  Contains all name-related functionality
+  Module for Aeternity Naming System, see: [https://github.com/aeternity/protocol/blob/master/AENS.md](https://github.com/aeternity/protocol/blob/master/AENS.md).
+  Contains all naming-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Model.{
     NamePreclaimTx,
@@ -343,7 +343,6 @@ defmodule Core.AENS do
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
-
   @spec update_name(
           Client.t(),
           String.t(),
@@ -611,7 +610,6 @@ defmodule Core.AENS do
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
-
   @spec revoke_name(Client.t(), String.t(), aens_options()) :: {:error, String.t()} | {:ok, map()}
   def revoke_name(
         %Client{

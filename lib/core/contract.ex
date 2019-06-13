@@ -1,9 +1,9 @@
 defmodule Core.Contract do
   @moduledoc """
-  Contains all contract-related functionality
+  Contains all contract-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
