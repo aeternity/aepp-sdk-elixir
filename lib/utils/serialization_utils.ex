@@ -386,17 +386,17 @@ defmodule Utils.SerializationUtils do
         lock_period: lock_period,
         ttl: ttl,
         fee: fee,
-        # delegate_ids: delegate_ids,
+        delegate_ids: delegate_ids,
         state_hash: state_hash,
         nonce: nonce
       }) do
     initiator_id = proccess_id_to_record(initiator)
     responder_id = proccess_id_to_record(responder)
 
-    # list_delegate_ids =
-    #   for id <- delegate_ids do
-    #     proccess_id_to_record(id)
-    #   end
+    list_delegate_ids =
+      for id <- delegate_ids do
+        proccess_id_to_record(id)
+      end
 
     {:ok,
      [
@@ -408,8 +408,7 @@ defmodule Utils.SerializationUtils do
        lock_period,
        ttl,
        fee,
-       #  list_delegate_ids,
-       # TODO: Have to be implemented/fixed when 3.1.0 aeternity node is out!!!
+       list_delegate_ids,
        state_hash,
        nonce
      ], :channel_create_tx}

@@ -430,6 +430,7 @@ defmodule Utils.Transaction do
         network_id
       )
 
+    # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
     signed_tx_fields = [[signature], serialized_tx]
     serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
     encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)

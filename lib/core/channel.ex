@@ -89,6 +89,7 @@ defmodule Core.Channel do
              lock_period,
              Keyword.get(opts, :ttl, 0),
              Keyword.get(opts, :fee, 0),
+             Keyword.get(opts, :delegate_ids, []),
              nonce,
              state_hash
            ),
@@ -577,6 +578,7 @@ defmodule Core.Channel do
          lock_period,
          ttl,
          fee,
+         delegate_ids,
          nonce,
          state_hash
        ) do
@@ -592,6 +594,7 @@ defmodule Core.Channel do
        ttl: ttl,
        fee: fee,
        nonce: nonce,
+       delegate_ids: delegate_ids,
        state_hash: state_hash
      }}
   end
