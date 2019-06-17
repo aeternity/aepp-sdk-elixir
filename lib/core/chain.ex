@@ -1,9 +1,9 @@
 defmodule Core.Chain do
   @moduledoc """
-  Contains all chain-related functionality
+  Contains all chain-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Debug, as: DebugApi
@@ -37,6 +37,7 @@ defmodule Core.Chain do
   alias Core.Client
   alias Tesla.Env
 
+  @type await_options :: [attempts: non_neg_integer(), interval: non_neg_integer()]
   @type generic_transaction :: %{version: non_neg_integer(), type: String.t()}
   @type generic_signed_transaction :: %{
           tx: generic_transaction(),
@@ -128,7 +129,7 @@ defmodule Core.Chain do
   @doc """
   Get the height of the current key block
 
-  ## Examples
+  ## Example
       iex> Core.Chain.height(client)
       {:ok, 84535}
   """
@@ -142,11 +143,11 @@ defmodule Core.Chain do
   @doc """
   Wait for the chain to reach specific height
 
-  ## Examples
+  ## Example
       iex> Core.Chain.await_height(client, 84590)
       :ok
   """
-  @spec await_height(Client.t(), non_neg_integer(), list()) ::
+  @spec await_height(Client.t(), non_neg_integer(), await_options()) ::
           :ok | {:error, String.t()} | {:error, Env.t()}
   def await_height(%Client{} = client, height, opts \\ [])
       when is_integer(height) and height > 0 do
@@ -161,12 +162,12 @@ defmodule Core.Chain do
   @doc """
   Wait for a transaction to be mined
 
-  ## Examples
+  ## Example
       iex> transaction_hash = "th_232gp9o5Lm1XZ8SMaDCAnLcvyj2CkDkf5tssfD5yVAoFAnPBm7"
       iex> Core.Chain.await_transaction(client, transaction_hash)
       :ok
   """
-  @spec await_transaction(Client.t(), String.t(), list()) ::
+  @spec await_transaction(Client.t(), String.t(), await_options()) ::
           :ok | {:error, String.t()} | {:error, Env.t()}
   def await_transaction(%Client{connection: connection}, tx_hash, opts \\ [])
       when is_binary(tx_hash) do
@@ -181,7 +182,7 @@ defmodule Core.Chain do
   @doc """
   Get a transaction by hash
 
-  ## Examples
+  ## Example
       iex> tx_hash = "th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz"
       iex> Core.Chain.get_transaction(client, tx_hash)
       {:ok,
@@ -204,7 +205,7 @@ defmodule Core.Chain do
   @doc """
   Get a transaction info by hash
 
-  ## Examples
+  ## Example
       iex> tx_hash = "th_2jg2P41iGUgNif3Nu1vZ34P1aeSeZq4CWtKhEpr6jeLDoTL4mH"
       iex> Core.Chain.get_transaction_info(client, tx_hash)
       {:ok,
@@ -235,7 +236,7 @@ defmodule Core.Chain do
   @doc """
   Get all pending transactions
 
-  ## Examples
+  ## Example
       iex> Core.Chain.get_pending_transactions(client)
       {:ok, []}
   """
@@ -250,7 +251,7 @@ defmodule Core.Chain do
   @doc """
   Get current generation
 
-  ## Examples
+  ## Example
       iex> Core.Chain.get_current_generation(client)
       {:ok,
        %{
@@ -289,7 +290,7 @@ defmodule Core.Chain do
   @doc """
   Get a generation by hash
 
-  ## Examples
+  ## Example
       iex> hash = "kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP"
       iex> Core.Chain.get_generation(client, hash)
       {:ok,
@@ -334,7 +335,7 @@ defmodule Core.Chain do
   @doc """
   Get a generation by height
 
-  ## Examples
+  ## Example
       iex> height = 84551
       iex> Core.Chain.get_generation(client, height)
       {:ok,
@@ -379,7 +380,7 @@ defmodule Core.Chain do
   @doc """
   Get a micro block's transactions
 
-  ## Examples
+  ## Example
       iex> micro_block_hash = "mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw"
       iex> Core.Chain.get_micro_block_transactions(client, micro_block_hash)
       {:ok,
@@ -405,7 +406,7 @@ defmodule Core.Chain do
   @doc """
   Get a key block by hash
 
-  ## Examples
+  ## Example
       iex> key_block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
       iex> Core.Chain.get_key_block(client, key_block_hash)
       {:ok,
@@ -442,7 +443,7 @@ defmodule Core.Chain do
   @doc """
   Get a key block by height
 
-  ## Examples
+  ## Example
       iex> key_block_height = 84547
       iex> Core.Chain.get_key_block(client, key_block_height)
       {:ok,
@@ -479,7 +480,7 @@ defmodule Core.Chain do
   @doc """
   Get a micro block's header
 
-  ## Examples
+  ## Example
       iex> micro_block_hash = "mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw"
       iex> Core.Chain.get_micro_block_header(client, micro_block_hash)
       {:ok,
@@ -508,34 +509,34 @@ defmodule Core.Chain do
   @doc """
   Dry-run transactions on top of a given block
 
-  ## Examples
-        iex> transactions = ["tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw=="]
-        iex> accounts = [
-          %{
-            pubkey: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-            amount: 1651002120672731042209
-          }
-        ]
-        iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-        {:ok,
-         [
-           %{
-             call_obj: %{
-               caller_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-               caller_nonce: 8327,
-               contract_id: "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR",
-               gas_price: 1000000000,
-               gas_used: 252,
-               height: 61481,
-               log: [],
-               return_type: "ok",
-               return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
-             },
-             reason: nil,
-             result: "ok",
-             type: "contract_call"
-           }
-         ]}
+  ## Example
+      iex> transactions = ["tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw=="]
+      iex> accounts = [
+        %{
+          pubkey: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+          amount: 1651002120672731042209
+        }
+      ]
+      iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
+      {:ok,
+       [
+         %{
+           call_obj: %{
+             caller_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+             caller_nonce: 8327,
+             contract_id: "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR",
+             gas_price: 1000000000,
+             gas_used: 252,
+             height: 61481,
+             log: [],
+             return_type: "ok",
+             return_value: "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
+           },
+           reason: nil,
+           result: "ok",
+           type: "contract_call"
+         }
+       ]}
   """
   @spec dry_run(Client.t(), list(String.t()), list(dry_run_account()), String.t()) ::
           {:ok, list(dry_run_result())} | {:error, String.t()} | {:error, Env.t()}
@@ -565,7 +566,7 @@ defmodule Core.Chain do
   @doc """
   Get node's info
 
-  ## Examples
+  ## Example
       iex> Core.Chain.get_node_info(client)
       {:ok,
        %{

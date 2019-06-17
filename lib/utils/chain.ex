@@ -1,6 +1,6 @@
 defmodule Utils.Chain do
   @moduledoc """
-  Chain utils
+  Chain utils.
   """
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.{KeyBlockOrMicroBlockHeader, KeyBlock, MicroBlockHeader, Error}
@@ -9,7 +9,7 @@ defmodule Utils.Chain do
   @doc """
   Get the hash of the current top block
 
-  ## Examples
+  ## Example
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> Utils.Chain.get_top_block_hash(connection)
       {:ok, "kh_7e74Hs2ThcNdjFD1i5XngUbzTHgmXn9jTaXSej1XKio7rkpgM"}

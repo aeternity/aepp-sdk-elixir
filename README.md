@@ -9,11 +9,11 @@ Ensure that you have [Elixir](https://elixir-lang.org/install.html) and [wget](h
 
 ```
 git clone https://github.com/aeternity/aepp-sdk-elixir
-mix build_api v1.0.0-elixir v2.2.0
+mix build_api v1.1.0-elixir v3.0.0
 ```
 Where:
- - `v1.0.0-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.
- - `v2.2.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v2.2.0/config/swagger.yaml).
+ - `v1.1.0-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.
+ - `v3.0.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v3.0.0/config/swagger.yaml).
 
 ## Example usage
 Functions that make requests to a node require a client as their first parameter. A client is defined like so:
