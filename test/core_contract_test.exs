@@ -144,8 +144,7 @@ defmodule CoreContractTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"],
-        fee: 10_000_000_000_000_000
+        ["42"]
       )
 
     assert match?({:ok, _}, deploy_result)

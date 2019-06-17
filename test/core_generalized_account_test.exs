@@ -38,7 +38,7 @@ defmodule CoreGeneralizedAccountTest do
       Account.spend(
         setup_data.spend_client,
         setup_data.auth_client.keypair.public,
-        1_000_000_000_000_000_00
+        100_000_000_000_000_000
       )
 
     assert match?(
@@ -47,7 +47,7 @@ defmodule CoreGeneralizedAccountTest do
                auth: [
                  auth_contract_source: setup_data.source_code,
                  auth_args: ["true"],
-                 fee: 1_000_000_000_000_00
+                 fee: 100_000_000_000_000
                ]
              )
            )
@@ -68,7 +68,7 @@ defmodule CoreGeneralizedAccountTest do
                auth: [
                  auth_contract_source: setup_data.source_code,
                  auth_args: ["true"],
-                 fee: 1_000_000_000_000_00
+                 fee: 100_000_000_000_000
                ]
              )
            )
@@ -79,7 +79,7 @@ defmodule CoreGeneralizedAccountTest do
                auth: [
                  auth_contract_source: setup_data.source_code,
                  auth_args: ["false"],
-                 fee: 1_000_000_000_000_00
+                 fee: 100_000_000_000_000
                ]
              )
            )

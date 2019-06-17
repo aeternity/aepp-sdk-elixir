@@ -5,7 +5,7 @@ defmodule Core.GeneralizedAccount do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `Core.Client.new/4`.
 
-  For more information: https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md
+  For more information: [https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md](https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md)
   """
 
   alias Utils.{Hash, Serialization, Transaction, Encoding}
