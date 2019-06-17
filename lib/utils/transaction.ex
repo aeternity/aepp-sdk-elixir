@@ -3,8 +3,11 @@ defmodule Utils.Transaction do
   Transaction utils.
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias AeternityNode.Api.Account, as: AccountApi
+  alias Core.{Contract, Client, GeneralizedAccount}
 
   alias AeternityNode.Model.{
+    Account,
     PostTxResponse,
     Tx,
     Error,
@@ -51,6 +54,7 @@ defmodule Utils.Transaction do
   @dummy_fee 0
   @tx_posting_attempts 5
   @default_payload ""
+  @fortuna_height 90800
 
   @type tx_types ::
           SpendTx.t()
@@ -129,22 +133,24 @@ defmodule Utils.Transaction do
        }}
   """
   @spec try_post(
-          struct(),
-          String.t(),
-          String.t(),
+          Client.t(),
           non_neg_integer(),
           tx_types(),
           non_neg_integer()
         ) :: {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def try_post(
-        connection,
-        secret_key,
-        network_id,
-        gas_price,
+        %Client{} = client,
         tx,
+        auth_options,
         height
       ) do
-    try_post(connection, secret_key, network_id, gas_price, tx, height, @tx_posting_attempts)
+    try_post(
+      client,
+      tx,
+      auth_options,
+      height,
+      @tx_posting_attempts
+    )
   end
 
   @doc """
@@ -326,8 +332,9 @@ defmodule Utils.Transaction do
       Governance.gas(tx)
   end
 
-  def gas_limit(tx, height) do
-    {:error, "#{__MODULE__} Invalid #{inspect(tx)} and/or height #{inspect(height)}"}
+  def gas_limit(tx, _height) do
+    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas() +
+      Governance.gas(tx)
   end
 
   @spec default_await_attempts() :: non_neg_integer()
@@ -365,44 +372,50 @@ defmodule Utils.Transaction do
   end
 
   defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         _gas_price,
+         %Client{} = client,
          tx,
+         auth_options,
          _height,
          0
        ) do
-    post(connection, secret_key, network_id, tx)
+    post(client, tx, auth_options)
   end
 
   defp try_post(
-         connection,
-         secret_key,
-         network_id,
-         gas_price,
+         %Client{network_id: network_id, gas_price: gas_price} = client,
          tx,
+         auth_options,
          height,
          attempts
        ) do
-    case post(connection, secret_key, network_id, tx) do
+    case post(client, tx, auth_options) do
       {:ok, _} = response ->
         response
 
-      {:error, _} ->
+      {:error, "Invalid tx"} ->
         try_post(
-          connection,
-          secret_key,
-          network_id,
-          gas_price,
+          client,
           %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
+          auth_options,
           height,
           attempts - 1
         )
+
+      {:error, _} = err ->
+        err
     end
   end
 
-  defp post(connection, secret_key, network_id, %type{} = tx) do
+  defp post(
+         %Client{
+           connection: connection,
+           keypair: %{secret: secret_key},
+           network_id: network_id
+         },
+         tx,
+         nil
+       ) do
+    type = Map.get(tx, :__struct__, :no_type)
     serialized_tx = Serialization.serialize(tx)
 
     signature =
@@ -414,6 +427,7 @@ defmodule Utils.Transaction do
 
     signed_tx_fields = [[signature], serialized_tx]
     serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+
     encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)
 
     with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
@@ -426,11 +440,91 @@ defmodule Utils.Transaction do
       {:ok, %Error{reason: message}} ->
         {:error, message}
 
-      {:error, %Env{} = env} ->
-        {:error, env}
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp post(
+         %Client{
+           connection: connection,
+           keypair: %{public: public_key},
+           gas_price: gas_price,
+           network_id: network_id
+         },
+         tx,
+         auth_opts
+       ) do
+    tx = %{tx | nonce: 0}
+    type = Map.get(tx, :__struct__, :no_type)
+
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+           AccountApi.get_account_by_pubkey(connection, public_key),
+         :ok <- ensure_auth_opts(auth_opts),
+         {:ok, calldata} =
+           Contract.create_calldata(
+             Keyword.get(auth_opts, :auth_contract_source),
+             auth_fun,
+             Keyword.get(auth_opts, :auth_args)
+           ),
+         serialized_tx = wrap_in_empty_signed_tx(tx),
+         meta_tx_dummy_fee = %{
+           ga_id: public_key,
+           auth_data: calldata,
+           abi_version: Contract.abi_version(),
+           fee: @dummy_fee,
+           gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
+           gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
+           ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
+           tx: serialized_tx
+         },
+         meta_tx = %{
+           meta_tx_dummy_fee
+           | fee:
+               Keyword.get(
+                 auth_opts,
+                 :fee,
+                 calculate_fee(
+                   tx,
+                   @fortuna_height,
+                   network_id,
+                   @dummy_fee,
+                   meta_tx_dummy_fee.gas_price
+                 )
+               )
+         },
+         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
+         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx),
+         {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+           TransactionApi.post_transaction(connection, %Tx{
+             tx: encoded_signed_tx
+           }),
+         {:ok, _} = response <- await_mining(connection, tx_hash, type) do
+      response
+    else
+      {:ok, %Account{kind: "basic"}} ->
+        {:error, "Account isn't generalized"}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
 
       {:error, _} = error ->
         error
+    end
+  end
+
+  defp wrap_in_empty_signed_tx(tx) do
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [[], serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
+  end
+
+  defp ensure_auth_opts(auth_opts) do
+    if Keyword.has_key?(auth_opts, :auth_contract_source) &&
+         Keyword.has_key?(auth_opts, :auth_args) do
+      :ok
+    else
+      {:error, "Authorization source and function arguments are required"}
     end
   end
 
