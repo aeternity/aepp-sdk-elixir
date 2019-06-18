@@ -1,6 +1,6 @@
 defmodule Core.Channel do
   @moduledoc """
-  Aeternity Channel System: https://github.com/aeternity/protocol/blob/master/channels/README.md
+  Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
   Contains all channel-related functionality
 
   In order for its functions to be used, a client must be defined first.
@@ -38,8 +38,8 @@ defmodule Core.Channel do
   end
 
   @doc """
-  Create a channel.
-  More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create
+  Creates a channel.
+  More information at [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create)
 
   ## Examples
       iex>
@@ -58,13 +58,10 @@ defmodule Core.Channel do
   def create(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         initiator_amount,
         <<responder_prefix::binary-size(@prefix_byte_size), _::binary>> = responder_id,
         responder_amount,
@@ -95,11 +92,9 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              create_channel_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response
@@ -120,13 +115,10 @@ defmodule Core.Channel do
   def close_mutual(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         <<from_prefix::binary-size(@prefix_byte_size), _::binary>> = from_id,
         initiator_amount_final,
@@ -149,12 +141,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             close_mutual_tx,
-             height
+            client,
+            close_mutual_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -175,13 +165,10 @@ defmodule Core.Channel do
   def close_solo(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         poi,
@@ -202,12 +189,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             close_solo_tx,
-             height
+            client,
+            close_solo_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -228,13 +213,10 @@ defmodule Core.Channel do
   def deposit(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         amount,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         round,
@@ -258,12 +240,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             deposit_tx,
-             height
+            client,
+            deposit_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -294,13 +274,10 @@ defmodule Core.Channel do
   def force_progress(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         offchain_trees,
         payload,
@@ -327,12 +304,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             force_progress_tx,
-             height
+            client,
+            force_progress_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -355,13 +330,10 @@ defmodule Core.Channel do
   def settle(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         initiator_amount_final,
         responder_amount_final,
@@ -382,12 +354,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             settle_tx,
-             height
+            client,
+            settle_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -409,13 +379,10 @@ defmodule Core.Channel do
   def slash(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         poi,
@@ -436,12 +403,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             slash_tx,
-             height
+            client,
+            slash_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -464,13 +429,10 @@ defmodule Core.Channel do
   def snapshot_solo(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         opts \\ []
@@ -489,12 +451,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             snapshot_solo_tx,
-             height
+            client,
+            snapshot_solo_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
@@ -523,13 +483,10 @@ defmodule Core.Channel do
   def withdraw(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         to_id,
         amount,
@@ -554,12 +511,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
-             withdraw_tx,
-             height
+            client,
+            withdraw_tx,
+            Keyword.get(opts, :auth, nil),
+            height
            ) do
       response
     else
