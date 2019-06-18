@@ -2,9 +2,12 @@
 peers:
     - "aenode://pp_2i8N6XsjCGe1wkdMhDRs7t7xzijrjJDN4xA22RoNGCgt6ay9QB@31.13.249.70:3011" # wrong port
 fork_management:
-    network_id: "my_test" 
+    network_id: "my_test"
 chain:
     persist: false
+    hard_forks:
+      "1": 0
+      "3": 1
 http:
     external:
       port: 3013
@@ -27,4 +30,3 @@ mining:
             extra_args: "-t 1"
             # Use the smaller graph for faster mining
             edge_bits: 15
-            
