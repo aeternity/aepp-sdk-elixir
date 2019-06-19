@@ -1,7 +1,7 @@
 # Aepp SDK Elixir example usage
 
-## Add Aepp SDK Elixir to your project
-To add **Aepp SDK Elixir** to your project simply add the following line in your `mix.exs` file:
+## Installation
+First, add **Aepp SDK Elixir** to your `mix.exs` dependencies:
 ``` elixir
 defp deps do
   [
@@ -9,17 +9,19 @@ defp deps do
   ]
 end
 ```
-## Get the dependencies
+
+Then, update your dependencies:
 ``` elixir
 mix deps.get
 ```
 
-## Run your project
+Run your project:
 ``` elixir
 iex -S mix
 ```
 
-## Define a client
+## Usage
+#### Define a client:
 In order to use our SDK you should define your own client.
 The example client:
 ``` elixir
@@ -38,9 +40,9 @@ Every module and function is documented and you can get the documentation by usi
 h Core.Client
 ```
 
-## Example command
+## Examples
 
-#### To get current generation
+#### To get current generation:
 ``` elixir
 iex> Core.Chain.get_current_generation(client)                                                          
 {:ok,
@@ -70,7 +72,7 @@ iex> Core.Chain.get_current_generation(client)
  }}
 ```
 
-#### To get `client` balance
+#### To get `client` balance:
 ``` elixir
 iex> Core.Account.balance(client, client.keypair.public) 
 {:ok, 811193097223266796526}
