@@ -34,10 +34,16 @@ defmodule AeppSdkElixir.MixProject do
        git: "https://github.com/aeternity/aesophia.git",
        manager: :rebar,
        ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"},
+      {:enoise,
+       git: "https://github.com/aeternity/enoise.git",
+       manager: :rebar,
+       ref: "c06bbae07d5a6711e60254e45e57e37e270b961d"},
       {:distillery, "~> 2.0"},
-      {:enacl, github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75"},
+      {:enacl,
+       github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75", override: true},
       {:tesla, "~> 1.2.1"},
-      {:poison, "~> 3.0.0"}
+      {:poison, "~> 3.0.0"},
+      {:ranch, github: "ninenines/ranch", tag: "1.4.0"}
     ]
   end
 

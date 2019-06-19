@@ -51,6 +51,16 @@ defmodule Utils.Keys do
   end
 
   @doc """
+  false
+  """
+  def generate_peer_keypair do
+    %{public: peer_public_key, secret: peer_secret_key} = :enacl.sign_keypair()
+    public = :enacl.crypto_sign_ed25519_public_to_curve25519(peer_public_key)
+    secret = :enacl.crypto_sign_ed25519_secret_to_curve25519(peer_secret_key)
+    %{public: public, secret: secret}
+  end
+
+  @doc """
   Sign a binary message with the given private key
 
   ## Example

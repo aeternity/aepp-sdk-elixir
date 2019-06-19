@@ -199,7 +199,6 @@ defmodule Utils.Serialization do
     fields_with_keys = set_keys(fields, template, [])
     tag = type_to_tag(type)
     version = version(type)
-
     :aeserialization.serialize(tag, version, template, fields_with_keys)
   end
 
@@ -347,6 +346,18 @@ defmodule Utils.Serialization do
       source_code_hash: :binary,
       type_info: [{:binary, :binary, :binary, :binary}],
       byte_code: :binary
+    ]
+  end
+
+  defp serialization_template(:ping) do
+    [
+      port: :int,
+      share: :int,
+      genesis_hash: :binary,
+      difficulty: :int,
+      best_hash: :binary,
+      sync_allowed: :bool,
+      peers: [:binary]
     ]
   end
 
