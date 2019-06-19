@@ -22,8 +22,7 @@ iex -S mix
 
 ## Usage
 #### Define a client:
-In order to use our SDK you should define your own client.
-The example client:
+In order to use functions that require retrieving/sending data to a node, a client structure is needed, for example:
 ``` elixir
 public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
 secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
@@ -33,9 +32,9 @@ internal_url = "https://sdk-testnet.aepps.com/v2"
 client = Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
 ```
 
-And now you are ready to use **Aepp SDK Elixir**.
+And now, you are ready to use **Aepp SDK Elixir**.
 
-Every module and function is documented and you can get the documentation by using for example:
+Every module and function is documented and you can get the documentation by using, for example:
 ``` elixir
 h Core.Client
 ```
@@ -72,7 +71,7 @@ iex> Core.Chain.get_current_generation(client)
  }}
 ```
 
-#### To get `client` balance:
+#### To get an account's balance:
 ``` elixir
 iex> Core.Account.balance(client, client.keypair.public) 
 {:ok, 811193097223266796526}
