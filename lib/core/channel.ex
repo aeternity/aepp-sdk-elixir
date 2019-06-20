@@ -54,7 +54,7 @@ defmodule Core.Channel do
           non_neg_integer(),
           binary(),
           list()
-        ) :: {:ok, map()} | {:error, String.t()}
+        ) :: {:ok, keyword()} | {:error, String.t()}
   def create(
         %Client{
           keypair: %{
@@ -74,7 +74,6 @@ defmodule Core.Channel do
       when sender_prefix == "ak" and responder_prefix == "ak" and
              byte_size(state_hash) == @state_hash_byte_size do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
-         {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, create_channel_tx} <-
            build_create_channel_tx(
              sender_pubkey,
@@ -90,14 +89,9 @@ defmodule Core.Channel do
              nonce,
              state_hash
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
-             create_channel_tx,
-             Keyword.get(opts, :auth, nil),
-             height
-           ) do
-      response
+         {:ok, tx, encoded_signed_tx, signature} <-
+           Transaction.sign_tx(create_channel_tx, client, Keyword.get(opts, :auth, :no_opts)) do
+      {:ok, [tx: tx, encoded_signed_tx: encoded_signed_tx, signature: signature]}
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of ChannelCreateTx : #{inspect(error)}"}
     end
@@ -141,10 +135,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            close_mutual_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             close_mutual_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -189,10 +183,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            close_solo_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             close_solo_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -240,10 +234,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            deposit_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             deposit_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -304,10 +298,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            force_progress_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             force_progress_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -354,10 +348,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            settle_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             settle_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -403,10 +397,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            slash_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             slash_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -451,10 +445,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            snapshot_solo_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             snapshot_solo_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else
@@ -511,10 +505,10 @@ defmodule Core.Channel do
            ),
          {:ok, _} = response <-
            Transaction.try_post(
-            client,
-            withdraw_tx,
-            Keyword.get(opts, :auth, nil),
-            height
+             client,
+             withdraw_tx,
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
       response
     else

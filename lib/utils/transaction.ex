@@ -375,6 +375,91 @@ defmodule Utils.Transaction do
     end
   end
 
+  def sign_tx(tx, client, auth_opts \\ :no_opts) do
+    sign_tx_(tx, client, auth_opts)
+  end
+
+  defp sign_tx_(tx, %Client{keypair: %{secret: secret_key}, network_id: network_id}, :no_opts)
+       when is_map(tx) do
+    serialized_tx = Serialization.serialize(tx)
+
+    signature =
+      Keys.sign(
+        serialized_tx,
+        Keys.secret_key_to_binary(secret_key),
+        network_id
+      )
+
+    # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
+    signed_tx_fields = [[signature], serialized_tx]
+    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+
+    {:ok, tx, Encoding.prefix_encode_base64("tx", serialized_signed_tx),
+     Encoding.prefix_encode_base58c("sg", signature)}
+  end
+
+  defp sign_tx_(
+         tx,
+         %Client{
+           keypair: %{public: public_key},
+           connection: connection,
+           gas_price: gas_price,
+           network_id: network_id
+         },
+         auth_opts
+       ) do
+    tx = %{tx | nonce: 0}
+
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+           AccountApi.get_account_by_pubkey(connection, public_key),
+         :ok <- ensure_auth_opts(auth_opts),
+         {:ok, calldata} =
+           Contract.create_calldata(
+             Keyword.get(auth_opts, :auth_contract_source),
+             auth_fun,
+             Keyword.get(auth_opts, :auth_args)
+           ),
+         serialized_tx = wrap_in_empty_signed_tx(tx),
+         meta_tx_dummy_fee = %{
+           ga_id: public_key,
+           auth_data: calldata,
+           abi_version: Contract.abi_version(),
+           fee: @dummy_fee,
+           gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
+           gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
+           ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
+           tx: serialized_tx
+         },
+         meta_tx = %{
+           meta_tx_dummy_fee
+           | fee:
+               Keyword.get(
+                 auth_opts,
+                 :fee,
+                 calculate_fee(
+                   tx,
+                   @fortuna_height,
+                   network_id,
+                   @dummy_fee,
+                   meta_tx_dummy_fee.gas_price
+                 )
+               )
+         },
+         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
+         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx) do
+      {:ok, tx, encoded_signed_tx, []}
+    else
+      {:ok, %Account{kind: "basic"}} ->
+        {:error, "Account isn't generalized"}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
   defp oracle_ttl_delta(_current_height, {:relative, d}), do: d
 
   defp oracle_ttl_delta(current_height, {:absolute, h}) when h > current_height,
