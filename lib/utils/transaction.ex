@@ -396,7 +396,7 @@ defmodule Utils.Transaction do
     # signed_tx_fields = [[signature], serialized_tx]
     # serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
     # TODO adjust
-    {:ok, [tx, [signature]], serialized_tx}
+    {:ok, [tx, signature], serialized_tx}
   end
 
   defp sign_tx_(
@@ -525,7 +525,6 @@ defmodule Utils.Transaction do
        ) do
     type = Map.get(tx, :__struct__, :no_type)
     serialized_tx = Serialization.serialize(tx)
-    IO.inspect(serialized_tx, limit: :infinity)
 
     signature =
       Keys.sign(
@@ -533,8 +532,6 @@ defmodule Utils.Transaction do
         Keys.secret_key_to_binary(secret_key),
         network_id
       )
-
-    IO.inspect(signatures_list, label: "signatur list:")
 
     signed_tx_fields =
       case signatures_list do
@@ -571,7 +568,8 @@ defmodule Utils.Transaction do
            network_id: network_id
          },
          tx,
-         auth_opts
+         auth_opts,
+         _signatures_list
        ) do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)

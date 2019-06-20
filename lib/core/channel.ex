@@ -89,8 +89,23 @@ defmodule Core.Channel do
              nonce,
              state_hash
            ),
+         {:ok, %{height: height}} <-
+           AeternityNode.Api.Chain.get_current_key_block_height(client.connection),
+         fee <-
+           calculate_n_times_fee(
+             create_channel_tx,
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
          {:ok, _, _} = res <-
-           Transaction.sign_tx(create_channel_tx, client, Keyword.get(opts, :auth, :no_opts)) do
+           Transaction.sign_tx(
+             %{create_channel_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
+           ) do
       res
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of ChannelCreateTx : #{inspect(error)}"}
@@ -553,6 +568,19 @@ defmodule Core.Channel do
        delegate_ids: delegate_ids,
        state_hash: state_hash
      }}
+  end
+
+  defp calculate_n_times_fee(tx, height, network_id, fee, gas_price, times) do
+    calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, 0)
+  end
+
+  defp calculate_fee_n_times(_tx, _height, _network_id, _fee, _gas_price, 0, acc) do
+    acc
+  end
+
+  defp calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, _acc) do
+    acc = Transaction.calculate_fee(tx, height, network_id, 0, gas_price)
+    calculate_fee_n_times(%{tx | fee: acc}, height, network_id, fee, gas_price, times - 1, acc)
   end
 
   defp build_close_mutual_tx(
