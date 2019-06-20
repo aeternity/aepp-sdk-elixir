@@ -42,5 +42,5 @@ iex> init_args = ["42"]
 iex> Core.Contract.deploy(client, source_code, init_args)
 {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
 ```
-## How to use it
+## Usage
 If you are wondering how you can use in your elixir project, check [here](https://github.com/aeternity/aepp-sdk-elixir/tree/master/examples/usage.md).
