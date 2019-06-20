@@ -43,4 +43,4 @@ iex> Core.Contract.deploy(client, source_code, init_args)
 {:ok, "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"}
 ```
 ## Usage
-If you are wondering how you can use in your elixir project, check [here](https://github.com/aeternity/aepp-sdk-elixir/tree/master/examples/usage.md).
+An installation and usage guide can be found [here](https://github.com/aeternity/aepp-sdk-elixir/tree/master/examples/usage.md).

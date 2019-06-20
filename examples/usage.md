@@ -32,8 +32,6 @@ internal_url = "https://sdk-testnet.aepps.com/v2"
 client = Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
 ```
 
-And now, you are ready to use **Aepp SDK Elixir**.
-
 Every module and function is documented and you can get the documentation by using, for example:
 ``` elixir
 h Core.Client
