@@ -150,23 +150,25 @@ defmodule Utils.Transaction do
          hash: "th_gfVPUw5zerDAkokfanFrhoQk9WDJaCdbwS6dGxVQWZce7tU3j"
        }}
   """
-  @spec try_post(
-          Client.t(),
-          non_neg_integer(),
-          tx_types(),
-          non_neg_integer()
-        ) :: {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
+  # @spec try_post(
+  #         Client.t(),
+  #         non_neg_integer(),
+  #         tx_types(),
+  #         non_neg_integer()
+  #       ) :: {:ok, map()} | {:error, String.t()} | {:error, Env.t()}
   def try_post(
         %Client{} = client,
         tx,
         auth_options,
-        height
+        height,
+        signatures_list \\ :no_channels
       ) do
     try_post(
       client,
       tx,
       auth_options,
       height,
+      signatures_list,
       @tx_posting_attempts
     )
   end
@@ -391,11 +393,10 @@ defmodule Utils.Transaction do
       )
 
     # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
-    signed_tx_fields = [[signature], serialized_tx]
-    serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
-
-    {:ok, tx, Encoding.prefix_encode_base64("tx", serialized_signed_tx),
-     Encoding.prefix_encode_base58c("sg", signature)}
+    # signed_tx_fields = [[signature], serialized_tx]
+    # serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+    # TODO adjust
+    {:ok, [tx, [signature]], serialized_tx}
   end
 
   defp sign_tx_(
@@ -445,9 +446,9 @@ defmodule Utils.Transaction do
                  )
                )
          },
-         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
-         encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx) do
-      {:ok, tx, encoded_signed_tx, []}
+         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx) do
+      # encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx) do
+      {:ok, [meta_tx, []], serialized_meta_tx}
     else
       {:ok, %Account{kind: "basic"}} ->
         {:error, "Account isn't generalized"}
@@ -479,9 +480,10 @@ defmodule Utils.Transaction do
          tx,
          auth_options,
          _height,
+         signatures_list,
          0
        ) do
-    post(client, tx, auth_options)
+    post(client, tx, auth_options, signatures_list)
   end
 
   defp try_post(
@@ -489,9 +491,10 @@ defmodule Utils.Transaction do
          tx,
          auth_options,
          height,
+         signatures_list,
          attempts
        ) do
-    case post(client, tx, auth_options) do
+    case post(client, tx, auth_options, signatures_list) do
       {:ok, _} = response ->
         response
 
@@ -501,6 +504,7 @@ defmodule Utils.Transaction do
           %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
           auth_options,
           height,
+          signatures_list,
           attempts - 1
         )
 
@@ -516,10 +520,12 @@ defmodule Utils.Transaction do
            network_id: network_id
          },
          tx,
-         nil
+         nil,
+         signatures_list
        ) do
     type = Map.get(tx, :__struct__, :no_type)
     serialized_tx = Serialization.serialize(tx)
+    IO.inspect(serialized_tx, limit: :infinity)
 
     signature =
       Keys.sign(
@@ -528,8 +534,16 @@ defmodule Utils.Transaction do
         network_id
       )
 
+    IO.inspect(signatures_list, label: "signatur list:")
+
+    signed_tx_fields =
+      case signatures_list do
+        :no_channels -> [[signature], serialized_tx]
+        _ -> [signatures_list, serialized_tx]
+      end
+
     # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
-    signed_tx_fields = [[signature], serialized_tx]
+    # signed_tx_fields = [[signature], serialized_tx]
     serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
 
     encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_signed_tx)

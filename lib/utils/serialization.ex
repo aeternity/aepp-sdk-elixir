@@ -237,10 +237,15 @@ defmodule Utils.Serialization do
       do: {:id, type, value}
 
   defp process_serialize(fields, type) do
+    IO.inspect(fields, label: "FIELDS: ")
+    IO.inspect(type, label: "Type: ")
     template = serialization_template(type)
     fields_with_keys = set_keys(fields, template, [])
+    IO.inspect(fields_with_keys, label: "fields_with_keys:::::")
     tag = type_to_tag(type)
+    IO.inspect(tag, label: "tag******")
     version = version(type)
+    IO.inspect(version, label: "version*****")
 
     :aeserialization.serialize(tag, version, template, fields_with_keys)
   end

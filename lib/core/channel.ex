@@ -89,9 +89,9 @@ defmodule Core.Channel do
              nonce,
              state_hash
            ),
-         {:ok, tx, encoded_signed_tx, signature} <-
+         {:ok, _, _} = res <-
            Transaction.sign_tx(create_channel_tx, client, Keyword.get(opts, :auth, :no_opts)) do
-      {:ok, [tx: tx, encoded_signed_tx: encoded_signed_tx, signature: signature]}
+      res
     else
       error -> {:error, "#{__MODULE__}: Unsuccessful post of ChannelCreateTx : #{inspect(error)}"}
     end
@@ -515,6 +515,13 @@ defmodule Core.Channel do
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelWithdrawTx : #{inspect(error)}"}
     end
+  end
+
+  def post(client, signatures_list, tx) do
+    {:ok, %{height: height}} =
+      AeternityNode.Api.Chain.get_current_key_block_height(client.connection)
+
+    Transaction.try_post(client, tx, nil, height, signatures_list)
   end
 
   defp build_create_channel_tx(
