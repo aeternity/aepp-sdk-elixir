@@ -17,7 +17,19 @@ defmodule Core.Listener.Peers do
   end
 
   def init(state) do
-    {:ok, state, 0}
+    {:ok, state}
+  end
+
+  def rlp_decode_peers(encoded_peers) do
+    Enum.map(encoded_peers, fn encoded_peer ->
+      [host, port_bin, pubkey] = :aeser_rlp.decode(encoded_peer)
+
+      %{
+        host: to_charlist(host),
+        port: :binary.decode_unsigned(port_bin),
+        pubkey: pubkey
+      }
+    end)
   end
 
   def remove_peer(pubkey) do
@@ -34,17 +46,13 @@ defmodule Core.Listener.Peers do
     GenServer.call(__MODULE__, :state)
   end
 
-  def handle_info(:timeout, state) do
-    {:noreply, state}
-  end
-
   def add_peer(conn_info) do
     GenServer.call(__MODULE__, {:add_peer, conn_info})
   end
 
   @spec try_connect(map()) :: :ok
   def try_connect(peer_info) do
-    GenServer.cast(__MODULE__, {:try_connect, peer_info})
+    GenServer.cast(__MODULE__, {:try_connect, Map.put(peer_info, :network, :testnet)})
   end
 
   def handle_call({:remove_peer, pubkey}, _from, %{peers: peers} = state) do

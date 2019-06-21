@@ -31,7 +31,8 @@ defmodule Core.Listener.Supervisor do
         PeerConnection,
         %{
           port: @default_port,
-          keypair: keypair
+          keypair: keypair,
+          network: network
         }
       )
     ]
