@@ -18,12 +18,15 @@ defmodule Core.Channel do
     ChannelSettleTx,
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
-    ChannelWithdrawTx
+    ChannelWithdrawTx,
+    PostTxResponse,
+    Tx
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.Transaction
+  alias Utils.{Transaction, Serialization, Encoding}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -532,11 +535,35 @@ defmodule Core.Channel do
     end
   end
 
-  def post(client, signatures_list, tx) do
+  def post(client, tx, signatures_list \\ []) do
     {:ok, %{height: height}} =
       AeternityNode.Api.Chain.get_current_key_block_height(client.connection)
 
     Transaction.try_post(client, tx, nil, height, signatures_list)
+  end
+
+  def post_(client, meta_tx, basic_account_signature) do
+    signed_tx =
+      Encoding.prefix_encode_base64(
+        "tx",
+        wrap_in_empty_signed_tx(meta_tx, basic_account_signature)
+      )
+
+    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+      TransactionApi.post_transaction(client.connection, %Tx{
+        tx: signed_tx
+      })
+
+    {:ok, _} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+    # Transaction.try_post(client, tx, nil, height, signatures_list)
+  end
+
+  defp wrap_in_empty_signed_tx(tx, signature_list) do
+    IO.inspect(tx, label: "******TX*****")
+    IO.inspect(signature_list, label: "******signature_list*****")
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [signature_list, serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
 
   defp build_create_channel_tx(

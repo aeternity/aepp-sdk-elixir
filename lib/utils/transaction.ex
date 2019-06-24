@@ -448,7 +448,7 @@ defmodule Utils.Transaction do
          },
          serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx) do
       # encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx) do
-      {:ok, [meta_tx, []], serialized_meta_tx}
+      {:ok, [tx, meta_tx, []], serialized_meta_tx}
     else
       {:ok, %Account{kind: "basic"}} ->
         {:error, "Account isn't generalized"}
@@ -644,16 +644,16 @@ defmodule Utils.Transaction do
     end
   end
 
-  defp await_mining(connection, tx_hash, type) do
+  def await_mining(connection, tx_hash, type) do
     await_mining(connection, tx_hash, @await_attempts, type)
   end
 
-  defp await_mining(_connection, _tx_hash, 0, _type),
+  def await_mining(_connection, _tx_hash, 0, _type),
     do:
       {:error,
        "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
 
-  defp await_mining(connection, tx_hash, attempts, type) do
+  def await_mining(connection, tx_hash, attempts, type) do
     Process.sleep(@await_attempt_interval)
 
     mining_status =
