@@ -19,16 +19,19 @@ defmodule Core.Channel do
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
-    PostTxResponse,
-    Tx
+    Error,
+    Channel
+    # PostTxResponse,
+    # Tx
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Serialization, Encoding}
-  alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  # alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
+  # TODO adjust handling of state hash, the hash format should be decoded base58 (st_************)
   @state_hash_byte_size 32
 
   defguard valid_prefixes(sender_pubkey_prefix, channel_prefix)
@@ -103,7 +106,7 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         {:ok, _, _} = res <-
+         {:ok, _} = res <-
            Transaction.sign_tx(
              %{create_channel_tx | fee: fee},
              client,
@@ -151,14 +154,22 @@ defmodule Core.Channel do
              responder_amount_final,
              Keyword.get(opts, :ttl, 0)
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              close_mutual_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{close_mutual_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelCloseMutualTx : #{inspect(error)}"}
@@ -199,14 +210,23 @@ defmodule Core.Channel do
              poi,
              Keyword.get(opts, :ttl, 0)
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              close_solo_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         # TODO probably only one sign and post because of SOLO word, if so we can post it directly after signing it
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{close_solo_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelCloseSoloTx : #{inspect(error)}"}
@@ -232,13 +252,14 @@ defmodule Core.Channel do
         amount,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         round,
-        state_hash,
+        <<"st_", state_hash>>,
         opts \\ []
-      )
-      when valid_prefixes(sender_prefix, channel_prefix) and
-             byte_size(state_hash) == @state_hash_byte_size do
+      ) # TODO ADJUST!!
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         # binary_state_hash <-
+         # true <- byte_size(binary_state_hash) == binary_state_hash <-
          {:ok, deposit_tx} <-
            build_deposit_tx(
              amount,
@@ -250,14 +271,22 @@ defmodule Core.Channel do
              state_hash,
              Keyword.get(opts, :ttl, 0)
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              deposit_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{deposit_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelDepositTx : #{inspect(error)}"}
@@ -314,14 +343,23 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0),
              update
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              force_progress_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         # TODO probably should be posted right away without signing from another participant
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{force_progress_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelForceProgressTx : #{inspect(error)}"}
@@ -364,14 +402,23 @@ defmodule Core.Channel do
              responder_amount_final,
              Keyword.get(opts, :ttl, 0)
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              settle_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         # TODO check if 2 signatures is needed, otherwise post it after signing
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{settle_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSettleTx : #{inspect(error)}"}
@@ -413,14 +460,23 @@ defmodule Core.Channel do
              poi,
              Keyword.get(opts, :ttl, 0)
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              slash_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         # TODO probably should be posted right away without signing from another participant
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{slash_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSlashTx : #{inspect(error)}"}
@@ -461,14 +517,23 @@ defmodule Core.Channel do
              Keyword.get(opts, :fee, 0),
              nonce
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              snapshot_solo_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         # TODO probably only one sign and post because of SOLO word, if so we can post it directly after signing it
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{snapshot_solo_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSnapshotSoloTx : #{inspect(error)}"}
@@ -521,42 +586,105 @@ defmodule Core.Channel do
              state_hash,
              round
            ),
-         {:ok, _} = response <-
-           Transaction.try_post(
-             client,
+         fee <-
+           calculate_n_times_fee(
              withdraw_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             client.network_id,
+             0,
+             client.gas_price,
+             5
+           ),
+         {:ok, _} = res <-
+           Transaction.sign_tx(
+             %{withdraw_tx | fee: fee},
+             client,
+             Keyword.get(opts, :auth, :no_opts)
            ) do
-      response
+      res
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelWithdrawTx : #{inspect(error)}"}
     end
   end
 
-  def post(client, tx, signatures_list \\ []) do
-    {:ok, %{height: height}} =
-      AeternityNode.Api.Chain.get_current_key_block_height(client.connection)
-
-    Transaction.try_post(client, tx, nil, height, signatures_list)
+  @spec post(Client.t(), struct(), list() | :no_signatures) :: {:ok, map()} | {:error, String.t()}
+  def post(client, tx, signatures_list \\ :no_signatures) do
+    post_(client, tx, signatures_list)
   end
 
-  def post_(client, meta_tx, basic_account_signature) do
-    signed_tx =
-      Encoding.prefix_encode_base64(
-        "tx",
-        wrap_in_empty_signed_tx(meta_tx, basic_account_signature)
-      )
-
-    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-      TransactionApi.post_transaction(client.connection, %Tx{
-        tx: signed_tx
-      })
-
-    {:ok, _} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-    # Transaction.try_post(client, tx, nil, height, signatures_list)
+  @spec get_current_state_hash(Client.t(), binary()) ::
+          {:ok, binary()} | {:error, String.t() | Error.t()}
+  def get_current_state_hash(
+        %Client{connection: connection},
+        <<"ch_", _bin::binary>> = channel_id
+      ) do
+    case ChannelAPI.get_channel_by_pubkey(connection, channel_id) do
+      {:ok, %Channel{state_hash: state_hash}} -> {:ok, state_hash}
+      {:ok, %Error{} = error} -> {:error, error}
+      error -> error
+    end
   end
+
+  # post_ B+B
+  defp post_(%Client{connection: connection} = client, tx, signatures_list)
+       when is_list(signatures_list) do
+    sig_list = :lists.sort(signatures_list)
+    {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
+    {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
+
+    case tx do
+      %ChannelCreateTx{} ->
+        {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, res}
+    end
+  end
+
+  defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)
+       when is_binary(initiator and is_binary(responder and nonce >= 0)) do
+    decoded_initiator = Encoding.decode_base58c(initiator)
+    decoded_responder = Encoding.decode_base58c(responder)
+    {:ok, hash} = Hash.hash(decoded_initiator <> <<nonce::256>> <> decoded_responder)
+    {:ok, Encoding.prefix_encode_base58c("ch", hash)}
+  end
+
+  defp compute_channel_id(initiator, nonce, responder) do
+    {:error,
+     "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
+       inspect(nonce)
+     } and responder_id: #{responder} "}
+  end
+
+  # post_ G+G
+  defp post_(%Client{connection: _connection} = _client, _tx, :no_signatures) do
+    # TODO to be implemented
+    nil
+  end
+
+  ## post B+G ??AND?? G+B
+  # defp post_() do
+  #   # TODO to be implemented
+  #   nil
+  # end
+
+  # def post_(client, meta_tx, basic_account_signature) do
+  #   signed_tx =
+  #     Encoding.prefix_encode_base64(
+  #       "tx",
+  #       wrap_in_empty_signed_tx(meta_tx, basic_account_signature)
+  #     )
+
+  #   {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+  #     TransactionApi.post_transaction(client.connection, %Tx{
+  #       tx: signed_tx
+  #     })
+
+  #   {:ok, _} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+  #   # Transaction.try_post(client, tx, nil, height, signatures_list)
+  # end
 
   defp wrap_in_empty_signed_tx(tx, signature_list) do
     IO.inspect(tx, label: "******TX*****")

@@ -381,22 +381,40 @@ defmodule Utils.Transaction do
     sign_tx_(tx, client, auth_opts)
   end
 
-  defp sign_tx_(tx, %Client{keypair: %{secret: secret_key}, network_id: network_id}, :no_opts)
+  defp sign_tx_(
+         tx,
+         %Client{
+           keypair: %{public: public_key, secret: secret_key},
+           network_id: network_id,
+           connection: connection
+         },
+         :no_opts
+       )
        when is_map(tx) do
-    serialized_tx = Serialization.serialize(tx)
+    case AccountApi.get_account_by_pubkey(connection, public_key) do
+      {:ok, %Account{kind: "basic"}} ->
+        serialized_tx = Serialization.serialize(tx)
+        IO.inspect(tx.nonce, label: "BASIC ACCOUNT TX NONCE: ")
 
-    signature =
-      Keys.sign(
-        serialized_tx,
-        Keys.secret_key_to_binary(secret_key),
-        network_id
-      )
+        signature =
+          Keys.sign(
+            serialized_tx,
+            Keys.secret_key_to_binary(secret_key),
+            network_id
+          )
 
-    # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
-    # signed_tx_fields = [[signature], serialized_tx]
-    # serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
-    # TODO adjust
-    {:ok, [tx, signature], serialized_tx}
+        # TODO: For channel create tx there should be more than one signature: one from initiator key and one from responder key
+        # signed_tx_fields = [[signature], serialized_tx]
+        # serialized_signed_tx = Serialization.serialize(signed_tx_fields, :signed_tx)
+        # TODO adjust
+        {:ok, [tx, signature]}
+
+      {:ok, %Account{kind: other}} ->
+        {:error, "Account can't be authorized as Basic, as it is #{inspect(other)} type"}
+
+      {:error, err} ->
+        {:error, "Unexpected error: #{inspect(err)} "}
+    end
   end
 
   defp sign_tx_(
@@ -409,7 +427,9 @@ defmodule Utils.Transaction do
          },
          auth_opts
        ) do
+    IO.inspect(tx.nonce, label: "GENERALIZED ACCOUNT TX BEFORE NONCE: ")
     tx = %{tx | nonce: 0}
+    IO.inspect(tx.nonce, label: "GENERALIZED ACCOUNT TX AFTER NONCE: ")
 
     with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
@@ -445,10 +465,11 @@ defmodule Utils.Transaction do
                    meta_tx_dummy_fee.gas_price
                  )
                )
-         },
-         serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx) do
-      # encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx) do
-      {:ok, [tx, meta_tx, []], serialized_meta_tx}
+         } do
+      # serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx) do
+      # encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx)
+
+      {:ok, [tx, meta_tx, []]}
     else
       {:ok, %Account{kind: "basic"}} ->
         {:error, "Account isn't generalized"}
