@@ -31,12 +31,34 @@ defmodule Core.Channel do
   # alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
-  # TODO adjust handling of state hash, the hash format should be decoded base58 (st_************)
   @state_hash_byte_size 32
 
   defguard valid_prefixes(sender_pubkey_prefix, channel_prefix)
            when sender_pubkey_prefix == "ak" and channel_prefix == "ch"
 
+  @doc """
+  Gets channel information by its pubkey.
+
+  ## Example
+      iex> Core.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      {:ok,
+         %AeternityNode.Model.Channel{
+           channel_amount: 16720002000,
+           channel_reserve: 1000,
+           delegate_ids: [],
+           id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+           initiator_amount: 1000,
+           initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+           lock_period: 100,
+           locked_until: 0,
+           responder_amount: 1000,
+           responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+           round: 2,
+           solo_round: 0,
+           state_hash: "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"
+         }}
+
+  """
   @spec get_by_pubkey(Core.Client.t(), binary()) ::
           {:error, Tesla.Env.t()} | {:ok, AeternityNode.Model.Channel.t()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
@@ -47,8 +69,30 @@ defmodule Core.Channel do
   Creates a channel.
   More information at [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create)
 
-  ## Examples
-      iex>
+  ## Example
+      iex> Core.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
+      {:ok,
+        [
+          %AeternityNode.Model.ChannelCreateTx{
+            channel_reserve: 1000,
+            delegate_ids: [],
+            fee: 17480000000,
+            initiator_amount: 1000,
+            initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            lock_period: 100,
+            nonce: 2,
+            push_amount: 1000,
+            responder_amount: 1000,
+            responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            ttl: 0
+          },
+          <<57, 30, 45, 155, 161, 147, 152, 117, 167, 202, 127, 50, 186, 142, 248, 183,
+            245, 237, 11, 198, 95, 30, 247, 78, 16, 18, 109, 90, 182, 112, 241, 61, 92,
+            97, 212, 128, 172, 40, 96, 81, 201, 207, 100, 15, 133, 174, 95, 140, 88, 96,
+            253, 85, 93, 32, 78, 78, 61, 230, 29, 58, 14, 104, 157, 5>>
+        ]}
   """
   @spec create(
           Client.t(),
@@ -74,12 +118,13 @@ defmodule Core.Channel do
         push_amount,
         channel_reserve,
         lock_period,
-        state_hash,
+        <<"st_", state_hash::binary>>,
         opts \\ []
       )
-      when sender_prefix == "ak" and responder_prefix == "ak" and
-             byte_size(state_hash) == @state_hash_byte_size do
+      when sender_prefix == "ak" and responder_prefix == "ak" do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+         decoded_state_hash <- Encoding.decode_base58c(state_hash),
+         true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, create_channel_tx} <-
            build_create_channel_tx(
              sender_pubkey,
@@ -93,7 +138,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :delegate_ids, []),
              nonce,
-             state_hash
+             decoded_state_hash
            ),
          {:ok, %{height: height}} <-
            AeternityNode.Api.Chain.get_current_key_block_height(client.connection),
@@ -114,6 +159,7 @@ defmodule Core.Channel do
            ) do
       res
     else
+      false -> {:error, "#{__MODULE__}: Incorrect state hash size."}
       error -> {:error, "#{__MODULE__}: Unsuccessful post of ChannelCreateTx : #{inspect(error)}"}
     end
   end
@@ -122,10 +168,26 @@ defmodule Core.Channel do
   Closes a channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_mutual
 
-  ## Examples
-      iex>
+  ## Example
+      iex> Core.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
+      {:ok,
+        [
+          %AeternityNode.Model.ChannelCloseMutualTx{
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 16740000000,
+            from_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            initiator_amount_final: 2000,
+            nonce: 5,
+            responder_amount_final: 12000000,
+            ttl: 0
+          },
+          <<154, 198, 126, 220, 52, 91, 55, 178, 103, 155, 224, 160, 38, 97, 203, 251, 95,
+            184, 237, 184, 100, 14, 142, 198, 103, 42, 119, 49, 90, 193, 111, 86, 233,
+            167, 125, 207, 57, 66, 91, 211, 225, 192, 219, 245, 99, 50, 214, 2, 10, 130,
+            165, 215, 161, 72, 62, 202, 98, 170, 134, 52, 200, 23, 85, 7>>
+        ]}
   """
-  @spec close_mutual(Client.t(), binary(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
+  @spec close_mutual(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, map()} | {:error, String.t()}
   def close_mutual(
         %Client{
@@ -135,20 +197,19 @@ defmodule Core.Channel do
           connection: connection
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
-        <<from_prefix::binary-size(@prefix_byte_size), _::binary>> = from_id,
         initiator_amount_final,
         responder_amount_final,
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and initiator_amount_final >= 0 and
-             responder_amount_final <= 0 and from_prefix == "ak" do
+             responder_amount_final >= 0 do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
            build_close_mutual_tx(
              channel_id,
              Keyword.get(opts, :fee, 0),
-             from_id,
+             sender_pubkey,
              initiator_amount_final,
              nonce,
              responder_amount_final,
@@ -180,7 +241,7 @@ defmodule Core.Channel do
   Closes a channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_solo
 
-  ## Examples
+  ## Example
       iex>
   """
   @spec close_solo(Client.t(), binary(), String.t(), list(), list()) ::
@@ -219,14 +280,14 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         # TODO probably only one sign and post because of SOLO word, if so we can post it directly after signing it
-         {:ok, _} = res <-
-           Transaction.sign_tx(
-             %{close_solo_tx | fee: fee},
+         {:ok, _response} = response <-
+           Transaction.try_post(
              client,
-             Keyword.get(opts, :auth, :no_opts)
+             %{close_solo_tx | fee: fee},
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
-      res
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelCloseSoloTx : #{inspect(error)}"}
@@ -237,8 +298,26 @@ defmodule Core.Channel do
   Deposits funds into a channel after creation
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_deposit
 
-  ## Examples
-      iex>
+  ## Example
+      iex> Core.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
+      {:ok,
+        [
+          %AeternityNode.Model.ChannelDepositTx{
+            amount: 16720000000,
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 17400000000,
+            from_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            nonce: 3,
+            round: 2,
+            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            ttl: 0
+          },
+          <<44, 241, 124, 7, 189, 254, 202, 235, 78, 79, 88, 185, 235, 90, 234, 213, 246,
+            149, 239, 157, 69, 42, 234, 50, 68, 76, 194, 42, 21, 200, 29, 82, 134, 126,
+            53, 228, 12, 77, 80, 150, 65, 211, 194, 127, 22, 93, 106, 254, 143, 15, 216,
+            79, 56, 104, 96, 48, 45, 9, 137, 108, 15, 29, 121, 1>>
+        ]}
   """
   @spec deposit(Client.t(), non_neg_integer(), binary(), non_neg_integer(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -252,14 +331,14 @@ defmodule Core.Channel do
         amount,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         round,
-        <<"st_", state_hash>>,
+        <<"st_", state_hash::binary>>,
         opts \\ []
-      ) # TODO ADJUST!!
+      )
       when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         # binary_state_hash <-
-         # true <- byte_size(binary_state_hash) == binary_state_hash <-
+         decoded_state_hash <- Encoding.decode_base58c(state_hash),
+         true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, deposit_tx} <-
            build_deposit_tx(
              amount,
@@ -268,7 +347,7 @@ defmodule Core.Channel do
              sender_pubkey,
              nonce,
              round,
-             state_hash,
+             decoded_state_hash,
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
@@ -288,6 +367,9 @@ defmodule Core.Channel do
            ) do
       res
     else
+      false ->
+        {:error, "#{__MODULE__}: Incorrect state hash size."}
+
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelDepositTx : #{inspect(error)}"}
     end
@@ -298,7 +380,7 @@ defmodule Core.Channel do
   one of them wants to use the blockchain as an arbiter.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#forcing-progress
 
-  ## Examples
+  ## Example
       iex>
   """
   @spec force_progress(
@@ -323,13 +405,15 @@ defmodule Core.Channel do
         offchain_trees,
         payload,
         round,
-        state_hash,
+        <<"st_", state_hash::binary>>,
         update,
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         decoded_state_hash <- Encoding.decode_base58c(state_hash),
+         true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, force_progress_tx} <-
            build_force_progress_tx(
              channel_id,
@@ -339,7 +423,7 @@ defmodule Core.Channel do
              offchain_trees,
              payload,
              round,
-             state_hash,
+             decoded_state_hash,
              Keyword.get(opts, :ttl, 0),
              update
            ),
@@ -352,15 +436,18 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         # TODO probably should be posted right away without signing from another participant
-         {:ok, _} = res <-
-           Transaction.sign_tx(
-             %{force_progress_tx | fee: fee},
+         {:ok, _response} = response <-
+           Transaction.try_post(
              client,
-             Keyword.get(opts, :auth, :no_opts)
+             %{force_progress_tx | fee: fee},
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
-      res
+      response
     else
+      false ->
+        {:error, "#{__MODULE__}: Incorrect state hash size."}
+
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelForceProgressTx : #{inspect(error)}"}
     end
@@ -372,7 +459,7 @@ defmodule Core.Channel do
   trying to close the channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
 
-  ## Examples
+  ## Example
       iex>
   """
   @spec settle(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
@@ -411,14 +498,15 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         # TODO check if 2 signatures is needed, otherwise post it after signing
-         {:ok, _} = res <-
-           Transaction.sign_tx(
-             %{settle_tx | fee: fee},
+         IO.inspect(fee, label: "Fee:"),
+         {:ok, _response} = response <-
+           Transaction.try_post(
              client,
-             Keyword.get(opts, :auth, :no_opts)
+             %{settle_tx | fee: fee},
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
-      res
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSettleTx : #{inspect(error)}"}
@@ -430,7 +518,7 @@ defmodule Core.Channel do
   the honest party has the opportunity to issue a channel_slash transaction
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
 
-  ## Examples
+  ## Example
       iex>
   """
   @spec slash(Client.t(), binary(), String.t(), list(), list()) ::
@@ -469,14 +557,14 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         # TODO probably should be posted right away without signing from another participant
-         {:ok, _} = res <-
-           Transaction.sign_tx(
-             %{slash_tx | fee: fee},
+         {:ok, _response} = response <-
+           Transaction.try_post(
              client,
-             Keyword.get(opts, :auth, :no_opts)
+             %{slash_tx | fee: fee},
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
-      res
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSlashTx : #{inspect(error)}"}
@@ -489,7 +577,7 @@ defmodule Core.Channel do
   to be recorded on-chain.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
 
-  ## Examples
+  ## Example
       iex>
   """
   @spec snapshot_solo(Client.t(), binary(), String.t(), list()) ::
@@ -526,14 +614,14 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         # TODO probably only one sign and post because of SOLO word, if so we can post it directly after signing it
-         {:ok, _} = res <-
-           Transaction.sign_tx(
-             %{snapshot_solo_tx | fee: fee},
+         {:ok, _response} = response <-
+           Transaction.try_post(
              client,
-             Keyword.get(opts, :auth, :no_opts)
+             %{snapshot_solo_tx | fee: fee},
+             Keyword.get(opts, :auth, nil),
+             height
            ) do
-      res
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSnapshotSoloTx : #{inspect(error)}"}
@@ -544,8 +632,26 @@ defmodule Core.Channel do
   Witdraws locked tokens from channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
 
-  ## Examples
-      iex>
+  ## Example
+      iex> Core.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
+      {:ok,
+        [
+          %AeternityNode.Model.ChannelWithdrawTx{
+            amount: 2000,
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 17340000000,
+            nonce: 3,
+            round: 3,
+            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            to_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            ttl: 0
+          },
+          <<125, 128, 179, 4, 157, 39, 210, 210, 55, 199, 175, 101, 22, 45, 219, 123, 131,
+            88, 103, 91, 30, 140, 190, 109, 26, 212, 188, 82, 174, 253, 2, 148, 205, 112,
+            94, 106, 218, 54, 250, 185, 144, 170, 227, 114, 36, 232, 24, 157, 164, 143,
+            66, 47, 177, 190, 24, 69, 60, 65, 119, 133, 147, 191, 191, 8>>
+        ]}
   """
   @spec withdraw(
           Client.t(),
@@ -567,14 +673,15 @@ defmodule Core.Channel do
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         to_id,
         amount,
-        state_hash,
+        <<"st_", state_hash::binary>>,
         round,
         opts \\ []
       )
-      when valid_prefixes(sender_prefix, channel_prefix) and
-             byte_size(state_hash) == @state_hash_byte_size do
+      when valid_prefixes(sender_prefix, channel_prefix) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
+         decoded_state_hash <- Encoding.decode_base58c(state_hash),
+         true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, withdraw_tx} <-
            build_withdraw_tx(
              channel_id,
@@ -583,7 +690,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0),
              Keyword.get(opts, :fee, 0),
              nonce,
-             state_hash,
+             decoded_state_hash,
              round
            ),
          fee <-
@@ -603,16 +710,39 @@ defmodule Core.Channel do
            ) do
       res
     else
+      false ->
+        {:error, "#{__MODULE__}: Incorrect state hash size."}
+
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelWithdrawTx : #{inspect(error)}"}
     end
   end
 
+  @doc """
+  Serialize the list of fields to RLP transaction binary, adds signatures and post it to the node.
+
+  ## Example
+      iex> Core.Channel.post(client, tx, [signature_1, signature_2])
+      {:ok,
+        %{
+          block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
+          block_height: 206,
+          channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+          tx_hash: "th_2f2sTv4z8R6QZknnCKhqvnHLiQKrAiBqME1nVV8sbGyeYWrSQ3"
+        }
+  """
   @spec post(Client.t(), struct(), list() | :no_signatures) :: {:ok, map()} | {:error, String.t()}
   def post(client, tx, signatures_list \\ :no_signatures) do
     post_(client, tx, signatures_list)
   end
 
+  @doc """
+  Gets current state hash.
+
+  ## Example
+      iex> Core.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
+  """
   @spec get_current_state_hash(Client.t(), binary()) ::
           {:ok, binary()} | {:error, String.t() | Error.t()}
   def get_current_state_hash(
@@ -644,7 +774,7 @@ defmodule Core.Channel do
   end
 
   defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)
-       when is_binary(initiator and is_binary(responder and nonce >= 0)) do
+       when nonce >= 0 do
     decoded_initiator = Encoding.decode_base58c(initiator)
     decoded_responder = Encoding.decode_base58c(responder)
     {:ok, hash} = Hash.hash(decoded_initiator <> <<nonce::256>> <> decoded_responder)
@@ -686,13 +816,13 @@ defmodule Core.Channel do
   #   # Transaction.try_post(client, tx, nil, height, signatures_list)
   # end
 
-  defp wrap_in_empty_signed_tx(tx, signature_list) do
-    IO.inspect(tx, label: "******TX*****")
-    IO.inspect(signature_list, label: "******signature_list*****")
-    serialized_tx = Serialization.serialize(tx)
-    signed_tx_fields = [signature_list, serialized_tx]
-    Serialization.serialize(signed_tx_fields, :signed_tx)
-  end
+  # defp wrap_in_empty_signed_tx(tx, signature_list) do
+  #   IO.inspect(tx, label: "******TX*****")
+  #   IO.inspect(signature_list, label: "******signature_list*****")
+  #   serialized_tx = Serialization.serialize(tx)
+  #   signed_tx_fields = [signature_list, serialized_tx]
+  #   Serialization.serialize(signed_tx_fields, :signed_tx)
+  # end
 
   defp build_create_channel_tx(
          initiator_id,

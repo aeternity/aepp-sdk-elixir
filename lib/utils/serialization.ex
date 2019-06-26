@@ -493,7 +493,7 @@ defmodule Utils.Serialization do
     ]
   end
 
-  defp serialization_template(:channel_force_progress_tx) do
+  defp serialization_template(:channel_solo_force_tx) do
     [
       channel_id: :id,
       from_id: :id,

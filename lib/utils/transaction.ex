@@ -98,7 +98,7 @@ defmodule Utils.Transaction do
   def dummy_fee(), do: @dummy_fee
 
   @doc """
-  Serialize the list of fields to an RLP transaction binary, sign it with the private key and network ID,
+  Serialize the list of fields to RLP transaction binary, sign it with the private key and network ID,
   add calculated minimum fee and post it to the node
 
   ## Example
