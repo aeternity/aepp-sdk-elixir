@@ -7,6 +7,7 @@ defmodule Core.Listener.PeerConnection do
 
   require Logger
 
+  alias Core.Listener
   alias Core.Listener.{Peers, Supervisor}
 
   @behaviour :ranch_protocol
@@ -149,7 +150,7 @@ defmodule Core.Listener.PeerConnection do
       do: handle_fragment(state, fragment_index, total_fragments, fragment)
 
   def handle_info({:noise, _, <<type::16, payload::binary()>>}, %{network: network} = state) do
-    deserialized_payload = rlp_decode(type, payload) |> IO.inspect()
+    deserialized_payload = rlp_decode(type, payload)
 
     case type do
       @p2p_response ->
@@ -160,7 +161,7 @@ defmodule Core.Listener.PeerConnection do
         spawn(fn -> handle_ping(:todo, self(), state) end)
 
       @key_block ->
-        spawn(fn -> handle_new_key_block(:todo) end)
+        spawn(fn -> handle_new_key_block(deserialized_payload) end)
 
       @micro_block ->
         spawn(fn -> handle_new_micro_block(:todo) end)
@@ -289,8 +290,7 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp handle_new_key_block(key_block) do
-    # Listener.notify_new_block(block)
-    IO.inspect(key_block)
+    Listener.notify_for_key_block(key_block)
   end
 
   defp handle_new_micro_block(micro_block) do
