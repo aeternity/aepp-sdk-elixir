@@ -27,7 +27,7 @@ defmodule Core.Channel do
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias Utils.{Transaction, Encoding, Hash}
   # alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
@@ -118,7 +118,7 @@ defmodule Core.Channel do
         push_amount,
         channel_reserve,
         lock_period,
-        <<"st_", state_hash::binary>>,
+        <<"st_", state_hash::binary>> = encoded_state_hash,
         opts \\ []
       )
       when sender_prefix == "ak" and responder_prefix == "ak" do
@@ -138,7 +138,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :delegate_ids, []),
              nonce,
-             decoded_state_hash
+             encoded_state_hash
            ),
          {:ok, %{height: height}} <-
            AeternityNode.Api.Chain.get_current_key_block_height(client.connection),
@@ -331,7 +331,7 @@ defmodule Core.Channel do
         amount,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         round,
-        <<"st_", state_hash::binary>>,
+        <<"st_", state_hash::binary>> = encoded_state_hash,
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
@@ -347,7 +347,7 @@ defmodule Core.Channel do
              sender_pubkey,
              nonce,
              round,
-             decoded_state_hash,
+             encoded_state_hash,
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
@@ -405,7 +405,7 @@ defmodule Core.Channel do
         offchain_trees,
         payload,
         round,
-        <<"st_", state_hash::binary>>,
+        <<"st_", state_hash::binary>> = encoded_state_hash,
         update,
         opts \\ []
       )
@@ -423,7 +423,7 @@ defmodule Core.Channel do
              offchain_trees,
              payload,
              round,
-             decoded_state_hash,
+             encoded_state_hash,
              Keyword.get(opts, :ttl, 0),
              update
            ),
@@ -673,7 +673,7 @@ defmodule Core.Channel do
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         to_id,
         amount,
-        <<"st_", state_hash::binary>>,
+        <<"st_", state_hash::binary>> = encoded_state_hash,
         round,
         opts \\ []
       )
@@ -690,7 +690,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0),
              Keyword.get(opts, :fee, 0),
              nonce,
-             decoded_state_hash,
+             encoded_state_hash,
              round
            ),
          fee <-

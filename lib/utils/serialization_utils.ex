@@ -387,9 +387,10 @@ defmodule Utils.SerializationUtils do
         ttl: ttl,
         fee: fee,
         delegate_ids: delegate_ids,
-        state_hash: state_hash,
+        state_hash: <<"st_", state_hash::binary>>,
         nonce: nonce
       }) do
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
     initiator_id = proccess_id_to_record(initiator)
     responder_id = proccess_id_to_record(responder)
 
@@ -409,7 +410,7 @@ defmodule Utils.SerializationUtils do
        ttl,
        fee,
        list_delegate_ids,
-       state_hash,
+       decoded_state_hash,
        nonce
      ], :channel_create_tx}
   end
@@ -470,9 +471,10 @@ defmodule Utils.SerializationUtils do
         from_id: from,
         nonce: nonce,
         round: round,
-        state_hash: state_hash,
+        state_hash: <<"st_", state_hash::binary>>,
         ttl: ttl
       }) do
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
     channel_id = proccess_id_to_record(channel)
     from_id = proccess_id_to_record(from)
 
@@ -483,7 +485,7 @@ defmodule Utils.SerializationUtils do
        amount,
        ttl,
        fee,
-       state_hash,
+       decoded_state_hash,
        round,
        nonce
      ], :channel_deposit_tx}
@@ -497,16 +499,27 @@ defmodule Utils.SerializationUtils do
         offchain_trees: offchain_trees,
         payload: payload,
         round: round,
-        state_hash: state_hash,
+        state_hash: <<"st_", state_hash::binary>>,
         ttl: ttl,
         update: update
       }) do
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
     channel_id = proccess_id_to_record(channel)
     from_id = proccess_id_to_record(from)
 
     {:ok,
-     [channel_id, from_id, payload, round, update, state_hash, offchain_trees, ttl, fee, nonce],
-     :channel_force_progress_tx}
+     [
+       channel_id,
+       from_id,
+       payload,
+       round,
+       update,
+       decoded_state_hash,
+       offchain_trees,
+       ttl,
+       fee,
+       nonce
+     ], :channel_force_progress_tx}
   end
 
   def process_tx_fields(%ChannelSettleTx{
@@ -571,12 +584,15 @@ defmodule Utils.SerializationUtils do
         ttl: ttl,
         fee: fee,
         nonce: nonce,
-        state_hash: state_hash,
+        state_hash: <<"st_", state_hash::binary>>,
         round: round
       }) do
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
     channel_id = proccess_id_to_record(channel)
     to_id = proccess_id_to_record(to)
-    {:ok, [channel_id, to_id, amount, ttl, fee, state_hash, round, nonce], :channel_withdraw_tx}
+
+    {:ok, [channel_id, to_id, amount, ttl, fee, decoded_state_hash, round, nonce],
+     :channel_withdraw_tx}
   end
 
   def process_tx_fields(%{
