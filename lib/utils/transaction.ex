@@ -650,7 +650,7 @@ defmodule Utils.Transaction do
     end
   end
 
-  defp wrap_in_empty_signed_tx(tx) do
+  def wrap_in_empty_signed_tx(tx) do
     serialized_tx = Serialization.serialize(tx)
     signed_tx_fields = [[], serialized_tx]
     Serialization.serialize(signed_tx_fields, :signed_tx)

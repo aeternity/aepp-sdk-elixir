@@ -20,15 +20,15 @@ defmodule Core.Channel do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     Error,
-    Channel
-    # PostTxResponse,
-    # Tx
+    Channel,
+    PostTxResponse,
+    Tx
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Encoding, Hash}
-  # alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -84,8 +84,7 @@ defmodule Core.Channel do
             push_amount: 1000,
             responder_amount: 1000,
             responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
-            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            state_hash:"st_11111111111111111111111111111111273Yts",
             ttl: 0
           },
           <<57, 30, 45, 155, 161, 147, 152, 117, 167, 202, 127, 50, 186, 142, 248, 183,
@@ -244,7 +243,7 @@ defmodule Core.Channel do
   ## Example
       iex>
   """
-  @spec close_solo(Client.t(), binary(), String.t(), list(), list()) ::
+  @spec close_solo(Client.t(), binary(), binary(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
   def close_solo(
         %Client{
@@ -258,7 +257,7 @@ defmodule Core.Channel do
         poi,
         opts \\ []
       )
-      when valid_prefixes(sender_prefix, channel_prefix) do
+      when valid_prefixes(sender_prefix, channel_prefix) and is_binary(poi) and is_binary(payload) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
@@ -309,8 +308,7 @@ defmodule Core.Channel do
             from_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
             nonce: 3,
             round: 2,
-            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            state_hash: "st_11111111111111111111111111111111273Yts",
             ttl: 0
           },
           <<44, 241, 124, 7, 189, 254, 202, 235, 78, 79, 88, 185, 235, 90, 234, 213, 246,
@@ -498,7 +496,6 @@ defmodule Core.Channel do
              client.gas_price,
              5
            ),
-         IO.inspect(fee, label: "Fee:"),
          {:ok, _response} = response <-
            Transaction.try_post(
              client,
@@ -642,8 +639,7 @@ defmodule Core.Channel do
             fee: 17340000000,
             nonce: 3,
             round: 3,
-            state_hash: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>,
+            state_hash: "st_11111111111111111111111111111111273Yts",
             to_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
             ttl: 0
           },
@@ -719,24 +715,6 @@ defmodule Core.Channel do
   end
 
   @doc """
-  Serialize the list of fields to RLP transaction binary, adds signatures and post it to the node.
-
-  ## Example
-      iex> Core.Channel.post(client, tx, [signature_1, signature_2])
-      {:ok,
-        %{
-          block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
-          block_height: 206,
-          channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
-          tx_hash: "th_2f2sTv4z8R6QZknnCKhqvnHLiQKrAiBqME1nVV8sbGyeYWrSQ3"
-        }
-  """
-  @spec post(Client.t(), struct(), list() | :no_signatures) :: {:ok, map()} | {:error, String.t()}
-  def post(client, tx, signatures_list \\ :no_signatures) do
-    post_(client, tx, signatures_list)
-  end
-
-  @doc """
   Gets current state hash.
 
   ## Example
@@ -756,8 +734,76 @@ defmodule Core.Channel do
     end
   end
 
+  @doc """
+  Serialize the list of fields to RLP transaction binary, adds signatures and post it to the node.
+
+  ## Example
+      iex> Core.Channel.post(client, tx, [signature_1, signature_2])
+      {:ok,
+        %{
+          block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
+          block_height: 206,
+          channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+          tx_hash: "th_2f2sTv4z8R6QZknnCKhqvnHLiQKrAiBqME1nVV8sbGyeYWrSQ3"
+        }
+  """
+  @spec post(Client.t(), struct(), list() | :no_signatures) :: {:ok, map()} | {:error, String.t()}
+  def post(client, tx, opts \\ [signatures_list: :no_signatures]) do
+    post_(client, tx, opts)
+  end
+
   # post_ B+B
-  defp post_(%Client{connection: connection} = client, tx, signatures_list)
+
+  # post_ G+G
+  defp post_(%Client{connection: _connection} = _client, _tx,
+         signatures_list: :no_signatures,
+         inner_tx: _inner_tx
+       ) do
+    # TODO to be implemented
+    nil
+  end
+
+  ## post B+G ??AND?? G+B
+  # defp post_() do
+  #   # TODO to be implemented
+  #   nil
+  # end
+
+  # TODO CHECK IF SERIALIZED INNER TX MATCHES WITH SERIALIZED  INNER TX PROVIDED BY USER
+  defp post_(client, %{tx: _serialized_inner_tx} = meta_tx,
+         signatures_list: basic_account_signature,
+         inner_tx: inner_tx
+       )
+       when is_list(basic_account_signature) do
+    # case serialized_inner_tx  === Serialization.serialize(inner_tx, :signed_tx) do
+    #  true ->
+    new_serialized_inner_tx =
+      Serialization.serialize(
+        [basic_account_signature, Serialization.serialize(inner_tx)],
+        :signed_tx
+      )
+
+    new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+    signed_tx =
+      Encoding.prefix_encode_base64(
+        "tx",
+        wrap_in_signature_signed_tx(new_meta_tx, [])
+      )
+
+    # [meta_tx(tx(signatu)),[]]
+    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+      TransactionApi.post_transaction(client.connection, %Tx{
+        tx: signed_tx
+      })
+
+    {:ok, _} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+    # Transaction.try_post(client, tx, nil, height, signatures_list)
+    #   false -> {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    # end
+  end
+
+  defp post_(%Client{connection: connection} = client, tx, signatures_list: signatures_list)
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
     {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
@@ -788,41 +834,13 @@ defmodule Core.Channel do
      } and responder_id: #{responder} "}
   end
 
-  # post_ G+G
-  defp post_(%Client{connection: _connection} = _client, _tx, :no_signatures) do
-    # TODO to be implemented
-    nil
+  defp wrap_in_signature_signed_tx(tx, signature_list) do
+    IO.inspect(tx, label: "******TX*****")
+    IO.inspect(signature_list, label: "******signature_list*****")
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [signature_list, serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
-
-  ## post B+G ??AND?? G+B
-  # defp post_() do
-  #   # TODO to be implemented
-  #   nil
-  # end
-
-  # def post_(client, meta_tx, basic_account_signature) do
-  #   signed_tx =
-  #     Encoding.prefix_encode_base64(
-  #       "tx",
-  #       wrap_in_empty_signed_tx(meta_tx, basic_account_signature)
-  #     )
-
-  #   {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-  #     TransactionApi.post_transaction(client.connection, %Tx{
-  #       tx: signed_tx
-  #     })
-
-  #   {:ok, _} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-  #   # Transaction.try_post(client, tx, nil, height, signatures_list)
-  # end
-
-  # defp wrap_in_empty_signed_tx(tx, signature_list) do
-  #   IO.inspect(tx, label: "******TX*****")
-  #   IO.inspect(signature_list, label: "******signature_list*****")
-  #   serialized_tx = Serialization.serialize(tx)
-  #   signed_tx_fields = [signature_list, serialized_tx]
-  #   Serialization.serialize(signed_tx_fields, :signed_tx)
-  # end
 
   defp build_create_channel_tx(
          initiator_id,
