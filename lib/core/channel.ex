@@ -8,6 +8,7 @@ defmodule Core.Channel do
   """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
+  alias Core.GeneralizedAccount
 
   alias AeternityNode.Model.{
     ChannelCreateTx,
@@ -798,16 +799,20 @@ defmodule Core.Channel do
       })
 
     {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-    IO.inspect inner_tx, label: "inner_tx"
+    IO.inspect(inner_tx, label: "inner_tx")
+
     case inner_tx do
       %ChannelCreateTx{} ->
-        {:ok, hash} = Hash.hash(Utils.Encoding.prefix_decode_base58c(meta_tx.ga_id) <> meta_tx.auth_data)
+        {:ok, hash} =
+          Hash.hash(Utils.Encoding.prefix_decode_base58c(meta_tx.ga_id) <> meta_tx.auth_data)
+
         {:ok, channel_id} = compute_channel_id(inner_tx.initiator_id, hash, inner_tx.responder_id)
         {:ok, Map.put(res, :channel_id, channel_id)}
 
       _ ->
         {:ok, res}
     end
+
     # Transaction.try_post(client, tx, nil, height, signatures_list)
     #   false -> {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
     # end
@@ -829,18 +834,29 @@ defmodule Core.Channel do
     end
   end
 
-  defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>) when is_integer(nonce) do
+  defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)
+       when is_integer(nonce) do
     decoded_initiator = Encoding.decode_base58c(initiator)
     decoded_responder = Encoding.decode_base58c(responder)
     {:ok, hash} = Hash.hash(decoded_initiator <> <<nonce::256>> <> decoded_responder)
     {:ok, Encoding.prefix_encode_base58c("ch", hash)}
   end
 
-  defp compute_channel_id(<<"ak_", initiator::binary>>, auth_data, <<"ak_", responder::binary>>) when is_binary(auth_data) do
+  defp compute_channel_id(
+         <<"ak_", initiator::binary>> = encoded_ga_id,
+         auth_data,
+         <<"ak_", responder::binary>>
+       )
+       when is_binary(auth_data) do
     decoded_initiator = Encoding.decode_base58c(initiator)
     decoded_responder = Encoding.decode_base58c(responder)
-    {:ok, auth_id} = Hash.hash(auth_data)
-    {:ok, hash} = Hash.hash(decoded_initiator <> auth_id <> decoded_responder)
+
+    {:ok, auth_id} =
+      GeneralizedAccount.compute_auth_id(%{ga_id: encoded_ga_id, auth_data: auth_data})
+
+    {:ok, hash} =
+      Hash.hash(<<decoded_initiator::binary, auth_id::binary, decoded_responder::binary>>)
+
     {:ok, Encoding.prefix_encode_base58c("ch", hash)}
   end
 
