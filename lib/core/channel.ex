@@ -803,10 +803,9 @@ defmodule Core.Channel do
 
     case inner_tx do
       %ChannelCreateTx{} ->
-        {:ok, hash} =
-          Hash.hash(Utils.Encoding.prefix_decode_base58c(meta_tx.ga_id) <> meta_tx.auth_data)
+        {:ok, channel_id} =
+          compute_channel_id(inner_tx.initiator_id, meta_tx.auth_data, inner_tx.responder_id)
 
-        {:ok, channel_id} = compute_channel_id(inner_tx.initiator_id, hash, inner_tx.responder_id)
         {:ok, Map.put(res, :channel_id, channel_id)}
 
       _ ->
@@ -854,9 +853,7 @@ defmodule Core.Channel do
     {:ok, auth_id} =
       GeneralizedAccount.compute_auth_id(%{ga_id: encoded_ga_id, auth_data: auth_data})
 
-    {:ok, hash} =
-      Hash.hash(<<decoded_initiator::binary, auth_id::binary, decoded_responder::binary>>)
-
+    {:ok, hash} = Hash.hash(decoded_initiator <> auth_id <> decoded_responder)
     {:ok, Encoding.prefix_encode_base58c("ch", hash)}
   end
 

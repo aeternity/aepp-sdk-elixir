@@ -394,7 +394,6 @@ defmodule Utils.Transaction do
     case AccountApi.get_account_by_pubkey(connection, public_key) do
       {:ok, %Account{kind: "basic"}} ->
         serialized_tx = Serialization.serialize(tx)
-        IO.inspect(tx.nonce, label: "BASIC ACCOUNT TX NONCE: ")
 
         signature =
           Keys.sign(
@@ -427,9 +426,7 @@ defmodule Utils.Transaction do
          },
          auth_opts
        ) do
-    IO.inspect(tx.nonce, label: "GENERALIZED ACCOUNT TX BEFORE NONCE: ")
     tx = %{tx | nonce: 0}
-    IO.inspect(tx.nonce, label: "GENERALIZED ACCOUNT TX AFTER NONCE: ")
 
     with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
