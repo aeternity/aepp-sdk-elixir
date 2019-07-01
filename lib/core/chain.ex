@@ -590,7 +590,7 @@ defmodule Core.Chain do
            difficulty: 252791033,
            genesis_key_block_hash: "kh_wUCideEB8aDtUaiHCtKcfywU6oHZW6gnyci8Mw6S1RSTCnCRu",
            listening: true,
-           network_id: "ae_uat",
+           network_id: "my_test",
            node_revision: "a267159203252ddd6964f49e9125f32bce1efbb0",
            node_version: "3.0.0-rc.1",
            peer_count: 8841,

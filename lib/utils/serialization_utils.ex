@@ -22,7 +22,7 @@ defmodule Utils.SerializationUtils do
     Ttl
   }
 
-  @ct_version 0x30001
+  @ct_version 0x40001
 
   @doc """
   Serializes a transaction to a tuple of list of fields and type, depending on its structure.
@@ -370,6 +370,16 @@ defmodule Utils.SerializationUtils do
 
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
+  end
+
+  def ttl_type_for_client(type) do
+    case type do
+      0 ->
+        :relative
+
+      1 ->
+        :absolute
+    end
   end
 
   defp proccess_id_to_record(tx_public_key) when is_binary(tx_public_key) do

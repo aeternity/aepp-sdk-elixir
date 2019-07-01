@@ -8,6 +8,8 @@ defmodule Core.Listener.PeerConnection do
   require Logger
 
   alias Core.Listener.{Peers, Supervisor}
+  alias Utils.Hash
+  alias Utils.Serialization
 
   @behaviour :ranch_protocol
 
@@ -15,9 +17,12 @@ defmodule Core.Listener.PeerConnection do
 
   @msg_fragment 0
   @ping 1
+  @micro_header 0
   @key_header 1
+  @get_block_txs 7
   @key_block 10
   @micro_block 11
+  @block_txs 13
   @p2p_response 100
 
   @noise_timeout 5000
@@ -148,22 +153,30 @@ defmodule Core.Listener.PeerConnection do
       ),
       do: handle_fragment(state, fragment_index, total_fragments, fragment)
 
-  def handle_info({:noise, _, <<type::16, payload::binary()>>}, %{network: network} = state) do
-    deserialized_payload = rlp_decode(type, payload) |> IO.inspect()
+  def handle_info(
+        {:noise, _, <<type::16, payload::binary()>>},
+        %{status: {:connected, socket}, network: network} = state
+      ) do
+    if type != 9 do
+      deserialized_payload = rlp_decode(type, payload)
 
-    case type do
-      @p2p_response ->
-        # we're only going to be receiving responses for ping
-        handle_ping_msg(deserialized_payload.object, network)
+      case type do
+        @p2p_response ->
+          # we're only going to be receiving responses for ping
+          handle_response(deserialized_payload, network)
 
-      @ping ->
-        spawn(fn -> handle_ping(:todo, self(), state) end)
+        @ping ->
+          spawn(fn -> handle_ping(:todo, self(), state) end)
 
-      @key_block ->
-        spawn(fn -> handle_new_key_block(:todo) end)
+        @key_block ->
+          spawn(fn -> handle_new_key_block(:todo) end)
 
-      @micro_block ->
-        spawn(fn -> handle_new_micro_block(:todo) end)
+        @micro_block ->
+          handle_new_micro_block(deserialized_payload, socket)
+
+        _ ->
+          :ok
+      end
     end
 
     {:noreply, state}
@@ -197,6 +210,25 @@ defmodule Core.Listener.PeerConnection do
        when fragment_index == length(fragments) + 1 do
     {:noreply, %{state | fragments: [fragment | fragments]}}
   end
+
+  defp handle_response(
+         %{result: true, type: type, object: object, reason: nil},
+         network
+       ) do
+    case type do
+      @ping ->
+        handle_ping_msg(object, network)
+
+      @block_txs ->
+        handle_block_txs(object)
+    end
+  end
+
+  defp handle_response(
+         %{result: false, type: _type, object: nil, reason: reason},
+         _network
+       ),
+       do: Logger.error(reason)
 
   defp handle_ping(
          %{
@@ -293,9 +325,23 @@ defmodule Core.Listener.PeerConnection do
     IO.inspect(key_block)
   end
 
-  defp handle_new_micro_block(micro_block) do
-    # Listener.notify_new_block(block)
-    IO.inspect(micro_block)
+  defp handle_new_micro_block(
+         %{block_info: block_info, hash: hash, tx_hashes: tx_hashes} = info,
+         socket
+       ) do
+    get_block_txs_rlp = :aeser_rlp.encode([:binary.encode_unsigned(1), hash, tx_hashes])
+
+    get_block_txs_msg = <<@get_block_txs::16, get_block_txs_rlp::binary>>
+
+    :ok = :enoise.send(socket, get_block_txs_msg)
+  end
+
+  defp handle_block_txs(txs) do
+    serialized_txs =
+      Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
+      |> IO.inspect()
+
+    # Listener.publish_txs(serialized_txs)
   end
 
   defp ping_object_fields(),
@@ -321,7 +367,7 @@ defmodule Core.Listener.PeerConnection do
     [
       noise: "Noise_XK_25519_ChaChaPoly_BLAKE2b",
       s: :enoise_keypair.new(:dh25519, privkey, pubkey),
-      prologue: <<version::binary(), genesis_hash::binary()>> <> <<"ae_uat">>,
+      prologue: <<version::binary(), genesis_hash::binary()>> <> <<"my_test">>,
       timeout: @noise_timeout
     ]
   end
@@ -333,11 +379,10 @@ defmodule Core.Listener.PeerConnection do
 
   defp genesis_hash(:testnet),
     do:
-      <<123, 173, 180, 20, 178, 230, 65, 254, 59, 198, 234, 129, 117, 11, 11, 80, 142, 52, 238,
-        147, 191, 98, 135, 252, 203, 203, 175, 212, 7, 8, 237, 83>>
+      <<174, 36, 148, 219, 224, 173, 204, 138, 98, 177, 222, 19, 81, 20, 248, 121, 34, 251, 150,
+        97, 11, 12, 130, 0, 6, 186, 138, 239, 69, 85, 82, 206>>
 
   defp rlp_decode(@p2p_response, encoded_response) do
-    # vsn should be additionally decoded with :binary.decode_unsigned
     [_vsn, result, type, reason, object] = :aeser_rlp.decode(encoded_response)
     deserialized_result = bool_bin(result)
 
@@ -370,8 +415,6 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp rlp_decode(@ping, encoded_ping) do
-    IO.inspect(:aeser_rlp.decode(encoded_ping), limit: :infinity)
-
     [
       _vsn,
       port,
@@ -418,14 +461,75 @@ defmodule Core.Listener.PeerConnection do
       prev_hash: :aeser_api_encoder.encode(prev_block_type, <<prev_hash::256>>),
       prev_key_hash: :aeser_api_encoder.encode(:key_block_hash, <<prev_key_hash::256>>),
       root_hash: :aeser_api_encoder.encode(:block_state_hash, <<root_hash::256>>),
-      miner: :aeser_api_encoder.encode(:account_pubkey, <<root_hash::256>>),
-      beneficiary: :aeser_api_encoder.encode(:account_pubkey, <<root_hash::256>>),
+      miner: :aeser_api_encoder.encode(:account_pubkey, <<miner::256>>),
+      beneficiary: :aeser_api_encoder.encode(:account_pubkey, <<beneficiary::256>>),
       target: target,
       pow_evidence: deserialized_pow_evidence,
       nonce: nonce,
       time: time,
       info: :aeser_api_encoder.encode(:contract_bytearray, info)
     }
+  end
+
+  defp rlp_decode(@micro_block, encoded_micro_block) do
+    [
+      _vsn,
+      micro_block_bin,
+      is_light
+    ] = :aeser_rlp.decode(encoded_micro_block)
+
+    light_micro_template = [header: :binary, tx_hashes: [:binary], pof: [:binary]]
+    {type, version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(micro_block_bin)
+
+    [header: header_bin, tx_hashes: tx_hashes, pof: pof] =
+      :aeser_chain_objects.deserialize(
+        type,
+        version,
+        light_micro_template,
+        micro_block_bin
+      )
+
+    <<version::32, @micro_header::1, pof_tag::1, 0::30, height::64, prev_hash::256,
+      prev_key_hash::256, root_hash::256, txs_hash::256, time::64, rest::binary()>> = header_bin
+
+    {:ok, header_hash} = Hash.hash(header_bin)
+
+    prev_block_type =
+      if prev_hash == prev_key_hash do
+        :key_block_hash
+      else
+        :micro_block_hash
+      end
+
+    block_info = %{
+      version: version,
+      height: height,
+      prev_hash: :aeser_api_encoder.encode(prev_block_type, <<prev_hash::256>>),
+      prev_key_hash: :aeser_api_encoder.encode(:key_block_hash, <<prev_key_hash::256>>),
+      root_hash: :aeser_api_encoder.encode(:block_state_hash, <<root_hash::256>>),
+      txs_hash: :aeser_api_encoder.encode(:block_tx_hash, <<txs_hash::256>>),
+      time: time
+    }
+
+    %{block_info: block_info, hash: header_hash, tx_hashes: tx_hashes}
+  end
+
+  defp rlp_decode(@block_txs, encoded_txs) do
+    [
+      _vsn,
+      block_hash,
+      txs
+    ] = :aeser_rlp.decode(encoded_txs)
+
+    Enum.map(txs, fn encoded_tx -> decode_tx(encoded_tx) end) |> IO.inspect()
+  end
+
+  defp decode_tx(tx) do
+    [signatures: signatures, transaction: transaction] = Serialization.deserialize(tx, :signed_tx)
+    {type, _version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(transaction)
+    deserialized_tx = Serialization.deserialize(transaction, type)
+
+    {deserialized_tx, type}
   end
 
   defp bool_bin(bool) do

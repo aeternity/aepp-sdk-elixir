@@ -24,7 +24,7 @@ Core.Client.new(
     secret:
       "e647a7711a2ec9476033984e2805c0631730f402eae62bf23675084fd02034bc4bc297d3b621b99a229c3f9a3c0db1ce98573fc5d7098be2603357ba53340e2f"
   }, # keypair
-  "ae_uat", # network ID
+  "my_test", # network ID
   "http://localhost:3013/v2", # external URL
   "http://localhost:3113/v2" # internal URL
 )
@@ -33,7 +33,7 @@ Core.Client.new(
 **Deploy a smart contract:**
 ``` elixir
 iex> keypair = Utils.Keys.generate_keypair()
-iex> network_id = "ae_uat"
+iex> network_id = "my_test"
 iex> url = "https://sdk-testnet.aepps.com/v2"
 iex> internal_url = "https://sdk-testnet.aepps.com/v2"
 iex> client = Core.Client.new(keypair, network_id, url, internal_url)

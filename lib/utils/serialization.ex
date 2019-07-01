@@ -139,6 +139,11 @@ defmodule Utils.Serialization do
     process_serialize(fields, type)
   end
 
+  def serialize_for_client(tx, type) do
+    serialized_tx = serialize_for_client(tx)
+    Map.put(serialized_tx, :type, type)
+  end
+
   @doc """
   Deserialize an RLP binary payload with the template corresponding to the given type
 
@@ -206,6 +211,269 @@ defmodule Utils.Serialization do
     do: set_keys(rest_fields, rest_template, [{key, field} | fields_with_keys])
 
   defp set_keys([], [], fields_with_keys), do: Enum.reverse(fields_with_keys)
+
+  defp serialize_for_client(
+         sender_id: sender_id,
+         recipient_id: recipient_id,
+         amount: amount,
+         fee: fee,
+         ttl: ttl,
+         nonce: nonce,
+         payload: payload
+       ) do
+    %{
+      sender_id: :aeser_api_encoder.encode(:id_hash, sender_id),
+      recipient_id: :aeser_api_encoder.encode(:id_hash, recipient_id),
+      amount: amount,
+      fee: fee,
+      ttl: ttl,
+      nonce: nonce,
+      payload: payload
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         query_format: query_format,
+         response_format: response_format,
+         query_fee: query_fee,
+         ttl_type: ttl_type,
+         ttl_value: ttl_value,
+         fee: fee,
+         ttl: ttl,
+         abi_version: abi_version
+       ) do
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      query_format: query_format,
+      response_format: response_format,
+      query_fee: query_fee,
+      ttl_type: SerializationUtils.ttl_type_for_client(ttl_type),
+      ttl_value: ttl_value,
+      fee: fee,
+      ttl: ttl,
+      abi_version: abi_version
+    }
+  end
+
+  defp serialize_for_client(
+         sender_id: sender_id,
+         nonce: nonce,
+         oracle_id: oracle_id,
+         query: query,
+         query_fee: query_fee,
+         query_ttl_type: query_ttl_type,
+         query_ttl_value: query_ttl_value,
+         response_ttl_type: response_ttl_type,
+         response_ttl_value: response_ttl_value,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      sender_id: :aeser_api_encoder.encode(:id_hash, sender_id),
+      nonce: nonce,
+      oracle_id: :aeser_api_encoder.encode(:id_hash, oracle_id),
+      query: query,
+      query_fee: query_fee,
+      query_ttl_type: SerializationUtils.ttl_type_for_client(query_ttl_type),
+      query_ttl_value: query_ttl_value,
+      response_ttl_type: SerializationUtils.ttl_type_for_client(response_ttl_type),
+      response_ttl_value: response_ttl_value,
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         oracle_id: oracle_id,
+         nonce: nonce,
+         query_id: query_id,
+         response: response,
+         response_ttl_type: response_ttl_type,
+         response_ttl_value: response_ttl_value,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      oracle_id: :aeser_api_encoder.encode(:id_hash, oracle_id),
+      nonce: nonce,
+      query_id: :aeser_api_encoder.encode(:oracle_query_id, query_id),
+      response: response,
+      response_ttl_type: SerializationUtils.ttl_type_for_client(response_ttl_type),
+      response_ttl_value: response_ttl_value,
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         oracle_id: oracle_id,
+         nonce: nonce,
+         oracle_ttl_type: oracle_ttl_type,
+         oracle_ttl_value: oracle_ttl_value,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      oracle_id: :aeser_api_encoder.encode(:id_hash, oracle_id),
+      nonce: nonce,
+      oracle_ttl_type: SerializationUtils.ttl_type_for_client(oracle_ttl_type),
+      oracle_ttl_value: oracle_ttl_value,
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         name: name,
+         name_salt: name_salt,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      name: name,
+      name_salt: name_salt,
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         commitment_id: commitment_id,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      commitment_id: :aeser_api_encoder.encode(:id_hash, commitment_id),
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         name_id: name_id,
+         name_ttl: name_ttl,
+         pointers: pointers,
+         client_ttl: client_ttl,
+         fee: fee,
+         ttl: ttl
+       ) do
+    serialized_pointers =
+      Enum.map(pointers, fn {key, id} ->
+        %{key: key, id: :aeser_api_encoder.encode(:id_hash, id)}
+      end)
+
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      name_id: :aeser_api_encoder.encode(:id_hash, name_id),
+      name_ttl: name_ttl,
+      pointers: serialized_pointers,
+      client_ttl: client_ttl,
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         name_id: name_id,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      name_id: :aeser_api_encoder.encode(:id_hash, name_id),
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         account_id: account_id,
+         nonce: nonce,
+         name_id: name_id,
+         recipient_id: recipient_id,
+         fee: fee,
+         ttl: ttl
+       ) do
+    %{
+      account_id: :aeser_api_encoder.encode(:id_hash, account_id),
+      nonce: nonce,
+      name_id: :aeser_api_encoder.encode(:id_hash, name_id),
+      recipient_id: :aeser_api_encoder.encode(:id_hash, recipient_id),
+      fee: fee,
+      ttl: ttl
+    }
+  end
+
+  defp serialize_for_client(
+         owner_id: owner_id,
+         nonce: nonce,
+         code: code,
+         ct_version: ct_version,
+         fee: fee,
+         ttl: ttl,
+         deposit: deposit,
+         amount: amount,
+         gas: gas,
+         gas_price: gas_price,
+         call_data: call_data
+       ) do
+    %{
+      owner_id: :aeser_api_encoder.encode(:id_hash, owner_id),
+      nonce: nonce,
+      code: :aeser_api_encoder.encode(:contract_bytearray, code),
+      ct_version: ct_version,
+      fee: fee,
+      ttl: ttl,
+      deposit: deposit,
+      amount: amount,
+      gas: gas,
+      gas_price: gas_price,
+      call_data: :aeser_api_encoder.encode(:contract_bytearray, call_data)
+    }
+  end
+
+  defp serialize_for_client(
+         caller_id: caller_id,
+         nonce: nonce,
+         contract_id: contract_id,
+         abi_version: abi_version,
+         fee: fee,
+         ttl: ttl,
+         amount: amount,
+         gas: gas,
+         gas_price: gas_price,
+         call_data: call_data
+       ) do
+    %{
+      caller_id: :aeser_api_encoder.encode(:id_hash, caller_id),
+      nonce: nonce,
+      contract_id: :aeser_api_encoder.encode(:id_hash, contract_id),
+      abi_version: abi_version,
+      fee: fee,
+      ttl: ttl,
+      amount: amount,
+      gas: gas,
+      gas_price: gas_price,
+      call_data: :aeser_api_encoder.encode(:contract_bytearray, call_data)
+    }
+  end
 
   defp serialization_template(:signed_tx) do
     [
@@ -349,15 +617,31 @@ defmodule Utils.Serialization do
     ]
   end
 
-  defp serialization_template(:ping) do
+  defp serialization_template(:ga_attach_tx) do
     [
-      port: :int,
-      share: :int,
-      genesis_hash: :binary,
-      difficulty: :int,
-      best_hash: :binary,
-      sync_allowed: :bool,
-      peers: [:binary]
+      owner_id: :id,
+      nonce: :int,
+      code: :binary,
+      auth_fun: :binary,
+      ct_version: :int,
+      fee: :int,
+      ttl: :int,
+      gas: :int,
+      gas_price: :int,
+      call_data: :binary
+    ]
+  end
+
+  defp serialization_template(:ga_meta_tx) do
+    [
+      ga_id: :id,
+      auth_data: :binary,
+      abi_version: :int,
+      fee: :int,
+      gas: :int,
+      gas_price: :int,
+      ttl: :int,
+      tx: :binary
     ]
   end
 

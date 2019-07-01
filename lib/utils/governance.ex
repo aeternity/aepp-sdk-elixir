@@ -113,6 +113,6 @@ defmodule Utils.Governance do
 
   defp protocol_effective_at_height(height, "ae_mainnet") when height < 47_800, do: 1
   defp protocol_effective_at_height(height, "ae_mainnet") when height >= 47_800, do: 2
-  defp protocol_effective_at_height(height, "ae_uat") when height < 40_900, do: 1
-  defp protocol_effective_at_height(height, "ae_uat") when height >= 40_900, do: 2
+  defp protocol_effective_at_height(height, "my_test") when height < 40_900, do: 1
+  defp protocol_effective_at_height(height, "my_test") when height >= 40_900, do: 2
 end
