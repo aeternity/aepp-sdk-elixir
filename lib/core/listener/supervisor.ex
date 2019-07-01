@@ -5,6 +5,7 @@ defmodule Core.Listener.Supervisor do
 
   use Supervisor
 
+  alias Core.Listener
   alias Core.Listener.Peers
   alias Core.Listener.PeerConnection
   alias Core.Listener.PeerConnectionSupervisor
@@ -34,7 +35,8 @@ defmodule Core.Listener.Supervisor do
           keypair: keypair,
           network: network
         }
-      )
+      ),
+      Listener
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

@@ -7,6 +7,7 @@ defmodule Core.Listener.PeerConnection do
 
   require Logger
 
+  alias Core.Listener
   alias Core.Listener.{Peers, Supervisor}
   alias Utils.Hash
   alias Utils.Serialization
@@ -169,7 +170,7 @@ defmodule Core.Listener.PeerConnection do
           spawn(fn -> handle_ping(:todo, self(), state) end)
 
         @key_block ->
-          spawn(fn -> handle_new_key_block(:todo) end)
+          spawn(fn -> handle_new_key_block(deserialized_payload) end)
 
         @micro_block ->
           handle_new_micro_block(deserialized_payload, socket)
@@ -321,8 +322,7 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp handle_new_key_block(key_block) do
-    # Listener.notify_new_block(block)
-    IO.inspect(key_block)
+    Listener.notify_for_key_block(key_block)
   end
 
   defp handle_new_micro_block(
