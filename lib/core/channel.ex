@@ -739,7 +739,7 @@ defmodule Core.Channel do
   Serialize the list of fields to RLP transaction binary, adds signatures and post it to the node.
 
   ## Example
-      iex> Core.Channel.post(client, tx, [signature_1, signature_2])
+      iex> Core.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
           block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
@@ -749,35 +749,28 @@ defmodule Core.Channel do
         }
   """
   @spec post(Client.t(), struct(), list() | :no_signatures) :: {:ok, map()} | {:error, String.t()}
-  def post(client, tx, opts \\ [signatures_list: :no_signatures]) do
-    post_(client, tx, opts)
+  def post(client, tx, opts \\ []) do
+    post_(client, tx, [signatures_list: Keyword.get(opts, :signatures_list, :no_signatures), inner_tx: Keyword.get(opts, :inner_tx, :no_inner_tx)])
   end
 
-  # post_ B+B
 
   # post_ G+G
-  defp post_(%Client{connection: _connection} = _client, _tx,
+  defp post_(%Client{connection: connection} = client, tx,
          signatures_list: :no_signatures,
-         inner_tx: _inner_tx
+         inner_tx: inner_meta_tx
        ) do
     # TODO to be implemented
     nil
   end
 
-  ## post B+G ??AND?? G+B
-  # defp post_() do
-  #   # TODO to be implemented
-  #   nil
-  # end
-
-  # TODO CHECK IF SERIALIZED INNER TX MATCHES WITH SERIALIZED  INNER TX PROVIDED BY USER
-  defp post_(client, %{tx: _serialized_inner_tx} = meta_tx,
+  # POST GA account + Basic account
+  defp post_(client, %{tx: serialized_inner_tx} = meta_tx,
          signatures_list: basic_account_signature,
          inner_tx: inner_tx
        )
        when is_list(basic_account_signature) do
-    # case serialized_inner_tx  === Serialization.serialize(inner_tx, :signed_tx) do
-    #  true ->
+   case serialized_inner_tx  === Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
+      true ->
     new_serialized_inner_tx =
       Serialization.serialize(
         [basic_account_signature, Serialization.serialize(inner_tx)],
@@ -797,9 +790,7 @@ defmodule Core.Channel do
       TransactionApi.post_transaction(client.connection, %Tx{
         tx: signed_tx
       })
-
     {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-    IO.inspect(inner_tx, label: "inner_tx")
 
     case inner_tx do
       %ChannelCreateTx{} ->
@@ -808,16 +799,23 @@ defmodule Core.Channel do
 
         {:ok, Map.put(res, :channel_id, channel_id)}
 
+      %ChannelDepositTx{} ->
+
+        {:ok, channel_info} =  get_by_pubkey(client, inner_tx.channel_id)
+
+        {:ok, Map.put(res, :info, channel_info)}
       _ ->
-        {:ok, res}
+        {:ok, channel_info} =  get_by_pubkey(client, inner_tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
     end
 
-    # Transaction.try_post(client, tx, nil, height, signatures_list)
-    #   false -> {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
-    # end
+
+     false -> {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    end
   end
 
-  defp post_(%Client{connection: connection} = client, tx, signatures_list: signatures_list)
+  # POST Basic account + Basic account
+  defp post_(%Client{connection: connection} = client, tx, signatures_list: signatures_list, inner_tx: :no_inner_tx)
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
     {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
@@ -831,6 +829,10 @@ defmodule Core.Channel do
       _ ->
         {:ok, res}
     end
+  end
+
+  defp post_(client,tx, opts_list) do
+    {:error, "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{inspect opts_list}"}
   end
 
   defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)
@@ -865,8 +867,6 @@ defmodule Core.Channel do
   end
 
   defp wrap_in_signature_signed_tx(tx, signature_list) do
-    IO.inspect(tx, label: "******TX*****")
-    IO.inspect(signature_list, label: "******signature_list*****")
     serialized_tx = Serialization.serialize(tx)
     signed_tx_fields = [signature_list, serialized_tx]
     Serialization.serialize(signed_tx_fields, :signed_tx)
