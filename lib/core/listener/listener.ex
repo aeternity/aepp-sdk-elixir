@@ -16,6 +16,7 @@ defmodule Core.Listener do
      %{
        micro_block_subscribers: [],
        key_block_subscribers: [],
+       txs_subscribers: [],
        spend_transaction_subscribers: [],
        oracle_query_subscribers: [],
        oracle_response_subscribers: []
@@ -36,6 +37,14 @@ defmodule Core.Listener do
 
   def unsubscribe_from_key_blocks(subscriber_pid) do
     GenServer.call(__MODULE__, {:unsubscribe_from_key_blocks, subscriber_pid})
+  end
+
+  def subscribe_for_txs(subscriber_pid) do
+    GenServer.call(__MODULE__, {:subscribe_for_txs, subscriber_pid})
+  end
+
+  def unsubscribe_from_txs(subscriber_pid) do
+    GenServer.call(__MODULE__, {:unsubscribe_from_txs, subscriber_pid})
   end
 
   def subscribe_for_spend_transactions(subscriber_pid, pubkey) do
@@ -68,6 +77,10 @@ defmodule Core.Listener do
 
   def notify_for_key_block(key_block) do
     GenServer.cast(__MODULE__, {:notify_for_key_block, key_block})
+  end
+
+  def notify_for_txs(txs) do
+    GenServer.cast(__MODULE__, {:notify_for_txs, txs})
   end
 
   def get_state do
@@ -110,6 +123,22 @@ defmodule Core.Listener do
       ) do
     {:reply, :ok,
      %{state | key_block_subscribers: List.delete(key_block_subscribers, subscriber_pid)}}
+  end
+
+  def handle_call(
+        {:subscribe_for_txs, subscriber_pid},
+        _from,
+        %{txs_subscribers: txs_subscribers} = state
+      ) do
+    {:reply, :ok, %{state | txs_subscribers: add_subscriber(subscriber_pid, txs_subscribers)}}
+  end
+
+  def handle_call(
+        {:unsubscribe_from_txs, subscriber_pid},
+        _from,
+        %{txs_subscribers: txs_subscribers} = state
+      ) do
+    {:reply, :ok, %{state | txs_subscribers: List.delete(txs_subscribers, subscriber_pid)}}
   end
 
   def handle_call(
@@ -230,6 +259,17 @@ defmodule Core.Listener do
         } = state
       ) do
     send_object_to_subscribers(key_block, key_block_subscribers)
+
+    {:noreply, state}
+  end
+
+  def handle_cast(
+        {:notify_for_txs, txs},
+        %{
+          txs_subscribers: txs_subscribers
+        } = state
+      ) do
+    send_object_to_subscribers(txs, txs_subscribers)
 
     {:noreply, state}
   end

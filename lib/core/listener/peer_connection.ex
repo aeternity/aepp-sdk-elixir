@@ -34,6 +34,7 @@ defmodule Core.Listener.PeerConnection do
 
   @first_ping_timeout 30_000
 
+  @get_block_txs_version 1
   @ping_version 1
   @share 32
   @difficulty 0
@@ -41,6 +42,7 @@ defmodule Core.Listener.PeerConnection do
   @sync_allowed <<0>>
 
   @msg_id_size 2
+  @hash_size 256
 
   def start_link(ref, socket, transport, opts) do
     args = [ref, socket, transport, opts]
@@ -57,12 +59,12 @@ defmodule Core.Listener.PeerConnection do
     :ok = :proc_lib.init_ack({:ok, self()})
     {:ok, {host, _}} = :inet.peername(socket)
     host_bin = host |> :inet.ntoa() |> :binary.list_to_bin()
-    genesis_hash = genesis_hash(:testnet)
+    genesis_hash = genesis_hash("my_test")
     version = <<@p2p_protocol_vsn::64>>
 
     state = Map.merge(opts, %{host: host_bin, version: version, genesis: genesis_hash})
 
-    noise_opts = noise_opts(state.privkey, state.pubkey, genesis_hash, version)
+    noise_opts = noise_opts(state.privkey, state.pubkey, genesis_hash, version, state.network)
     :ok = :ranch.accept_ack(ref)
     :ok = :ranch_tcp.setopts(socket, [{:active, true}])
 
@@ -79,7 +81,7 @@ defmodule Core.Listener.PeerConnection do
   end
 
   def init(conn_info) do
-    genesis_hash = genesis_hash(:testnet)
+    genesis_hash = genesis_hash("my_test")
 
     updated_con_info =
       Map.merge(conn_info, %{
@@ -106,12 +108,13 @@ defmodule Core.Listener.PeerConnection do
           privkey: privkey,
           r_pubkey: r_pubkey,
           host: host,
-          port: port
+          port: port,
+          network: network_id
         } = state
       ) do
     case :gen_tcp.connect(host, port, [:binary, reuseaddr: true, active: false]) do
       {:ok, socket} ->
-        noise_opts = noise_opts(privkey, pubkey, r_pubkey, genesis, version)
+        noise_opts = noise_opts(privkey, pubkey, r_pubkey, genesis, version, network_id)
 
         :inet.setopts(socket, active: true)
 
@@ -119,7 +122,7 @@ defmodule Core.Listener.PeerConnection do
           {:ok, noise_socket, _status} ->
             new_state = Map.put(state, :status, {:connected, noise_socket})
             peer = %{host: host, pubkey: r_pubkey, port: port, connection: self()}
-            :ok = do_ping(new_state)
+            :ok = do_ping(noise_socket, network_id)
             Peers.add_peer(peer)
             {:noreply, new_state}
 
@@ -170,7 +173,7 @@ defmodule Core.Listener.PeerConnection do
           spawn(fn -> handle_ping(:todo, self(), state) end)
 
         @key_block ->
-          spawn(fn -> handle_new_key_block(deserialized_payload) end)
+          handle_new_key_block(deserialized_payload)
 
         @micro_block ->
           handle_new_micro_block(deserialized_payload, socket)
@@ -188,12 +191,6 @@ defmodule Core.Listener.PeerConnection do
 
     Peers.remove_peer(state.r_pubkey)
     {:stop, :normal, state}
-  end
-
-  defp do_ping(%{status: {:connected, socket}}) do
-    rlp_ping = :aeser_rlp.encode(ping_object_fields())
-    msg = <<@ping::16, rlp_ping::binary()>>
-    :enoise.send(socket, msg)
   end
 
   defp handle_fragment(state, 1, _m, fragment) do
@@ -248,7 +245,7 @@ defmodule Core.Listener.PeerConnection do
 
     exclude = Enum.map(peers, fn peer -> peer.pubkey end)
 
-    send_response({:ok, ping_object_fields()}, @ping, conn_pid)
+    send_response({:ok, ping_object_fields(network)}, @ping, conn_pid)
   end
 
   defp send_response(result, type, pid) do
@@ -299,10 +296,6 @@ defmodule Core.Listener.PeerConnection do
 
   defp pack_msg(type, payload), do: <<type::16, rlp_encode(type, payload)::binary>>
 
-  defp rlp_encode(type, payload) do
-    :todo
-  end
-
   defp handle_ping_msg(
          %{
            genesis_hash: genesis_hash,
@@ -321,66 +314,26 @@ defmodule Core.Listener.PeerConnection do
     end
   end
 
-  defp handle_new_key_block(key_block) do
-    Listener.notify_for_key_block(key_block)
-  end
+  defp handle_new_key_block(key_block), do: Listener.notify_for_key_block(key_block)
 
   defp handle_new_micro_block(
-         %{block_info: block_info, hash: hash, tx_hashes: tx_hashes} = info,
+         %{block_info: block_info, hash: hash, tx_hashes: tx_hashes},
          socket
        ) do
-    get_block_txs_rlp = :aeser_rlp.encode([:binary.encode_unsigned(1), hash, tx_hashes])
-
-    get_block_txs_msg = <<@get_block_txs::16, get_block_txs_rlp::binary>>
-
-    :ok = :enoise.send(socket, get_block_txs_msg)
+    Listener.notify_for_micro_block(block_info)
+    do_get_block_txs(hash, tx_hashes, socket)
   end
 
   defp handle_block_txs(txs) do
     serialized_txs =
       Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
-      |> IO.inspect()
 
-    # Listener.publish_txs(serialized_txs)
+    Listener.notify_for_txs(serialized_txs)
   end
 
-  defp ping_object_fields(),
-    do: [
-      :binary.encode_unsigned(@ping_version),
-      :binary.encode_unsigned(Supervisor.port()),
-      :binary.encode_unsigned(@share),
-      genesis_hash(:testnet),
-      :binary.encode_unsigned(@difficulty),
-      genesis_hash(:testnet),
-      @sync_allowed,
-      []
-    ]
-
-  defp noise_opts(privkey, pubkey, r_pubkey, genesis_hash, version) do
-    [
-      {:rs, :enoise_keypair.new(:dh25519, r_pubkey)}
-      | noise_opts(privkey, pubkey, genesis_hash, version)
-    ]
+  defp rlp_encode(type, payload) do
+    :todo
   end
-
-  defp noise_opts(privkey, pubkey, genesis_hash, version) do
-    [
-      noise: "Noise_XK_25519_ChaChaPoly_BLAKE2b",
-      s: :enoise_keypair.new(:dh25519, privkey, pubkey),
-      prologue: <<version::binary(), genesis_hash::binary()>> <> <<"my_test">>,
-      timeout: @noise_timeout
-    ]
-  end
-
-  defp genesis_hash(:mainnet),
-    do:
-      <<108, 21, 218, 110, 191, 175, 2, 120, 254, 175, 77, 241, 176, 241, 169, 130, 85, 7, 174,
-        123, 154, 73, 75, 195, 76, 145, 113, 63, 56, 221, 87, 131>>
-
-  defp genesis_hash(:testnet),
-    do:
-      <<174, 36, 148, 219, 224, 173, 204, 138, 98, 177, 222, 19, 81, 20, 248, 121, 34, 251, 150,
-        97, 11, 12, 130, 0, 6, 186, 138, 239, 69, 85, 82, 206>>
 
   defp rlp_decode(@p2p_response, encoded_response) do
     [_vsn, result, type, reason, object] = :aeser_rlp.decode(encoded_response)
@@ -440,20 +393,16 @@ defmodule Core.Listener.PeerConnection do
       key_block_bin
     ] = :aeser_rlp.decode(encoded_key_block)
 
-    <<version::32, @key_header::1, _info_flag::1, 0::30, height::64, prev_hash::256,
-      prev_key_hash::256, root_hash::256, miner::256, beneficiary::256, target::32,
-      pow_evidence::1344, nonce::64, time::64, info::binary()>> = key_block_bin
+    <<version::32, @key_header::1, _info_flag::1, 0::30, height::64, prev_hash::@hash_size,
+      prev_key_hash::@hash_size, root_hash::@hash_size, miner::@hash_size,
+      beneficiary::@hash_size, target::32, pow_evidence::1344, nonce::64, time::64,
+      info::binary()>> = key_block_bin
 
     bin_pow_evidence = <<pow_evidence::1344>>
 
     deserialized_pow_evidence = for <<x::32 <- bin_pow_evidence>>, do: x
 
-    prev_block_type =
-      if prev_hash == prev_key_hash do
-        :key_block_hash
-      else
-        :micro_block_hash
-      end
+    prev_block_type = prev_block_type(prev_hash, prev_key_hash)
 
     %{
       version: version,
@@ -489,19 +438,21 @@ defmodule Core.Listener.PeerConnection do
         micro_block_bin
       )
 
-    <<version::32, @micro_header::1, pof_tag::1, 0::30, height::64, prev_hash::256,
-      prev_key_hash::256, root_hash::256, txs_hash::256, time::64, rest::binary()>> = header_bin
+    <<version::32, @micro_header::1, pof_tag::1, 0::30, height::64, prev_hash::@hash_size,
+      prev_key_hash::@hash_size, root_hash::@hash_size, txs_hash::@hash_size, time::64,
+      rest::binary()>> = header_bin
+
+    pof_hash_size = pof_tag * 32
+
+    <<pof_hash::size(pof_hash_size), signature::binary>> = rest
 
     {:ok, header_hash} = Hash.hash(header_bin)
 
-    prev_block_type =
-      if prev_hash == prev_key_hash do
-        :key_block_hash
-      else
-        :micro_block_hash
-      end
+    prev_block_type = prev_block_type(prev_hash, prev_key_hash)
 
     block_info = %{
+      pof_hash: encode_pof_hash(<<pof_hash::size(pof_hash_size)>>),
+      signature: :aeser_api_encoder.encode(:signature, signature),
       version: version,
       height: height,
       prev_hash: :aeser_api_encoder.encode(prev_block_type, <<prev_hash::256>>),
@@ -521,7 +472,7 @@ defmodule Core.Listener.PeerConnection do
       txs
     ] = :aeser_rlp.decode(encoded_txs)
 
-    Enum.map(txs, fn encoded_tx -> decode_tx(encoded_tx) end) |> IO.inspect()
+    Enum.map(txs, fn encoded_tx -> decode_tx(encoded_tx) end)
   end
 
   defp decode_tx(tx) do
@@ -531,6 +482,65 @@ defmodule Core.Listener.PeerConnection do
 
     {deserialized_tx, type}
   end
+
+  defp do_ping(socket, network_id) do
+    ping_rlp = network_id |> ping_object_fields() |> :aeser_rlp.encode()
+    msg = <<@ping::16, ping_rlp::binary()>>
+    :enoise.send(socket, msg)
+  end
+
+  defp do_get_block_txs(block_hash, tx_hashes, socket) do
+    get_block_txs_rlp = block_hash |> get_block_txs_fields(tx_hashes) |> :aeser_rlp.encode()
+
+    get_block_txs_msg = <<@get_block_txs::16, get_block_txs_rlp::binary>>
+
+    :ok = :enoise.send(socket, get_block_txs_msg)
+  end
+
+  defp ping_object_fields(network_id),
+    do: [
+      :binary.encode_unsigned(@ping_version),
+      :binary.encode_unsigned(Supervisor.port()),
+      :binary.encode_unsigned(@share),
+      genesis_hash(network_id),
+      :binary.encode_unsigned(@difficulty),
+      genesis_hash(network_id),
+      @sync_allowed,
+      []
+    ]
+
+  defp get_block_txs_fields(block_hash, tx_hashes),
+    do: [:binary.encode_unsigned(@get_block_txs_version), block_hash, tx_hashes]
+
+  defp noise_opts(privkey, pubkey, r_pubkey, genesis_hash, version, network_id) do
+    [
+      {:rs, :enoise_keypair.new(:dh25519, r_pubkey)}
+      | noise_opts(privkey, pubkey, genesis_hash, version, network_id)
+    ]
+  end
+
+  defp noise_opts(privkey, pubkey, genesis_hash, version, network_id) do
+    [
+      noise: "Noise_XK_25519_ChaChaPoly_BLAKE2b",
+      s: :enoise_keypair.new(:dh25519, privkey, pubkey),
+      prologue: <<version::binary(), genesis_hash::binary(), network_id::binary()>>,
+      timeout: @noise_timeout
+    ]
+  end
+
+  defp genesis_hash(:mainnet),
+    do:
+      <<108, 21, 218, 110, 191, 175, 2, 120, 254, 175, 77, 241, 176, 241, 169, 130, 85, 7, 174,
+        123, 154, 73, 75, 195, 76, 145, 113, 63, 56, 221, 87, 131>>
+
+  defp genesis_hash("my_test"),
+    do:
+      <<174, 36, 148, 219, 224, 173, 204, 138, 98, 177, 222, 19, 81, 20, 248, 121, 34, 251, 150,
+        97, 11, 12, 130, 0, 6, 186, 138, 239, 69, 85, 82, 206>>
+
+  defp encode_pof_hash(""), do: "no_fraud"
+
+  defp encode_pof_hash(pof_hash), do: :aeser_api_encoder.encode(:pof_hash, pof_hash)
 
   defp bool_bin(bool) do
     case bool do
@@ -545,6 +555,14 @@ defmodule Core.Listener.PeerConnection do
 
       <<0>> ->
         false
+    end
+  end
+
+  defp prev_block_type(prev_hash, prev_key_hash) do
+    if prev_hash == prev_key_hash do
+      :key_block_hash
+    else
+      :micro_block_hash
     end
   end
 end

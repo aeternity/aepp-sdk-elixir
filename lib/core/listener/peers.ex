@@ -52,7 +52,7 @@ defmodule Core.Listener.Peers do
 
   @spec try_connect(map()) :: :ok
   def try_connect(peer_info) do
-    GenServer.cast(__MODULE__, {:try_connect, Map.put(peer_info, :network, :testnet)})
+    GenServer.cast(__MODULE__, {:try_connect, Map.put(peer_info, :network, "my_test")})
   end
 
   def handle_call({:remove_peer, pubkey}, _from, %{peers: peers} = state) do
