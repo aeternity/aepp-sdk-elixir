@@ -1,10 +1,10 @@
 defmodule Core.Channel do
   @moduledoc """
   Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
-  Contains all channel-related functionality
+  Contains all channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
@@ -21,15 +21,12 @@ defmodule Core.Channel do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     Error,
-    Channel,
-    PostTxResponse,
-    Tx
+    Channel
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
   alias Utils.{Transaction, Serialization, Encoding, Hash}
-  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -143,7 +140,7 @@ defmodule Core.Channel do
          {:ok, %{height: height}} <-
            AeternityNode.Api.Chain.get_current_key_block_height(client.connection),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              create_channel_tx,
              height,
              client.network_id,
@@ -216,7 +213,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              close_mutual_tx,
              height,
              client.network_id,
@@ -272,7 +269,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              close_solo_tx,
              height,
              client.network_id,
@@ -350,7 +347,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              deposit_tx,
              height,
              client.network_id,
@@ -427,7 +424,7 @@ defmodule Core.Channel do
              update
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              force_progress_tx,
              height,
              client.network_id,
@@ -489,7 +486,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              settle_tx,
              height,
              client.network_id,
@@ -547,7 +544,7 @@ defmodule Core.Channel do
              Keyword.get(opts, :ttl, 0)
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              slash_tx,
              height,
              client.network_id,
@@ -604,7 +601,7 @@ defmodule Core.Channel do
              nonce
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              snapshot_solo_tx,
              height,
              client.network_id,
@@ -691,7 +688,7 @@ defmodule Core.Channel do
              round
            ),
          fee <-
-           calculate_n_times_fee(
+           Transaction.calculate_n_times_fee(
              withdraw_tx,
              height,
              client.network_id,
@@ -756,97 +753,7 @@ defmodule Core.Channel do
     )
   end
 
-  # post_ G+G
-  defp post_(%Client{} = client, meta_tx,
-         signatures_list: :no_signatures,
-         inner_tx: inner_meta_tx
-       )
-       when is_map(inner_meta_tx) do
-    # case serialized_inner_tx  === Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
-    #   true ->
-    new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_meta_tx, [])
-
-    new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
-
-    signed_tx =
-      Encoding.prefix_encode_base64(
-        "tx",
-        wrap_in_signature_signed_tx(new_meta_tx, [])
-      )
-
-    # [meta_tx(tx(signatu)),[]]
-    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-      TransactionApi.post_transaction(client.connection, %Tx{
-        tx: signed_tx
-      })
-
-    {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-    # check tx type if create -> compute id
-    # case do
-    # ChannelCreateTx ->
-    # {:ok, channel_id} =
-    #   compute_channel_id(inner_tx., meta_tx.auth_data, inner_tx.responder_id)
-
-    # {:ok, Map.put(res, :channel_id, channel_id)}
-
-    # false ->
-    # end
-    # false ->
-    # {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
-    # end
-  end
-
-  # POST GA account + Basic account
-  defp post_(client, %{tx: serialized_inner_tx} = meta_tx,
-         signatures_list: basic_account_signature,
-         inner_tx: inner_tx
-       )
-       when is_list(basic_account_signature) and is_map(inner_tx) do
-    case serialized_inner_tx ===
-           Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
-      true ->
-        new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_tx, basic_account_signature)
-
-        new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
-
-        signed_tx =
-          Encoding.prefix_encode_base64(
-            "tx",
-            wrap_in_signature_signed_tx(new_meta_tx, [])
-          )
-
-        # [meta_tx(tx(signatu)),[]]
-        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-          TransactionApi.post_transaction(client.connection, %Tx{
-            tx: signed_tx
-          })
-
-        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-
-        case inner_tx do
-          %ChannelCreateTx{} ->
-            {:ok, channel_id} =
-              compute_channel_id(inner_tx.initiator_id, meta_tx.auth_data, inner_tx.responder_id)
-
-            {:ok, Map.put(res, :channel_id, channel_id)}
-
-          %ChannelDepositTx{} ->
-            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
-
-            {:ok, Map.put(res, :info, channel_info)}
-
-          _ ->
-            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
-            {:ok, Map.put(res, :info, channel_info)}
-        end
-
-      false ->
-        {:error,
-         "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
-    end
-  end
-
-  # POST Basic account + Basic account
+  ## POST Basic account + Basic account
   defp post_(%Client{connection: connection} = client, tx,
          signatures_list: signatures_list,
          inner_tx: :no_inner_tx
@@ -939,19 +846,6 @@ defmodule Core.Channel do
        delegate_ids: delegate_ids,
        state_hash: state_hash
      }}
-  end
-
-  defp calculate_n_times_fee(tx, height, network_id, fee, gas_price, times) do
-    calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, 0)
-  end
-
-  defp calculate_fee_n_times(_tx, _height, _network_id, _fee, _gas_price, 0, acc) do
-    acc
-  end
-
-  defp calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, _acc) do
-    acc = Transaction.calculate_fee(tx, height, network_id, 0, gas_price)
-    calculate_fee_n_times(%{tx | fee: acc}, height, network_id, fee, gas_price, times - 1, acc)
   end
 
   defp build_close_mutual_tx(
