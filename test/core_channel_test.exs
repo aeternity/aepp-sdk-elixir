@@ -41,7 +41,12 @@ defmodule CoreChannelTest do
         "http://localhost:3113/v2"
       )
 
-    [client: client, client1: client1, client2: client2]
+    source_code = "contract Authorization =
+
+        function auth(auth_value : bool) =
+          auth_value"
+
+    [client: client, client1: client1, client2: client2, source_code: source_code]
   end
 
   @tag :travis_test
@@ -51,7 +56,12 @@ defmodule CoreChannelTest do
              Account.spend(
                setup_data.client,
                setup_data.client1.keypair.public,
-               10_000_000_000_000
+               10_000_000_000_000,
+               auth: [
+                 auth_contract_source: setup_data.source_code,
+                 auth_args: ["true"],
+                 fee: 100_000_000
+               ]
              )
            )
 
@@ -60,7 +70,12 @@ defmodule CoreChannelTest do
              Account.spend(
                setup_data.client,
                setup_data.client2.keypair.public,
-               10_000_000_000_000
+               10_000_000_000_000,
+               auth: [
+                 auth_contract_source: setup_data.source_code,
+                 auth_args: ["true"],
+                 fee: 100_000_000
+               ]
              )
            )
 
