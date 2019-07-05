@@ -173,7 +173,8 @@ defmodule Core.Listener.PeerConnection do
           spawn(fn -> handle_ping(:todo, self(), state) end)
 
         @key_block ->
-          handle_new_key_block(deserialized_payload)
+          payload_hash = Hash.hash(payload)
+          handle_new_key_block(deserialized_payload, payload_hash)
 
         @micro_block ->
           handle_new_micro_block(deserialized_payload, socket)
@@ -314,13 +315,14 @@ defmodule Core.Listener.PeerConnection do
     end
   end
 
-  defp handle_new_key_block(key_block), do: Listener.notify_for_key_block(key_block)
+  defp handle_new_key_block(key_block, key_block_hash),
+    do: Listener.notify_for_key_block(key_block, key_block_hash)
 
   defp handle_new_micro_block(
          %{block_info: block_info, hash: hash, tx_hashes: tx_hashes},
          socket
        ) do
-    Listener.notify_for_micro_block(block_info)
+    Listener.notify_for_micro_block(block_info, hash)
     do_get_block_txs(hash, tx_hashes, socket)
   end
 

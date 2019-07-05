@@ -14,6 +14,7 @@ defmodule Core.Listener do
   def init(_) do
     {:ok,
      %{
+       objects_sent: %{},
        micro_block_subscribers: [],
        key_block_subscribers: [],
        txs_subscribers: [],
@@ -71,12 +72,12 @@ defmodule Core.Listener do
     GenServer.call(__MODULE__, {:unsubscribe_from_oracle_response, subscriber_pid, query_id})
   end
 
-  def notify_for_micro_block(micro_block) do
-    GenServer.cast(__MODULE__, {:notify_for_micro_block, micro_block})
+  def notify_for_micro_block(micro_block, hash) do
+    GenServer.cast(__MODULE__, {:notify_for_micro_block, micro_block, hash})
   end
 
-  def notify_for_key_block(key_block) do
-    GenServer.cast(__MODULE__, {:notify_for_key_block, key_block})
+  def notify_for_key_block(key_block, hash) do
+    GenServer.cast(__MODULE__, {:notify_for_key_block, key_block, hash})
   end
 
   def notify_for_txs(txs) do
@@ -242,25 +243,35 @@ defmodule Core.Listener do
   end
 
   def handle_cast(
-        {:notify_for_micro_block, micro_block},
+        {:notify_for_micro_block, micro_block, hash},
         %{
+          objects_sent: objects_sent,
           micro_block_subscribers: micro_block_subscribers
         } = state
       ) do
-    send_object_to_subscribers(micro_block, micro_block_subscribers)
+    updated_objects_sent =
+      send_object_to_subscribers(
+        :micro_block,
+        micro_block,
+        hash,
+        micro_block_subscribers,
+        objects_sent
+      )
 
-    {:noreply, state}
+    {:noreply, %{state | objects_sent: updated_objects_sent}}
   end
 
   def handle_cast(
-        {:notify_for_key_block, key_block},
+        {:notify_for_key_block, key_block, hash},
         %{
+          objects_sent: objects_sent,
           key_block_subscribers: key_block_subscribers
         } = state
       ) do
-    send_object_to_subscribers(key_block, key_block_subscribers)
+    updated_objects_sent =
+      send_object_to_subscribers(:key_block, key_block, hash, key_block_subscribers, objects_sent)
 
-    {:noreply, state}
+    {:noreply, %{state | objects_sent: updated_objects_sent}}
   end
 
   def handle_cast(
@@ -269,7 +280,7 @@ defmodule Core.Listener do
           txs_subscribers: txs_subscribers
         } = state
       ) do
-    send_object_to_subscribers(txs, txs_subscribers)
+    # send_object_to_subscribers(txs, txs_subscribers)
 
     {:noreply, state}
   end
@@ -282,9 +293,19 @@ defmodule Core.Listener do
     end
   end
 
-  defp send_object_to_subscribers(object, subscribers) do
-    Enum.each(subscribers, fn subscriber ->
-      send(subscriber, object)
+  defp send_object_to_subscribers(type, object, hash, subscribers, objects_sent) do
+    Enum.reduce(subscribers, objects_sent, fn subscriber, acc ->
+      object_receivers = Map.get(objects_sent, hash, [])
+
+      if Enum.member?(object_receivers, subscriber) do
+        acc
+      else
+        send(subscriber, {type, object})
+
+        Map.update(objects_sent, hash, [subscriber], fn obj_receivers ->
+          obj_receivers ++ [subscriber]
+        end)
+      end
     end)
   end
 end
