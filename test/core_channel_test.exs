@@ -3,7 +3,6 @@ defmodule CoreChannelTest do
 
   alias Core.{Account, Client, Channel}
   alias Utils.{Encoding, Transaction}
-  alias AeternityNode.Api.Channel, as: ChannelApi
 
   setup_all do
     client =
@@ -33,7 +32,7 @@ defmodule CoreChannelTest do
     [client: client, client1: client1]
   end
 
-  @tag :channel
+  @tag :travis_test
   test "create, deposit, withdraw and close_mutual channel", setup_data do
     assert match?(
              {:ok, _},
@@ -58,7 +57,7 @@ defmodule CoreChannelTest do
              Channel.post(setup_data.client, tx, signatures_list: [sig, sig1])
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             ChannelApi.get_channel_by_pubkey(setup_data.client.connection, channel_id)
+             Channel.get_by_pubkey(setup_data.client, channel_id)
 
     assert match?(2_000, channel_amount)
 
@@ -75,7 +74,7 @@ defmodule CoreChannelTest do
     assert match?({:ok, _}, Channel.post(setup_data.client, tx, signatures_list: [sig, sig1]))
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             ChannelApi.get_channel_by_pubkey(setup_data.client.connection, channel_id)
+             Channel.get_by_pubkey(setup_data.client, channel_id)
 
     assert match?(1_000_000_002_000, channel_amount)
 
@@ -93,7 +92,7 @@ defmodule CoreChannelTest do
     assert match?({:ok, _}, Channel.post(setup_data.client, tx, signatures_list: [sig, sig1]))
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             ChannelApi.get_channel_by_pubkey(setup_data.client.connection, channel_id)
+             Channel.get_by_pubkey(setup_data.client, channel_id)
 
     assert match?(1_000_000_000_000, channel_amount)
 
@@ -103,7 +102,7 @@ defmodule CoreChannelTest do
 
     assert match?(
              {:ok, %{reason: "Channel not found"}},
-             ChannelApi.get_channel_by_pubkey(setup_data.client.connection, channel_id)
+             Channel.get_by_pubkey(setup_data.client, channel_id)
            )
   end
 end

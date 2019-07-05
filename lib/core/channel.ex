@@ -26,7 +26,7 @@ defmodule Core.Channel do
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias Utils.{Transaction, Encoding, Hash}
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -237,9 +237,6 @@ defmodule Core.Channel do
   @doc """
   Closes a channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_solo
-
-  ## Example
-      iex>
   """
   @spec close_solo(Client.t(), binary(), binary(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -375,9 +372,6 @@ defmodule Core.Channel do
   Forcing progress is the mechanism to be used when a dispute arises between parties and
   one of them wants to use the blockchain as an arbiter.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#forcing-progress
-
-  ## Example
-      iex>
   """
   @spec force_progress(
           Client.t(),
@@ -454,9 +448,6 @@ defmodule Core.Channel do
   but only required if the parties involved did not manage to cooperate when
   trying to close the channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
-
-  ## Example
-      iex>
   """
   @spec settle(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -512,9 +503,6 @@ defmodule Core.Channel do
   If a malicious party sent a channel_close_solo or channel_force_progress_tx with an outdated state,
   the honest party has the opportunity to issue a channel_slash transaction
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
-
-  ## Example
-      iex>
   """
   @spec slash(Client.t(), binary(), String.t(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -571,9 +559,6 @@ defmodule Core.Channel do
   we provide the functionality of snapshots. Snapshots provide a recent off-chain state
   to be recorded on-chain.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
-
-  ## Example
-      iex>
   """
   @spec snapshot_solo(Client.t(), binary(), String.t(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -736,6 +721,20 @@ defmodule Core.Channel do
   Serialize the list of fields to RLP transaction binary, adds signatures and post it to the node.
 
   ## Example
+      iex> tx = %AeternityNode.Model.ChannelCreateTx{
+                  channel_reserve: 1000,
+                  delegate_ids: [],
+                  fee: 17480000000,
+                  initiator_amount: 1000,
+                  initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                  lock_period: 100,
+                  nonce: 2,
+                  push_amount: 1000,
+                  responder_amount: 1000,
+                  responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+                  state_hash: "st_11111111111111111111111111111111273Yts",
+                  ttl: 0
+                }
       iex> Core.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
@@ -809,12 +808,6 @@ defmodule Core.Channel do
      "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
        inspect(nonce)
      } and responder_id: #{responder} "}
-  end
-
-  defp wrap_in_signature_signed_tx(tx, signature_list) do
-    serialized_tx = Serialization.serialize(tx)
-    signed_tx_fields = [signature_list, serialized_tx]
-    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
 
   defp build_create_channel_tx(
