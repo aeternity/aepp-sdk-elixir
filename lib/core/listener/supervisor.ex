@@ -14,27 +14,26 @@ defmodule Core.Listener.Supervisor do
   @default_port 3020
   @acceptors_count 10
 
-  def start_link(network) do
-    Supervisor.start_link(__MODULE__, network)
+  def start_link(%{network: _, genesis: _, initial_peers: _} = info) do
+    Supervisor.start_link(__MODULE__, info)
   end
 
-  def init(network) do
+  def init(info) do
     keypair = Keys.generate_peer_keypair()
 
     children = [
       PeerConnectionSupervisor,
-      {Peers, network},
+      {Peers, info},
       :ranch.child_spec(
         :peer_pool,
         @acceptors_count,
         :ranch_tcp,
         [port: @default_port],
         PeerConnection,
-        %{
-          port: @default_port,
-          keypair: keypair,
-          network: network
-        }
+        Map.merge(
+          %{port: @default_port, keypair: keypair},
+          info
+        )
       ),
       Listener
     ]

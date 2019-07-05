@@ -7,9 +7,18 @@ defmodule Core.Listener do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  def start(network_id) do
-    Supervisor.start_link(network_id)
-  end
+  def start(network_id) when network_id in ["ae_mainnet", "ae_uat"],
+    do: Supervisor.start_link(%{network: network_id, initial_peers: [], genesis: nil})
+
+  def start(_),
+    do:
+      {:error,
+       "Cannot start Listener for a non-predefined network, use start/3 for private networks"}
+
+  def start(peers, network_id, genesis_hash)
+      when is_list(peers) and is_binary(network_id) and is_binary(genesis_hash),
+      do:
+        Supervisor.start_link(%{initial_peers: peers, network: network_id, genesis: genesis_hash})
 
   def init(_) do
     {:ok,

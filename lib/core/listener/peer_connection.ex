@@ -59,7 +59,7 @@ defmodule Core.Listener.PeerConnection do
     :ok = :proc_lib.init_ack({:ok, self()})
     {:ok, {host, _}} = :inet.peername(socket)
     host_bin = host |> :inet.ntoa() |> :binary.list_to_bin()
-    genesis_hash = genesis_hash("my_test")
+    genesis_hash = Peers.genesis_hash("my_test")
     version = <<@p2p_protocol_vsn::64>>
 
     state = Map.merge(opts, %{host: host_bin, version: version, genesis: genesis_hash})
@@ -81,16 +81,10 @@ defmodule Core.Listener.PeerConnection do
   end
 
   def init(conn_info) do
-    genesis_hash = genesis_hash("my_test")
-
-    updated_con_info =
-      Map.merge(conn_info, %{
-        version: <<@p2p_protocol_vsn::64>>,
-        genesis: genesis_hash
-      })
+    updated_conn_info = Map.put(conn_info, :version, <<@p2p_protocol_vsn::64>>)
 
     # trigger a timeout so that a connection is attempted immediately
-    {:ok, updated_con_info, 0}
+    {:ok, updated_conn_info, 0}
   end
 
   def handle_call({:send_msg_no_response, msg}, _from, %{status: {:connected, socket}} = state) do
@@ -161,26 +155,25 @@ defmodule Core.Listener.PeerConnection do
         {:noise, _, <<type::16, payload::binary()>>},
         %{status: {:connected, socket}, network: network} = state
       ) do
-    if type != 9 do
-      deserialized_payload = rlp_decode(type, payload)
+    IO.inspect(type)
+    deserialized_payload = rlp_decode(type, payload)
 
-      case type do
-        @p2p_response ->
-          # we're only going to be receiving responses for ping
-          handle_response(deserialized_payload, network)
+    case type do
+      @p2p_response ->
+        # we're only going to be receiving responses for ping
+        handle_response(deserialized_payload, network)
 
-        @ping ->
-          spawn(fn -> handle_ping(:todo, self(), state) end)
+      @ping ->
+        spawn(fn -> handle_ping(:todo, self(), state) end)
 
-        @key_block ->
-          handle_new_key_block(deserialized_payload)
+      @key_block ->
+        handle_new_key_block(deserialized_payload)
 
-        @micro_block ->
-          handle_new_micro_block(deserialized_payload, socket)
+      @micro_block ->
+        handle_new_micro_block(deserialized_payload, socket)
 
-        _ ->
-          :ok
-      end
+      _ ->
+        :ok
     end
 
     {:noreply, state}
@@ -303,10 +296,10 @@ defmodule Core.Listener.PeerConnection do
          },
          network
        ) do
-    if genesis_hash(network) == genesis_hash do
+    if Peers.genesis_hash(network) == genesis_hash do
       Enum.each(peers, fn peer ->
         if !Peers.have_peer?(peer.pubkey) do
-          Peers.try_connect(peer)
+          peer |> Map.merge(%{genesis: genesis_hash, network: network}) |> Peers.try_connect()
         end
       end)
     else
@@ -502,9 +495,9 @@ defmodule Core.Listener.PeerConnection do
       :binary.encode_unsigned(@ping_version),
       :binary.encode_unsigned(Supervisor.port()),
       :binary.encode_unsigned(@share),
-      genesis_hash(network_id),
+      Peers.genesis_hash(network_id),
       :binary.encode_unsigned(@difficulty),
-      genesis_hash(network_id),
+      Peers.genesis_hash(network_id),
       @sync_allowed,
       []
     ]
@@ -527,16 +520,6 @@ defmodule Core.Listener.PeerConnection do
       timeout: @noise_timeout
     ]
   end
-
-  defp genesis_hash(:mainnet),
-    do:
-      <<108, 21, 218, 110, 191, 175, 2, 120, 254, 175, 77, 241, 176, 241, 169, 130, 85, 7, 174,
-        123, 154, 73, 75, 195, 76, 145, 113, 63, 56, 221, 87, 131>>
-
-  defp genesis_hash("my_test"),
-    do:
-      <<174, 36, 148, 219, 224, 173, 204, 138, 98, 177, 222, 19, 81, 20, 248, 121, 34, 251, 150,
-        97, 11, 12, 130, 0, 6, 186, 138, 239, 69, 85, 82, 206>>
 
   defp encode_pof_hash(""), do: "no_fraud"
 
