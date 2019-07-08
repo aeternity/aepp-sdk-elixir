@@ -36,7 +36,7 @@ defmodule Core.Client do
   ## Example
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "my_test"
+      iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
       iex> Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
@@ -62,7 +62,7 @@ defmodule Core.Client do
           secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61",
           public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
         },
-        network_id: "my_test"
+        network_id: "ae_uat"
       }
   """
   @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()

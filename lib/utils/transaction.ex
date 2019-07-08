@@ -43,7 +43,7 @@ defmodule Utils.Transaction do
     ContractCreateTx
   ]
 
-  @network_id_list ["ae_mainnet", "my_test"]
+  @network_id_list ["ae_mainnet", "ae_uat"]
 
   @await_attempts 25
   @await_attempt_interval 200
@@ -83,7 +83,7 @@ defmodule Utils.Transaction do
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-      iex> network_id = "my_test"
+      iex> network_id = "ae_uat"
       iex> gas_price = 1_000_000_000_000
       iex> {:ok, nonce} = Utils.Account.next_valid_nonce(connection, public_key)
       iex> source_code = "contract Number =
@@ -160,7 +160,7 @@ defmodule Utils.Transaction do
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
       }
-      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "my_test", 0, 1_000_000)
+      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
       16660000000
   """
   @spec calculate_fee(
