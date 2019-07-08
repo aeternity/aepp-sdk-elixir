@@ -3,6 +3,8 @@ defmodule Core.Listener do
 
   alias Core.Listener.Supervisor
 
+  @gc_objects_sent_interval 180_000
+
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
@@ -21,6 +23,8 @@ defmodule Core.Listener do
         Supervisor.start_link(%{initial_peers: peers, network: network_id, genesis: genesis_hash})
 
   def init(_) do
+    do_gc_objects_sent()
+
     {:ok,
      %{
        objects_sent: %{},
@@ -294,6 +298,11 @@ defmodule Core.Listener do
     {:noreply, state}
   end
 
+  def handle_info(:gc_objects_sent, state) do
+    do_gc_objects_sent()
+    {:noreply, %{state | objects_sent: %{}}}
+  end
+
   defp add_subscriber(subscriber, subscribers) do
     if Enum.member?(subscribers, subscriber) do
       subscribers
@@ -316,5 +325,9 @@ defmodule Core.Listener do
         end)
       end
     end)
+  end
+
+  defp do_gc_objects_sent() do
+    Process.send_after(self(), :gc_objects_sent, @gc_objects_sent_interval)
   end
 end
