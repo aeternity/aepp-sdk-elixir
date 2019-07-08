@@ -27,71 +27,65 @@ defmodule Core.Listener do
        micro_block_subscribers: [],
        key_block_subscribers: [],
        txs_subscribers: [],
+       pool_txs_subscribers: [],
        spend_transaction_subscribers: [],
        oracle_query_subscribers: [],
        oracle_response_subscribers: []
      }}
   end
 
-  def subscribe_for_micro_blocks(subscriber_pid) do
-    GenServer.call(__MODULE__, {:subscribe_for_micro_blocks, subscriber_pid})
-  end
+  def subscribe_for_micro_blocks(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:subscribe_for_micro_blocks, subscriber_pid})
 
-  def unsubscribe_from_micro_blocks(subscriber_pid) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_micro_blocks, subscriber_pid})
-  end
+  def unsubscribe_from_micro_blocks(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_micro_blocks, subscriber_pid})
 
-  def subscribe_for_key_blocks(subscriber_pid) do
-    GenServer.call(__MODULE__, {:subscribe_for_key_blocks, subscriber_pid})
-  end
+  def subscribe_for_key_blocks(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:subscribe_for_key_blocks, subscriber_pid})
 
-  def unsubscribe_from_key_blocks(subscriber_pid) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_key_blocks, subscriber_pid})
-  end
+  def unsubscribe_from_key_blocks(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_key_blocks, subscriber_pid})
 
-  def subscribe_for_txs(subscriber_pid) do
-    GenServer.call(__MODULE__, {:subscribe_for_txs, subscriber_pid})
-  end
+  def subscribe_for_txs(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:subscribe_for_txs, subscriber_pid})
 
-  def unsubscribe_from_txs(subscriber_pid) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_txs, subscriber_pid})
-  end
+  def unsubscribe_from_txs(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_txs, subscriber_pid})
 
-  def subscribe_for_spend_transactions(subscriber_pid, pubkey) do
-    GenServer.call(__MODULE__, {:subscribe_for_spend_transactions, subscriber_pid, pubkey})
-  end
+  def subscribe_for_pool_txs(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:subscribe_for_pool_txs, subscriber_pid})
 
-  def unsubscribe_from_spend_transactions(subscriber_pid, pubkey) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_spend_transactions, subscriber_pid, pubkey})
-  end
+  def unsubscribe_from_pool_txs(subscriber_pid),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_pool_txs, subscriber_pid})
 
-  def subscribe_for_oracle_queries(subscriber_pid, oracle_id) do
-    GenServer.call(__MODULE__, {:subscribe_for_oracle_queries, subscriber_pid, oracle_id})
-  end
+  def subscribe_for_spend_transactions(subscriber_pid, pubkey),
+    do: GenServer.call(__MODULE__, {:subscribe_for_spend_transactions, subscriber_pid, pubkey})
 
-  def unsubscribe_from_oracle_queries(subscriber_pid, oracle_id) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_oracle_queries, subscriber_pid, oracle_id})
-  end
+  def unsubscribe_from_spend_transactions(subscriber_pid, pubkey),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_spend_transactions, subscriber_pid, pubkey})
 
-  def subscribe_for_oracle_response(subscriber_pid, query_id) do
-    GenServer.call(__MODULE__, {:subscribe_for_oracle_response, subscriber_pid, query_id})
-  end
+  def subscribe_for_oracle_queries(subscriber_pid, oracle_id),
+    do: GenServer.call(__MODULE__, {:subscribe_for_oracle_queries, subscriber_pid, oracle_id})
 
-  def unsubscribe_from_oracle_response(subscriber_pid, query_id) do
-    GenServer.call(__MODULE__, {:unsubscribe_from_oracle_response, subscriber_pid, query_id})
-  end
+  def unsubscribe_from_oracle_queries(subscriber_pid, oracle_id),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_oracle_queries, subscriber_pid, oracle_id})
 
-  def notify_for_micro_block(micro_block, hash) do
-    GenServer.cast(__MODULE__, {:notify_for_micro_block, micro_block, hash})
-  end
+  def subscribe_for_oracle_response(subscriber_pid, query_id),
+    do: GenServer.call(__MODULE__, {:subscribe_for_oracle_response, subscriber_pid, query_id})
 
-  def notify_for_key_block(key_block, hash) do
-    GenServer.cast(__MODULE__, {:notify_for_key_block, key_block, hash})
-  end
+  def unsubscribe_from_oracle_response(subscriber_pid, query_id),
+    do: GenServer.call(__MODULE__, {:unsubscribe_from_oracle_response, subscriber_pid, query_id})
 
-  def notify_for_txs(txs) do
-    GenServer.cast(__MODULE__, {:notify_for_txs, txs})
-  end
+  def notify_for_micro_block(micro_block, hash),
+    do: GenServer.cast(__MODULE__, {:notify_for_micro_block, micro_block, hash})
+
+  def notify_for_key_block(key_block, hash),
+    do: GenServer.cast(__MODULE__, {:notify_for_key_block, key_block, hash})
+
+  def notify_for_txs(txs, hash), do: GenServer.cast(__MODULE__, {:notify_for_txs, txs, hash})
+
+  def notify_for_pool_txs(txs, hash),
+    do: GenServer.cast(__MODULE__, {:notify_for_pool_txs, txs, hash})
 
   def get_state do
     GenServer.call(__MODULE__, :get_state)
@@ -149,6 +143,23 @@ defmodule Core.Listener do
         %{txs_subscribers: txs_subscribers} = state
       ) do
     {:reply, :ok, %{state | txs_subscribers: List.delete(txs_subscribers, subscriber_pid)}}
+  end
+
+  def handle_call(
+        {:subscribe_for_pool_txs, subscriber_pid},
+        _from,
+        %{txs_subscribers: txs_subscribers} = state
+      ) do
+    {:reply, :ok,
+     %{state | pool_txs_subscribers: add_subscriber(subscriber_pid, txs_subscribers)}}
+  end
+
+  def handle_call(
+        {:unsubscribe_from_pool_txs, subscriber_pid},
+        _from,
+        %{txs_subscribers: txs_subscribers} = state
+      ) do
+    {:reply, :ok, %{state | pool_txs_subscribers: List.delete(txs_subscribers, subscriber_pid)}}
   end
 
   def handle_call(
@@ -284,14 +295,29 @@ defmodule Core.Listener do
   end
 
   def handle_cast(
-        {:notify_for_txs, txs},
+        {:notify_for_txs, txs, hash},
         %{
+          objects_sent: objects_sent,
           txs_subscribers: txs_subscribers
         } = state
       ) do
-    # send_object_to_subscribers(txs, txs_subscribers)
+    updated_objects_sent =
+      send_object_to_subscribers(:txs, txs, hash, txs_subscribers, objects_sent)
 
-    {:noreply, state}
+    {:noreply, %{state | objects_sent: updated_objects_sent}}
+  end
+
+  def handle_cast(
+        {:notify_for_pool_txs, txs, hash},
+        %{
+          objects_sent: objects_sent,
+          pool_txs_subscribers: pool_txs_subscribers
+        } = state
+      ) do
+    updated_objects_sent =
+      send_object_to_subscribers(:pool_txs, txs, hash, pool_txs_subscribers, objects_sent)
+
+    {:noreply, %{state | objects_sent: updated_objects_sent}}
   end
 
   defp add_subscriber(subscriber, subscribers) do

@@ -21,16 +21,13 @@ defmodule Core.Listener.PeerConnection do
   @micro_header 0
   @key_header 1
   @get_block_txs 7
+  @txs 9
   @key_block 10
   @micro_block 11
   @block_txs 13
   @p2p_response 100
 
   @noise_timeout 5000
-
-  @max_packet_size 0x1FF
-  @fragment_size 0x1F9
-  @fragment_size_bits @fragment_size * 8
 
   @first_ping_timeout 30_000
 
@@ -41,7 +38,6 @@ defmodule Core.Listener.PeerConnection do
   # don't trigger sync attempt when pinging
   @sync_allowed <<0>>
 
-  @msg_id_size 2
   @hash_size 256
 
   def start_link(ref, socket, transport, opts) do
@@ -59,7 +55,7 @@ defmodule Core.Listener.PeerConnection do
     :ok = :proc_lib.init_ack({:ok, self()})
     {:ok, {host, _}} = :inet.peername(socket)
     host_bin = host |> :inet.ntoa() |> :binary.list_to_bin()
-    genesis_hash = Peers.genesis_hash("my_test")
+    genesis_hash = Peers.genesis_hash(opts.genesis)
     version = <<@p2p_protocol_vsn::64>>
 
     state = Map.merge(opts, %{host: host_bin, version: version, genesis: genesis_hash})
@@ -155,26 +151,22 @@ defmodule Core.Listener.PeerConnection do
         {:noise, _, <<type::16, payload::binary()>>},
         %{status: {:connected, socket}, network: network} = state
       ) do
-    IO.inspect(type)
     deserialized_payload = rlp_decode(type, payload)
+
+    payload_hash = Hash.hash(payload)
 
     case type do
       @p2p_response ->
-        # we're only going to be receiving responses for ping
-        handle_response(deserialized_payload, network)
+        handle_response(deserialized_payload, payload_hash, network)
 
-      @ping ->
-        spawn(fn -> handle_ping(:todo, self(), state) end)
+      @txs ->
+        handle_new_pool_txs(deserialized_payload, payload_hash)
 
       @key_block ->
-        payload_hash = Hash.hash(payload)
         handle_new_key_block(deserialized_payload, payload_hash)
 
       @micro_block ->
         handle_new_micro_block(deserialized_payload, socket)
-
-      _ ->
-        :ok
     end
 
     {:noreply, state}
@@ -205,6 +197,7 @@ defmodule Core.Listener.PeerConnection do
 
   defp handle_response(
          %{result: true, type: type, object: object, reason: nil},
+         hash,
          network
        ) do
     case type do
@@ -212,83 +205,16 @@ defmodule Core.Listener.PeerConnection do
         handle_ping_msg(object, network)
 
       @block_txs ->
-        handle_block_txs(object)
+        handle_block_txs(object, hash)
     end
   end
 
-  defp handle_response(
-         %{result: false, type: _type, object: nil, reason: reason},
-         _network
-       ),
-       do: Logger.error(reason)
+  defp handle_new_pool_txs(txs, hash) do
+    serialized_txs =
+      Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
 
-  defp handle_ping(
-         %{
-           peers: peers,
-           port: port
-         } = payload,
-         conn_pid,
-         %{host: host, r_pubkey: r_pubkey, network: network}
-       ) do
-    if !Peers.have_peer?(r_pubkey) do
-      peer = %{pubkey: r_pubkey, port: port, host: host, connection: conn_pid}
-      Peers.add_peer(peer)
-    end
-
-    handle_ping_msg(payload, network)
-
-    exclude = Enum.map(peers, fn peer -> peer.pubkey end)
-
-    send_response({:ok, ping_object_fields(network)}, @ping, conn_pid)
+    Listener.notify_for_pool_txs(serialized_txs, hash)
   end
-
-  defp send_response(result, type, pid) do
-    payload =
-      case result do
-        {:ok, object} ->
-          %{result: true, type: type, reason: nil, object: object}
-
-        {:error, reason} ->
-          %{result: false, type: type, reason: reason, object: nil}
-      end
-
-    @p2p_response
-    |> pack_msg(payload)
-    |> send_msg_no_response(pid)
-  end
-
-  defp send_msg_no_response(msg, pid) when byte_size(msg) > @max_packet_size - @msg_id_size do
-    number_of_chunks = msg |> byte_size() |> Kernel./(@fragment_size) |> Float.ceil() |> trunc()
-    send_chunks(pid, 1, number_of_chunks, msg)
-  end
-
-  defp send_msg_no_response(msg, pid), do: GenServer.call(pid, {:send_msg_no_response, msg})
-
-  defp send_chunks(pid, fragment_index, total_fragments, msg)
-       when fragment_index == total_fragments do
-    send_fragment(
-      <<@msg_fragment::16, fragment_index::16, total_fragments::16, msg::binary()>>,
-      pid
-    )
-  end
-
-  defp send_chunks(
-         pid,
-         fragment_index,
-         total_fragments,
-         <<chunk::@fragment_size_bits, rest::binary()>>
-       ) do
-    send_fragment(
-      <<@msg_fragment::16, fragment_index::16, total_fragments::16, chunk::@fragment_size_bits>>,
-      pid
-    )
-
-    send_chunks(pid, fragment_index + 1, total_fragments, rest)
-  end
-
-  defp send_fragment(fragment, pid), do: GenServer.call(pid, {:send_msg_no_response, fragment})
-
-  defp pack_msg(type, payload), do: <<type::16, rlp_encode(type, payload)::binary>>
 
   defp handle_ping_msg(
          %{
@@ -300,7 +226,9 @@ defmodule Core.Listener.PeerConnection do
     if Peers.genesis_hash(network) == genesis_hash do
       Enum.each(peers, fn peer ->
         if !Peers.have_peer?(peer.pubkey) do
-          peer |> Map.merge(%{genesis: genesis_hash, network: network}) |> Peers.try_connect()
+          peer
+          |> Map.merge(%{genesis: genesis_hash, network: network})
+          |> Peers.try_connect()
         end
       end)
     else
@@ -319,15 +247,11 @@ defmodule Core.Listener.PeerConnection do
     do_get_block_txs(hash, tx_hashes, socket)
   end
 
-  defp handle_block_txs(txs) do
+  defp handle_block_txs(txs, hash) do
     serialized_txs =
       Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
 
-    Listener.notify_for_txs(serialized_txs)
-  end
-
-  defp rlp_encode(type, payload) do
-    :todo
+    Listener.notify_for_txs(serialized_txs, hash)
   end
 
   defp rlp_decode(@p2p_response, encoded_response) do
@@ -360,6 +284,12 @@ defmodule Core.Listener.PeerConnection do
       reason: deserialized_reason,
       object: deserialized_object
     }
+  end
+
+  defp rlp_decode(@txs, encoded_txs) do
+    [_vsn, txs] = :aeser_rlp.decode(encoded_txs)
+
+    Enum.map(txs, fn encoded_tx -> decode_tx(encoded_tx) end)
   end
 
   defp rlp_decode(@ping, encoded_ping) do
@@ -419,13 +349,13 @@ defmodule Core.Listener.PeerConnection do
     [
       _vsn,
       micro_block_bin,
-      is_light
+      _is_light
     ] = :aeser_rlp.decode(encoded_micro_block)
 
     light_micro_template = [header: :binary, tx_hashes: [:binary], pof: [:binary]]
     {type, version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(micro_block_bin)
 
-    [header: header_bin, tx_hashes: tx_hashes, pof: pof] =
+    [header: header_bin, tx_hashes: tx_hashes, pof: _pof] =
       :aeser_chain_objects.deserialize(
         type,
         version,
@@ -463,7 +393,7 @@ defmodule Core.Listener.PeerConnection do
   defp rlp_decode(@block_txs, encoded_txs) do
     [
       _vsn,
-      block_hash,
+      _block_hash,
       txs
     ] = :aeser_rlp.decode(encoded_txs)
 
@@ -471,7 +401,9 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp decode_tx(tx) do
-    [signatures: signatures, transaction: transaction] = Serialization.deserialize(tx, :signed_tx)
+    [signatures: _signatures, transaction: transaction] =
+      Serialization.deserialize(tx, :signed_tx)
+
     {type, _version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(transaction)
     deserialized_tx = Serialization.deserialize(transaction, type)
 

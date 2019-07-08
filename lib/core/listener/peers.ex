@@ -87,8 +87,6 @@ defmodule Core.Listener.Peers do
         {:try_connect, peer_info},
         %{peers: peers, local_keypair: %{secret: privkey, public: pubkey}} = state
       ) do
-    IO.inspect(peer_info)
-
     if peer_info.pubkey != pubkey do
       case Map.has_key?(peers, peer_info.pubkey) do
         false ->
@@ -96,6 +94,7 @@ defmodule Core.Listener.Peers do
             Map.merge(peer_info, %{r_pubkey: peer_info.pubkey, privkey: privkey, pubkey: pubkey})
 
           {:ok, _pid} = PeerConnectionSupervisor.start_peer_connection(conn_info)
+
           {:noreply, state}
 
         true ->
