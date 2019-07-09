@@ -40,7 +40,7 @@ defmodule Core.Channel do
   ## Example
       iex> Core.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok,
-         %AeternityNode.Model.Channel{
+         %{
            channel_amount: 16720002000,
            channel_reserve: 1000,
            delegate_ids: [],
@@ -57,8 +57,8 @@ defmodule Core.Channel do
          }}
 
   """
-  @spec get_by_pubkey(Core.Client.t(), binary()) ::
-          {:error, Tesla.Env.t()} | {:ok, AeternityNode.Model.Channel.t()}
+  @spec get_by_pubkey(Core.Client.t(), String.t()) ::
+          {:error, Tesla.Env.t()} | {:ok, map()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
     prepare_result(ChannelAPI.get_channel_by_pubkey(connection, channel_pubkey))
   end
@@ -185,7 +185,7 @@ defmodule Core.Channel do
         ]}
   """
   @spec close_mutual(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
-          {:ok, map()} | {:error, String.t()}
+          {:ok, list()} | {:error, String.t()}
   def close_mutual(
         %Client{
           keypair: %{
@@ -609,7 +609,7 @@ defmodule Core.Channel do
   end
 
   @doc """
-  Witdraws locked tokens from channel.
+  Withdraws locked tokens from channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
 
   ## Example
@@ -641,7 +641,7 @@ defmodule Core.Channel do
           non_neg_integer(),
           list()
         ) ::
-          {:ok, map()} | {:error, String.t()}
+          {:ok, list()} | {:error, String.t()}
   def withdraw(
         %Client{
           keypair: %{
@@ -704,7 +704,7 @@ defmodule Core.Channel do
       iex> Core.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
   """
-  @spec get_current_state_hash(Client.t(), binary()) ::
+  @spec get_current_state_hash(Client.t(), String.t()) ::
           {:ok, binary()} | {:error, String.t() | Error.t()}
   def get_current_state_hash(
         %Client{connection: connection},
@@ -1022,7 +1022,7 @@ defmodule Core.Channel do
   end
 
   defp prepare_result({:ok, response}) do
-    {:ok, response}
+    {:ok, Map.from_struct(response)}
   end
 
   defp prepare_result({:error, _} = error) do
