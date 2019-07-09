@@ -101,7 +101,7 @@ defmodule Core.Channel do
           non_neg_integer(),
           binary(),
           list()
-        ) :: {:ok, keyword()} | {:error, String.t()}
+        ) :: {:ok, list()} | {:error, String.t()}
   def create(
         %Client{
           keypair: %{
