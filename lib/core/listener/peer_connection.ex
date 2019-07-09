@@ -9,8 +9,7 @@ defmodule Core.Listener.PeerConnection do
 
   alias Core.Listener
   alias Core.Listener.{Peers, Supervisor}
-  alias Utils.Hash
-  alias Utils.Serialization
+  alias Utils.{Hash, Serialization, Encoding}
 
   @behaviour :ranch_protocol
 
@@ -51,16 +50,18 @@ defmodule Core.Listener.PeerConnection do
   end
 
   # called for inbound connections
-  def accept_init(ref, socket, :ranch_tcp, opts) do
+  def accept_init(ref, socket, :ranch_tcp, %{genesis: genesis_hash} = opts) do
+    IO.inspect(opts)
     :ok = :proc_lib.init_ack({:ok, self()})
     {:ok, {host, _}} = :inet.peername(socket)
     host_bin = host |> :inet.ntoa() |> :binary.list_to_bin()
-    genesis_hash = Peers.genesis_hash(opts.genesis)
     version = <<@p2p_protocol_vsn::64>>
 
-    state = Map.merge(opts, %{host: host_bin, version: version, genesis: genesis_hash})
+    binary_genesis = Encoding.prefix_decode_base58c(genesis_hash)
 
-    noise_opts = noise_opts(state.privkey, state.pubkey, genesis_hash, version, state.network)
+    state = Map.merge(opts, %{host: host_bin, version: version, genesis: binary_genesis})
+
+    noise_opts = noise_opts(state.privkey, state.pubkey, binary_genesis, version, state.network)
     :ok = :ranch.accept_ack(ref)
     :ok = :ranch_tcp.setopts(socket, [{:active, true}])
 
@@ -112,7 +113,7 @@ defmodule Core.Listener.PeerConnection do
           {:ok, noise_socket, _status} ->
             new_state = Map.put(state, :status, {:connected, noise_socket})
             peer = %{host: host, pubkey: r_pubkey, port: port, connection: self()}
-            :ok = do_ping(noise_socket, network_id)
+            :ok = do_ping(noise_socket, genesis)
             Peers.add_peer(peer)
             {:noreply, new_state}
 
@@ -149,15 +150,16 @@ defmodule Core.Listener.PeerConnection do
 
   def handle_info(
         {:noise, _, <<type::16, payload::binary()>>},
-        %{status: {:connected, socket}, network: network} = state
+        %{status: {:connected, socket}, network: network, genesis: genesis} = state
       ) do
     deserialized_payload = rlp_decode(type, payload)
 
     payload_hash = Hash.hash(payload)
+    IO.inspect(type)
 
     case type do
       @p2p_response ->
-        handle_response(deserialized_payload, payload_hash, network)
+        handle_response(deserialized_payload, payload_hash, network, genesis)
 
       @txs ->
         handle_new_pool_txs(deserialized_payload, payload_hash)
@@ -198,11 +200,12 @@ defmodule Core.Listener.PeerConnection do
   defp handle_response(
          %{result: true, type: type, object: object, reason: nil},
          hash,
-         network
+         network,
+         genesis
        ) do
     case type do
       @ping ->
-        handle_ping_msg(object, network)
+        handle_ping_msg(object, network, genesis)
 
       @block_txs ->
         handle_block_txs(object, hash)
@@ -221,9 +224,10 @@ defmodule Core.Listener.PeerConnection do
            genesis_hash: genesis_hash,
            peers: peers
          },
-         network
+         network,
+         local_genesis
        ) do
-    if Peers.genesis_hash(network) == genesis_hash do
+    if local_genesis == genesis_hash do
       Enum.each(peers, fn peer ->
         if !Peers.have_peer?(peer.pubkey) do
           peer
@@ -410,8 +414,8 @@ defmodule Core.Listener.PeerConnection do
     {deserialized_tx, type}
   end
 
-  defp do_ping(socket, network_id) do
-    ping_rlp = network_id |> ping_object_fields() |> :aeser_rlp.encode()
+  defp do_ping(socket, genesis) do
+    ping_rlp = genesis |> ping_object_fields() |> :aeser_rlp.encode()
     msg = <<@ping::16, ping_rlp::binary()>>
     :enoise.send(socket, msg)
   end
@@ -424,14 +428,14 @@ defmodule Core.Listener.PeerConnection do
     :ok = :enoise.send(socket, get_block_txs_msg)
   end
 
-  defp ping_object_fields(network_id),
+  defp ping_object_fields(genesis),
     do: [
       :binary.encode_unsigned(@ping_version),
       :binary.encode_unsigned(Supervisor.port()),
       :binary.encode_unsigned(@share),
-      Peers.genesis_hash(network_id),
+      genesis,
       :binary.encode_unsigned(@difficulty),
-      Peers.genesis_hash(network_id),
+      genesis,
       @sync_allowed,
       []
     ]
