@@ -20,9 +20,9 @@ defmodule CoreChannelTest do
     client1 =
       Client.new(
         %{
-          public: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+          public: "ak_2qRMVEKj7CWXLsBz1wtWANLyq4xBTdvFMSXpcKvmXb8RySumiX",
           secret:
-            "799ef7aa9ed8e3d58cd2492b7a569ccf967f3b63dc49ac2d0c9ea916d29cf8387ca99a8cd824b2a3efc3c6c5d500585713430575d4ce6999b202cb20f86019d8"
+            "4ea197c1717de46debbd0ea35a24e28e473e98f5aa328bdbe389e82262b6c5ff1a3ad4ef3f2c48fad6c5719ae9e2c6107013165733c455c7b992927247e61d1"
         },
         "my_test",
         "http://localhost:3013/v2",
