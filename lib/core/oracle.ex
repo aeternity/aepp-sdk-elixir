@@ -77,11 +77,9 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def register(
         %Client{
-          keypair: %{public: pubkey, secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          keypair: %{public: pubkey},
+          connection: connection
+        } = client,
         query_format,
         response_format,
         %{type: ttl_type, value: ttl_value} = ttl,
@@ -108,11 +106,9 @@ defmodule Core.Oracle do
          :ok <- validate_ttl(ttl, height),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              register_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       {:ok, Map.put(response, :oracle_id, String.replace_prefix(pubkey, "ak", "ok"))}
@@ -159,11 +155,9 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def query(
         %Client{
-          keypair: %{public: pubkey, secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          keypair: %{public: pubkey},
+          connection: connection
+        } = client,
         oracle_id,
         query,
         %{type: query_type, value: query_value} = query_ttl,
@@ -194,11 +188,9 @@ defmodule Core.Oracle do
          :ok <- validate_query_object_ttl(oracle_ttl, query_ttl, response_ttl_value, height),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              query_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       {:ok, Map.put(response, :query_id, calculate_query_id(pubkey, nonce, oracle_id))}
@@ -246,11 +238,9 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def respond(
         %Client{
-          keypair: %{public: pubkey, secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          keypair: %{public: pubkey},
+          connection: connection
+        } = client,
         oracle_id,
         query_id,
         response,
@@ -273,11 +263,9 @@ defmodule Core.Oracle do
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              response_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       {:ok, response}
@@ -311,11 +299,9 @@ defmodule Core.Oracle do
           | {:error, Env.t()}
   def extend(
         %Client{
-          keypair: %{public: pubkey, secret: secret_key},
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          keypair: %{public: pubkey},
+          connection: connection
+        } = client,
         oracle_id,
         oracle_ttl,
         opts \\ []
@@ -332,11 +318,9 @@ defmodule Core.Oracle do
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              extend_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       {:ok, response}

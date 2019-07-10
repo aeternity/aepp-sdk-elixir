@@ -48,13 +48,10 @@ defmodule Core.Account do
   def spend(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id,
-            secret: secret_key
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
           },
-          network_id: network_id,
-          connection: connection,
-          gas_price: gas_price
-        },
+          connection: connection
+        } = client,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []
@@ -75,11 +72,9 @@ defmodule Core.Account do
            ),
          {:ok, _response} = response <-
            Transaction.try_post(
-             connection,
-             secret_key,
-             network_id,
-             gas_price,
+             client,
              spend_tx,
+             Keyword.get(opts, :auth, nil),
              height
            ) do
       response

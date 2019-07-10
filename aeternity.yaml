@@ -4,6 +4,9 @@ fork_management:
     network_id: "my_test"
 chain:
     persist: false
+    hard_forks:
+      "1": 0
+      "3": 1
 http:
     external:
       port: 3013

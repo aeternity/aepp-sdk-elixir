@@ -57,8 +57,7 @@ defmodule CoreChainTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"],
-        fee: 10_000_000_000_000_000
+        ["42"]
       )
 
     assert :ok == Chain.await_transaction(setup_data.client, tx_hash)
@@ -121,8 +120,7 @@ defmodule CoreChainTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"],
-        fee: 10_000_000_000_000_000
+        ["42"]
       )
 
     micro_block_header_result = Chain.get_micro_block_header(setup_data.client, micro_block_hash)

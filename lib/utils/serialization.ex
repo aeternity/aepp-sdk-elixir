@@ -18,6 +18,8 @@ defmodule Utils.Serialization do
   @tag_contract_create_tx 42
   @tag_contract_call_tx 43
   @tag_sophia_byte_code 70
+  @tag_ga_attach_tx 80
+  @tag_ga_meta_tx 81
 
   @version_signed_tx 1
   @version_spend_tx 1
@@ -33,6 +35,8 @@ defmodule Utils.Serialization do
   @version_contract_create_tx 1
   @version_contract_call_tx 1
   @version_sophia_byte_code 1
+  @version_ga_attach_tx 1
+  @version_ga_meta_tx 1
 
   @type structure_type ::
           :signed_tx
@@ -659,6 +663,8 @@ defmodule Utils.Serialization do
   defp type_to_tag(:contract_create_tx), do: @tag_contract_create_tx
   defp type_to_tag(:contract_call_tx), do: @tag_contract_call_tx
   defp type_to_tag(:sophia_byte_code), do: @tag_sophia_byte_code
+  defp type_to_tag(:ga_attach_tx), do: @tag_ga_attach_tx
+  defp type_to_tag(:ga_meta_tx), do: @tag_ga_meta_tx
 
   defp version(:signed_tx), do: @version_signed_tx
   defp version(:spend_tx), do: @version_spend_tx
@@ -674,4 +680,6 @@ defmodule Utils.Serialization do
   defp version(:contract_create_tx), do: @version_contract_create_tx
   defp version(:contract_call_tx), do: @version_contract_call_tx
   defp version(:sophia_byte_code), do: @version_sophia_byte_code
+  defp version(:ga_attach_tx), do: @version_ga_attach_tx
+  defp version(:ga_meta_tx), do: @version_ga_meta_tx
 end

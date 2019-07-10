@@ -131,7 +131,8 @@ defmodule CoreContractTest do
         ct_address,
         setup_data.source_code,
         "non_existing_function",
-        ["33"]
+        ["33"],
+        fee: 10_000_000_000_000_000
       )
 
     assert match?({:error, _}, call_result)
