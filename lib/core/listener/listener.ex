@@ -1,27 +1,55 @@
 defmodule Core.Listener do
+  @moduledoc """
+  A listener service that connects to peers in a network and notifies processes for new blocks and transactions.
+  """
   use GenServer
 
   alias Core.Listener.Supervisor
 
   @gc_objects_sent_interval 180_000
 
+  @default_port 3016
+
+  @doc """
+  false
+  """
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  def start(network_id) when network_id in ["ae_mainnet", "ae_uat"],
-    do: Supervisor.start_link(%{network: network_id, initial_peers: [], genesis: nil})
+  @doc """
+  Start the listener for mainnet or testnet
+  """
+  @spec start(String.t(), non_neg_integer()) :: {:ok, pid()}
+  def start(network_id, port \\ @default_port)
 
-  def start(_),
+  def start(network_id, port) when network_id in ["ae_mainnet", "ae_uat"],
+    do: Supervisor.start_link(%{network: network_id, initial_peers: [], genesis: nil, port: port})
+
+  def start(_, _),
     do:
       {:error,
        "Cannot start Listener for a non-predefined network, use start/3 for private networks"}
 
-  def start(peers, network_id, genesis_hash)
+  @doc """
+  Start the listener for a custom/private network with a set of user defined peers, network ID and genesis hash.
+  A peer is defined in the following format:
+  "aenode://peer_pubkey@host:port" i.e. "aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"
+  """
+  @spec start(list(String.t()), String.t(), Encoding.base58c(), non_neg_integer()) :: {:ok, pid()}
+  def start(peers, network_id, genesis_hash, port \\ @default_port)
       when is_list(peers) and is_binary(network_id) and is_binary(genesis_hash),
       do:
-        Supervisor.start_link(%{initial_peers: peers, network: network_id, genesis: genesis_hash})
+        Supervisor.start_link(%{
+          initial_peers: peers,
+          network: network_id,
+          genesis: genesis_hash,
+          port: port
+        })
 
+  @doc """
+  false
+  """
   def init(_) do
     do_gc_objects_sent()
 
@@ -90,12 +118,6 @@ defmodule Core.Listener do
 
   def notify_for_pool_txs(txs, hash),
     do: GenServer.cast(__MODULE__, {:notify_for_pool_txs, txs, hash})
-
-  def get_state do
-    GenServer.call(__MODULE__, :get_state)
-  end
-
-  def handle_call(:get_state, _from, state), do: {:reply, state, state}
 
   def handle_call(
         {:subscribe_for_micro_blocks, subscriber_pid},

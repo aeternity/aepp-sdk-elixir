@@ -11,14 +11,13 @@ defmodule Core.Listener.Supervisor do
   alias Core.Listener.PeerConnectionSupervisor
   alias Utils.Keys
 
-  @default_port 3020
   @acceptors_count 10
 
-  def start_link(%{network: _, genesis: _, initial_peers: _} = info) do
+  def start_link(info) do
     Supervisor.start_link(__MODULE__, info)
   end
 
-  def init(info) do
+  def init(%{port: port} = info) do
     keypair = Keys.generate_peer_keypair()
 
     children = [
@@ -28,11 +27,12 @@ defmodule Core.Listener.Supervisor do
         :peer_pool,
         @acceptors_count,
         :ranch_tcp,
-        [port: @default_port],
+        [port: port],
         PeerConnection,
-        Map.merge(
-          %{port: @default_port, keypair: keypair},
-          info
+        Map.put(
+          info,
+          :keypair,
+          keypair
         )
       ),
       Listener
@@ -40,6 +40,4 @@ defmodule Core.Listener.Supervisor do
 
     Supervisor.init(children, strategy: :one_for_one)
   end
-
-  def port(), do: @default_port
 end

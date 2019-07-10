@@ -8,7 +8,7 @@ defmodule Core.Listener.PeerConnection do
   require Logger
 
   alias Core.Listener
-  alias Core.Listener.{Peers, Supervisor}
+  alias Core.Listener.Peers
   alias Utils.{Hash, Serialization, Encoding}
 
   @behaviour :ranch_protocol
@@ -51,7 +51,6 @@ defmodule Core.Listener.PeerConnection do
 
   # called for inbound connections
   def accept_init(ref, socket, :ranch_tcp, %{genesis: genesis_hash} = opts) do
-    IO.inspect(opts)
     :ok = :proc_lib.init_ack({:ok, self()})
     {:ok, {host, _}} = :inet.peername(socket)
     host_bin = host |> :inet.ntoa() |> :binary.list_to_bin()
@@ -113,7 +112,7 @@ defmodule Core.Listener.PeerConnection do
           {:ok, noise_socket, _status} ->
             new_state = Map.put(state, :status, {:connected, noise_socket})
             peer = %{host: host, pubkey: r_pubkey, port: port, connection: self()}
-            :ok = do_ping(noise_socket, genesis)
+            :ok = do_ping(noise_socket, genesis, port)
             Peers.add_peer(peer)
             {:noreply, new_state}
 
@@ -155,7 +154,6 @@ defmodule Core.Listener.PeerConnection do
     deserialized_payload = rlp_decode(type, payload)
 
     payload_hash = Hash.hash(payload)
-    IO.inspect(type)
 
     case type do
       @p2p_response ->
@@ -414,8 +412,8 @@ defmodule Core.Listener.PeerConnection do
     {deserialized_tx, type}
   end
 
-  defp do_ping(socket, genesis) do
-    ping_rlp = genesis |> ping_object_fields() |> :aeser_rlp.encode()
+  defp do_ping(socket, genesis, port) do
+    ping_rlp = genesis |> ping_object_fields(port) |> :aeser_rlp.encode()
     msg = <<@ping::16, ping_rlp::binary()>>
     :enoise.send(socket, msg)
   end
@@ -428,10 +426,10 @@ defmodule Core.Listener.PeerConnection do
     :ok = :enoise.send(socket, get_block_txs_msg)
   end
 
-  defp ping_object_fields(genesis),
+  defp ping_object_fields(genesis, port),
     do: [
       :binary.encode_unsigned(@ping_version),
-      :binary.encode_unsigned(Supervisor.port()),
+      :binary.encode_unsigned(port),
       :binary.encode_unsigned(@share),
       genesis,
       :binary.encode_unsigned(@difficulty),
