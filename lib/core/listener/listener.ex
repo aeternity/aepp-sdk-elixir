@@ -27,7 +27,12 @@ defmodule Core.Listener do
   end
 
   @doc """
-  Start the listener for mainnet or testnet
+  Start the listener for mainnet or testnet (network_id - "ae_mainnet" or "ae_uat").
+  Starting the listener is required before subscribing to any events
+
+  ## Example
+      iex> Core.Listener.start("ae_uat")
+      {:ok, #PID<0.261.0>}
   """
   @spec start(String.t(), non_neg_integer()) :: {:ok, pid()}
   def start(network_id, port \\ @default_port)
@@ -42,8 +47,17 @@ defmodule Core.Listener do
 
   @doc """
   Start the listener for a custom/private network with a set of user defined peers, network ID and genesis hash.
+  Starting the listener is required before subscribing to any events.
   A peer is defined in the following format:
   "aenode://peer_pubkey@host:port" i.e. "aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"
+
+  ## Example
+      iex> Core.Listener.start(
+            ["aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"],
+            "localnet",
+            "kh_2Eo9AVWHxTKio278ccANnwtr9hkUpzb1nLePfUzs7StwWyJ2xB"
+          )
+      {:ok, #PID<0.214.0>}
   """
   @spec start(list(String.t()), String.t(), Encoding.base58c(), non_neg_integer()) :: {:ok, pid()}
   def start(peers, network_id, genesis_hash, port \\ @default_port)
@@ -80,6 +94,45 @@ defmodule Core.Listener do
      }}
   end
 
+  @doc """
+  Subscribe a process to notifications for a general event.
+  These events are the following (passed as an atom):
+    :micro_blocks,
+    :key_blocks,
+    :transactions,
+    :pool_transactions.
+
+  Micro blocks are in a light format, meaning that they don't contain any transactions.
+  Subscribing to :transactions will notify for any mined transactions, while :pool_transactions
+  will notify for any new transactions added to the pool.
+
+  ## Example
+      iex> Core.Listener.subscribe(:key_blocks, self())
+      iex> flush
+      {:key_blocks,
+        %{
+         beneficiary: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
+         height: 107613,
+         info: "cb_AAAAAfy4hFE=",
+         miner: "ak_V9dqj32R728EmdtaeXmGC7Zn94oAtje2mU2R9vQeCE3uDF52z",
+         nonce: 15682880022608178725,
+         pow_evidence: [36880953, 49948618, 71657014, 77943721, 103433465, 109309407,
+          127422545, 140895507, 181678786, 182358531, 186372470, 188704699, 189292674,
+          201708293, 215741852, 233410604, 255594855, 257736633, 266211649, 269325362,
+          274670268, 292854435, 295392989, 307433512, 312822688, 330979144, 339358365,
+          340662380, 356338119, 356413992, 363610991, 364811647, 387037152, 387943984,
+          438683034, 469469067, 472181309, 479842054, 484418139, 506523084, 517149088,
+          532705934],
+         prev_hash: "mh_nxXxmga7AU5T3N7GGUV4s5T8YvJYEZnXGTaaUoLgBStva1dT4",
+         prev_key_hash: "kh_j47UCW6UYYN4FhcMwQgynpAKdddKeAkPUUFyF6G35hArsfo8Q",
+         root_hash: "bs_2hpHUMa7VWVTdcwwSm4L7U1CLMXqTbhrjZYJ2FMLz1LZCKfoCG",
+         target: 504011610,
+         time: 1562765121744,
+         version: 3
+       }}
+      :ok
+
+  """
   def subscribe(event, subscriber_pid) when event in @general_events do
     GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid})
   end
@@ -90,6 +143,34 @@ defmodule Core.Listener do
   def subscribe(event, _),
     do: {:error, "Unknown event to subscribe for: #{event}"}
 
+  @doc """
+  Subscribe a process to notifications for a filterable event i.e. a spend transaction
+  with a specific recipient or an oracle query transaction towards a specific oracle.
+
+  These events are the following and are filtered by a specific property:
+    :spend_transactions - recipient,
+    :oracle_queries - oracle ID,
+    :oracle_responses - oracle query ID,
+    :pool_spend_transactions - recipient,
+    :pool_oracle_queries - oracle ID,
+    :pool_oracle_responses - oracle query ID
+
+  ## Example
+      iex> Core.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
+      iex> flush
+      {:spend_transactions,
+       %{
+         amount: 5000000000000000000,
+         fee: 17080000000000,
+         nonce: 5881,
+         payload: "",
+         recipient_id: "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9",
+         sender_id: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
+         ttl: 0,
+         type: :spend_tx
+      }}
+      :ok
+  """
   def subscribe(event, subscriber_pid, filter) when event in @filtered_events do
     GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid, filter})
   end
