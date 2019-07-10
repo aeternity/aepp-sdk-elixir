@@ -7,6 +7,15 @@ defmodule Core.Listener do
   alias Core.Listener.Supervisor
 
   @gc_objects_sent_interval 180_000
+  @general_events [:micro_blocks, :key_blocks, :transactions, :pool_transactions]
+  @transactions_filtered_events [:spend_transactions, :oracle_queries, :oracle_responses]
+  @pool_transactions_filtered_events [
+    :pool_spend_transactions,
+    :pool_oracle_queries,
+    :pool_oracle_responses
+  ]
+  @filtered_events @transactions_filtered_events ++ @pool_transactions_filtered_events
+  @notifiable_events @general_events ++ @filtered_events
 
   @default_port 3016
 
@@ -56,302 +65,149 @@ defmodule Core.Listener do
     {:ok,
      %{
        objects_sent: %{},
-       micro_block_subscribers: [],
-       key_block_subscribers: [],
-       txs_subscribers: [],
-       pool_txs_subscribers: [],
-       spend_transaction_subscribers: [],
-       oracle_query_subscribers: [],
-       oracle_response_subscribers: []
+       subscribers: %{
+         micro_blocks: [],
+         key_blocks: [],
+         transactions: [],
+         pool_transactions: [],
+         spend_transactions: [],
+         oracle_queries: [],
+         oracle_responses: [],
+         pool_spend_transactions: [],
+         pool_oracle_queries: [],
+         pool_oracle_responses: []
+       }
      }}
   end
 
-  def subscribe_for_micro_blocks(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:subscribe_for_micro_blocks, subscriber_pid})
+  def subscribe(event, subscriber_pid) when event in @general_events do
+    GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid})
+  end
 
-  def unsubscribe_from_micro_blocks(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_micro_blocks, subscriber_pid})
+  def subscribe(event, _) when event in @filtered_events,
+    do: {:error, "Missing filter for event: #{event}"}
 
-  def subscribe_for_key_blocks(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:subscribe_for_key_blocks, subscriber_pid})
+  def subscribe(event, _),
+    do: {:error, "Unknown event to subscribe for: #{event}"}
 
-  def unsubscribe_from_key_blocks(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_key_blocks, subscriber_pid})
+  def subscribe(event, subscriber_pid, filter) when event in @filtered_events do
+    GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid, filter})
+  end
 
-  def subscribe_for_txs(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:subscribe_for_txs, subscriber_pid})
+  def subscribe(event, _, _), do: {:error, "Unknown event to subscribe for: #{event}"}
 
-  def unsubscribe_from_txs(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_txs, subscriber_pid})
+  def unsubscribe(event, subscriber_pid) when event in @general_events do
+    GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid})
+  end
 
-  def subscribe_for_pool_txs(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:subscribe_for_pool_txs, subscriber_pid})
+  def unsubscribe(event, _) when event in @filtered_events,
+    do: {:error, "Missing filter for event: #{event}"}
 
-  def unsubscribe_from_pool_txs(subscriber_pid),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_pool_txs, subscriber_pid})
+  def unsubscribe(event, _),
+    do: {:error, "Unknown event to unsubscribe from: #{event}"}
 
-  def subscribe_for_spend_transactions(subscriber_pid, pubkey),
-    do: GenServer.call(__MODULE__, {:subscribe_for_spend_transactions, subscriber_pid, pubkey})
+  def unsubscribe(event, subscriber_pid, filter) when event in @filtered_events do
+    GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid, filter})
+  end
 
-  def unsubscribe_from_spend_transactions(subscriber_pid, pubkey),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_spend_transactions, subscriber_pid, pubkey})
+  def unsubscribe(event, _, _), do: {:error, "Unknown event to unsubscribe from: #{event}"}
 
-  def subscribe_for_oracle_queries(subscriber_pid, oracle_id),
-    do: GenServer.call(__MODULE__, {:subscribe_for_oracle_queries, subscriber_pid, oracle_id})
+  def notify(event, data, hash) when event in @notifiable_events do
+    GenServer.cast(__MODULE__, {:notify, event, data, hash})
+  end
 
-  def unsubscribe_from_oracle_queries(subscriber_pid, oracle_id),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_oracle_queries, subscriber_pid, oracle_id})
-
-  def subscribe_for_oracle_response(subscriber_pid, query_id),
-    do: GenServer.call(__MODULE__, {:subscribe_for_oracle_response, subscriber_pid, query_id})
-
-  def unsubscribe_from_oracle_response(subscriber_pid, query_id),
-    do: GenServer.call(__MODULE__, {:unsubscribe_from_oracle_response, subscriber_pid, query_id})
-
-  def notify_for_micro_block(micro_block, hash),
-    do: GenServer.cast(__MODULE__, {:notify_for_micro_block, micro_block, hash})
-
-  def notify_for_key_block(key_block, hash),
-    do: GenServer.cast(__MODULE__, {:notify_for_key_block, key_block, hash})
-
-  def notify_for_txs(txs, hash), do: GenServer.cast(__MODULE__, {:notify_for_txs, txs, hash})
-
-  def notify_for_pool_txs(txs, hash),
-    do: GenServer.cast(__MODULE__, {:notify_for_pool_txs, txs, hash})
+  def notify(event, _, _), do: {:error, "Unknown event to notify for: #{event}"}
 
   def handle_call(
-        {:subscribe_for_micro_blocks, subscriber_pid},
+        {:subscribe, event, subscriber_pid},
         _from,
-        %{micro_block_subscribers: micro_block_subscribers} = state
+        %{subscribers: subscribers} = state
       ) do
+    %{^event => event_subscribers} = subscribers
+    updated_event_subscribers = add_subscriber(event_subscribers, subscriber_pid)
+
+    {:reply, :ok, %{state | subscribers: %{subscribers | event => updated_event_subscribers}}}
+  end
+
+  def handle_call(
+        {:subscribe, event, subscriber_pid, filter},
+        _from,
+        %{subscribers: subscribers} = state
+      ) do
+    %{^event => event_subscribers} = subscribers
+
+    updated_event_subscribers =
+      add_subscriber(
+        event_subscribers,
+        %{subscriber: subscriber_pid, filter: filter}
+      )
+
     {:reply, :ok,
-     %{state | micro_block_subscribers: add_subscriber(subscriber_pid, micro_block_subscribers)}}
+     %{
+       state
+       | subscribers: %{subscribers | event => updated_event_subscribers}
+     }}
   end
 
   def handle_call(
-        {:unsubscribe_from_micro_blocks, subscriber_pid},
-        _from,
-        %{micro_block_subscribers: micro_block_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{state | micro_block_subscribers: List.delete(micro_block_subscribers, subscriber_pid)}}
-  end
-
-  def handle_call(
-        {:subscribe_for_key_blocks, subscriber_pid},
-        _from,
-        %{key_block_subscribers: key_block_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{state | key_block_subscribers: add_subscriber(subscriber_pid, key_block_subscribers)}}
-  end
-
-  def handle_call(
-        {:unsubscribe_from_key_blocks, subscriber_pid},
-        _from,
-        %{key_block_subscribers: key_block_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{state | key_block_subscribers: List.delete(key_block_subscribers, subscriber_pid)}}
-  end
-
-  def handle_call(
-        {:subscribe_for_txs, subscriber_pid},
-        _from,
-        %{txs_subscribers: txs_subscribers} = state
-      ) do
-    {:reply, :ok, %{state | txs_subscribers: add_subscriber(subscriber_pid, txs_subscribers)}}
-  end
-
-  def handle_call(
-        {:unsubscribe_from_txs, subscriber_pid},
-        _from,
-        %{txs_subscribers: txs_subscribers} = state
-      ) do
-    {:reply, :ok, %{state | txs_subscribers: List.delete(txs_subscribers, subscriber_pid)}}
-  end
-
-  def handle_call(
-        {:subscribe_for_pool_txs, subscriber_pid},
-        _from,
-        %{txs_subscribers: txs_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{state | pool_txs_subscribers: add_subscriber(subscriber_pid, txs_subscribers)}}
-  end
-
-  def handle_call(
-        {:unsubscribe_from_pool_txs, subscriber_pid},
-        _from,
-        %{txs_subscribers: txs_subscribers} = state
-      ) do
-    {:reply, :ok, %{state | pool_txs_subscribers: List.delete(txs_subscribers, subscriber_pid)}}
-  end
-
-  def handle_call(
-        {:subscribe_for_spend_transactions, subscriber_pid, pubkey},
+        {:unsubscribe, event, subscriber_pid},
         _from,
         %{
-          spend_transaction_subscribers: spend_transaction_subscribers
+          subscribers: subscribers
         } = state
       ) do
-    {:reply, :ok,
-     %{
-       state
-       | spend_transaction_subscribers:
-           add_subscriber(
-             %{subscriber: subscriber_pid, pubkey: pubkey},
-             spend_transaction_subscribers
-           )
-     }}
+    %{^event => event_subscribers} = subscribers
+    updated_event_subscribers = List.delete(event_subscribers, subscriber_pid)
+
+    {:reply, :ok, %{state | subscribers: %{subscribers | event => updated_event_subscribers}}}
   end
 
   def handle_call(
-        {:unsubscribe_from_spend_transactions, subscriber_pid, pubkey},
+        {:unsubscribe, event, subscriber_pid, filter},
         _from,
-        %{spend_transaction_subscribers: spend_transaction_subscribers} = state
+        %{subscribers: subscribers} = state
       ) do
-    {:reply, :ok,
-     %{
-       state
-       | spend_transaction_subscribers:
-           List.delete(spend_transaction_subscribers, %{
-             subscriber: subscriber_pid,
-             pubkey: pubkey
-           })
-     }}
-  end
+    %{^event => event_subscribers} = subscribers
 
-  def handle_call(
-        {:subscribe_for_oracle_queries, subscriber_pid, oracle_id},
-        _from,
-        %{oracle_query_subscribers: oracle_query_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{
-       state
-       | oracle_query_subscribers:
-           add_subscriber(
-             %{subscriber: subscriber_pid, oracle_id: oracle_id},
-             oracle_query_subscribers
-           )
-     }}
-  end
+    updated_event_subscribers =
+      List.delete(event_subscribers, %{
+        subscriber: subscriber_pid,
+        filter: filter
+      })
 
-  def handle_call(
-        {:unsubscribe_from_oracle_queries, subscriber_pid, oracle_id},
-        _from,
-        %{oracle_query_subscribers: oracle_query_subscribers} = state
-      ) do
     {:reply, :ok,
      %{
        state
-       | oracle_query_subscribers:
-           List.delete(oracle_query_subscribers, %{
-             subscriber: subscriber_pid,
-             oracle_id: oracle_id
-           })
-     }}
-  end
-
-  def handle_call(
-        {:subscribe_for_oracle_response, subscriber_pid, query_id},
-        _from,
-        %{
-          oracle_response_subscribers: oracle_response_subscribers
-        } = state
-      ) do
-    {:reply, :ok,
-     %{
-       state
-       | oracle_response_subscribers:
-           add_subscriber(
-             %{subscriber: subscriber_pid, query_id: query_id},
-             oracle_response_subscribers
-           )
-     }}
-  end
-
-  def handle_call(
-        {:unsubscribe_from_oracle_response, subscriber_pid, query_id},
-        _from,
-        %{oracle_response_subscribers: oracle_response_subscribers} = state
-      ) do
-    {:reply, :ok,
-     %{
-       state
-       | oracle_response_subscribers:
-           List.delete(oracle_response_subscribers, %{
-             subscriber: subscriber_pid,
-             query_id: query_id
-           })
+       | subscribers: %{subscribers | event => updated_event_subscribers}
      }}
   end
 
   def handle_cast(
-        {:notify_for_micro_block, micro_block, hash},
+        {:notify, event, data, hash},
         %{
           objects_sent: objects_sent,
-          micro_block_subscribers: micro_block_subscribers
+          subscribers: subscribers
         } = state
       ) do
     updated_objects_sent =
       send_object_to_subscribers(
-        :micro_block,
-        micro_block,
+        event,
+        data,
         hash,
-        micro_block_subscribers,
+        subscribers,
         objects_sent
       )
 
     {:noreply, %{state | objects_sent: updated_objects_sent}}
   end
 
-  def handle_cast(
-        {:notify_for_key_block, key_block, hash},
-        %{
-          objects_sent: objects_sent,
-          key_block_subscribers: key_block_subscribers
-        } = state
-      ) do
-    updated_objects_sent =
-      send_object_to_subscribers(:key_block, key_block, hash, key_block_subscribers, objects_sent)
-
-    {:noreply, %{state | objects_sent: updated_objects_sent}}
-  end
-
-  def handle_cast(
-        {:notify_for_txs, txs, hash},
-        %{
-          objects_sent: objects_sent,
-          txs_subscribers: txs_subscribers
-        } = state
-      ) do
-    updated_objects_sent =
-      send_object_to_subscribers(:txs, txs, hash, txs_subscribers, objects_sent)
-
-    {:noreply, %{state | objects_sent: updated_objects_sent}}
-  end
-
-  def handle_cast(
-        {:notify_for_pool_txs, txs, hash},
-        %{
-          objects_sent: objects_sent,
-          pool_txs_subscribers: pool_txs_subscribers
-        } = state
-      ) do
-    updated_objects_sent =
-      send_object_to_subscribers(:pool_txs, txs, hash, pool_txs_subscribers, objects_sent)
-
-    {:noreply, %{state | objects_sent: updated_objects_sent}}
-  end
-
   def handle_info(:gc_objects_sent, state) do
     do_gc_objects_sent()
+
     {:noreply, %{state | objects_sent: %{}}}
   end
 
-  defp add_subscriber(subscriber, subscribers) do
+  defp add_subscriber(subscribers, subscriber) do
     if Enum.member?(subscribers, subscriber) do
       subscribers
     else
@@ -359,20 +215,107 @@ defmodule Core.Listener do
     end
   end
 
-  defp send_object_to_subscribers(type, object, hash, subscribers, objects_sent) do
+  defp send_object_to_subscribers(event, object, hash, subscribers, objects_sent) do
+    %{^event => general_event_subscribers} = subscribers
+
+    objects_sent1 =
+      send_general_event_object(event, object, hash, general_event_subscribers, objects_sent)
+
+    if Enum.member?(event, [:transactions, :pool_transactions]) do
+      Enum.reduce(object, objects_sent1, fn tx, acc ->
+        filter = determine_filter(event, tx)
+
+        case filter do
+          {filtered_event, value} ->
+            %{^filtered_event => specific_event_subscribers} = subscribers
+
+            send_filtered_event_object(
+              event,
+              tx,
+              hash,
+              specific_event_subscribers,
+              acc,
+              value
+            )
+
+          _ ->
+            acc
+        end
+      end)
+    else
+      objects_sent1
+    end
+  end
+
+  defp determine_filter(event, tx) do
+    [spend_tx_event, oracle_query_event, oracle_response_event] = get_specific_events(event)
+
+    case tx do
+      # spend
+      %{sender_id: _, recipient_id: recipient} ->
+        {spend_tx_event, recipient}
+
+      # oracle query
+      %{sender_id: _, oracle_id: oracle_id} ->
+        {oracle_query_event, oracle_id}
+
+      # oracle response
+      %{oracle_id: _, query_id: query_id} ->
+        {oracle_response_event, query_id}
+
+      _ ->
+        nil
+    end
+  end
+
+  defp send_general_event_object(event, object, hash, subscribers, objects_sent) do
     Enum.reduce(subscribers, objects_sent, fn subscriber, acc ->
       object_receivers = Map.get(objects_sent, hash, [])
 
       if Enum.member?(object_receivers, subscriber) do
         acc
       else
-        send(subscriber, {type, object})
-
-        Map.update(objects_sent, hash, [subscriber], fn obj_receivers ->
-          obj_receivers ++ [subscriber]
-        end)
+        send_and_update_objects_sent(event, object, hash, subscriber, objects_sent)
       end
     end)
+  end
+
+  defp send_filtered_event_object(event, object, hash, subscribers, objects_sent, object_value) do
+    Enum.reduce(
+      subscribers,
+      objects_sent,
+      fn %{
+           subscriber: subscriber_pid,
+           filter: filter
+         },
+         acc ->
+        if object_value == filter do
+          if Enum.member?(acc, subscriber_pid) do
+            acc
+          else
+            send_and_update_objects_sent(event, object, hash, subscriber_pid, objects_sent)
+          end
+        else
+          acc
+        end
+      end
+    )
+  end
+
+  defp send_and_update_objects_sent(event, object, hash, subscriber, objects_sent) do
+    send(subscriber, {event, object})
+
+    Map.update(objects_sent, hash, [subscriber], fn obj_receivers ->
+      obj_receivers ++ [subscriber]
+    end)
+  end
+
+  defp get_specific_events(:transactions) do
+    @transactions_filtered_events
+  end
+
+  defp get_specific_events(:pool_transactions) do
+    @pool_transactions_filtered_events
   end
 
   defp do_gc_objects_sent() do

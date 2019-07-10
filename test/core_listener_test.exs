@@ -26,33 +26,33 @@ defmodule CoreListenerTest do
       "kh_2KhFJSdz1BwrvEWe9fFBRBpWoweoaZuTiYLWwUPh21ptuDE8UQ"
     )
 
-    Listener.subscribe_for_key_blocks(self())
+    Listener.subscribe(:key_blocks, self())
 
     receive do
-      {:key_block, _} -> :ok
+      {:key_blocks, _} -> :ok
     end
 
-    Listener.subscribe_for_micro_blocks(self())
+    Listener.subscribe(:micro_blocks, self())
     Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
 
     receive do
-      {:micro_block, _} -> :ok
+      {:micro_blocks, _} -> :ok
     end
 
-    Listener.subscribe_for_txs(self())
-
-    Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
-
-    receive do
-      {:txs, _} -> :ok
-    end
-
-    Listener.subscribe_for_pool_txs(self())
+    Listener.subscribe(:transactions, self())
 
     Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
 
     receive do
-      {:pool_txs, _} -> :ok
+      {:transactions, _} -> :ok
+    end
+
+    Listener.subscribe(:pool_transactions, self())
+
+    Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
+
+    receive do
+      {:pool_transactions, _} -> :ok
     end
   end
 end

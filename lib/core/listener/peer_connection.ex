@@ -214,7 +214,7 @@ defmodule Core.Listener.PeerConnection do
     serialized_txs =
       Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
 
-    Listener.notify_for_pool_txs(serialized_txs, hash)
+    Listener.notify(:pool_transactions, serialized_txs, hash)
   end
 
   defp handle_ping_msg(
@@ -239,13 +239,13 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp handle_new_key_block(key_block, key_block_hash),
-    do: Listener.notify_for_key_block(key_block, key_block_hash)
+    do: Listener.notify(:key_blocks, key_block, key_block_hash)
 
   defp handle_new_micro_block(
          %{block_info: block_info, hash: hash, tx_hashes: tx_hashes},
          socket
        ) do
-    Listener.notify_for_micro_block(block_info, hash)
+    Listener.notify(:micro_blocks, block_info, hash)
     do_get_block_txs(hash, tx_hashes, socket)
   end
 
@@ -253,7 +253,7 @@ defmodule Core.Listener.PeerConnection do
     serialized_txs =
       Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
 
-    Listener.notify_for_txs(serialized_txs, hash)
+    Listener.notify(:transactions, serialized_txs, hash)
   end
 
   defp rlp_decode(@p2p_response, encoded_response) do
