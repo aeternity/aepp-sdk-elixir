@@ -1,7 +1,5 @@
 defmodule Utils.Governance do
-  @moduledoc """
-  Contains all constants and helper functions, related to blockchain.
-  """
+  @moduledoc false
   alias AeternityNode.Model.{
     SpendTx,
     OracleRegisterTx,

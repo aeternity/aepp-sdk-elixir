@@ -1,7 +1,5 @@
 defmodule Core.Listener.Supervisor do
-  @moduledoc """
-  Supervises the Peers, PeerConnectionSupervisor and ranch acceptor processes
-  """
+  @moduledoc false
 
   use Supervisor
 
@@ -14,7 +12,7 @@ defmodule Core.Listener.Supervisor do
   @acceptors_count 10
 
   def start_link(info) do
-    Supervisor.start_link(__MODULE__, info)
+    Supervisor.start_link(__MODULE__, info, name: __MODULE__)
   end
 
   def init(%{port: port} = info) do

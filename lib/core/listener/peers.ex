@@ -1,4 +1,5 @@
 defmodule Core.Listener.Peers do
+  @moduledoc false
   use GenServer
 
   alias Utils.{Keys, Encoding}

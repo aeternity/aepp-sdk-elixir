@@ -1,7 +1,5 @@
 defmodule Core.Listener.PeerConnection do
-  @moduledoc """
-  Every instance of this handles a single connection to a peer.
-  """
+  @moduledoc false
 
   use GenServer
 

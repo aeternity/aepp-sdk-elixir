@@ -1,4 +1,5 @@
 defmodule Core.Listener.PeerConnectionSupervisor do
+  @moduledoc false
   use DynamicSupervisor
 
   alias Core.Listener.PeerConnection

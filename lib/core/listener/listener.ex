@@ -5,6 +5,7 @@ defmodule Core.Listener do
   use GenServer
 
   alias Core.Listener.Supervisor
+  alias Utils.Encoding
 
   @gc_objects_sent_interval 180_000
   @general_events [:micro_blocks, :key_blocks, :transactions, :pool_transactions]
@@ -19,16 +20,14 @@ defmodule Core.Listener do
 
   @default_port 3016
 
-  @doc """
-  false
-  """
+  @doc false
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @doc """
-  Start the listener for mainnet or testnet (network_id - "ae_mainnet" or "ae_uat").
-  Starting the listener is required before subscribing to any events
+  Start the listener for mainnet or testnet (`network_id` - `"ae_mainnet"` or `"ae_uat"`).
+  Starting the listener is required before subscribing to any events.
 
   ## Example
       iex> Core.Listener.start("ae_uat")
@@ -49,7 +48,7 @@ defmodule Core.Listener do
   Start the listener for a custom/private network with a set of user defined peers, network ID and genesis hash.
   Starting the listener is required before subscribing to any events.
   A peer is defined in the following format:
-  "aenode://peer_pubkey@host:port" i.e. "aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"
+  `"aenode://peer_pubkey@host:port"` i.e. `"aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"`
 
   ## Example
       iex> Core.Listener.start(
@@ -70,9 +69,7 @@ defmodule Core.Listener do
           port: port
         })
 
-  @doc """
-  false
-  """
+  @doc false
   def init(_) do
     do_gc_objects_sent()
 
@@ -97,18 +94,18 @@ defmodule Core.Listener do
   @doc """
   Subscribe a process to notifications for a general event.
   These events are the following (passed as an atom):
-    :micro_blocks,
-    :key_blocks,
-    :transactions,
-    :pool_transactions.
+    - `:micro_blocks`
+    - `:key_blocks`
+    - `:transactions`
+    - `:pool_transactions`
 
   Micro blocks are in a light format, meaning that they don't contain any transactions.
-  Subscribing to :transactions will notify for any mined transactions, while :pool_transactions
+  Subscribing to `:transactions` will notify for any mined transactions, while `:pool_transactions`
   will notify for any new transactions added to the pool.
 
   ## Example
       iex> Core.Listener.subscribe(:key_blocks, self())
-      iex> flush
+      iex> flush()
       {:key_blocks,
         %{
          beneficiary: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
@@ -133,31 +130,38 @@ defmodule Core.Listener do
       :ok
 
   """
+  @spec subscribe(atom(), pid()) :: :ok
   def subscribe(event, subscriber_pid) when event in @general_events do
-    GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid})
+    case assert_listener_started() do
+      :ok ->
+        GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid})
+
+      {:error, _} = err ->
+        err
+    end
   end
 
   def subscribe(event, _) when event in @filtered_events,
     do: {:error, "Missing filter for event: #{event}"}
 
   def subscribe(event, _),
-    do: {:error, "Unknown event to subscribe for: #{event}"}
+    do: {:error, "Unknown event to subscribe to: #{event}"}
 
   @doc """
   Subscribe a process to notifications for a filterable event i.e. a spend transaction
-  with a specific recipient or an oracle query transaction towards a specific oracle.
+  with a specific recipient or an oracle query transaction that targets a specific oracle.
 
   These events are the following and are filtered by a specific property:
-    :spend_transactions - recipient,
-    :oracle_queries - oracle ID,
-    :oracle_responses - oracle query ID,
-    :pool_spend_transactions - recipient,
-    :pool_oracle_queries - oracle ID,
-    :pool_oracle_responses - oracle query ID
+    - `:spend_transactions` - recipient
+    - `:oracle_queries` - oracle ID
+    - `:oracle_responses` - oracle query ID
+    - `:pool_spend_transactions` - recipient
+    - `:pool_oracle_queries` - oracle ID
+    - `:pool_oracle_responses` - oracle query ID
 
   ## Example
       iex> Core.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
-      iex> flush
+      iex> flush()
       {:spend_transactions,
        %{
          amount: 5000000000000000000,
@@ -171,14 +175,29 @@ defmodule Core.Listener do
       }}
       :ok
   """
+  @spec subscribe(atom(), pid(), Encoding.base58c()) :: :ok
   def subscribe(event, subscriber_pid, filter) when event in @filtered_events do
     GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid, filter})
   end
 
-  def subscribe(event, _, _), do: {:error, "Unknown event to subscribe for: #{event}"}
+  def subscribe(event, _, _), do: {:error, "Unknown event to subscribe to: #{event}"}
 
+  @doc """
+  Unsubscribe a process from a general event.
+
+  ## Example
+      iex> Core.Listener.unsubscribe(:key_blocks, self())
+      :ok
+  """
+  @spec unsubscribe(atom(), pid()) :: :ok
   def unsubscribe(event, subscriber_pid) when event in @general_events do
-    GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid})
+    case assert_listener_started() do
+      :ok ->
+        GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid})
+
+      {:error, _} = err ->
+        err
+    end
   end
 
   def unsubscribe(event, _) when event in @filtered_events,
@@ -187,12 +206,20 @@ defmodule Core.Listener do
   def unsubscribe(event, _),
     do: {:error, "Unknown event to unsubscribe from: #{event}"}
 
+  @doc """
+  Unsubscribe a process from a filterable event.
+
+  ## Example
+      iex> Core.Listener.unsubscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
+      :ok
+  """
   def unsubscribe(event, subscriber_pid, filter) when event in @filtered_events do
     GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid, filter})
   end
 
   def unsubscribe(event, _, _), do: {:error, "Unknown event to unsubscribe from: #{event}"}
 
+  @doc false
   def notify(event, data, hash) when event in @notifiable_events do
     GenServer.cast(__MODULE__, {:notify, event, data, hash})
   end
@@ -401,5 +428,15 @@ defmodule Core.Listener do
 
   defp do_gc_objects_sent() do
     Process.send_after(self(), :gc_objects_sent, @gc_objects_sent_interval)
+  end
+
+  defp assert_listener_started() do
+    case Process.whereis(Supervisor) do
+      nil ->
+        {:error, "Listener not started, use start/1 or start/3"}
+
+      _pid ->
+        :ok
+    end
   end
 end
