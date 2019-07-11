@@ -7,7 +7,7 @@ defmodule Core.Listener do
   alias Core.Listener.Supervisor
   alias Utils.Encoding
 
-  @gc_objects_sent_interval 180_000
+  @gc_objects_sent_interval 10_000
   @general_events [:micro_blocks, :key_blocks, :transactions, :pool_transactions]
   @transactions_filtered_events [:spend_transactions, :oracle_queries, :oracle_responses]
   @pool_transactions_filtered_events [
@@ -71,11 +71,10 @@ defmodule Core.Listener do
 
   @doc false
   def init(_) do
-    do_gc_objects_sent()
-
     {:ok,
      %{
-       objects_sent: %{},
+       objects_sent: [],
+       gc_scheduled: false,
        subscribers: %{
          micro_blocks: [],
          key_blocks: [],
@@ -128,7 +127,6 @@ defmodule Core.Listener do
          version: 3
        }}
       :ok
-
   """
   @spec subscribe(atom(), pid()) :: :ok
   def subscribe(event, subscriber_pid) when event in @general_events do
@@ -294,25 +292,37 @@ defmodule Core.Listener do
         {:notify, event, data, hash},
         %{
           objects_sent: objects_sent,
+          gc_scheduled: gc_scheduled,
           subscribers: subscribers
         } = state
       ) do
     updated_objects_sent =
-      send_object_to_subscribers(
-        event,
-        data,
-        hash,
-        subscribers,
+      if Enum.member?(objects_sent, hash) do
         objects_sent
-      )
+      else
+        send_object_to_subscribers(
+          event,
+          data,
+          hash,
+          subscribers,
+          objects_sent
+        )
+      end
 
-    {:noreply, %{state | objects_sent: updated_objects_sent}}
+    updated_gc_scheduled =
+      if gc_scheduled do
+        gc_scheduled
+      else
+        do_gc_objects_sent()
+
+        true
+      end
+
+    {:noreply, %{state | objects_sent: updated_objects_sent, gc_scheduled: updated_gc_scheduled}}
   end
 
   def handle_info(:gc_objects_sent, state) do
-    do_gc_objects_sent()
-
-    {:noreply, %{state | objects_sent: %{}}}
+    {:noreply, %{state | objects_sent: [], gc_scheduled: false}}
   end
 
   defp add_subscriber(subscribers, subscriber) do
@@ -329,7 +339,7 @@ defmodule Core.Listener do
     objects_sent1 =
       send_general_event_object(event, object, hash, general_event_subscribers, objects_sent)
 
-    if Enum.member?(event, [:transactions, :pool_transactions]) do
+    if Enum.member?([:transactions, :pool_transactions], event) do
       Enum.reduce(object, objects_sent1, fn tx, acc ->
         filter = determine_filter(event, tx)
 
@@ -338,7 +348,7 @@ defmodule Core.Listener do
             %{^filtered_event => specific_event_subscribers} = subscribers
 
             send_filtered_event_object(
-              event,
+              filtered_event,
               tx,
               hash,
               specific_event_subscribers,
@@ -378,13 +388,7 @@ defmodule Core.Listener do
 
   defp send_general_event_object(event, object, hash, subscribers, objects_sent) do
     Enum.reduce(subscribers, objects_sent, fn subscriber, acc ->
-      object_receivers = Map.get(objects_sent, hash, [])
-
-      if Enum.member?(object_receivers, subscriber) do
-        acc
-      else
-        send_and_update_objects_sent(event, object, hash, subscriber, objects_sent)
-      end
+      send_and_update_objects_sent(event, object, hash, subscriber, acc)
     end)
   end
 
@@ -398,11 +402,7 @@ defmodule Core.Listener do
          },
          acc ->
         if object_value == filter do
-          if Enum.member?(acc, subscriber_pid) do
-            acc
-          else
-            send_and_update_objects_sent(event, object, hash, subscriber_pid, objects_sent)
-          end
+          send_and_update_objects_sent(event, object, hash, subscriber_pid, objects_sent)
         else
           acc
         end
@@ -413,9 +413,7 @@ defmodule Core.Listener do
   defp send_and_update_objects_sent(event, object, hash, subscriber, objects_sent) do
     send(subscriber, {event, object})
 
-    Map.update(objects_sent, hash, [subscriber], fn obj_receivers ->
-      obj_receivers ++ [subscriber]
-    end)
+    objects_sent ++ [hash]
   end
 
   defp get_specific_events(:transactions) do
