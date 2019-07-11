@@ -21,12 +21,15 @@ defmodule Core.Channel do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     Error,
-    Channel
+    Channel,
+    PostTxResponse,
+    Tx
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Encoding, Hash}
+  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -752,6 +755,94 @@ defmodule Core.Channel do
     )
   end
 
+  # POST GA + BASIC
+  defp post_(client, %{tx: serialized_inner_tx} = meta_tx,
+         signatures_list: basic_account_signature,
+         inner_tx: inner_tx
+       )
+       when is_list(basic_account_signature) and is_map(inner_tx) do
+    case serialized_inner_tx ===
+           Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
+      true ->
+        new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_tx, basic_account_signature)
+
+        new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+        signed_tx =
+          Encoding.prefix_encode_base64(
+            "tx",
+            wrap_in_signature_signed_tx(new_meta_tx, [])
+          )
+
+        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+          TransactionApi.post_transaction(client.connection, %Tx{
+            tx: signed_tx
+          })
+
+        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+
+        case inner_tx do
+          %ChannelCreateTx{} ->
+            {:ok, channel_id} =
+              compute_channel_id(inner_tx.initiator_id, meta_tx.auth_data, inner_tx.responder_id)
+
+            {:ok, Map.put(res, :channel_id, channel_id)}
+
+          %ChannelDepositTx{} ->
+            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
+
+            {:ok, Map.put(res, :info, channel_info)}
+
+          _ ->
+            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
+            {:ok, Map.put(res, :info, channel_info)}
+        end
+
+      false ->
+        {:error,
+         "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    end
+  end
+
+  # post_ G+G
+  defp post_(%Client{} = client, meta_tx,
+         signatures_list: :no_signatures,
+         inner_tx: inner_meta_tx
+       )
+       when is_map(inner_meta_tx) do
+    # case serialized_inner_tx  === Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
+    #   true ->
+    new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_meta_tx, [])
+
+    new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+    signed_tx =
+      Encoding.prefix_encode_base64(
+        "tx",
+        wrap_in_signature_signed_tx(new_meta_tx, [])
+      )
+
+    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+      TransactionApi.post_transaction(client.connection, %Tx{
+        tx: signed_tx
+      })
+
+    {:ok, _res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+    # check tx type if create -> compute id
+    # case do
+    # ChannelCreateTx ->
+    # {:ok, channel_id} =
+    #   compute_channel_id(inner_tx., meta_tx.auth_data, inner_tx.responder_id)
+
+    # {:ok, Map.put(res, :channel_id, channel_id)}
+
+    # false ->
+    # end
+    # false ->
+    # {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    # end
+  end
+
   ## POST Basic account + Basic account
   defp post_(%Client{connection: connection} = client, tx,
          signatures_list: signatures_list,
@@ -777,6 +868,12 @@ defmodule Core.Channel do
      "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
        inspect(opts_list)
      }"}
+  end
+
+  defp wrap_in_signature_signed_tx(tx, signature_list) do
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [signature_list, serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
 
   defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)

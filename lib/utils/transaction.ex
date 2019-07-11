@@ -516,16 +516,16 @@ defmodule Utils.Transaction do
     end
   end
 
-  defp await_mining(connection, tx_hash, type) do
+  def await_mining(connection, tx_hash, type) do
     await_mining(connection, tx_hash, @await_attempts, type)
   end
 
-  defp await_mining(_connection, _tx_hash, 0, _type),
+  def await_mining(_connection, _tx_hash, 0, _type),
     do:
       {:error,
        "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
 
-  defp await_mining(connection, tx_hash, attempts, type) do
+  def await_mining(connection, tx_hash, attempts, type) do
     Process.sleep(@await_attempt_interval)
 
     mining_status =
