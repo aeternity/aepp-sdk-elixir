@@ -517,6 +517,186 @@ defmodule Utils.Serialization do
     }
   end
 
+  defp serialize_for_client(
+         initiator_id: initiator_id,
+         initiator_amount: initiator_amount,
+         responder_id: responder_id,
+         responder_amount: responder_amount,
+         channel_reserve: channel_reserve,
+         lock_period: lock_period,
+         ttl: ttl,
+         fee: fee,
+         delegate_ids: delegate_ids,
+         state_hash: state_hash,
+         nonce: nonce
+       ) do
+    %{
+      initiator_id: :aeser_api_encoder.encode(:id_hash, initiator_id),
+      initiator_amount: initiator_amount,
+      responder_id: :aeser_api_encoder.encode(:id_hash, responder_id),
+      responder_amount: responder_amount,
+      channel_reserve: channel_reserve,
+      lock_period: lock_period,
+      ttl: ttl,
+      fee: fee,
+      delegate_ids: Enum.map(delegate_ids, fn id -> :aeser_api_encoder.encode(:id_hash, id) end),
+      state_hash: :aeser_api_encoder.encode(:state, state_hash),
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         amount: amount,
+         ttl: ttl,
+         fee: fee,
+         state_hash: state_hash,
+         round: round,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      amount: amount,
+      ttl: ttl,
+      fee: fee,
+      state_hash: :aeser_api_encoder.encode(:state, state_hash),
+      round: round,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         to_id: to_id,
+         amount: amount,
+         ttl: ttl,
+         fee: fee,
+         state_hash: state_hash,
+         round: round,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      to_id: :aeser_api_encoder.encode(:id_hash, to_id),
+      amount: amount,
+      ttl: ttl,
+      fee: fee,
+      state_hash: :aeser_api_encoder.encode(:state, state_hash),
+      round: round,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         initiator_amount_final: initiator_amount_final,
+         responder_amount_final: responder_amount_final,
+         ttl: ttl,
+         fee: fee,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      initiator_amount_final: initiator_amount_final,
+      responder_amount_final: responder_amount_final,
+      ttl: ttl,
+      fee: fee,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         payload: payload,
+         poi: poi,
+         ttl: ttl,
+         fee: fee,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      payload: :aeser_api_encoder.encode(:transaction, payload),
+      # TODO
+      poi: poi,
+      ttl: ttl,
+      fee: fee,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         payload: payload,
+         poi: poi,
+         ttl: ttl,
+         fee: fee,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      payload: :aeser_api_encoder.encode(:transaction, payload),
+      # TODO
+      poi: poi,
+      ttl: ttl,
+      fee: fee,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         payload: payload,
+         ttl: ttl,
+         fee: fee,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      payload: :aeser_api_encoder.encode(:transaction, payload),
+      ttl: ttl,
+      fee: fee,
+      nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(
+         channel_id: channel_id,
+         from_id: from_id,
+         payload: payload,
+         round: round,
+         update: update,
+         state_hash: state_hash,
+         offchain_trees: offchain_trees,
+         ttl: ttl,
+         fee: fee,
+         nonce: nonce
+       ) do
+    %{
+      channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
+      from_id: :aeser_api_encoder.encode(:id_hash, from_id),
+      payload: :aeser_api_encoder.encode(:transaction, payload),
+      round: round,
+      # TODO
+      update: update,
+      state_hash: :aeser_api_encoder.encode(:state, state_hash),
+      # TODO
+      offchain_trees: offchain_trees,
+      ttl: ttl,
+      fee: fee,
+      nonce: nonce
+    }
+  end
+
   defp serialization_template(:signed_tx) do
     [
       signatures: [:binary],
