@@ -37,7 +37,8 @@ defmodule CoreListenerTest do
     end
 
     Listener.subscribe(:micro_blocks, self())
-    Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
+    public_key = setup_data.client.keypair.public
+    Account.spend(setup_data.client, public_key, 100)
 
     receive do
       {:micro_blocks, _} -> :ok
@@ -47,14 +48,14 @@ defmodule CoreListenerTest do
 
     Listener.subscribe(:transactions, self())
 
-    Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
+    Account.spend(setup_data.client, public_key, 100)
 
     receive do
       {:transactions,
        [
          %{
-           sender_id: ^setup_data.client.keypair.public,
-           recipient_id: ^setup_data.client.keypair.public,
+           sender_id: ^public_key,
+           recipient_id: ^public_key,
            amount: 100,
            ttl: 0,
            payload: "payload",
@@ -68,14 +69,14 @@ defmodule CoreListenerTest do
 
     Listener.subscribe(:pool_transactions, self())
 
-    Account.spend(setup_data.client, setup_data.client.keypair.public, 100)
+    Account.spend(setup_data.client, public_key, 100)
 
     receive do
       {:pool_transactions,
        [
          %{
-           sender_id: ^setup_data.client.keypair.public,
-           recipient_id: ^setup_data.client.keypair.public,
+           sender_id: ^public_key,
+           recipient_id: ^public_key,
            amount: 100,
            ttl: 0,
            payload: "payload",
