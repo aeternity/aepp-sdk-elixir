@@ -53,8 +53,8 @@ defmodule CoreListenerTest do
       {:transactions,
        [
          %{
-           sender_id: setup_data.client.keypair.public,
-           recipient_id: setup_data.client.keypair.public,
+           sender_id: ^setup_data.client.keypair.public,
+           recipient_id: ^setup_data.client.keypair.public,
            amount: 100,
            ttl: 0,
            payload: "payload",
@@ -74,8 +74,8 @@ defmodule CoreListenerTest do
       {:pool_transactions,
        [
          %{
-           sender_id: setup_data.client.keypair.public,
-           recipient_id: setup_data.client.keypair.public,
+           sender_id: ^setup_data.client.keypair.public,
+           recipient_id: ^setup_data.client.keypair.public,
            amount: 100,
            ttl: 0,
            payload: "payload",
