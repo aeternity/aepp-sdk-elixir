@@ -4,7 +4,7 @@ defmodule Core.Listener do
   """
   use GenServer
 
-  alias Core.Listener.Supervisor
+  alias Core.Listener.Supervisor, as: ListenerSup
   alias Utils.Encoding
 
   @gc_objects_sent_interval 10_000
@@ -37,7 +37,8 @@ defmodule Core.Listener do
   def start(network_id, port \\ @default_port)
 
   def start(network_id, port) when network_id in ["ae_mainnet", "ae_uat"],
-    do: Supervisor.start_link(%{network: network_id, initial_peers: [], genesis: nil, port: port})
+    do:
+      ListenerSup.start_link(%{network: network_id, initial_peers: [], genesis: nil, port: port})
 
   def start(_, _),
     do:
@@ -62,12 +63,22 @@ defmodule Core.Listener do
   def start(peers, network_id, genesis_hash, port \\ @default_port)
       when is_list(peers) and is_binary(network_id) and is_binary(genesis_hash),
       do:
-        Supervisor.start_link(%{
+        ListenerSup.start_link(%{
           initial_peers: peers,
           network: network_id,
           genesis: genesis_hash,
           port: port
         })
+
+  @doc """
+  Stop the listener
+
+  ## Example
+      iex> Core.Listener.stop()
+      :ok
+  """
+  @spec stop() :: :ok
+  def stop(), do: Supervisor.stop(ListenerSup)
 
   @doc false
   def init(_) do
@@ -441,7 +452,7 @@ defmodule Core.Listener do
   end
 
   defp assert_listener_started() do
-    case Process.whereis(Supervisor) do
+    case Process.whereis(ListenerSup) do
       nil ->
         {:error, "Listener not started, use start/1 or start/3"}
 
