@@ -242,7 +242,6 @@ defmodule Core.Listener do
 
   @doc false
   def notify(event, data, hash) when event in @notifiable_events do
-    # IO.inspect({event, data, hash}, limit: :infinity)
     GenServer.cast(__MODULE__, {:notify, event, data, hash})
   end
 
