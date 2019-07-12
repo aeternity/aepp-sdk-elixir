@@ -28,66 +28,77 @@ defmodule CoreListenerTest do
       "kh_2KhFJSdz1BwrvEWe9fFBRBpWoweoaZuTiYLWwUPh21ptuDE8UQ"
     )
 
-    Listener.subscribe(:key_blocks, self())
-
-    receive do
-      {:key_blocks, _} -> :ok
-    after
-      2000 -> flunk("Didn't receive key block")
-    end
-
-    Listener.subscribe(:micro_blocks, self())
     public_key = setup_data.client.keypair.public
-    Account.spend(setup_data.client, public_key, 100)
 
-    receive do
-      {:micro_blocks, _} -> :ok
-    after
-      10000 -> flunk("Didn't receive micro block")
-    end
-
+    Listener.subscribe(:key_blocks, self())
+    Listener.subscribe(:micro_blocks, self())
     Listener.subscribe(:transactions, self())
-
-    Account.spend(setup_data.client, public_key, 100)
-
-    receive do
-      {:transactions,
-       [
-         %{
-           sender_id: ^public_key,
-           recipient_id: ^public_key,
-           amount: 100,
-           ttl: 0,
-           payload: "payload",
-           type: :spend_tx
-         }
-       ]} ->
-        :ok
-    after
-      10000 -> flunk("Didn't receive transactions")
-    end
-
     Listener.subscribe(:pool_transactions, self())
+    Listener.subscribe(:spend_transactions, self(), public_key)
+    Listener.subscribe(:pool_spend_transactions, self(), public_key)
 
     Account.spend(setup_data.client, public_key, 100)
 
-    receive do
-      {:pool_transactions,
-       [
-         %{
-           sender_id: ^public_key,
-           recipient_id: ^public_key,
-           amount: 100,
-           ttl: 0,
-           payload: "payload",
-           type: :spend_tx
-         }
-       ]} ->
-        :ok
-    after
-      10000 -> flunk("Didn't receive pool transactions")
-    end
+    # receive one of each of the events that we've subscribed to,
+    # we don't know the order in which the messages have been sent
+    receive_and_check_message(public_key)
+    receive_and_check_message(public_key)
+    receive_and_check_message(public_key)
+    receive_and_check_message(public_key)
+    receive_and_check_message(public_key)
+    receive_and_check_message(public_key)
 
     :ok = Listener.stop()
+  end
+
+  defp receive_and_check_message(public_key) do
+    receive do
+      {type, _} = message ->
+        case message do
+          {:transactions, txs} ->
+            assert :ok = check_txs(txs, public_key)
+
+          {:pool_transactions, txs} ->
+            assert :ok = check_txs(txs, public_key)
+
+          {:spend_transactions, txs} ->
+            assert :ok = check_txs([txs], public_key)
+
+          {:pool_spend_transactions, txs} ->
+            assert :ok = check_txs([txs], public_key)
+
+          {:key_blocks, _} ->
+            :ok
+
+          {:micro_blocks, _} ->
+            :ok
+
+          _ ->
+            flunk("Received invalid message")
+        end
+
+        Listener.unsubscribe(type, self())
+    after
+      15000 -> flunk("Didn't receive message")
+    end
+  end
+
+  defp check_txs(txs, public_key) do
+    case txs do
+      [
+        %{
+          sender_id: ^public_key,
+          recipient_id: ^public_key,
+          amount: 100,
+          ttl: 0,
+          payload: "",
+          type: :spend_tx
+        }
+      ] ->
+        :ok
+
+      _ ->
+        :error
+    end
   end
 end
