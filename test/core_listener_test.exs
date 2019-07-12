@@ -20,10 +20,10 @@ defmodule CoreListenerTest do
   end
 
   test "start listener, receive messages", setup_data do
-    IO.inspect(Core.Chain.get_node_info(setup_data.client), limit: :infinity)
+    {:ok, %{peer_pubkey: peer_pubkey}} = Core.Chain.get_node_info(setup_data.client)
 
     Listener.start(
-      ["aenode://pp_rr2Bz9zFDA78u3daZxZVyGvHazafc43PxQaXTcc5nwRj41sfc@localhost:3015"],
+      ["aenode://#{peer_pubkey}:3015"],
       "my_test",
       "kh_2KhFJSdz1BwrvEWe9fFBRBpWoweoaZuTiYLWwUPh21ptuDE8UQ"
     )
