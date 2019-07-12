@@ -175,7 +175,13 @@ defmodule Core.Listener do
   """
   @spec subscribe(atom(), pid(), Encoding.base58c()) :: :ok
   def subscribe(event, subscriber_pid, filter) when event in @filtered_events do
-    GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid, filter})
+    case assert_listener_started() do
+      :ok ->
+        GenServer.call(__MODULE__, {:subscribe, event, subscriber_pid, filter})
+
+      {:error, _} = err ->
+        err
+    end
   end
 
   def subscribe(event, _, _), do: {:error, "Unknown event to subscribe to: #{event}"}
@@ -212,7 +218,13 @@ defmodule Core.Listener do
       :ok
   """
   def unsubscribe(event, subscriber_pid, filter) when event in @filtered_events do
-    GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid, filter})
+    case assert_listener_started() do
+      :ok ->
+        GenServer.call(__MODULE__, {:unsubscribe, event, subscriber_pid, filter})
+
+      {:error, _} = err ->
+        err
+    end
   end
 
   def unsubscribe(event, _, _), do: {:error, "Unknown event to unsubscribe from: #{event}"}

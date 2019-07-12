@@ -114,6 +114,15 @@ defmodule Core.GeneralizedAccount do
   end
 
   @doc """
+     Computes an authorization id for given GA meta tx
+  """
+  @spec compute_auth_id(map()) :: {:ok, binary()}
+  def compute_auth_id(%{ga_id: ga_id, auth_data: auth_data} = _meta_tx) do
+    decoded_ga_id = Utils.Encoding.prefix_decode_base58c(ga_id)
+    {:ok, _auth_id} = Utils.Hash.hash(decoded_ga_id <> auth_data)
+  end
+
+  @doc """
   false
   """
   def default_gas(), do: @default_gas

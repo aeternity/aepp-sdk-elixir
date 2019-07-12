@@ -21,6 +21,16 @@ defmodule Utils.Serialization do
   @tag_ga_attach_tx 80
   @tag_ga_meta_tx 81
 
+  @tag_channel_create_tx 50
+  @tag_channel_deposit_tx 51
+  @tag_channel_withdraw_tx 52
+  @tag_channel_close_mutual_tx 53
+  @tag_channel_close_solo_tx 54
+  @tag_channel_slash_tx 55
+  @tag_channel_settle_tx 56
+  @tag_channel_snapshot_solo_tx 59
+  @tag_channel_force_progress_tx 521
+
   @version_signed_tx 1
   @version_spend_tx 1
   @version_oracle_register_tx 1
@@ -38,6 +48,16 @@ defmodule Utils.Serialization do
   @version_ga_attach_tx 1
   @version_ga_meta_tx 1
 
+  @version_channel_create_tx 1
+  @version_channel_deposit_tx 1
+  @version_channel_withdraw_tx 1
+  @version_channel_close_mutual_tx 1
+  @version_channel_close_solo_tx 1
+  @version_channel_slash_tx 1
+  @version_channel_settle_tx 1
+  @version_channel_snapshot_solo_tx 1
+  @version_channel_force_progress_tx 1
+
   @type structure_type ::
           :signed_tx
           | :spend_tx
@@ -53,6 +73,15 @@ defmodule Utils.Serialization do
           | :contract_create_tx
           | :contract_call_tx
           | :sophia_byte_code
+          | :channel_create_tx
+          | :channel_deposit_tx
+          | :channel_withdraw_tx
+          | :channel_close_mutual_tx
+          | :channel_close_solo_tx
+          | :channel_slash_tx
+          | :channel_settle_tx
+          | :channel_snapshot_solo_tx
+          | :channel_solo_force_tx
 
   @type tx_type ::
           AeternityNode.Model.SpendTx.t()
@@ -67,6 +96,15 @@ defmodule Utils.Serialization do
           | AeternityNode.Model.NameUpdateTx.t()
           | AeternityNode.Model.ContractCreateTx.t()
           | AeternityNode.Model.ContractCallTx.t()
+          | AeternityNode.Model.ChannelCreateTx.t()
+          | AeternityNode.Model.ChannelCloseMutualTx.t()
+          | AeternityNode.Model.ChannelCloseSoloTx.t()
+          | AeternityNode.Model.ChannelDepositTx.t()
+          | AeternityNode.Model.ChannelForceProgressTx.t()
+          | AeternityNode.Model.ChannelSettleTx.t()
+          | AeternityNode.Model.ChannelSlashTx.t()
+          | AeternityNode.Model.ChannelSnapshotSoloTx.t()
+          | AeternityNode.Model.ChannelWithdrawTx.t()
 
   @type id :: {:id, id_type(), binary()}
   @type id_type :: :account | :oracle | :name | :commitment | :contract | :channel
@@ -621,6 +659,124 @@ defmodule Utils.Serialization do
     ]
   end
 
+  defp serialization_template(:channel_create_tx) do
+    [
+      initiator_id: :id,
+      initiator_amount: :int,
+      responder_id: :id,
+      responder_amount: :int,
+      channel_reserve: :int,
+      lock_period: :int,
+      ttl: :int,
+      fee: :int,
+      delegate_ids: [:id],
+      state_hash: :binary,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_deposit_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      amount: :int,
+      ttl: :int,
+      fee: :int,
+      state_hash: :binary,
+      round: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_withdraw_tx) do
+    [
+      channel_id: :id,
+      to_id: :id,
+      amount: :int,
+      ttl: :int,
+      fee: :int,
+      state_hash: :binary,
+      round: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_close_mutual_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      initiator_amount_final: :int,
+      responder_amount_final: :int,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_close_solo_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      payload: :binary,
+      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
+      poi: :binary,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_slash_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      payload: :binary,
+      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
+      poi: :binary,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_settle_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      initiator_amount_final: :int,
+      responder_amount_final: :int,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_snapshot_solo_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      payload: :binary,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_solo_force_tx) do
+    [
+      channel_id: :id,
+      from_id: :id,
+      payload: :binary,
+      round: :int,
+      update: :binary,
+      state_hash: :binary,
+      offchain_trees: :trees,
+      ttl: :int,
+      fee: :int,
+      nonce: :int
+    ]
+  end
+
   defp serialization_template(:ga_attach_tx) do
     [
       owner_id: :id,
@@ -666,6 +822,16 @@ defmodule Utils.Serialization do
   defp type_to_tag(:ga_attach_tx), do: @tag_ga_attach_tx
   defp type_to_tag(:ga_meta_tx), do: @tag_ga_meta_tx
 
+  defp type_to_tag(:channel_create_tx), do: @tag_channel_create_tx
+  defp type_to_tag(:channel_deposit_tx), do: @tag_channel_deposit_tx
+  defp type_to_tag(:channel_withdraw_tx), do: @tag_channel_withdraw_tx
+  defp type_to_tag(:channel_close_mutual_tx), do: @tag_channel_close_mutual_tx
+  defp type_to_tag(:channel_close_solo_tx), do: @tag_channel_close_solo_tx
+  defp type_to_tag(:channel_slash_tx), do: @tag_channel_slash_tx
+  defp type_to_tag(:channel_settle_tx), do: @tag_channel_settle_tx
+  defp type_to_tag(:channel_snapshot_solo_tx), do: @tag_channel_snapshot_solo_tx
+  defp type_to_tag(:channel_force_progress_tx), do: @tag_channel_force_progress_tx
+
   defp version(:signed_tx), do: @version_signed_tx
   defp version(:spend_tx), do: @version_spend_tx
   defp version(:oracle_register_tx), do: @version_oracle_register_tx
@@ -680,6 +846,15 @@ defmodule Utils.Serialization do
   defp version(:contract_create_tx), do: @version_contract_create_tx
   defp version(:contract_call_tx), do: @version_contract_call_tx
   defp version(:sophia_byte_code), do: @version_sophia_byte_code
+  defp version(:channel_create_tx), do: @version_channel_create_tx
+  defp version(:channel_deposit_tx), do: @version_channel_deposit_tx
+  defp version(:channel_withdraw_tx), do: @version_channel_withdraw_tx
+  defp version(:channel_close_mutual_tx), do: @version_channel_close_mutual_tx
+  defp version(:channel_close_solo_tx), do: @version_channel_close_solo_tx
+  defp version(:channel_slash_tx), do: @version_channel_slash_tx
+  defp version(:channel_settle_tx), do: @version_channel_settle_tx
+  defp version(:channel_snapshot_solo_tx), do: @version_channel_snapshot_solo_tx
+  defp version(:channel_force_progress_tx), do: @version_channel_force_progress_tx
   defp version(:ga_attach_tx), do: @version_ga_attach_tx
   defp version(:ga_meta_tx), do: @version_ga_meta_tx
 end

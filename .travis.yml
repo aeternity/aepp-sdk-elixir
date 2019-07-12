@@ -6,7 +6,7 @@ elixir: '1.8'
 
 env:
   global:
-    - AETERNITY_VERSION=3.0.0
+    - AETERNITY_VERSION=3.1.0
     - GENERATOR_VERSION=1.1.0
     - LD_LIBRARY_PATH=$HOME/.libsodium/lib:$LD_LIBRARY_PATH
     - LD_RUN_PATH=$HOME/.libsodium/lib:$LD_RUN_PATH
