@@ -43,7 +43,7 @@ defmodule CoreListenerTest do
     receive do
       {:micro_blocks, _} -> :ok
     after
-      2000 -> flunk("Didn't receive micro block")
+      10000 -> flunk("Didn't receive micro block")
     end
 
     Listener.subscribe(:transactions, self())
@@ -64,7 +64,7 @@ defmodule CoreListenerTest do
        ]} ->
         :ok
     after
-      2000 -> flunk("Didn't receive transactions")
+      10000 -> flunk("Didn't receive transactions")
     end
 
     Listener.subscribe(:pool_transactions, self())
@@ -85,7 +85,7 @@ defmodule CoreListenerTest do
        ]} ->
         :ok
     after
-      2000 -> flunk("Didn't receive pool transactions")
+      10000 -> flunk("Didn't receive pool transactions")
     end
 
     :ok = Listener.stop()
