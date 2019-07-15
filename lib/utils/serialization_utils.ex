@@ -31,6 +31,8 @@ defmodule Utils.SerializationUtils do
 
   @ct_version 0x40001
 
+  @poi_version 1
+
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
         recipient_id: tx_recipient_id,
@@ -629,6 +631,27 @@ defmodule Utils.SerializationUtils do
       1 ->
         :absolute
     end
+  end
+
+  def serialize_poi(poi_bin) do
+    template_value = [{:binary, [{:binary, [:binary]}]}]
+
+    serialization_template = [
+      accounts: template_value,
+      calls: template_value,
+      channels: template_value,
+      contracts: template_value,
+      ns: template_value,
+      oracles: template_value
+    ]
+
+    fields =
+      :aeser_chain_objects.deserialize(:trees_poi, @poi_version, serialization_template, poi_bin)
+
+    serialized_fields =
+      :aeser_chain_objects.serialize(:trees_poi, @poi_version, serialization_template, fields)
+
+    :aeser_api_encoder.encode(:poi, serialized_fields)
   end
 
   defp proccess_id_to_record(id) when is_binary(id) do

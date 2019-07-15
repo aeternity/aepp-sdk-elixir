@@ -622,8 +622,7 @@ defmodule Utils.Serialization do
       channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
       from_id: :aeser_api_encoder.encode(:id_hash, from_id),
       payload: :aeser_api_encoder.encode(:transaction, payload),
-      # TODO
-      poi: poi,
+      poi: SerializationUtils.serialize_poi(poi),
       ttl: ttl,
       fee: fee,
       nonce: nonce
