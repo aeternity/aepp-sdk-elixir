@@ -227,7 +227,7 @@ defmodule Utils.Serialization do
     tag = type_to_tag(type)
     version = version(type)
 
-    :aeserialization.deserialize(:sophia_byte_code, tag, version, template, payload)
+    :aeserialization.deserialize(type, tag, version, template, payload)
   end
 
   # this is the way the id record is represented in erlang
@@ -536,6 +536,35 @@ defmodule Utils.Serialization do
       ttl: :int,
       tx: :binary
     ]
+  end
+
+  # Each subtree is either empty(empty list - []) or  [root_hash_of_subtree, [mpt_key, [mpt_value/s]]]
+  defp serialization_template(:poi) do
+    [
+      accounts: [{:binary, [{:binary, [:binary]}]}],
+      calls: [{:binary, [{:binary, [:binary]}]}],
+      channels: [{:binary, [{:binary, [:binary]}]}],
+      contracts: [{:binary, [{:binary, [:binary]}]}],
+      ns: [{:binary, [{:binary, [:binary]}]}],
+      oracles: [{:binary, [{:binary, [:binary]}]}]
+    ]
+  end
+
+  defp poi_serialization_format(:empty) do
+    []
+  end
+
+  # https://github.com/aeternity/aeternity/blob/master/apps/aecore/src/aec_poi.erl#L129
+  defp poi_serialization_format({:poi, {:aec_poi, hash, proof_db}}) do
+    [
+      hash,
+      serialize_proof_to_list(proof_db)
+    ]
+  end
+
+  # https://github.com/aeternity/aeternity/blob/master/apps/aecore/src/aec_poi.erl#L175
+  # TODO MAYBE Add gb trees library to the project.
+  defp serialize_proof_to_list(proof_db) do
   end
 
   defp type_to_tag(:signed_tx), do: @tag_signed_tx
