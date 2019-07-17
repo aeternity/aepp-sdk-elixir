@@ -1,7 +1,5 @@
 defmodule Utils.SerializationUtils do
-  @moduledoc """
-  Serialization helper module.
-  """
+  @moduledoc false
 
   alias Utils.{Encoding, Keys}
 
@@ -33,36 +31,6 @@ defmodule Utils.SerializationUtils do
 
   @ct_version 0x40001
 
-  @doc """
-  Serializes a transaction to a tuple of list of fields and type, depending on its structure.
-
-  ## Example
-      iex> alias AeternityNode.Model.SpendTx
-      iex> spend_tx = %SpendTx{
-          amount: 5_018_857_520_000_000_000,
-          fee: 0,
-          nonce: 37181,
-          payload: "",
-          recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-          sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-          ttl: 0
-        }
-      iex> Utils.SerializationUtils.process_tx_fields(spend_tx)
-      {:ok,
-       [
-         {:id, :account,
-          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141, 224, 214, 250, 79,
-            248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216, 129>>},
-         {:id, :account,
-          <<9, 51, 126, 98, 138, 255, 218, 224, 184, 180, 31, 234, 251, 255, 59, 141, 224, 214, 250, 79,
-            248, 30, 246, 237, 55, 83, 153, 134, 240, 138, 216, 129>>},
-         5_018_857_520_000_000_000,
-         0,
-         0,
-         37181,
-         ""
-       ], :spend_tx}
-  """
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
         recipient_id: tx_recipient_id,
@@ -651,6 +619,16 @@ defmodule Utils.SerializationUtils do
 
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
+  end
+
+  def ttl_type_for_client(type) do
+    case type do
+      0 ->
+        :relative
+
+      1 ->
+        :absolute
+    end
   end
 
   defp proccess_id_to_record(id) when is_binary(id) do
