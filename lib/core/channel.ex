@@ -505,7 +505,7 @@ defmodule Core.Channel do
   the honest party has the opportunity to issue a channel_slash transaction
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
   """
-  @spec slash(Client.t(), binary(), String.t(), binary() | map(), list()) ::
+  @spec slash(Client.t(), binary(), binary() | map(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
   def slash(
         %Client{
@@ -519,7 +519,7 @@ defmodule Core.Channel do
         poi,
         opts \\ []
       )
-      when valid_prefixes(sender_prefix, channel_prefix) do
+      when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) do
     with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
@@ -561,7 +561,7 @@ defmodule Core.Channel do
   to be recorded on-chain.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
   """
-  @spec snapshot_solo(Client.t(), binary(), String.t(), list()) ::
+  @spec snapshot_solo(Client.t(), binary(), binary() | map(), list()) ::
           {:ok, map()} | {:error, String.t()}
   def snapshot_solo(
         %Client{
@@ -871,8 +871,7 @@ defmodule Core.Channel do
          payload,
          poi,
          ttl
-       )
-       when is_list(poi) do
+       ) do
     serialized_poi = Serialization.serialize_poi(poi)
 
     {:ok,
@@ -967,6 +966,8 @@ defmodule Core.Channel do
          poi,
          ttl
        ) do
+    serialized_poi = Serialization.serialize_poi(poi)
+
     {:ok,
      %ChannelSlashTx{
        channel_id: channel_id,
@@ -974,7 +975,7 @@ defmodule Core.Channel do
        from_id: from_id,
        nonce: nonce,
        payload: payload,
-       poi: poi,
+       poi: serialized_poi,
        ttl: ttl
      }}
   end
