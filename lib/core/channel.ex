@@ -9,6 +9,7 @@ defmodule Core.Channel do
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
   alias Core.GeneralizedAccount
+  alias Utils.Serialization
 
   alias AeternityNode.Model.{
     ChannelCreateTx,
@@ -872,7 +873,7 @@ defmodule Core.Channel do
          ttl
        )
        when is_list(poi) do
-    serialized_poi = Serialization.serialize(poi, :poi)
+    serialized_poi = Serialization.serialize_poi(poi)
 
     {:ok,
      %ChannelCloseSoloTx{

@@ -57,6 +57,19 @@ defmodule Utils.Serialization do
   @version_channel_settle_tx 1
   @version_channel_snapshot_solo_tx 1
   @version_channel_force_progress_tx 1
+  @version_poi 1
+  @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
+
+  @type state_hash :: binary()
+  @type poi_keyword ::
+          [
+            {:accounts, {state_hash(), map()}},
+            {:calls, {state_hash(), map()}},
+            {:channels, {state_hash(), map()}},
+            {:contracts, {state_hash(), map()}},
+            {:ns, {state_hash, map()}},
+            {:oracles, {state_hash(), map()}}
+          ]
 
   @type structure_type ::
           :signed_tx
@@ -235,6 +248,47 @@ defmodule Utils.Serialization do
   def id_to_record(value, type)
       when type in [:account, :oracle, :name, :commitment, :contract, :channel],
       do: {:id, type, value}
+
+  @doc """
+  Serializes a Proof-of-Inclusion to a binary.
+
+  ## Example
+      iex> poi = [
+          accounts: {<<148, 112, 174, 4, 233, 253, 29, 65, 31, 17, 40, 153, 167, 18, 37,
+          179, 35, 141, 97, 95, 132, 162, 158, 78, 103, 11, 230, 39, 208, 27, 176,111>>, %{cache: {0, nil}}}
+         ]
+      iex> Utils.Serialization.serialize_poi poi
+      <<235, 60, 1, 227, 226, 160, 148, 112, 174, 4, 233, 253, 29, 65, 31,
+      17, 40, 153, 167, 18, 37, 179, 35, 141, 97, 95, 132, 162, 158, 78,
+      103, 11, 230, 39, 208, 27, 176, 111, 192, 192, 192, 192, 192, 192>>
+  """
+  @spec serialize_poi(poi_keyword()) :: binary()
+  def serialize_poi(state_hashes_list) when is_list(state_hashes_list) do
+    fields =
+      for tree_name <- @all_trees_names do
+        {state_hash, proof_db} = Keyword.get(state_hashes_list, tree_name, {[], %{}})
+        {tree_name, serialize_poi(state_hash, proof_db)}
+      end
+
+    :aeser_chain_objects.serialize(
+      :trees_poi,
+      version(:poi),
+      serialization_template(:poi),
+      fields
+    )
+  end
+
+  defp serialize_poi(<<_::256>> = root_hash, proof_db) do
+    [{root_hash, serialize_proof_to_list(proof_db)}]
+  end
+
+  defp serialize_poi([], _proof_db) do
+    []
+  end
+
+  defp serialize_proof_to_list(%{cache: cache}) do
+    :gb_trees.to_list(cache)
+  end
 
   defp process_serialize(fields, type) do
     template = serialization_template(type)
@@ -538,7 +592,6 @@ defmodule Utils.Serialization do
     ]
   end
 
-  # Each subtree is either empty(empty list - []) or  [root_hash_of_subtree, [mpt_key, [mpt_value/s]]]
   defp serialization_template(:poi) do
     [
       accounts: [{:binary, [{:binary, [:binary]}]}],
@@ -548,23 +601,6 @@ defmodule Utils.Serialization do
       ns: [{:binary, [{:binary, [:binary]}]}],
       oracles: [{:binary, [{:binary, [:binary]}]}]
     ]
-  end
-
-  defp poi_serialization_format(:empty) do
-    []
-  end
-
-  # https://github.com/aeternity/aeternity/blob/master/apps/aecore/src/aec_poi.erl#L129
-  defp poi_serialization_format({:poi, {:aec_poi, hash, proof_db}}) do
-    [
-      hash,
-      serialize_proof_to_list(proof_db)
-    ]
-  end
-
-  # https://github.com/aeternity/aeternity/blob/master/apps/aecore/src/aec_poi.erl#L175
-  # TODO MAYBE Add gb trees library to the project.
-  defp serialize_proof_to_list(proof_db) do
   end
 
   defp type_to_tag(:signed_tx), do: @tag_signed_tx
@@ -619,4 +655,5 @@ defmodule Utils.Serialization do
   defp version(:channel_force_progress_tx), do: @version_channel_force_progress_tx
   defp version(:ga_attach_tx), do: @version_ga_attach_tx
   defp version(:ga_meta_tx), do: @version_ga_meta_tx
+  defp version(:poi), do: @version_poi
 end
