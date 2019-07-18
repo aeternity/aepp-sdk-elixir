@@ -177,16 +177,20 @@ defmodule Core.Listener do
       iex> Core.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
       iex> flush()
       {:spend_transactions,
-       %{
-         amount: 5000000000000000000,
-         fee: 17080000000000,
-         nonce: 5881,
-         payload: "",
-         recipient_id: "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9",
-         sender_id: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
-         ttl: 0,
-         type: :spend_tx
-      }}
+        %{
+          hash: "th_2Z9198iTQbBBE3jdeFxJQNMHqGNSESxG7PyTs3vU3JZUjYs319",
+          tx: %{
+            amount: 100,
+            fee: 16640000000,
+            nonce: 3,
+            payload: "",
+            recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            ttl: 0,
+            type: :spend_tx
+          }
+        }
+      }
       :ok
   """
   @spec subscribe(atom(), pid(), Encoding.base58c()) :: :ok
