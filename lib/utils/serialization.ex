@@ -30,6 +30,11 @@ defmodule Utils.Serialization do
   @tag_channel_settle_tx 56
   @tag_channel_snapshot_solo_tx 59
   @tag_channel_force_progress_tx 521
+  @tag_channel_offchain_update_transfer 570
+  @tag_channel_offchain_update_deposit 571
+  @tag_channel_offchain_update_withdraw 572
+  @tag_channel_offchain_update_create_contract 573
+  @tag_channel_offchain_update_call_contract 574
 
   @version_signed_tx 1
   @version_spend_tx 1
@@ -57,6 +62,17 @@ defmodule Utils.Serialization do
   @version_channel_settle_tx 1
   @version_channel_snapshot_solo_tx 1
   @version_channel_force_progress_tx 1
+  @version_channel_offchain_update_transfer 1
+  @version_channel_offchain_update_deposit 1
+  @version_channel_offchain_update_withdraw 1
+  @version_channel_offchain_update_create_contract 1
+  @version_channel_offchain_update_call_contract 1
+
+  @channel_offchain_update_transfer_name "OffChainTransfer"
+  @channel_offchain_update_deposit_name "OffChainDeposit"
+  @channel_offchain_update_withdraw_name "OffChainWithdrawal"
+  @channel_offchain_update_create_contract_name "OffChainNewContract"
+  @channel_offchain_update_call_contract_name "OffChainCallContract"
 
   @type structure_type ::
           :signed_tx
@@ -81,7 +97,12 @@ defmodule Utils.Serialization do
           | :channel_slash_tx
           | :channel_settle_tx
           | :channel_snapshot_solo_tx
-          | :channel_solo_force_tx
+          | :channel_force_progress_tx
+          | :transfer_update
+          | :deposit_update
+          | :withdraw_update
+          | :create_contract_update
+          | :call_contract_update
 
   @type tx_type ::
           AeternityNode.Model.SpendTx.t()
@@ -232,7 +253,7 @@ defmodule Utils.Serialization do
     tag = type_to_tag(type)
     version = version(type)
 
-    :aeserialization.deserialize(:sophia_byte_code, tag, version, template, payload)
+    :aeserialization.deserialize(type, tag, version, template, payload)
   end
 
   # this is the way the id record is represented in erlang
@@ -659,19 +680,87 @@ defmodule Utils.Serialization do
          fee: fee,
          nonce: nonce
        ) do
+    {type, _, _} = :aeser_chain_objects.deserialize_type_and_vsn(update)
+
+    serialized_for_client_channel_offchain_update =
+      update |> deserialize(type) |> serialize_for_client()
+
     %{
       channel_id: :aeser_api_encoder.encode(:id_hash, channel_id),
       from_id: :aeser_api_encoder.encode(:id_hash, from_id),
       payload: :aeser_api_encoder.encode(:transaction, payload),
       round: round,
-      # TODO
-      update: update,
+      update: serialized_for_client_channel_offchain_update,
       state_hash: :aeser_api_encoder.encode(:state, state_hash),
-      # TODO
-      offchain_trees: offchain_trees,
+      offchain_trees: :aeser_api_encoder.encode(:state_trees, offchain_trees),
       ttl: ttl,
       fee: fee,
       nonce: nonce
+    }
+  end
+
+  defp serialize_for_client(from: from, to: to, amount: amount) do
+    %{
+      op: @channel_offchain_update_transfer_name,
+      from: :aeser_api_encoder.encode(:id_hash, from),
+      to: :aeser_api_encoder.encode(:id_hash, to),
+      amount: amount
+    }
+  end
+
+  defp serialize_for_client(from: from, amount: amount) do
+    %{
+      op: @channel_offchain_update_deposit_name,
+      from: :aeser_api_encoder.encode(:id_hash, from),
+      amount: amount
+    }
+  end
+
+  defp serialize_for_client(to: to, amount: amount) do
+    %{
+      op: @channel_offchain_update_withdraw_name,
+      to: :aeser_api_encoder.encode(:id_hash, to),
+      amount: amount
+    }
+  end
+
+  defp serialize_for_client(
+         owner: owner,
+         ct_version: ct_version,
+         code: code,
+         deposit: deposit,
+         call_data: call_data
+       ) do
+    %{
+      op: @channel_offchain_update_create_contract_name,
+      owner: :aeser_api_encoder.encode(:id_hash, owner),
+      ct_version: ct_version,
+      code: :aeser_api_encoder.encode(:contract_bytearray, code),
+      deposit: deposit,
+      call_data: :aeser_api_encoder.encode(:contract_bytearray, call_data)
+    }
+  end
+
+  defp serialize_for_client(
+         caller: caller,
+         contract: contract,
+         abi_version: abi_version,
+         amount: amount,
+         gas: gas,
+         gas_price: gas_price,
+         call_data: call_data,
+         call_stack: call_stack
+       ) do
+    %{
+      op: @channel_offchain_update_call_contract_name,
+      caller: :aeser_api_encoder.encode(:id_hash, caller),
+      contract: :aeser_api_encoder.encode(:id_hash, contract),
+      abi_version: abi_version,
+      amount: amount,
+      gas: gas,
+      gas_price: gas_price,
+      call_data: :aeser_api_encoder.encode(:contract_bytearray, call_data),
+      call_stack: call_stack
     }
   end
 
@@ -920,7 +1009,7 @@ defmodule Utils.Serialization do
     ]
   end
 
-  defp serialization_template(:channel_solo_force_tx) do
+  defp serialization_template(:channel_force_progress_tx) do
     [
       channel_id: :id,
       from_id: :id,
@@ -928,7 +1017,7 @@ defmodule Utils.Serialization do
       round: :int,
       update: :binary,
       state_hash: :binary,
-      offchain_trees: :trees,
+      offchain_trees: :binary,
       ttl: :int,
       fee: :int,
       nonce: :int
@@ -963,6 +1052,35 @@ defmodule Utils.Serialization do
     ]
   end
 
+  defp serialization_template(:channel_offchain_update_transfer) do
+    [from: :id, to: :id, amount: :int]
+  end
+
+  defp serialization_template(:channel_offchain_update_deposit) do
+    [from: :id, amount: :int]
+  end
+
+  defp serialization_template(:channel_offchain_update_withdraw) do
+    [to: :id, amount: :int]
+  end
+
+  defp serialization_template(:channel_offchain_update_create_contract) do
+    [owner: :id, ct_version: :int, code: :binary, deposit: :int, call_data: :binary]
+  end
+
+  defp serialization_template(:channel_offchain_update_call_contract) do
+    [
+      caller: :id,
+      contract: :id,
+      abi_version: :int,
+      amount: :int,
+      gas: :int,
+      gas_price: :int,
+      call_data: :binary,
+      call_stack: [:int]
+    ]
+  end
+
   defp type_to_tag(:signed_tx), do: @tag_signed_tx
   defp type_to_tag(:spend_tx), do: @tag_spend_tx
   defp type_to_tag(:oracle_register_tx), do: @tag_oracle_register_tx
@@ -989,6 +1107,15 @@ defmodule Utils.Serialization do
   defp type_to_tag(:channel_settle_tx), do: @tag_channel_settle_tx
   defp type_to_tag(:channel_snapshot_solo_tx), do: @tag_channel_snapshot_solo_tx
   defp type_to_tag(:channel_force_progress_tx), do: @tag_channel_force_progress_tx
+  defp type_to_tag(:channel_offchain_update_transfer), do: @tag_channel_offchain_update_transfer
+  defp type_to_tag(:channel_offchain_update_deposit), do: @tag_channel_offchain_update_deposit
+  defp type_to_tag(:channel_offchain_update_withdraw), do: @tag_channel_offchain_update_withdraw
+
+  defp type_to_tag(:channel_offchain_update_create_contract),
+    do: @tag_channel_offchain_update_create_contract
+
+  defp type_to_tag(:channel_offchain_update_call_contract),
+    do: @tag_channel_offchain_update_call_contract
 
   defp version(:signed_tx), do: @version_signed_tx
   defp version(:spend_tx), do: @version_spend_tx
@@ -1015,4 +1142,13 @@ defmodule Utils.Serialization do
   defp version(:channel_force_progress_tx), do: @version_channel_force_progress_tx
   defp version(:ga_attach_tx), do: @version_ga_attach_tx
   defp version(:ga_meta_tx), do: @version_ga_meta_tx
+  defp version(:channel_offchain_update_transfer), do: @version_channel_offchain_update_transfer
+  defp version(:channel_offchain_update_deposit), do: @version_channel_offchain_update_deposit
+  defp version(:channel_offchain_update_withdraw), do: @version_channel_offchain_update_withdraw
+
+  defp version(:channel_offchain_update_create_contract),
+    do: @version_channel_offchain_update_create_contract
+
+  defp version(:channel_offchain_update_call_contract),
+    do: @version_channel_offchain_update_call_contract
 end
