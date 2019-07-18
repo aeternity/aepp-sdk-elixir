@@ -41,36 +41,40 @@ defmodule CoreListenerTest do
 
     # receive one of each of the events that we've subscribed to,
     # we don't know the order in which the messages have been sent
-    receive_and_check_message(public_key)
-    receive_and_check_message(public_key)
-    receive_and_check_message(public_key)
-    receive_and_check_message(public_key)
-    receive_and_check_message(public_key)
-    receive_and_check_message(public_key)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
+    receive_and_check_message(public_key, setup_data.client)
 
     :ok = Listener.stop()
   end
 
-  defp receive_and_check_message(public_key) do
+  defp receive_and_check_message(public_key, client) do
     receive do
       {type, _} = message ->
         case message do
           {:transactions, txs} ->
-            assert :ok = check_txs(txs, public_key)
+            assert :ok = check_txs(txs, public_key, client, false)
 
           {:pool_transactions, txs} ->
-            assert :ok = check_txs(txs, public_key)
+            assert :ok = check_txs(txs, public_key, client, false)
 
           {:spend_transactions, txs} ->
-            assert :ok = check_txs([txs], public_key)
+            assert :ok = check_txs([txs], public_key, client, true)
 
           {:pool_spend_transactions, txs} ->
-            assert :ok = check_txs([txs], public_key)
+            assert :ok = check_txs([txs], public_key, client, false)
 
           {:key_blocks, _} ->
             :ok
 
           {:micro_blocks, _} ->
+            :ok
+
+          {:tx_confirmations, %{status: :confirmed} = msg} ->
             :ok
 
           _ ->
@@ -83,18 +87,25 @@ defmodule CoreListenerTest do
     end
   end
 
-  defp check_txs(txs, public_key) do
+  defp check_txs(txs, public_key, client, check_confirmations) do
     case txs do
       [
         %{
-          sender_id: ^public_key,
-          recipient_id: ^public_key,
-          amount: 100,
-          ttl: 0,
-          payload: "",
-          type: :spend_tx
+          hash: hash,
+          tx: %{
+            sender_id: ^public_key,
+            recipient_id: ^public_key,
+            amount: 100,
+            ttl: 0,
+            payload: "",
+            type: :spend_tx
+          }
         }
       ] ->
+        if check_confirmations do
+          Listener.check_tx_confirmations(client, hash, 1, self())
+        end
+
         :ok
 
       _ ->
