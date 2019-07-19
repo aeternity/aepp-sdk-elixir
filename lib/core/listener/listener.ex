@@ -448,26 +448,7 @@ defmodule Core.Listener do
     updated_objects_sent =
       case event do
         event when event in [:transactions, :pool_transactions] ->
-          Enum.reduce(object, objects_sent1, fn tx, acc ->
-            filter = determine_filter(event, tx)
-
-            case filter do
-              {filtered_event, value} ->
-                %{^filtered_event => specific_event_subscribers} = subscribers
-
-                send_filtered_event_object(
-                  filtered_event,
-                  tx,
-                  hash,
-                  specific_event_subscribers,
-                  acc,
-                  value
-                )
-
-              _ ->
-                acc
-            end
-          end)
+          send_specific_event_objects(hash, object, objects_sent1, event, subscribers)
 
         _ ->
           objects_sent1
@@ -495,6 +476,29 @@ defmodule Core.Listener do
       _ ->
         nil
     end
+  end
+
+  defp send_specific_event_objects(hash, object, objects_sent, event, subscribers) do
+    Enum.reduce(object, objects_sent, fn tx, acc ->
+      filter = determine_filter(event, tx)
+
+      case filter do
+        {filtered_event, value} ->
+          %{^filtered_event => specific_event_subscribers} = subscribers
+
+          send_filtered_event_object(
+            filtered_event,
+            tx,
+            hash,
+            specific_event_subscribers,
+            acc,
+            value
+          )
+
+        _ ->
+          acc
+      end
+    end)
   end
 
   defp send_general_event_object(event, object, hash, subscribers, objects_sent) do
