@@ -74,7 +74,7 @@ defmodule CoreListenerTest do
           {:micro_blocks, _} ->
             :ok
 
-          {:tx_confirmations, %{status: :confirmed} = msg} ->
+          {:tx_confirmations, %{status: :confirmed}} ->
             :ok
 
           _ ->
