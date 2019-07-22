@@ -466,7 +466,12 @@ defmodule Utils.Transaction do
          },
          auth_opts
        ) do
-    tx = %{tx | nonce: 0}
+    tx =
+      if tx.__struct__ in [ChannelCreateTx] && tx.initiator_id == public_key do
+        %{tx | nonce: 0}
+      else
+        tx
+      end
 
     with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
