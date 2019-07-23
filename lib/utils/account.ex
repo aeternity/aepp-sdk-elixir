@@ -46,7 +46,7 @@ defmodule Utils.Account do
     {:ok, nonce + 1}
   end
 
-  defp prepare_result({:ok, %Account{nonce: nonce, kind: "generalized"}}) do
+  defp prepare_result({:ok, %Account{kind: "generalized"}}) do
     {:ok, 0}
   end
 

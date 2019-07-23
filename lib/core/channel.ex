@@ -751,8 +751,73 @@ defmodule Core.Channel do
   def post(client, tx, opts \\ []) do
     post_(client, tx,
       signatures_list: Keyword.get(opts, :signatures_list, :no_signatures),
-      inner_tx: Keyword.get(opts, :inner_tx, :no_inner_tx)
+      inner_tx: Keyword.get(opts, :inner_tx, :no_inner_tx),
+      tx: Keyword.get(opts, :tx, :no_tx)
     )
+  end
+
+  # POST BA + BA
+  defp post_(%Client{connection: connection} = client, tx,
+         signatures_list: signatures_list,
+         inner_tx: :no_inner_tx,
+         tx: :no_tx
+       )
+       when is_list(signatures_list) do
+    sig_list = :lists.sort(signatures_list)
+    {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
+    {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
+
+    case tx do
+      %ChannelCreateTx{} ->
+        {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, res}
+    end
+  end
+
+  # POST GA + GA
+  defp post_(%Client{} = client, meta_tx,
+         signatures_list: :no_signatures,
+         inner_tx: inner_meta_tx,
+         tx: tx
+       )
+       when is_map(inner_meta_tx) do
+    case inner_meta_tx.tx ===
+           Serialization.serialize([[], Serialization.serialize(tx)], :signed_tx) do
+      true ->
+        new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_meta_tx, [])
+
+        new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+        signed_tx =
+          Encoding.prefix_encode_base64(
+            "tx",
+            wrap_in_signature_signed_tx(new_meta_tx, [])
+          )
+
+        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+          TransactionApi.post_transaction(client.connection, %Tx{
+            tx: signed_tx
+          })
+
+        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+
+        case tx do
+          %ChannelCreateTx{} ->
+            data = find_initiator_data(meta_tx, inner_meta_tx, tx)
+            {:ok, channel_id} = compute_channel_id(tx.initiator_id, data, tx.responder_id)
+            {:ok, Map.put(res, :channel_id, channel_id)}
+
+          _ ->
+            {:ok, res}
+        end
+
+      false ->
+        {:error,
+         "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    end
   end
 
   # POST GA + BASIC
@@ -760,7 +825,8 @@ defmodule Core.Channel do
          client,
          %{tx: serialized_inner_tx} = meta_tx,
          signatures_list: basic_account_signature,
-         inner_tx: inner_tx
+         inner_tx: inner_tx,
+         tx: :no_tx
        )
        when is_list(basic_account_signature) and is_map(inner_tx) do
     case serialized_inner_tx ===
@@ -809,70 +875,32 @@ defmodule Core.Channel do
     end
   end
 
-  # post_ G+G
-  defp post_(%Client{} = client, meta_tx,
-         signatures_list: :no_signatures,
-         inner_tx: inner_meta_tx
-       )
-       when is_map(inner_meta_tx) do
-    # case serialized_inner_tx  === Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
-    #   true ->
-    new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_meta_tx, [])
-
-    new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
-
-    signed_tx =
-      Encoding.prefix_encode_base64(
-        "tx",
-        wrap_in_signature_signed_tx(new_meta_tx, [])
-      )
-
-    {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-      TransactionApi.post_transaction(client.connection, %Tx{
-        tx: signed_tx
-      })
-
-    {:ok, _res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-    # check tx type if create -> compute id
-    # case do
-    # ChannelCreateTx ->
-    # {:ok, channel_id} =
-    #   compute_channel_id(inner_tx., meta_tx.auth_data, inner_tx.responder_id)
-
-    # {:ok, Map.put(res, :channel_id, channel_id)}
-
-    # false ->
-    # end
-    # false ->
-    # {:error, "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
-    # end
-  end
-
-  ## POST Basic account + Basic account
-  defp post_(%Client{connection: connection} = client, tx,
-         signatures_list: signatures_list,
-         inner_tx: :no_inner_tx
-       )
-       when is_list(signatures_list) do
-    sig_list = :lists.sort(signatures_list)
-    {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
-    {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
-
-    case tx do
-      %ChannelCreateTx{} ->
-        {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
-        {:ok, Map.put(res, :channel_id, channel_id)}
-
-      _ ->
-        {:ok, res}
-    end
-  end
-
   defp post_(client, tx, opts_list) do
     {:error,
      "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
        inspect(opts_list)
      }"}
+  end
+
+  defp find_initiator_data(%{ga_id: ga_id, auth_data: auth_data}, _meta_tx1, %ChannelCreateTx{
+         initiator_id: init_id
+       })
+       when ga_id === init_id do
+    auth_data
+  end
+
+  defp find_initiator_data(_meta_tx, %{ga_id: ga_id, auth_data: auth_data}, %ChannelCreateTx{
+         initiator_id: init_id
+       })
+       when ga_id === init_id do
+    auth_data
+  end
+
+  defp find_initiator_data(%{ga_id: ga_id}, %{ga_id: ga_id1}, %ChannelCreateTx{
+         initiator_id: init_id
+       }) do
+    {:error,
+     "#{__MODULE__}: NO MATCH FOR INITIATOR ID: #{init_id}, ga_id: #{ga_id}, ga_id1: #{ga_id1}"}
   end
 
   defp wrap_in_signature_signed_tx(tx, signature_list) do
