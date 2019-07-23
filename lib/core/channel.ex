@@ -756,7 +756,9 @@ defmodule Core.Channel do
   end
 
   # POST GA + BASIC
-  defp post_(client, %{tx: serialized_inner_tx} = meta_tx,
+  defp post_(
+         client,
+         %{tx: serialized_inner_tx} = meta_tx,
          signatures_list: basic_account_signature,
          inner_tx: inner_tx
        )
@@ -784,14 +786,17 @@ defmodule Core.Channel do
         case inner_tx do
           %ChannelCreateTx{} ->
             {:ok, channel_id} =
-              compute_channel_id(inner_tx.initiator_id, meta_tx.auth_data, inner_tx.responder_id)
+              if inner_tx.initiator_id != meta_tx.ga_id do
+                compute_channel_id(inner_tx.initiator_id, inner_tx.nonce, inner_tx.responder_id)
+              else
+                compute_channel_id(
+                  inner_tx.initiator_id,
+                  meta_tx.auth_data,
+                  inner_tx.responder_id
+                )
+              end
 
             {:ok, Map.put(res, :channel_id, channel_id)}
-
-          %ChannelDepositTx{} ->
-            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
-
-            {:ok, Map.put(res, :info, channel_info)}
 
           _ ->
             {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)

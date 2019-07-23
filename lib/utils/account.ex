@@ -42,8 +42,12 @@ defmodule Utils.Account do
     prepare_result(response)
   end
 
-  defp prepare_result({:ok, %Account{nonce: nonce}}) do
+  defp prepare_result({:ok, %Account{nonce: nonce, kind: "basic"}}) do
     {:ok, nonce + 1}
+  end
+
+  defp prepare_result({:ok, %Account{nonce: nonce, kind: "generalized"}}) do
+    {:ok, 0}
   end
 
   defp prepare_result({:ok, %Error{reason: message}}) do
