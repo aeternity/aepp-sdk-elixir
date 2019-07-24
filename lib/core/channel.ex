@@ -756,7 +756,7 @@ defmodule Core.Channel do
     )
   end
 
-  # POST BA + BA
+  # POST Basic + Basic
   defp post_(%Client{connection: connection} = client, tx,
          signatures_list: signatures_list,
          inner_tx: :no_inner_tx,
@@ -773,7 +773,8 @@ defmodule Core.Channel do
         {:ok, Map.put(res, :channel_id, channel_id)}
 
       _ ->
-        {:ok, res}
+        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
     end
   end
 
@@ -811,7 +812,8 @@ defmodule Core.Channel do
             {:ok, Map.put(res, :channel_id, channel_id)}
 
           _ ->
-            {:ok, res}
+            {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+            {:ok, Map.put(res, :info, channel_info)}
         end
 
       false ->
@@ -820,7 +822,7 @@ defmodule Core.Channel do
     end
   end
 
-  # POST GA + BASIC
+  # POST GA + Basic
   defp post_(
          client,
          %{tx: serialized_inner_tx} = meta_tx,
@@ -875,33 +877,33 @@ defmodule Core.Channel do
     end
   end
 
-  defp post_(client, tx, opts_list) do
-    {:error,
-     "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
-       inspect(opts_list)
-     }"}
-  end
+  defp post_(client, tx, opts_list),
+    do:
+      {:error,
+       "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
+         inspect(opts_list)
+       }"}
 
   defp find_initiator_data(%{ga_id: ga_id, auth_data: auth_data}, _meta_tx1, %ChannelCreateTx{
          initiator_id: init_id
        })
-       when ga_id === init_id do
-    auth_data
-  end
+       when ga_id === init_id,
+       do: auth_data
 
   defp find_initiator_data(_meta_tx, %{ga_id: ga_id, auth_data: auth_data}, %ChannelCreateTx{
          initiator_id: init_id
        })
-       when ga_id === init_id do
-    auth_data
-  end
+       when ga_id === init_id,
+       do: auth_data
 
   defp find_initiator_data(%{ga_id: ga_id}, %{ga_id: ga_id1}, %ChannelCreateTx{
          initiator_id: init_id
-       }) do
-    {:error,
-     "#{__MODULE__}: NO MATCH FOR INITIATOR ID: #{init_id}, ga_id: #{ga_id}, ga_id1: #{ga_id1}"}
-  end
+       }),
+       do:
+         {:error,
+          "#{__MODULE__}: No match for initiator_id: #{init_id}, ga_id: #{ga_id}, ga_id1: #{
+            ga_id1
+          }"}
 
   defp wrap_in_signature_signed_tx(tx, signature_list) do
     serialized_tx = Serialization.serialize(tx)
@@ -933,12 +935,12 @@ defmodule Core.Channel do
     {:ok, Encoding.prefix_encode_base58c("ch", hash)}
   end
 
-  defp compute_channel_id(initiator, nonce, responder) do
-    {:error,
-     "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
-       inspect(nonce)
-     } and responder_id: #{responder} "}
-  end
+  defp compute_channel_id(initiator, nonce, responder),
+    do:
+      {:error,
+       "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
+         inspect(nonce)
+       } and responder_id: #{responder} "}
 
   defp build_create_channel_tx(
          initiator_id,
