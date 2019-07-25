@@ -71,20 +71,22 @@ defmodule CoreChannelTest do
 
   @tag :travis_test
   test "create, deposit, withdraw and close_mutual channel", setup_data do
+    %{client: client, client1: client1} = setup_data
+
     assert match?(
              {:ok, _},
              Account.spend(
-               setup_data.client,
-               setup_data.client1.keypair.public,
+               client,
+               client1.keypair.public,
                10_000_000_000_000
              )
            )
 
-    assert {:ok, [tx, sig]} =
+    assert {:ok, [create_tx, create_sig]} =
              Channel.create(
-               setup_data.client,
+               client,
                1000,
-               setup_data.client1.keypair.public,
+               client1.keypair.public,
                1000,
                1000,
                1000,
@@ -92,17 +94,17 @@ defmodule CoreChannelTest do
                Encoding.prefix_encode_base58c("st", <<0::256>>)
              )
 
-    assert {:ok, [^tx, sig1]} = Transaction.sign_tx(tx, setup_data.client1)
+    assert {:ok, [^create_tx, create_sig1]} = Transaction.sign_tx(create_tx, client1)
 
     assert {:ok, %{channel_id: channel_id}} =
-             Channel.post(setup_data.client, tx, signatures_list: [sig, sig1])
+             Channel.post(client, create_tx, signatures_list: [create_sig, create_sig1])
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             Channel.get_by_pubkey(setup_data.client, channel_id)
+             Channel.get_by_pubkey(client, channel_id)
 
     assert match?(2_000, channel_amount)
 
-    assert {:ok, [tx, sig]} =
+    assert {:ok, [deposit_tx, deposit_sig]} =
              Channel.deposit(
                setup_data.client,
                1_000_000_000_000,
@@ -111,39 +113,56 @@ defmodule CoreChannelTest do
                Encoding.prefix_encode_base58c("st", <<0::256>>)
              )
 
-    assert {:ok, [^tx, sig1]} = Transaction.sign_tx(tx, setup_data.client1)
-    assert match?({:ok, _}, Channel.post(setup_data.client, tx, signatures_list: [sig, sig1]))
+    assert {:ok, [^deposit_tx, deposit_sig1]} = Transaction.sign_tx(deposit_tx, client1)
+
+    assert match?(
+             {:ok, _},
+             Channel.post(client, deposit_tx, signatures_list: [deposit_sig, deposit_sig1])
+           )
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             Channel.get_by_pubkey(setup_data.client, channel_id)
+             Channel.get_by_pubkey(client, channel_id)
 
     assert match?(1_000_000_002_000, channel_amount)
 
-    assert {:ok, [tx, sig]} =
+    assert {:ok, [withdraw_tx, withdraw_sig]} =
              Channel.withdraw(
-               setup_data.client,
+               client,
                channel_id,
-               setup_data.client.keypair.public,
+               client.keypair.public,
                2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                3
              )
 
-    assert {:ok, [^tx, sig1]} = Transaction.sign_tx(tx, setup_data.client1)
-    assert match?({:ok, _}, Channel.post(setup_data.client, tx, signatures_list: [sig, sig1]))
+    assert {:ok, [^withdraw_tx, withdraw_sig1]} = Transaction.sign_tx(withdraw_tx, client1)
+
+    assert match?(
+             {:ok, _},
+             Channel.post(client, withdraw_tx, signatures_list: [withdraw_sig, withdraw_sig1])
+           )
 
     assert {:ok, %{channel_amount: channel_amount, id: ^channel_id}} =
-             Channel.get_by_pubkey(setup_data.client, channel_id)
+             Channel.get_by_pubkey(client, channel_id)
 
     assert match?(1_000_000_000_000, channel_amount)
 
-    assert {:ok, [tx, sig]} = Channel.close_mutual(setup_data.client, channel_id, 70_000, 0)
-    assert {:ok, [tx, sig1]} = Transaction.sign_tx(tx, setup_data.client1)
-    assert match?({:ok, _}, Channel.post(setup_data.client, tx, signatures_list: [sig, sig1]))
+    assert {:ok, [close_mutual_tx, close_mutual_sig]} =
+             Channel.close_mutual(client, channel_id, 70_000, 0)
+
+    assert {:ok, [^close_mutual_tx, close_mutual_sig1]} =
+             Transaction.sign_tx(close_mutual_tx, client1)
+
+    assert match?(
+             {:ok, _},
+             Channel.post(client, close_mutual_tx,
+               signatures_list: [close_mutual_sig, close_mutual_sig1]
+             )
+           )
 
     assert match?(
              {:ok, %{reason: "Channel not found"}},
-             Channel.get_by_pubkey(setup_data.client, channel_id)
+             Channel.get_by_pubkey(client, channel_id)
            )
   end
 
