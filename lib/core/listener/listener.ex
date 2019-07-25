@@ -5,7 +5,11 @@ defmodule Core.Listener do
   use GenServer
 
   alias Core.Listener.Supervisor, as: ListenerSup
+  alias Core.Client
   alias Utils.Encoding
+  alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Model.{GenericSignedTx, Error}
 
   @gc_objects_sent_interval 10_000
   @general_events [:micro_blocks, :key_blocks, :transactions, :pool_transactions]
@@ -87,6 +91,7 @@ defmodule Core.Listener do
        objects_sent: [],
        gc_scheduled: false,
        subscribers: %{
+         tx_confirmations: [],
          micro_blocks: [],
          key_blocks: [],
          transactions: [],
@@ -172,16 +177,20 @@ defmodule Core.Listener do
       iex> Core.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
       iex> flush()
       {:spend_transactions,
-       %{
-         amount: 5000000000000000000,
-         fee: 17080000000000,
-         nonce: 5881,
-         payload: "",
-         recipient_id: "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9",
-         sender_id: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
-         ttl: 0,
-         type: :spend_tx
-      }}
+        %{
+          hash: "th_2Z9198iTQbBBE3jdeFxJQNMHqGNSESxG7PyTs3vU3JZUjYs319",
+          tx: %{
+            amount: 100,
+            fee: 16640000000,
+            nonce: 3,
+            payload: "",
+            recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            ttl: 0,
+            type: :spend_tx
+          }
+        }
+      }
       :ok
   """
   @spec subscribe(atom(), pid(), Encoding.base58c()) :: :ok
@@ -198,12 +207,52 @@ defmodule Core.Listener do
   def subscribe(event, _, _), do: {:error, "Unknown event to subscribe to: #{event}"}
 
   @doc """
-  Unsubscribe a process from a general event.
+  Subscribe a process to be notified whether or not a transaction with a given hash
+  has been confirmed after a `block_count` amount of key blocks. Requires a client to be
+  passed as the first argument as it makes requests to a node.
 
   ## Example
-      iex> Core.Listener.unsubscribe(:key_blocks, self())
+      iex> Core.Client.new(
+        %{
+          public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+          secret:
+            "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+        },
+        "ae_uat",
+        "https://sdk-testnet.aepps.com/v2",
+        "https://sdk-testnet.aepps.com/v2"
+      )
+      iex> tx_hash = "th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM"
+      iex> block_count = 10
+      iex> Core.Listener.check_tx_confirmations(client, tx_hash, block_count, self())
+      iex> flush()
+      {:tx_confirmations,
+       %{
+         height: 111283,
+         status: :confirmed,
+         tx_hash: "th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM"
+       }}
       :ok
   """
+  @spec check_tx_confirmations(Client.t(), Encoding.base58c(), non_neg_integer(), pid()) ::
+          :ok | {:error, any()}
+  def check_tx_confirmations(
+        %Client{connection: connection},
+        tx_hash,
+        block_count,
+        subscriber_pid
+      ) do
+    with :ok <- assert_listener_started(),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection) do
+      GenServer.call(
+        __MODULE__,
+        {:check_tx_confirmations, connection, tx_hash, height + block_count, subscriber_pid}
+      )
+    else
+      {:error, _} = err -> err
+    end
+  end
+
   @spec unsubscribe(atom(), pid()) :: :ok
   def unsubscribe(event, subscriber_pid) when event in @general_events do
     case assert_listener_started() do
@@ -279,6 +328,21 @@ defmodule Core.Listener do
   end
 
   def handle_call(
+        {:check_tx_confirmations, connection, tx_hash, height, subscriber_pid},
+        _from,
+        %{subscribers: %{tx_confirmations: tx_confirmations} = subscribers} = state
+      ) do
+    updated_tx_confirmations =
+      add_subscriber(
+        tx_confirmations,
+        %{subscriber: subscriber_pid, connection: connection, tx_hash: tx_hash, height: height}
+      )
+
+    {:reply, :ok,
+     %{state | subscribers: %{subscribers | tx_confirmations: updated_tx_confirmations}}}
+  end
+
+  def handle_call(
         {:unsubscribe, event, subscriber_pid},
         _from,
         %{
@@ -316,12 +380,12 @@ defmodule Core.Listener do
         %{
           objects_sent: objects_sent,
           gc_scheduled: gc_scheduled,
-          subscribers: subscribers
+          subscribers: %{tx_confirmations: tx_confirmations} = subscribers
         } = state
       ) do
-    updated_objects_sent =
+    {updated_tx_confirmations, updated_objects_sent} =
       if Enum.member?(objects_sent, hash) do
-        objects_sent
+        {tx_confirmations, objects_sent}
       else
         send_object_to_subscribers(
           event,
@@ -341,7 +405,13 @@ defmodule Core.Listener do
         true
       end
 
-    {:noreply, %{state | objects_sent: updated_objects_sent, gc_scheduled: updated_gc_scheduled}}
+    {:noreply,
+     %{
+       state
+       | objects_sent: updated_objects_sent,
+         gc_scheduled: updated_gc_scheduled,
+         subscribers: %{subscribers | tx_confirmations: updated_tx_confirmations}
+     }}
   end
 
   def handle_info(:gc_objects_sent, state) do
@@ -356,39 +426,38 @@ defmodule Core.Listener do
     end
   end
 
-  defp send_object_to_subscribers(event, object, hash, subscribers, objects_sent) do
+  defp send_object_to_subscribers(
+         event,
+         object,
+         hash,
+         %{tx_confirmations: tx_confirmations} = subscribers,
+         objects_sent
+       ) do
     %{^event => general_event_subscribers} = subscribers
 
     objects_sent1 =
       send_general_event_object(event, object, hash, general_event_subscribers, objects_sent)
 
-    if Enum.member?([:transactions, :pool_transactions], event) do
-      Enum.reduce(object, objects_sent1, fn tx, acc ->
-        filter = determine_filter(event, tx)
+    updated_tx_confirmations =
+      if event == :key_blocks do
+        send_confirmation_info(tx_confirmations, object.height)
+      else
+        tx_confirmations
+      end
 
-        case filter do
-          {filtered_event, value} ->
-            %{^filtered_event => specific_event_subscribers} = subscribers
+    updated_objects_sent =
+      case event do
+        event when event in [:transactions, :pool_transactions] ->
+          send_specific_event_objects(hash, object, objects_sent1, event, subscribers)
 
-            send_filtered_event_object(
-              filtered_event,
-              tx,
-              hash,
-              specific_event_subscribers,
-              acc,
-              value
-            )
+        _ ->
+          objects_sent1
+      end
 
-          _ ->
-            acc
-        end
-      end)
-    else
-      objects_sent1
-    end
+    {updated_tx_confirmations, updated_objects_sent}
   end
 
-  defp determine_filter(event, tx) do
+  defp determine_filter(event, %{tx: tx}) do
     [spend_tx_event, oracle_query_event, oracle_response_event] = get_specific_events(event)
 
     case tx do
@@ -407,6 +476,29 @@ defmodule Core.Listener do
       _ ->
         nil
     end
+  end
+
+  defp send_specific_event_objects(hash, object, objects_sent, event, subscribers) do
+    Enum.reduce(object, objects_sent, fn tx, acc ->
+      filter = determine_filter(event, tx)
+
+      case filter do
+        {filtered_event, value} ->
+          %{^filtered_event => specific_event_subscribers} = subscribers
+
+          send_filtered_event_object(
+            filtered_event,
+            tx,
+            hash,
+            specific_event_subscribers,
+            acc,
+            value
+          )
+
+        _ ->
+          acc
+      end
+    end)
   end
 
   defp send_general_event_object(event, object, hash, subscribers, objects_sent) do
@@ -449,6 +541,44 @@ defmodule Core.Listener do
 
   defp do_gc_objects_sent() do
     Process.send_after(self(), :gc_objects_sent, @gc_objects_sent_interval)
+  end
+
+  defp transaction_in_state?(connection, tx_hash) do
+    case TransactionApi.get_transaction_by_hash(connection, tx_hash) do
+      {:ok, %GenericSignedTx{}} ->
+        true
+
+      {:ok, %Error{}} ->
+        false
+    end
+  end
+
+  defp send_confirmation_info(tx_confirmation_subscribers, current_height) do
+    Enum.reduce(tx_confirmation_subscribers, tx_confirmation_subscribers, fn %{
+                                                                               connection:
+                                                                                 connection,
+                                                                               tx_hash: tx_hash,
+                                                                               height: height,
+                                                                               subscriber: pid
+                                                                             } = confirmation_info,
+                                                                             acc ->
+      cond do
+        height == current_height && transaction_in_state?(connection, tx_hash) ->
+          send(pid, {:tx_confirmations, %{tx_hash: tx_hash, status: :confirmed, height: height}})
+          List.delete(acc, confirmation_info)
+
+        height == current_height && !transaction_in_state?(connection, tx_hash) ->
+          send(
+            pid,
+            {:tx_confirmations, %{tx_hash: tx_hash, status: :not_in_state, height: height}}
+          )
+
+          List.delete(acc, confirmation_info)
+
+        true ->
+          acc
+      end
+    end)
   end
 
   defp assert_listener_started() do

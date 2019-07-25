@@ -210,7 +210,9 @@ defmodule Core.Listener.PeerConnection do
 
   defp handle_new_pool_txs(txs, hash) do
     serialized_txs =
-      Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
+      Enum.map(txs, fn {tx, type, hash} ->
+        %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
+      end)
 
     Listener.notify(:pool_transactions, serialized_txs, hash)
   end
@@ -249,7 +251,9 @@ defmodule Core.Listener.PeerConnection do
 
   defp handle_block_txs(txs, hash) do
     serialized_txs =
-      Enum.map(txs, fn {tx, type} -> Serialization.serialize_for_client(tx, type) end)
+      Enum.map(txs, fn {tx, type, hash} ->
+        %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
+      end)
 
     Listener.notify(:transactions, serialized_txs, hash)
   end
@@ -401,13 +405,16 @@ defmodule Core.Listener.PeerConnection do
   end
 
   defp decode_tx(tx) do
+    {:ok, binary_hash} = Hash.hash(tx)
+    hash = Encoding.prefix_encode_base58c("th", binary_hash)
+
     [signatures: _signatures, transaction: transaction] =
       Serialization.deserialize(tx, :signed_tx)
 
     {type, _version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(transaction)
     deserialized_tx = Serialization.deserialize(transaction, type)
 
-    {deserialized_tx, type}
+    {deserialized_tx, type, hash}
   end
 
   defp do_ping(socket, genesis, port) do
