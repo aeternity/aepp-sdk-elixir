@@ -766,16 +766,7 @@ defmodule Core.Channel do
     sig_list = :lists.sort(signatures_list)
     {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
     {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
-
-    case tx do
-      %ChannelCreateTx{} ->
-        {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
-        {:ok, Map.put(res, :channel_id, channel_id)}
-
-      _ ->
-        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
-        {:ok, Map.put(res, :info, channel_info)}
-    end
+    channel_info(client, tx, res)
   end
 
   # POST GA + GA
@@ -804,17 +795,7 @@ defmodule Core.Channel do
           })
 
         {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-
-        case tx do
-          %ChannelCreateTx{} ->
-            data = find_initiator_data(meta_tx, inner_meta_tx, tx)
-            {:ok, channel_id} = compute_channel_id(tx.initiator_id, data, tx.responder_id)
-            {:ok, Map.put(res, :channel_id, channel_id)}
-
-          _ ->
-            {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
-            {:ok, Map.put(res, :info, channel_info)}
-        end
+        channel_info(client, tx, res, meta_tx, inner_meta_tx)
 
       false ->
         {:error,
@@ -822,7 +803,7 @@ defmodule Core.Channel do
     end
   end
 
-  # POST GA + Basic
+  # POST Basic + GA
   defp post_(
          client,
          %{tx: serialized_inner_tx} = meta_tx,
@@ -850,26 +831,7 @@ defmodule Core.Channel do
           })
 
         {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-
-        case inner_tx do
-          %ChannelCreateTx{} ->
-            {:ok, channel_id} =
-              if inner_tx.initiator_id != meta_tx.ga_id do
-                compute_channel_id(inner_tx.initiator_id, inner_tx.nonce, inner_tx.responder_id)
-              else
-                compute_channel_id(
-                  inner_tx.initiator_id,
-                  meta_tx.auth_data,
-                  inner_tx.responder_id
-                )
-              end
-
-            {:ok, Map.put(res, :channel_id, channel_id)}
-
-          _ ->
-            {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
-            {:ok, Map.put(res, :info, channel_info)}
-        end
+        channel_info(client, res, meta_tx, inner_tx)
 
       false ->
         {:error,
@@ -883,6 +845,53 @@ defmodule Core.Channel do
        "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
          inspect(opts_list)
        }"}
+
+  defp channel_info(client, tx, res) do
+    case tx do
+      %ChannelCreateTx{} ->
+        {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
+    end
+  end
+
+  defp channel_info(client, tx, res, meta_tx, inner_meta_tx) do
+    case tx do
+      %ChannelCreateTx{} ->
+        data = find_initiator_data(meta_tx, inner_meta_tx, tx)
+        {:ok, channel_id} = compute_channel_id(tx.initiator_id, data, tx.responder_id)
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
+    end
+  end
+
+  defp channel_info(client, res, meta_tx, inner_tx) do
+    case inner_tx do
+      %ChannelCreateTx{} ->
+        {:ok, channel_id} =
+          if inner_tx.initiator_id != meta_tx.ga_id do
+            compute_channel_id(inner_tx.initiator_id, inner_tx.nonce, inner_tx.responder_id)
+          else
+            compute_channel_id(
+              inner_tx.initiator_id,
+              meta_tx.auth_data,
+              inner_tx.responder_id
+            )
+          end
+
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
+    end
+  end
 
   defp find_initiator_data(%{ga_id: ga_id, auth_data: auth_data}, _meta_tx1, %ChannelCreateTx{
          initiator_id: init_id
