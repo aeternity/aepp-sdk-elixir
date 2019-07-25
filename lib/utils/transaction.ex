@@ -401,7 +401,69 @@ defmodule Utils.Transaction do
     calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, 0)
   end
 
-  @spec calculate_fee_n_times(any, any, any, any, any, non_neg_integer, any) :: any
+  @doc false
+  def await_mining(connection, tx_hash, type) do
+    await_mining(connection, tx_hash, @await_attempts, type)
+  end
+
+  @doc false
+  def await_mining(_connection, _tx_hash, 0, _type),
+    do:
+      {:error,
+       "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
+
+  @doc false
+  def await_mining(connection, tx_hash, attempts, type) do
+    Process.sleep(@await_attempt_interval)
+
+    mining_status =
+      case type do
+        ContractCallTx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
+        ContractCreateTx ->
+          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
+
+        _ ->
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+      end
+
+    case mining_status do
+      {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
+        await_mining(connection, tx_hash, attempts - 1, type)
+
+      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
+        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
+
+      {:ok,
+       %TxInfoObject{
+         call_info: %ContractCallObject{
+           log: log,
+           return_value: return_value,
+           return_type: return_type
+         }
+       }} ->
+        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+
+        {:ok,
+         %{
+           block_hash: block_hash,
+           block_height: block_height,
+           tx_hash: tx_hash,
+           return_value: return_value,
+           return_type: return_type,
+           log: log
+         }}
+
+      {:ok, %Error{}} ->
+        await_mining(connection, tx_hash, attempts - 1, type)
+
+      {:error, %Env{} = env} ->
+        {:error, env}
+    end
+  end
+
   defp calculate_fee_n_times(_tx, _height, _network_id, _fee, _gas_price, 0, acc) do
     acc
   end
@@ -511,66 +573,6 @@ defmodule Utils.Transaction do
 
       {:error, _} = error ->
         error
-    end
-  end
-
-  def await_mining(connection, tx_hash, type) do
-    await_mining(connection, tx_hash, @await_attempts, type)
-  end
-
-  def await_mining(_connection, _tx_hash, 0, _type),
-    do:
-      {:error,
-       "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1000} seconds"}
-
-  def await_mining(connection, tx_hash, attempts, type) do
-    Process.sleep(@await_attempt_interval)
-
-    mining_status =
-      case type do
-        ContractCallTx ->
-          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
-
-        ContractCreateTx ->
-          TransactionApi.get_transaction_info_by_hash(connection, tx_hash)
-
-        _ ->
-          TransactionApi.get_transaction_by_hash(connection, tx_hash)
-      end
-
-    case mining_status do
-      {:ok, %GenericSignedTx{block_hash: "none", block_height: -1}} ->
-        await_mining(connection, tx_hash, attempts - 1, type)
-
-      {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} ->
-        {:ok, %{block_hash: block_hash, block_height: block_height, tx_hash: tx_hash}}
-
-      {:ok,
-       %TxInfoObject{
-         call_info: %ContractCallObject{
-           log: log,
-           return_value: return_value,
-           return_type: return_type
-         }
-       }} ->
-        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
-          TransactionApi.get_transaction_by_hash(connection, tx_hash)
-
-        {:ok,
-         %{
-           block_hash: block_hash,
-           block_height: block_height,
-           tx_hash: tx_hash,
-           return_value: return_value,
-           return_type: return_type,
-           log: log
-         }}
-
-      {:ok, %Error{}} ->
-        await_mining(connection, tx_hash, attempts - 1, type)
-
-      {:error, %Env{} = env} ->
-        {:error, env}
     end
   end
 
