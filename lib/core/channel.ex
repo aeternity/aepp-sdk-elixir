@@ -22,12 +22,15 @@ defmodule Core.Channel do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     Error,
-    Channel
+    Channel,
+    PostTxResponse,
+    Tx
   }
 
   alias Core.Client
   alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Encoding, Hash}
+  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -749,35 +752,173 @@ defmodule Core.Channel do
   def post(client, tx, opts \\ []) do
     post_(client, tx,
       signatures_list: Keyword.get(opts, :signatures_list, :no_signatures),
-      inner_tx: Keyword.get(opts, :inner_tx, :no_inner_tx)
+      inner_tx: Keyword.get(opts, :inner_tx, :no_inner_tx),
+      tx: Keyword.get(opts, :tx, :no_tx)
     )
   end
 
-  ## POST Basic account + Basic account
+  # POST Basic + Basic
   defp post_(%Client{connection: connection} = client, tx,
          signatures_list: signatures_list,
-         inner_tx: :no_inner_tx
+         inner_tx: :no_inner_tx,
+         tx: :no_tx
        )
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
     {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
     {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
+    channel_info(client, tx, res)
+  end
 
+  # POST GA + GA
+  defp post_(%Client{} = client, meta_tx,
+         signatures_list: :no_signatures,
+         inner_tx: inner_meta_tx,
+         tx: tx
+       )
+       when is_map(inner_meta_tx) do
+    case inner_meta_tx.tx ===
+           Serialization.serialize([[], Serialization.serialize(tx)], :signed_tx) do
+      true ->
+        new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_meta_tx, [])
+
+        new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+        signed_tx =
+          Encoding.prefix_encode_base64(
+            "tx",
+            wrap_in_signature_signed_tx(new_meta_tx, [])
+          )
+
+        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+          TransactionApi.post_transaction(client.connection, %Tx{
+            tx: signed_tx
+          })
+
+        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+        channel_info(client, tx, res, meta_tx, inner_meta_tx)
+
+      false ->
+        {:error,
+         "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    end
+  end
+
+  # POST Basic + GA
+  defp post_(
+         client,
+         %{tx: serialized_inner_tx} = meta_tx,
+         signatures_list: basic_account_signature,
+         inner_tx: inner_tx,
+         tx: :no_tx
+       )
+       when is_list(basic_account_signature) and is_map(inner_tx) do
+    case serialized_inner_tx ===
+           Serialization.serialize([[], Serialization.serialize(inner_tx)], :signed_tx) do
+      true ->
+        new_serialized_inner_tx = wrap_in_signature_signed_tx(inner_tx, basic_account_signature)
+
+        new_meta_tx = %{meta_tx | tx: new_serialized_inner_tx}
+
+        signed_tx =
+          Encoding.prefix_encode_base64(
+            "tx",
+            wrap_in_signature_signed_tx(new_meta_tx, [])
+          )
+
+        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
+          TransactionApi.post_transaction(client.connection, %Tx{
+            tx: signed_tx
+          })
+
+        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
+        channel_info(client, res, meta_tx, inner_tx)
+
+      false ->
+        {:error,
+         "#{__MODULE__}: Inner transaction does not match with inner transaction provided in meta tx"}
+    end
+  end
+
+  defp post_(client, tx, opts_list),
+    do:
+      {:error,
+       "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
+         inspect(opts_list)
+       }"}
+
+  defp channel_info(client, tx, res) do
     case tx do
       %ChannelCreateTx{} ->
         {:ok, channel_id} = compute_channel_id(tx.initiator_id, tx.nonce, tx.responder_id)
         {:ok, Map.put(res, :channel_id, channel_id)}
 
       _ ->
-        {:ok, res}
+        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
     end
   end
 
-  defp post_(client, tx, opts_list) do
-    {:error,
-     "#{__MODULE__}: Invalid posting of #{inspect(tx)} , with given client: #{inspect(client)} ,  and options list: #{
-       inspect(opts_list)
-     }"}
+  defp channel_info(client, tx, res, meta_tx, inner_meta_tx) do
+    case tx do
+      %ChannelCreateTx{} ->
+        data = find_initiator_data(meta_tx, inner_meta_tx, tx)
+        {:ok, channel_id} = compute_channel_id(tx.initiator_id, data, tx.responder_id)
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, channel_info} = get_by_pubkey(client, tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
+    end
+  end
+
+  defp channel_info(client, res, meta_tx, inner_tx) do
+    case inner_tx do
+      %ChannelCreateTx{} ->
+        {:ok, channel_id} =
+          if inner_tx.initiator_id != meta_tx.ga_id do
+            compute_channel_id(inner_tx.initiator_id, inner_tx.nonce, inner_tx.responder_id)
+          else
+            compute_channel_id(
+              inner_tx.initiator_id,
+              meta_tx.auth_data,
+              inner_tx.responder_id
+            )
+          end
+
+        {:ok, Map.put(res, :channel_id, channel_id)}
+
+      _ ->
+        {:ok, channel_info} = get_by_pubkey(client, inner_tx.channel_id)
+        {:ok, Map.put(res, :info, channel_info)}
+    end
+  end
+
+  defp find_initiator_data(%{ga_id: ga_id, auth_data: auth_data}, _meta_tx1, %ChannelCreateTx{
+         initiator_id: init_id
+       })
+       when ga_id === init_id,
+       do: auth_data
+
+  defp find_initiator_data(_meta_tx, %{ga_id: ga_id, auth_data: auth_data}, %ChannelCreateTx{
+         initiator_id: init_id
+       })
+       when ga_id === init_id,
+       do: auth_data
+
+  defp find_initiator_data(%{ga_id: ga_id}, %{ga_id: ga_id1}, %ChannelCreateTx{
+         initiator_id: init_id
+       }),
+       do:
+         {:error,
+          "#{__MODULE__}: No match for initiator_id: #{init_id}, ga_id: #{ga_id}, ga_id1: #{
+            ga_id1
+          }"}
+
+  defp wrap_in_signature_signed_tx(tx, signature_list) do
+    serialized_tx = Serialization.serialize(tx)
+    signed_tx_fields = [signature_list, serialized_tx]
+    Serialization.serialize(signed_tx_fields, :signed_tx)
   end
 
   defp compute_channel_id(<<"ak_", initiator::binary>>, nonce, <<"ak_", responder::binary>>)
@@ -804,12 +945,12 @@ defmodule Core.Channel do
     {:ok, Encoding.prefix_encode_base58c("ch", hash)}
   end
 
-  defp compute_channel_id(initiator, nonce, responder) do
-    {:error,
-     "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
-       inspect(nonce)
-     } and responder_id: #{responder} "}
-  end
+  defp compute_channel_id(initiator, nonce, responder),
+    do:
+      {:error,
+       "#{__MODULE__}: Can't compute channel id with given initiator_id: #{initiator}, nonce: #{
+         inspect(nonce)
+       } and responder_id: #{responder} "}
 
   defp build_create_channel_tx(
          initiator_id,
