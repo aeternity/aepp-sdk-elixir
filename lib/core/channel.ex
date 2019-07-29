@@ -9,7 +9,7 @@ defmodule Core.Channel do
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
   alias Core.GeneralizedAccount
-  alias Utils.Serialization
+  alias Utils.{Hash, Serialization}
 
   alias AeternityNode.Model.{
     ChannelCreateTx,
@@ -34,6 +34,9 @@ defmodule Core.Channel do
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
+  @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
+  @empty_tree_hash <<0::256>>
+  @poi_version 1
 
   defguard valid_prefixes(sender_pubkey_prefix, channel_prefix)
            when sender_pubkey_prefix == "ak" and channel_prefix == "ch"
@@ -719,6 +722,22 @@ defmodule Core.Channel do
       {:ok, %Error{} = error} -> {:error, error}
       error -> error
     end
+  end
+
+  @doc """
+    Calculates state hash by provided Proof of Inclusion
+  """
+  @spec calculate_state_hash(Serialization.poi_keyword()) :: {:ok, binary()}
+  def calculate_state_hash(poi) when is_list(poi) do
+    packed_state_hashes =
+      for tree <- @all_trees_names, into: <<@poi_version::64>> do
+        {state_hash, _proof_db} = Keyword.get(poi, tree, {@empty_tree_hash, %{cache: {0, nil}}})
+        state_hash
+      end
+
+    {:ok, state_hash} = Hash.hash(packed_state_hashes)
+
+    {:ok, Encoding.prefix_encode_base58c("st", state_hash)}
   end
 
   @doc """

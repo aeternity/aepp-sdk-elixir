@@ -64,6 +64,7 @@ defmodule Utils.Serialization do
   @version_channel_force_progress_tx 1
   @version_poi 1
   @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
+  @empty_tree_hash <<0::256>>
 
   @type state_hash :: binary()
   @type poi_keyword ::
@@ -291,7 +292,9 @@ defmodule Utils.Serialization do
   def serialize_poi(state_hashes_list) when is_list(state_hashes_list) do
     fields =
       for tree_name <- @all_trees_names do
-        {state_hash, proof_db} = Keyword.get(state_hashes_list, tree_name, {[], %{}})
+        {state_hash, proof_db} =
+          Keyword.get(state_hashes_list, tree_name, {@empty_tree_hash, %{cache: {0, nil}}})
+
         {tree_name, serialize_poi(state_hash, proof_db)}
       end
 
@@ -303,12 +306,12 @@ defmodule Utils.Serialization do
     )
   end
 
-  defp serialize_poi(<<_::256>> = root_hash, proof_db) do
-    [{root_hash, serialize_proof_to_list(proof_db)}]
+  defp serialize_poi(@empty_tree_hash, _proof_db) do
+    []
   end
 
-  defp serialize_poi([], _proof_db) do
-    []
+  defp serialize_poi(<<_::256>> = root_hash, proof_db) do
+    [{root_hash, serialize_proof_to_list(proof_db)}]
   end
 
   defp serialize_proof_to_list(%{cache: cache}) do
