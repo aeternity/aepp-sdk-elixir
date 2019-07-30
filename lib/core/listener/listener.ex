@@ -414,8 +414,17 @@ defmodule Core.Listener do
      }}
   end
 
-  def handle_info(:gc_objects_sent, state) do
-    {:noreply, %{state | objects_sent: [], gc_scheduled: false}}
+  def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
+    half_count = floor(Enum.count(objects_sent) / 2)
+
+    gc_objects_sent =
+      if half_count > 0 do
+        Enum.drop(objects_sent, half_count)
+      else
+        objects_sent
+      end
+
+    {:noreply, %{state | objects_sent: gc_objects_sent, gc_scheduled: false}}
   end
 
   defp add_subscriber(subscribers, subscriber) do
