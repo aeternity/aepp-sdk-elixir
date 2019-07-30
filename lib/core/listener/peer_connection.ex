@@ -151,7 +151,7 @@ defmodule Core.Listener.PeerConnection do
       ) do
     deserialized_payload = rlp_decode(type, payload)
 
-    payload_hash = Hash.hash(payload)
+    {:ok, payload_hash} = Hash.hash(payload)
 
     case type do
       @p2p_response ->
