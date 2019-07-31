@@ -29,6 +29,7 @@ defmodule Core.Client do
 
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
+  adapter(Tesla.Adapter.Hackney, recv_timeout: 30_000)
 
   @doc """
   Client constructor
@@ -76,9 +77,7 @@ defmodule Core.Client do
       when is_binary(public_key) and is_binary(secret_key) and is_binary(network_id) and
              is_binary(url) and is_binary(internal_url) do
     connection = Connection.new(url)
-    connection = %{connection | adapter: [recv_timeout: 30_000]}
     internal_connection = Connection.new(internal_url)
-    internal_connection = %{internal_connection | adapter: [recv_timeout: 30_000]}
 
     %Client{
       keypair: keypair,
