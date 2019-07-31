@@ -43,7 +43,8 @@ defmodule AeppSdkElixir.MixProject do
        github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75", override: true},
       {:tesla, "~> 1.2.1"},
       {:poison, "~> 3.0.0"},
-      {:ranch, github: "ninenines/ranch", tag: "1.4.0"}
+      {:ranch, github: "ninenines/ranch", tag: "1.4.0"},
+      {:hackney, "~> 1.15"}
     ]
   end
 

@@ -29,7 +29,6 @@ defmodule Core.Client do
 
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
-  adapter(Tesla.Adapter.Hackney, recv_timeout: 30_000)
 
   @doc """
   Client constructor
