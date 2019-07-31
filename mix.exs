@@ -10,7 +10,7 @@ defmodule AeppSdkElixir.MixProject do
       package: package(),
       deps: deps(),
       aliases: aliases(),
-      elixir: "~> 1.8",
+      elixir: "~> 1.9",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
