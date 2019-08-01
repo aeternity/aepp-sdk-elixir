@@ -38,7 +38,6 @@ defmodule AeppSdkElixir.MixProject do
        git: "https://github.com/aeternity/enoise.git",
        manager: :rebar,
        ref: "c06bbae07d5a6711e60254e45e57e37e270b961d"},
-      {:distillery, "~> 2.0"},
       {:enacl,
        github: "aeternity/enacl", ref: "26180f42c0b3a450905d2efd8bc7fd5fd9cece75", override: true},
       {:tesla, "~> 1.2.1"},
