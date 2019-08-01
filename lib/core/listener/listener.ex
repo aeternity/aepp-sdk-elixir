@@ -421,7 +421,7 @@ defmodule Core.Listener do
           subscribers: %{tx_confirmations: tx_confirmations} = subscribers
         } = state
       ) do
-    IO.inspect(data, limit: :infinity)
+    # IO.inspect(data, limit: :infinity)
 
     case data do
       [
@@ -432,14 +432,14 @@ defmodule Core.Listener do
           }
         }
       ] ->
-        IO.inspect("------------------------------------------------")
-        IO.inspect(event)
-        IO.inspect("DATA:")
-        IO.inspect(data, limit: :infinity)
-        IO.inspect("HASH:")
-        IO.inspect(hash)
-        IO.inspect("OBJECTS SENT:")
-        IO.inspect(objects_sent, limit: :infinity)
+        # IO.inspect("------------------------------------------------")
+        # IO.inspect(event)
+        # IO.inspect("DATA:")
+        # IO.inspect(data, limit: :infinity)
+        # IO.inspect("HASH:")
+        # IO.inspect(hash)
+        # IO.inspect("OBJECTS SENT:")
+        # IO.inspect(objects_sent, limit: :infinity)
 
       _ ->
         nil
@@ -447,10 +447,10 @@ defmodule Core.Listener do
 
     {updated_tx_confirmations, updated_objects_sent} =
       if Enum.member?(objects_sent, hash) do
-        IO.inspect("OBJECT ALREADY SENT")
+        # IO.inspect("OBJECT ALREADY SENT")
         {tx_confirmations, objects_sent}
       else
-        IO.inspect("SENDING OBJECT TO SUBSCRIBERS")
+        # IO.inspect("SENDING OBJECT TO SUBSCRIBERS")
 
         {send_object_to_subscribers(
            event,
@@ -478,7 +478,7 @@ defmodule Core.Listener do
   end
 
   def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
-    IO.inspect("GC CALLED")
+    # IO.inspect("GC CALLED")
     half_count = floor(Enum.count(objects_sent) / 2)
 
     gc_objects_sent = []
@@ -624,20 +624,20 @@ defmodule Core.Listener do
   end
 
   defp send_contract_events(object, contract_event_subscribers) do
-    IO.inspect("SENDING CONTRACT EVENTS")
+    # IO.inspect("SENDING CONTRACT EVENTS")
 
     Enum.each(object, fn %{tx: tx, hash: hash} ->
       case tx do
         %{contract_id: contract_id, type: :contract_call_tx} ->
-          IO.inspect("MATCHED A CONTRACT CALL TX")
+          # IO.inspect("MATCHED A CONTRACT CALL TX")
 
           subscribers_for_contract =
             Enum.filter(contract_event_subscribers, fn %{contract_id: sub_contract_id} ->
               sub_contract_id == contract_id
             end)
 
-          IO.inspect("SUBSCRIBERS:")
-          IO.inspect(subscribers_for_contract, limit: :infinity)
+          # IO.inspect("SUBSCRIBERS:")
+          # IO.inspect(subscribers_for_contract, limit: :infinity)
 
           Enum.each(subscribers_for_contract, fn %{
                                                    subscriber: subscriber_pid,
@@ -650,19 +650,19 @@ defmodule Core.Listener do
                    log: log
                  }
                }} ->
-                IO.inspect("------ SENDING EVENT-------")
+                # IO.inspect("------ SENDING EVENT-------")
                 send(subscriber_pid, {:contract_events, log})
 
               a ->
-                IO.inspect("COULDN'T FETCH TX INFO:")
-                IO.inspect(a, limit: :infinity)
+                # IO.inspect("COULDN'T FETCH TX INFO:")
+                # IO.inspect(a, limit: :infinity)
                 :skip
             end
           end)
 
         a ->
-          IO.inspect("DIDN'T MATCH A CONTRACT CALL TX:")
-          IO.inspect(a, limit: :infinity)
+          # IO.inspect("DIDN'T MATCH A CONTRACT CALL TX:")
+          # IO.inspect(a, limit: :infinity)
           :skip
       end
     end)
