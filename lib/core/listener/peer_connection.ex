@@ -214,7 +214,7 @@ defmodule Core.Listener.PeerConnection do
         %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
       end)
 
-    Listener.notify(:pool_transactions, serialized_txs, hash)
+    Listener.notify(:pool_transactions, serialized_txs, hash <> <<0>>)
   end
 
   defp handle_ping_msg(
@@ -255,7 +255,7 @@ defmodule Core.Listener.PeerConnection do
         %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
       end)
 
-    Listener.notify(:transactions, serialized_txs, hash)
+    Listener.notify(:transactions, serialized_txs, hash <> <<1>>)
   end
 
   defp rlp_decode(@p2p_response, encoded_response) do
