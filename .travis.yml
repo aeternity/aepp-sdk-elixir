@@ -2,12 +2,12 @@ dist: xenial
 sudo: false
 
 language: elixir
-elixir: '1.8'
+elixir: '1.9'
 
 env:
   global:
     - AETERNITY_VERSION=4.0.0
-    - GENERATOR_VERSION=1.1.0
+    - GENERATOR_VERSION=1.2.0
     - LD_LIBRARY_PATH=$HOME/.libsodium/lib:$LD_LIBRARY_PATH
     - LD_RUN_PATH=$HOME/.libsodium/lib:$LD_RUN_PATH
     - PATH=$PATH:$HOME/.libsodium/lib:$HOME/.libsodium/include:$HOME/.kiex
