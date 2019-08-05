@@ -621,7 +621,7 @@ defmodule Core.Contract do
   """
   def default_gas_price(), do: @default_gas_price
 
-  defp decode_logs(logs) do
+  def decode_logs(logs) do
     Enum.map(logs, fn log ->
       string_data = Encoding.prefix_decode_base64(log.data)
       log |> Map.from_struct() |> Map.replace!(:data, string_data)

@@ -6,6 +6,7 @@ defmodule Core.Listener do
 
   alias Core.Listener.Supervisor, as: ListenerSup
   alias Core.Client
+  alias Core.Contract
   alias Utils.Encoding
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -651,7 +652,7 @@ defmodule Core.Listener do
                  }
                }} ->
                 # IO.inspect("------ SENDING EVENT-------")
-                send(subscriber_pid, {:contract_events, log})
+                send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
 
               a ->
                 # IO.inspect("COULDN'T FETCH TX INFO:")
