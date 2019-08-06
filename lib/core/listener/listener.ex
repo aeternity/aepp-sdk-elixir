@@ -654,7 +654,7 @@ defmodule Core.Listener do
                 # IO.inspect("------ SENDING EVENT-------")
                 send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
 
-              a ->
+              _ ->
                 # IO.inspect("COULDN'T FETCH TX INFO:")
                 # IO.inspect(a, limit: :infinity)
                 :skip
