@@ -661,7 +661,7 @@ defmodule Core.Listener do
             end
           end)
 
-        a ->
+        _ ->
           # IO.inspect("DIDN'T MATCH A CONTRACT CALL TX:")
           # IO.inspect(a, limit: :infinity)
           :skip
