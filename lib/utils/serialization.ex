@@ -1,8 +1,8 @@
-defmodule Utils.Serialization do
+defmodule AeppSDK.Utils.Serialization do
   @moduledoc """
   Transaction serialization.
   """
-  alias Utils.SerializationUtils
+  alias AeppSDK.Utils.SerializationUtils
 
   @tag_signed_tx 11
   @tag_spend_tx 12
@@ -168,7 +168,7 @@ defmodule Utils.Serialization do
            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33>>]
           iex> type = :contract_call_tx
-          iex> Utils.Serialization.serialize(fields, type)
+          iex> AeppSDK.Utils.Serialization.serialize(fields, type)
           <<248, 224, 43, 1, 161, 1, 11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181,
           225, 52, 13, 18, 51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57,
           212, 30, 97, 130, 33, 131, 161, 5, 64, 216, 143, 81, 41, 52, 245, 89, 135,
@@ -192,7 +192,7 @@ defmodule Utils.Serialization do
 
   ## Example
       iex> alias AeternityNode.Model.{Ttl,OracleRegisterTx}
-      iex> Utils.Serialization.serialize( %OracleRegisterTx{
+      iex> AeppSDK.Utils.Serialization.serialize( %OracleRegisterTx{
            query_format: <<"query_format">>,
            response_format: <<"response_format">>,
            query_fee: 10,
@@ -236,7 +236,7 @@ defmodule Utils.Serialization do
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 33>>
       iex> type = :contract_call_tx
-      iex> Utils.Serialization.deserialize(payload, type)
+      iex> AeppSDK.Utils.Serialization.deserialize(payload, type)
       [
         caller_id: {:id, :account,
          <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
@@ -282,7 +282,7 @@ defmodule Utils.Serialization do
           accounts: {<<148, 112, 174, 4, 233, 253, 29, 65, 31, 17, 40, 153, 167, 18, 37,
           179, 35, 141, 97, 95, 132, 162, 158, 78, 103, 11, 230, 39, 208, 27, 176,111>>, %{cache: {0, nil}}}
          ]
-      iex> Utils.Serialization.serialize_poi poi
+      iex> AeppSDK.Utils.Serialization.serialize_poi poi
       <<235, 60, 1, 227, 226, 160, 148, 112, 174, 4, 233, 253, 29, 65, 31,
       17, 40, 153, 167, 18, 37, 179, 35, 141, 97, 95, 132, 162, 158, 78,
       103, 11, 230, 39, 208, 27, 176, 111, 192, 192, 192, 192, 192, 192>>

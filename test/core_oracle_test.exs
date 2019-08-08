@@ -1,7 +1,7 @@
 defmodule CoreOracleTest do
   use ExUnit.Case
 
-  alias Core.{Client, Oracle}
+  alias AeppSDK.Core.{Client, Oracle}
 
   setup_all do
     client =

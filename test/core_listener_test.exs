@@ -1,7 +1,7 @@
 defmodule CoreListenerTest do
   use ExUnit.Case
 
-  alias Core.{Client, Listener, Account}
+  alias AeppSDK.Core.{Client, Listener, Account}
 
   setup_all do
     client =
@@ -20,7 +20,7 @@ defmodule CoreListenerTest do
   end
 
   test "start listener, receive messages", setup_data do
-    {:ok, %{peer_pubkey: peer_pubkey}} = Core.Chain.get_node_info(setup_data.client)
+    {:ok, %{peer_pubkey: peer_pubkey}} = AeppSDK.Core.Chain.get_node_info(setup_data.client)
 
     Listener.start(
       ["aenode://#{peer_pubkey}@localhost:3015"],

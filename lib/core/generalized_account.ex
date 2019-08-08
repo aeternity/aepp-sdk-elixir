@@ -1,18 +1,18 @@
-defmodule Core.GeneralizedAccount do
+defmodule AeppSDK.Core.GeneralizedAccount do
   @moduledoc """
   Contains all generalized accounts functionalities.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Core.Client.new/4`.
 
   For more information: [https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md](https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md)
   """
 
-  alias Utils.{Hash, Serialization, Transaction, Encoding}
+  alias AeppSDK.Utils.{Hash, Serialization, Transaction, Encoding}
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.Error
-  alias Utils.Account, as: AccountUtils
-  alias Core.{Client, Contract}
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Core.{Client, Contract}
 
   @ct_version 0x40001
   @init_function "init"
@@ -44,7 +44,7 @@ defmodule Core.GeneralizedAccount do
           auth_value"
       iex> auth_fun = "auth"
       iex> init_args = []
-      iex> Core.GeneralizedAccount.attach(client, source_code, auth_fun, init_args)
+      iex> AeppSDK.Core.GeneralizedAccount.attach(client, source_code, auth_fun, init_args)
       {:ok,
        %{
          block_hash: "mh_CfEuHm4V2omAQGNAxcdPARrkfnYbKuuF1HpGhG5oQvoVC34nD",
@@ -118,8 +118,8 @@ defmodule Core.GeneralizedAccount do
   """
   @spec compute_auth_id(map()) :: {:ok, binary()}
   def compute_auth_id(%{ga_id: ga_id, auth_data: auth_data} = _meta_tx) do
-    decoded_ga_id = Utils.Encoding.prefix_decode_base58c(ga_id)
-    {:ok, _auth_id} = Utils.Hash.hash(decoded_ga_id <> auth_data)
+    decoded_ga_id = Encoding.prefix_decode_base58c(ga_id)
+    {:ok, _auth_id} = Hash.hash(decoded_ga_id <> auth_data)
   end
 
   @doc """

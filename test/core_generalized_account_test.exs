@@ -1,7 +1,7 @@
 defmodule CoreGeneralizedAccountTest do
   use ExUnit.Case
 
-  alias Core.{Account, GeneralizedAccount, Client}
+  alias AeppSDK.Core.{Account, GeneralizedAccount, Client}
 
   setup_all do
     spend_client =

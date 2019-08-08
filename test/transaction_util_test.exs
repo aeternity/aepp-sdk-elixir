@@ -1,12 +1,12 @@
 defmodule TransactionUtilTest do
   use ExUnit.Case
 
-  alias Utils.Transaction
-  alias Core.Account
+  alias AeppSDK.Utils.Transaction
+  alias AeppSDK.Core.Account
 
   setup_all do
-    Code.require_file("test_utils.ex", "test/")
-    TestUtils.get_test_data()
+    Code.require_file("test_AeppSDK.Utils.ex", "test/")
+    TestAeppSDK.Utils.get_test_data()
   end
 
   test "minimum fee calculation", fields do

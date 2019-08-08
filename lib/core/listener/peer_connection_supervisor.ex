@@ -1,8 +1,8 @@
-defmodule Core.Listener.PeerConnectionSupervisor do
+defmodule AeppSDK.Core.Listener.PeerConnectionSupervisor do
   @moduledoc false
   use DynamicSupervisor
 
-  alias Core.Listener.PeerConnection
+  alias AeppSDK.Core.Listener.PeerConnection
 
   def start_link(_args) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)

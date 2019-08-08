@@ -1,11 +1,11 @@
 defmodule UtilsSerializationTest do
   use ExUnit.Case
 
-  alias Utils.Serialization
+  alias AeppSDK.Utils.Serialization
 
   setup_all do
-    Code.require_file("test_utils.ex", "test/")
-    TestUtils.get_test_data()
+    Code.require_file("test_AeppSDK.Utils.ex", "test/")
+    TestAeppSDK.Utils.get_test_data()
   end
 
   test "serialization of valid fields doesn't raise error", fields do

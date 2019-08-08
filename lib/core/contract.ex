@@ -1,9 +1,9 @@
-defmodule Core.Contract do
+defmodule AeppSDK.Core.Contract do
   @moduledoc """
   Contains all contract-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Core.Client.new/4`.
   """
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -18,11 +18,11 @@ defmodule Core.Contract do
     Error
   }
 
-  alias Utils.{Transaction, Serialization, Encoding, Keys}
-  alias Utils.Account, as: AccountUtils
-  alias Utils.Chain, as: ChainUtils
-  alias Utils.Hash
-  alias Core.Client
+  alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Keys}
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.Chain, as: ChainUtils
+  alias AeppSDK.Utils.Hash
+  alias AeppSDK.Core.Client
   alias Tesla.Env
 
   @default_deposit 0
@@ -62,7 +62,7 @@ defmodule Core.Contract do
         function add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
-      iex> Core.Contract.deploy(client, source_code, init_args)
+      iex> AeppSDK.Core.Contract.deploy(client, source_code, init_args)
       {:ok,
        %{
          block_hash: "mh_6fEZ9CCPNXxyjpKwSjkihv2UA5voRKCBpvrK24gK38zkZZB5Q",
@@ -167,7 +167,7 @@ defmodule Core.Contract do
           state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
-      iex> Core.Contract.call(client, contract_address, source_code, function_name, function_args)
+      iex> AeppSDK.Core.Contract.call(client, contract_address, source_code, function_name, function_args)
       {:ok,
        %{
          block_hash: "mh_2uzSrRdURXy4ATwCo3XpeSngH9ECXhkBj3MWEYFatqK4pJgFWG",
@@ -258,7 +258,7 @@ defmodule Core.Contract do
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
       iex> top_block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-      iex> Core.Contract.call_static(client, contract_address, source_code, function_name, function_args, [top: top_block_hash])
+      iex> AeppSDK.Core.Contract.call_static(client, contract_address, source_code, function_name, function_args, [top: top_block_hash])
       {:ok,
         %{
           return_type: "ok",
@@ -356,7 +356,7 @@ defmodule Core.Contract do
       iex> sophia_type = "int"
       iex> return_value = "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
       iex> return_type = "ok"
-      iex> Core.Contract.decode_return_value(sophia_type, return_value, return_type)
+      iex> AeppSDK.Core.Contract.decode_return_value(sophia_type, return_value, return_type)
       {:ok, 75}
   """
   @spec decode_return_value(String.t(), String.t(), String.t()) ::
@@ -399,7 +399,7 @@ defmodule Core.Contract do
 
         function add_to_number(x : int) =
           state.number + x"
-      iex> Core.Contract.compile(source_code)
+      iex> AeppSDK.Core.Contract.compile(source_code)
       {:ok,
        %{
          byte_code: <<98, 0, 0, 100, 98, 0, 0, 151, 145, 128, 128, 128, 81, 127, 112,
@@ -505,7 +505,7 @@ defmodule Core.Contract do
           state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
-      iex> Core.Contract.create_calldata(source_code, function_name, function_args)
+      iex> AeppSDK.Core.Contract.create_calldata(source_code, function_name, function_args)
       {:ok,
          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 32, 226, 35, 29, 108, 223, 201, 57, 22, 222, 76, 179, 169,
@@ -567,7 +567,7 @@ defmodule Core.Contract do
         function add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
-      iex> Core.Contract.get_function_return_type(source_code, function_name)
+      iex> AeppSDK.Core.Contract.get_function_return_type(source_code, function_name)
       {:ok, "int"}
   """
   @spec get_function_return_type(String.t(), String.t()) ::
