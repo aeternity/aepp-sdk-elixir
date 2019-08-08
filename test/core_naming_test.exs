@@ -4,7 +4,7 @@ defmodule CoreNamingTest do
   alias AeppSDK.Core.{AENS, Account}
 
   setup_all do
-    Code.require_file("test_AeppSDK.Utils.ex", "test/")
+    Code.require_file("test_utils.ex", "test/")
     TestAeppSDK.Utils.get_test_data()
   end
 
