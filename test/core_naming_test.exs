@@ -5,7 +5,7 @@ defmodule CoreNamingTest do
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")
-    TestAeppSDK.Utils.get_test_data()
+    TestUtils.get_test_data()
   end
 
   @tag :travis_test
