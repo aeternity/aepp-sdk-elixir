@@ -313,8 +313,8 @@ defmodule Core.Listener do
   def unsubscribe(event, _, _), do: {:error, "Unknown event to unsubscribe from: #{event}"}
 
   @doc false
-  def notify(event, data, hash) when event in @notifiable_events do
-    GenServer.call(__MODULE__, {:notify, event, data, hash})
+  def notify(event, data) when event in @notifiable_events do
+    GenServer.call(__MODULE__, {:notify, event, data})
   end
 
   def notify(event, _, _), do: {:error, "Unknown event to notify for: #{event}"}
@@ -414,51 +414,16 @@ defmodule Core.Listener do
   end
 
   def handle_call(
-        {:notify, event, data, hash},
+        {:notify, event, data},
         _from,
         %{
           objects_sent: objects_sent,
           gc_scheduled: gc_scheduled,
-          subscribers: %{tx_confirmations: tx_confirmations} = subscribers
+          subscribers: subscribers
         } = state
       ) do
-    case data do
-      [
-        %{
-          tx: %{
-            contract_id: "ct_2Vg9QEmHrhoEGhYaKz3ZwzSKYe7bQtsUxxstMi6CZ1aK62rE4",
-            type: :contract_call_tx
-          }
-        }
-      ] ->
-        1
-
-      # IO.inspect("------------------------------------------------")
-      # IO.inspect(event)
-      # IO.inspect("DATA:")
-      # IO.inspect(data, limit: :infinity)
-      # IO.inspect("HASH:")
-      # IO.inspect(hash)
-      # IO.inspect("OBJECTS SENT:")
-      # IO.inspect(objects_sent, limit: :infinity)
-
-      _ ->
-        nil
-    end
-
     {updated_tx_confirmations, updated_objects_sent} =
-      if Enum.member?(objects_sent, hash) do
-        # IO.inspect("OBJECT ALREADY SENT")
-        {tx_confirmations, objects_sent}
-      else
-        # IO.inspect("SENDING OBJECT TO SUBSCRIBERS")
-
-        {send_object_to_subscribers(
-           event,
-           data,
-           subscribers
-         ), objects_sent ++ [hash]}
-      end
+      handle_notify(event, data, objects_sent, subscribers)
 
     updated_gc_scheduled =
       if gc_scheduled do
@@ -478,8 +443,41 @@ defmodule Core.Listener do
      }}
   end
 
+  defp handle_notify(
+         event,
+         data,
+         objects_sent,
+         %{tx_confirmations: tx_confirmations} = subscribers
+       )
+       when is_list(data) do
+    Enum.reduce(data, {tx_confirmations, objects_sent}, fn tx,
+                                                           {tx_confirmations_acc,
+                                                            objects_sent_acc} ->
+      handle_notify(event, tx, objects_sent_acc, %{
+        subscribers
+        | tx_confirmations: tx_confirmations_acc
+      })
+    end)
+  end
+
+  defp handle_notify(
+         event,
+         {object, hash},
+         objects_sent,
+         %{tx_confirmations: tx_confirmations} = subscribers
+       ) do
+    if Enum.member?(objects_sent, hash) do
+      {tx_confirmations, objects_sent}
+    else
+      {send_object_to_subscribers(
+         event,
+         object,
+         subscribers
+       ), objects_sent ++ [hash]}
+    end
+  end
+
   def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
-    # IO.inspect("GC CALLED")
     half_count = floor(Enum.count(objects_sent) / 2)
 
     gc_objects_sent =
@@ -511,25 +509,12 @@ defmodule Core.Listener do
     send_general_event_object(event, object, general_event_subscribers)
 
     if event in [:transactions, :pool_transactions] do
-      send_specific_event_object_transactions(event, object, subscribers)
+      send_filtered_event_transaction(event, object, subscribers)
     end
 
-    # case object do
-    #   [
-    #     %{
-    #       tx: %{
-    #         contract_id: "ct_2Vg9QEmHrhoEGhYaKz3ZwzSKYe7bQtsUxxstMi6CZ1aK62rE4",
-    #         type: :contract_call_tx
-    #       }
-    #     }
-    #   ] ->
     if event == :transactions do
       send_contract_events(object, contract_event_subscribers)
     end
-
-    #   _ ->
-    #     nil
-    # end
 
     if event == :key_blocks do
       send_confirmation_info(tx_confirmations, object.height)
@@ -544,25 +529,22 @@ defmodule Core.Listener do
     end)
   end
 
-  defp send_specific_event_object_transactions(event, object, subscribers) do
-    Enum.each(object, fn tx ->
-      filter = determine_filter(event, tx)
+  defp send_filtered_event_transaction(event, tx, subscribers) do
+    filter = determine_filter(event, tx)
 
-      case filter do
-        {filtered_event, tx_filter_value} ->
-          %{^filtered_event => specific_event_subscribers} = subscribers
+    if filter != nil do
+      {filtered_event, tx_filter_value} = filter
+      %{^filtered_event => filtered_event_subscribers} = subscribers
 
-          send_filtered_event_object_transaction(
-            filtered_event,
-            tx,
-            specific_event_subscribers,
-            tx_filter_value
-          )
-
-        _ ->
-          :skip
-      end
-    end)
+      Enum.each(filtered_event_subscribers, fn %{
+                                                 subscriber: subscriber_pid,
+                                                 filter: subscriber_filter
+                                               } ->
+        if tx_filter_value == subscriber_filter do
+          send(subscriber_pid, {event, tx})
+        end
+      end)
+    end
   end
 
   defp determine_filter(event, %{tx: tx}) do
@@ -591,17 +573,6 @@ defmodule Core.Listener do
     end
   end
 
-  defp send_filtered_event_object_transaction(event, tx, subscribers, tx_filter_value) do
-    Enum.each(subscribers, fn %{
-                                subscriber: subscriber_pid,
-                                filter: filter
-                              } ->
-      if tx_filter_value == filter do
-        send(subscriber_pid, {event, tx})
-      end
-    end)
-  end
-
   defp get_specific_events(:transactions) do
     @transactions_filtered_events
   end
@@ -624,49 +595,35 @@ defmodule Core.Listener do
     end
   end
 
-  defp send_contract_events(object, contract_event_subscribers) do
-    # IO.inspect("SENDING CONTRACT EVENTS")
-
-    Enum.each(object, fn %{tx: tx, hash: hash} ->
-      case tx do
-        %{contract_id: contract_id, type: :contract_call_tx} ->
-          # IO.inspect("MATCHED A CONTRACT CALL TX")
-
-          subscribers_for_contract =
-            Enum.filter(contract_event_subscribers, fn %{contract_id: sub_contract_id} ->
-              sub_contract_id == contract_id
-            end)
-
-          # IO.inspect("SUBSCRIBERS:")
-          # IO.inspect(subscribers_for_contract, limit: :infinity)
-
-          Enum.each(subscribers_for_contract, fn %{
-                                                   subscriber: subscriber_pid,
-                                                   connection: connection
-                                                 } ->
-            case TransactionApi.get_transaction_info_by_hash(connection, hash) do
-              {:ok,
-               %TxInfoObject{
-                 call_info: %ContractCallObject{
-                   log: log
-                 }
-               }} ->
-                # IO.inspect("------ SENDING EVENT-------")
-                send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
-
-              _ ->
-                # IO.inspect("COULDN'T FETCH TX INFO:")
-                # IO.inspect(a, limit: :infinity)
-                :skip
-            end
+  defp send_contract_events(%{hash: hash, tx: tx}, contract_event_subscribers) do
+    case tx do
+      %{contract_id: contract_id, type: :contract_call_tx} ->
+        subscribers_for_contract =
+          Enum.filter(contract_event_subscribers, fn %{contract_id: sub_contract_id} ->
+            sub_contract_id == contract_id
           end)
 
-        _ ->
-          # IO.inspect("DIDN'T MATCH A CONTRACT CALL TX:")
-          # IO.inspect(a, limit: :infinity)
-          :skip
-      end
-    end)
+        Enum.each(subscribers_for_contract, fn %{
+                                                 subscriber: subscriber_pid,
+                                                 connection: connection
+                                               } ->
+          case TransactionApi.get_transaction_info_by_hash(connection, hash) do
+            {:ok,
+             %TxInfoObject{
+               call_info: %ContractCallObject{
+                 log: log
+               }
+             }} ->
+              send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
+
+            _ ->
+              :skip
+          end
+        end)
+
+      _ ->
+        :skip
+    end
   end
 
   defp send_confirmation_info(tx_confirmation_subscribers, current_height) do
