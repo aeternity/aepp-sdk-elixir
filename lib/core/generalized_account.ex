@@ -1,9 +1,9 @@
-defmodule AeppSDK.Core.GeneralizedAccount do
+defmodule AeppSDK.GeneralizedAccount do
   @moduledoc """
   Contains all generalized accounts functionalities.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `AeppSDK.Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
 
   For more information: [https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md](https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md)
   """
@@ -12,7 +12,7 @@ defmodule AeppSDK.Core.GeneralizedAccount do
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.Error
   alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Core.{Client, Contract}
+  alias AeppSDK.{Client, Contract}
 
   @ct_version 0x40001
   @init_function "init"
@@ -44,7 +44,7 @@ defmodule AeppSDK.Core.GeneralizedAccount do
           auth_value"
       iex> auth_fun = "auth"
       iex> init_args = []
-      iex> AeppSDK.Core.GeneralizedAccount.attach(client, source_code, auth_fun, init_args)
+      iex> AeppSDK.GeneralizedAccount.attach(client, source_code, auth_fun, init_args)
       {:ok,
        %{
          block_hash: "mh_CfEuHm4V2omAQGNAxcdPARrkfnYbKuuF1HpGhG5oQvoVC34nD",

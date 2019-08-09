@@ -1,14 +1,14 @@
-defmodule AeppSDK.Core.Channel do
+defmodule AeppSDK.Channel do
   @moduledoc """
   Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
   Contains all channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `AeppSDK.Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
-  alias AeppSDK.Core.GeneralizedAccount
+  alias AeppSDK.GeneralizedAccount
   alias AeppSDK.Utils.Serialization
 
   alias AeternityNode.Model.{
@@ -27,7 +27,7 @@ defmodule AeppSDK.Core.Channel do
     Tx
   }
 
-  alias AeppSDK.Core.Client
+  alias AeppSDK.Client
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Hash}
   alias AeternityNode.Api.Transaction, as: TransactionApi
@@ -42,7 +42,7 @@ defmodule AeppSDK.Core.Channel do
   Gets channel information by its pubkey.
 
   ## Example
-      iex> AeppSDK.Core.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> AeppSDK.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok,
          %{
            channel_amount: 16720002000,
@@ -61,7 +61,7 @@ defmodule AeppSDK.Core.Channel do
          }}
 
   """
-  @spec get_by_pubkey(AeppSDK.Core.Client.t(), String.t()) ::
+  @spec get_by_pubkey(AeppSDK.Client.t(), String.t()) ::
           {:error, Tesla.Env.t()} | {:ok, map()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
     prepare_result(ChannelAPI.get_channel_by_pubkey(connection, channel_pubkey))
@@ -72,7 +72,7 @@ defmodule AeppSDK.Core.Channel do
   More information at [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create)
 
   ## Example
-      iex> AeppSDK.Core.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
+      iex> AeppSDK.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
       {:ok,
         [
           %AeternityNode.Model.ChannelCreateTx{
@@ -170,7 +170,7 @@ defmodule AeppSDK.Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_mutual
 
   ## Example
-      iex> AeppSDK.Core.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
+      iex> AeppSDK.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
       {:ok,
         [
           %AeternityNode.Model.ChannelCloseMutualTx{
@@ -297,7 +297,7 @@ defmodule AeppSDK.Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_deposit
 
   ## Example
-      iex> AeppSDK.Core.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
+      iex> AeppSDK.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
       {:ok,
         [
           %AeternityNode.Model.ChannelDepositTx{
@@ -617,7 +617,7 @@ defmodule AeppSDK.Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
 
   ## Example
-      iex> AeppSDK.Core.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, AeppSDK.Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
+      iex> AeppSDK.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, AeppSDK.Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
       {:ok,
         [
           %AeternityNode.Model.ChannelWithdrawTx{
@@ -705,7 +705,7 @@ defmodule AeppSDK.Core.Channel do
   Gets current state hash.
 
   ## Example
-      iex> AeppSDK.Core.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> AeppSDK.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
   """
   @spec get_current_state_hash(Client.t(), String.t()) ::
@@ -739,7 +739,7 @@ defmodule AeppSDK.Core.Channel do
                   state_hash: "st_11111111111111111111111111111111273Yts",
                   ttl: 0
                 }
-      iex> AeppSDK.Core.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
+      iex> AeppSDK.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
           block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",

@@ -1,11 +1,11 @@
-defmodule AeppSDK.Core.Account do
+defmodule AeppSDK.Account do
   @moduledoc """
    High-level module for Account-related activities.
 
    In order for its functions to be used, a client must be defined first.
-   Client example can be found at: `AeppSDK.Core.Client.new/4`
+   Client example can be found at: `AeppSDK.Client.new/4`
   """
-  alias AeppSDK.Core.Client
+  alias AeppSDK.Client
   alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.{Account, SpendTx, Error}
@@ -28,7 +28,7 @@ defmodule AeppSDK.Core.Account do
 
   ## Example
       iex> public_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> AeppSDK.Core.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
+      iex> AeppSDK.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
       {:ok,
         %{
         block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
@@ -88,7 +88,7 @@ defmodule AeppSDK.Core.Account do
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> AeppSDK.Core.Account.balance(client, pubkey)
+      iex> AeppSDK.Account.balance(client, pubkey)
       {:ok, 1652992279192254044805}
   """
   @spec balance(Client.t(), String.t()) ::
@@ -109,7 +109,7 @@ defmodule AeppSDK.Core.Account do
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> height = 80000
-      iex> AeppSDK.Core.Account.balance(client, pubkey, height)
+      iex> AeppSDK.Account.balance(client, pubkey, height)
       {:ok, 1641606227460612819475}
   """
   @spec balance(Client.t(), String.t(), non_neg_integer()) ::
@@ -126,7 +126,7 @@ defmodule AeppSDK.Core.Account do
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
-      iex> AeppSDK.Core.Account.balance(client, pubkey, block_hash)
+      iex> AeppSDK.Account.balance(client, pubkey, block_hash)
       {:ok, 1653014562214254044805}
   """
   @spec balance(Client.t(), String.t(), String.t()) ::
@@ -144,7 +144,7 @@ defmodule AeppSDK.Core.Account do
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> height = 80000
-      iex> AeppSDK.Core.Account.get(client, pubkey, height)
+      iex> AeppSDK.Account.get(client, pubkey, height)
       {:ok,
        %{
          auth_fun: nil,
@@ -170,7 +170,7 @@ defmodule AeppSDK.Core.Account do
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
-      iex> AeppSDK.Core.Account.get(client, pubkey, block_hash)
+      iex> AeppSDK.Account.get(client, pubkey, block_hash)
       {:ok,
        %{
          auth_fun: nil,

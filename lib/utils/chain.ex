@@ -4,7 +4,7 @@ defmodule AeppSDK.Utils.Chain do
   """
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.{KeyBlockOrMicroBlockHeader, KeyBlock, MicroBlockHeader, Error}
-  alias AeppSDK.Core.Client
+  alias AeppSDK.Client
 
   @doc """
   Get the hash of the current top block

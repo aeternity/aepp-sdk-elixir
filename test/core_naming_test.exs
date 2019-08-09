@@ -1,7 +1,7 @@
 defmodule CoreNamingTest do
   use ExUnit.Case
   alias AeppSDK.Utils.{Keys, Serialization}
-  alias AeppSDK.Core.{AENS, Account}
+  alias AeppSDK.{AENS, Account}
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")

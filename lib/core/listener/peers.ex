@@ -1,9 +1,9 @@
-defmodule AeppSDK.Core.Listener.Peers do
+defmodule AeppSDK.Listener.Peers do
   @moduledoc false
   use GenServer
 
   alias AeppSDK.Utils.{Keys, Encoding}
-  alias AeppSDK.Core.Listener.PeerConnectionSupervisor
+  alias AeppSDK.Listener.PeerConnectionSupervisor
 
   require Logger
 

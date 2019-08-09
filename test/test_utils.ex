@@ -1,6 +1,6 @@
 defmodule TestUtils do
   alias AeppSDK.Utils.Serialization
-  alias AeppSDK.Core.Client
+  alias AeppSDK.Client
 
   alias AeternityNode.Model.{
     SpendTx,

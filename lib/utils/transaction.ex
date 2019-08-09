@@ -3,11 +3,11 @@ defmodule AeppSDK.Utils.Transaction do
   Transaction AeppSDK.Utils.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `AeppSDK.Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Account, as: AccountApi
-  alias AeppSDK.Core.{Contract, Client, GeneralizedAccount}
+  alias AeppSDK.{Contract, Client, GeneralizedAccount}
 
   alias AeternityNode.Model.{
     Account,

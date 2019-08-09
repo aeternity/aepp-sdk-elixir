@@ -1,9 +1,9 @@
-defmodule AeppSDK.Core.Chain do
+defmodule AeppSDK.Chain do
   @moduledoc """
   Contains all chain-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `AeppSDK.Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Debug, as: DebugApi
@@ -34,7 +34,7 @@ defmodule AeppSDK.Core.Chain do
   }
 
   alias AeppSDK.Utils.Transaction, as: TransactionUtils
-  alias AeppSDK.Core.Client
+  alias AeppSDK.Client
   alias Tesla.Env
 
   @type await_options :: [attempts: non_neg_integer(), interval: non_neg_integer()]
@@ -130,7 +130,7 @@ defmodule AeppSDK.Core.Chain do
   Get the height of the current key block
 
   ## Example
-      iex> AeppSDK.Core.Chain.height(client)
+      iex> AeppSDK.Chain.height(client)
       {:ok, 84535}
   """
   @spec height(Client.t()) :: {:ok, non_neg_integer()} | {:error, Env.t()}
@@ -144,7 +144,7 @@ defmodule AeppSDK.Core.Chain do
   Wait for the chain to reach specific height
 
   ## Example
-      iex> AeppSDK.Core.Chain.await_height(client, 84590)
+      iex> AeppSDK.Chain.await_height(client, 84590)
       :ok
   """
   @spec await_height(Client.t(), non_neg_integer(), await_options()) ::
@@ -164,7 +164,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> transaction_hash = "th_232gp9o5Lm1XZ8SMaDCAnLcvyj2CkDkf5tssfD5yVAoFAnPBm7"
-      iex> AeppSDK.Core.Chain.await_transaction(client, transaction_hash)
+      iex> AeppSDK.Chain.await_transaction(client, transaction_hash)
       :ok
   """
   @spec await_transaction(Client.t(), String.t(), await_options()) ::
@@ -184,7 +184,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> tx_hash = "th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz"
-      iex> AeppSDK.Core.Chain.get_transaction(client, tx_hash)
+      iex> AeppSDK.Chain.get_transaction(client, tx_hash)
       {:ok,
        %{
          block_hash: "mh_bZUgGMEvu8kaAEv47xyatNfstvoH54VbrCb93y8J44gr2EsCJ",
@@ -207,7 +207,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> tx_hash = "th_2jg2P41iGUgNif3Nu1vZ34P1aeSeZq4CWtKhEpr6jeLDoTL4mH"
-      iex> AeppSDK.Core.Chain.get_transaction_info(client, tx_hash)
+      iex> AeppSDK.Chain.get_transaction_info(client, tx_hash)
       {:ok,
        %{
          call_info: %{
@@ -237,7 +237,7 @@ defmodule AeppSDK.Core.Chain do
   Get all pending transactions
 
   ## Example
-      iex> AeppSDK.Core.Chain.get_pending_transactions(client)
+      iex> AeppSDK.Chain.get_pending_transactions(client)
       {:ok, []}
   """
   @spec get_pending_transactions(Client.t()) ::
@@ -252,7 +252,7 @@ defmodule AeppSDK.Core.Chain do
   Get current generation
 
   ## Example
-      iex> AeppSDK.Core.Chain.get_current_generation(client)
+      iex> AeppSDK.Chain.get_current_generation(client)
       {:ok,
        %{
          key_block: %{
@@ -292,7 +292,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> hash = "kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP"
-      iex> AeppSDK.Core.Chain.get_generation(client, hash)
+      iex> AeppSDK.Chain.get_generation(client, hash)
       {:ok,
        %{
          key_block: %{
@@ -337,7 +337,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> height = 84551
-      iex> AeppSDK.Core.Chain.get_generation(client, height)
+      iex> AeppSDK.Chain.get_generation(client, height)
       {:ok,
        %{
          key_block: %{
@@ -382,7 +382,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> micro_block_hash = "mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw"
-      iex> AeppSDK.Core.Chain.get_micro_block_transactions(client, micro_block_hash)
+      iex> AeppSDK.Chain.get_micro_block_transactions(client, micro_block_hash)
       {:ok,
        [
          %{
@@ -408,7 +408,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> key_block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
-      iex> AeppSDK.Core.Chain.get_key_block(client, key_block_hash)
+      iex> AeppSDK.Chain.get_key_block(client, key_block_hash)
       {:ok,
        %{
          beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
@@ -445,7 +445,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> key_block_height = 84547
-      iex> AeppSDK.Core.Chain.get_key_block(client, key_block_height)
+      iex> AeppSDK.Chain.get_key_block(client, key_block_height)
       {:ok,
        %{
          beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
@@ -482,7 +482,7 @@ defmodule AeppSDK.Core.Chain do
 
   ## Example
       iex> micro_block_hash = "mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw"
-      iex> AeppSDK.Core.Chain.get_micro_block_header(client, micro_block_hash)
+      iex> AeppSDK.Chain.get_micro_block_header(client, micro_block_hash)
       {:ok,
        %{
          hash: "mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw",
@@ -567,7 +567,7 @@ defmodule AeppSDK.Core.Chain do
   Get node's info
 
   ## Example
-      iex> AeppSDK.Core.Chain.get_node_info(client)
+      iex> AeppSDK.Chain.get_node_info(client)
       {:ok,
        %{
          node_beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",

@@ -29,19 +29,19 @@ secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70b
 network_id = "ae_uat"
 url = "https://sdk-testnet.aepps.com/v2"
 internal_url = "https://sdk-testnet.aepps.com/v2"
-client = AeppSDK.Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
+client = AeppSDK.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
 ```
 
 Every module and function is documented and you can get the documentation by using, for example:
 ``` elixir
-h AeppSDK.Core.Client
+h AeppSDK.Client
 ```
 
 ## Examples
 
 #### To get current generation:
 ``` elixir
-iex> AeppSDK.Core.Chain.get_current_generation(client)                                                          
+iex> AeppSDK.Chain.get_current_generation(client)                                                          
 {:ok,
  %{
    key_block: %{
@@ -71,6 +71,6 @@ iex> AeppSDK.Core.Chain.get_current_generation(client)
 
 #### To get an account's balance:
 ``` elixir
-iex> AeppSDK.Core.Account.balance(client, client.keypair.public) 
+iex> AeppSDK.Account.balance(client, client.keypair.public) 
 {:ok, 811193097223266796526}
 ```

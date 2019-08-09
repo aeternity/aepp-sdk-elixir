@@ -1,7 +1,7 @@
 defmodule CoreChannelTest do
   use ExUnit.Case
 
-  alias AeppSDK.Core.{Account, Client, Channel, GeneralizedAccount}
+  alias AeppSDK.{Account, Client, Channel, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Transaction}
 
   setup_all do
@@ -193,7 +193,7 @@ defmodule CoreChannelTest do
     GeneralizedAccount.attach(client3, source_code, "auth", [])
 
     assert {:ok, [tx, create_meta_tx, []]} =
-             AeppSDK.Core.Channel.create(
+             AeppSDK.Channel.create(
                client2,
                1000,
                client3.keypair.public,
@@ -208,15 +208,15 @@ defmodule CoreChannelTest do
     assert {:ok, [^tx, create_meta_tx1, []]} = AeppSDK.Utils.Transaction.sign_tx(tx, client3, auth)
 
     assert {:ok, %{channel_id: channel_id}} =
-             AeppSDK.Core.Channel.post(client2, create_meta_tx, inner_tx: create_meta_tx1, tx: tx)
+             AeppSDK.Channel.post(client2, create_meta_tx, inner_tx: create_meta_tx1, tx: tx)
 
-    assert {:ok, %{id: ^channel_id}} = AeppSDK.Core.Channel.get_by_pubkey(client2, channel_id)
+    assert {:ok, %{id: ^channel_id}} = AeppSDK.Channel.get_by_pubkey(client2, channel_id)
 
-    {:ok, %{round: round}} = AeppSDK.Core.Channel.get_by_pubkey(client2, channel_id)
+    {:ok, %{round: round}} = AeppSDK.Channel.get_by_pubkey(client2, channel_id)
     next_round = round + 1
 
     assert {:ok, [deposit_tx, deposit_meta_tx, deposit_sig]} =
-             AeppSDK.Core.Channel.deposit(
+             AeppSDK.Channel.deposit(
                client2,
                100_000_000_000,
                channel_id,
@@ -229,16 +229,16 @@ defmodule CoreChannelTest do
              AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client3, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, deposit_meta_tx,
+             AeppSDK.Channel.post(client2, deposit_meta_tx,
                inner_tx: deposit_meta_tx1,
                tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = AeppSDK.Core.Channel.get_by_pubkey(client2, channel_id)
+    {:ok, %{round: round}} = AeppSDK.Channel.get_by_pubkey(client2, channel_id)
     next_round = round + 1
 
     assert {:ok, [withdraw_tx, withdraw_meta_tx, withdraw_sig]} =
-             AeppSDK.Core.Channel.withdraw(
+             AeppSDK.Channel.withdraw(
                client2,
                channel_id,
                client2.keypair.public,
@@ -252,19 +252,19 @@ defmodule CoreChannelTest do
              AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client3, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, withdraw_meta_tx,
+             AeppSDK.Channel.post(client2, withdraw_meta_tx,
                inner_tx: withdraw_meta_tx1,
                tx: withdraw_tx
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_meta_tx, close_mutual_sig]} =
-             AeppSDK.Core.Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
+             AeppSDK.Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
 
     assert {:ok, [^close_mutual_tx, close_mutual_meta_tx1, close_mutual_sig1]} =
              AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client3, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, close_mutual_meta_tx,
+             AeppSDK.Channel.post(client2, close_mutual_meta_tx,
                inner_tx: close_mutual_meta_tx1,
                tx: close_mutual_tx
              )
@@ -286,7 +286,7 @@ defmodule CoreChannelTest do
     GeneralizedAccount.attach(client2, source_code, "auth", [])
 
     assert {:ok, [tx, sig]} =
-             AeppSDK.Core.Channel.create(
+             AeppSDK.Channel.create(
                client,
                1000,
                client2.keypair.public,
@@ -300,15 +300,15 @@ defmodule CoreChannelTest do
     assert {:ok, [^tx, create_meta_tx, []]} = AeppSDK.Utils.Transaction.sign_tx(tx, client2, auth)
 
     assert {:ok, %{channel_id: channel_id}} =
-             AeppSDK.Core.Channel.post(client, create_meta_tx, signatures_list: [sig], inner_tx: tx)
+             AeppSDK.Channel.post(client, create_meta_tx, signatures_list: [sig], inner_tx: tx)
 
     assert {:ok, %{id: ^channel_id, round: round}} =
-             AeppSDK.Core.Channel.get_by_pubkey(client, channel_id)
+             AeppSDK.Channel.get_by_pubkey(client, channel_id)
 
     next_round = round + 1
 
     assert {:ok, [deposit_tx, deposit_sig]} =
-             AeppSDK.Core.Channel.deposit(
+             AeppSDK.Channel.deposit(
                client,
                100_000_000_000,
                channel_id,
@@ -320,16 +320,16 @@ defmodule CoreChannelTest do
              AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client2, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client, deposit_meta_tx,
+             AeppSDK.Channel.post(client, deposit_meta_tx,
                signatures_list: [deposit_sig],
                inner_tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = AeppSDK.Core.Channel.get_by_pubkey(client, channel_id)
+    {:ok, %{round: round}} = AeppSDK.Channel.get_by_pubkey(client, channel_id)
     next_round = round + 1
 
     assert {:ok, [withdraw_tx, withdraw_sig]} =
-             AeppSDK.Core.Channel.withdraw(
+             AeppSDK.Channel.withdraw(
                client,
                channel_id,
                client2.keypair.public,
@@ -342,19 +342,19 @@ defmodule CoreChannelTest do
              AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client2, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client, withdraw_meta_tx,
+             AeppSDK.Channel.post(client, withdraw_meta_tx,
                signatures_list: [withdraw_sig],
                inner_tx: withdraw_tx
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_sig]} =
-             AeppSDK.Core.Channel.close_mutual(client, channel_id, 1000, 1000)
+             AeppSDK.Channel.close_mutual(client, channel_id, 1000, 1000)
 
     assert {:ok, [^close_mutual_tx, close_mutual_meta_tx, []]} =
              AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client2, auth)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client, close_mutual_meta_tx,
+             AeppSDK.Channel.post(client, close_mutual_meta_tx,
                signatures_list: [close_mutual_sig],
                inner_tx: close_mutual_tx
              )
@@ -376,7 +376,7 @@ defmodule CoreChannelTest do
     GeneralizedAccount.attach(client2, source_code, "auth", [])
 
     assert {:ok, [tx, create_meta_tx, []]} =
-             AeppSDK.Core.Channel.create(
+             AeppSDK.Channel.create(
                client2,
                1000,
                client.keypair.public,
@@ -391,18 +391,18 @@ defmodule CoreChannelTest do
     assert {:ok, [^tx, create_sig]} = AeppSDK.Utils.Transaction.sign_tx(tx, client)
 
     assert {:ok, %{channel_id: channel_id}} =
-             AeppSDK.Core.Channel.post(client2, create_meta_tx,
+             AeppSDK.Channel.post(client2, create_meta_tx,
                signatures_list: [create_sig],
                inner_tx: tx
              )
 
     assert {:ok, %{id: ^channel_id, round: round}} =
-             AeppSDK.Core.Channel.get_by_pubkey(client, channel_id)
+             AeppSDK.Channel.get_by_pubkey(client, channel_id)
 
     next_round = round + 1
 
     assert {:ok, [deposit_tx, deposit_meta_tx, []]} =
-             AeppSDK.Core.Channel.deposit(
+             AeppSDK.Channel.deposit(
                client2,
                100_000_000_000,
                channel_id,
@@ -414,16 +414,16 @@ defmodule CoreChannelTest do
     assert {:ok, [^deposit_tx, deposit_sig]} = AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, deposit_meta_tx,
+             AeppSDK.Channel.post(client2, deposit_meta_tx,
                signatures_list: [deposit_sig],
                inner_tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = AeppSDK.Core.Channel.get_by_pubkey(client, channel_id)
+    {:ok, %{round: round}} = AeppSDK.Channel.get_by_pubkey(client, channel_id)
     next_round = round + 1
 
     assert {:ok, [withdraw_tx, withdraw_meta_tx, []]} =
-             AeppSDK.Core.Channel.withdraw(
+             AeppSDK.Channel.withdraw(
                client2,
                channel_id,
                client.keypair.public,
@@ -436,19 +436,19 @@ defmodule CoreChannelTest do
     assert {:ok, [^withdraw_tx, withdraw_sig]} = AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, withdraw_meta_tx,
+             AeppSDK.Channel.post(client2, withdraw_meta_tx,
                signatures_list: [withdraw_sig],
                inner_tx: withdraw_tx
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_meta_tx, []]} =
-             AeppSDK.Core.Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
+             AeppSDK.Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
 
     assert {:ok, [^close_mutual_tx, close_mutual_sig]} =
              AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client)
 
     assert {:ok, _} =
-             AeppSDK.Core.Channel.post(client2, close_mutual_meta_tx,
+             AeppSDK.Channel.post(client2, close_mutual_meta_tx,
                signatures_list: [close_mutual_sig],
                inner_tx: close_mutual_tx
              )

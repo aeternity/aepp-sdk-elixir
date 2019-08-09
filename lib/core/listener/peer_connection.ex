@@ -1,10 +1,10 @@
-defmodule AeppSDK.Core.Listener.PeerConnection do
+defmodule AeppSDK.Listener.PeerConnection do
   @moduledoc false
 
   use GenServer
 
-  alias AeppSDK.Core.Listener
-  alias AeppSDK.Core.Listener.Peers
+  alias AeppSDK.Listener
+  alias AeppSDK.Listener.Peers
   alias AeppSDK.Utils.{Hash, Serialization, Encoding}
 
   @behaviour :ranch_protocol
