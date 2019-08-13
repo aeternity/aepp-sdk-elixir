@@ -541,7 +541,7 @@ defmodule Core.Listener do
                                                  filter: subscriber_filter
                                                } ->
         if tx_filter_value == subscriber_filter do
-          send(subscriber_pid, {event, tx})
+          send(subscriber_pid, {filtered_event, tx_filter_value, tx})
         end
       end)
     end

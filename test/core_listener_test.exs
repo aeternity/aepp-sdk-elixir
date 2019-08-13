@@ -62,10 +62,10 @@ defmodule CoreListenerTest do
           {:pool_transactions, txs} ->
             assert :ok = check_txs(txs, public_key, client, false)
 
-          {:spend_transactions, txs} ->
+          {:spend_transactions, ^public_key, txs} ->
             assert :ok = check_txs([txs], public_key, client, true)
 
-          {:pool_spend_transactions, txs} ->
+          {:pool_spend_transactions, ^public_key, txs} ->
             assert :ok = check_txs([txs], public_key, client, false)
 
           {:key_blocks, _} ->

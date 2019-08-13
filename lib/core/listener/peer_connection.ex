@@ -35,6 +35,9 @@ defmodule Core.Listener.PeerConnection do
 
   @hash_size 256
 
+  @pool_tx_hash_prefix <<0>>
+  @block_tx_hash_prefix <<1>>
+
   def start_link(ref, socket, transport, opts) do
     args = [ref, socket, transport, opts]
     {:ok, pid} = :proc_lib.start_link(__MODULE__, :accept_init, args)
@@ -209,7 +212,8 @@ defmodule Core.Listener.PeerConnection do
       Enum.map(txs, fn {tx, type, binary_hash} ->
         hash = Encoding.prefix_encode_base58c("th", binary_hash)
 
-        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)}, binary_hash}
+        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)},
+         @pool_tx_hash_prefix <> binary_hash}
       end)
 
     Listener.notify(:pool_transactions, serialized_txs)
@@ -250,7 +254,8 @@ defmodule Core.Listener.PeerConnection do
       Enum.map(txs, fn {tx, type, binary_hash} ->
         hash = Encoding.prefix_encode_base58c("th", binary_hash)
 
-        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)}, binary_hash}
+        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)},
+         @block_tx_hash_prefix <> binary_hash}
       end)
 
     Listener.notify(:transactions, serialized_txs)
