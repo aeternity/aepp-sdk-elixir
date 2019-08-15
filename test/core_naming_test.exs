@@ -1,7 +1,7 @@
 defmodule CoreNamingTest do
   use ExUnit.Case
-  alias Utils.{Keys, Serialization}
-  alias Core.{AENS, Account}
+  alias AeppSDK.Utils.{Keys, Serialization}
+  alias AeppSDK.{AENS, Account}
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")
@@ -21,7 +21,7 @@ defmodule CoreNamingTest do
 
     # Update a name
     list_of_pointers = [
-      {Utils.Keys.public_key_to_binary(setup.valid_pub_key),
+      {AeppSDK.Utils.Keys.public_key_to_binary(setup.valid_pub_key),
        Serialization.id_to_record(
          Keys.public_key_to_binary(setup.valid_pub_key),
          :account

@@ -1,8 +1,8 @@
-defmodule Utils.Keys do
+defmodule AeppSDK.Utils.Keys do
   @moduledoc """
   Key generation, handling, encoding and crypto.
   """
-  alias Utils.Encoding
+  alias AeppSDK.Utils.Encoding
 
   @hex_base 16
   @prefix_bits 24
@@ -34,7 +34,7 @@ defmodule Utils.Keys do
   Generate a Curve25519 keypair
 
   ## Example
-      iex> Utils.Keys.generate_keypair()
+      iex> AeppSDK.Utils.Keys.generate_keypair()
       %{
         public: "ak_Q9DozPaq7fZ9WnB8SwNxuniaWwUmp1M7HsFTgCdJSsU2kKtC4",
         secret: "227bdeedb4c3dd2b554ea6b448ac6788fbe66df1b4f87093a450bba748f296f5348bd07453735393e2ff8c03c65b4593f3bdd94f957a2e7cb314688b53441280"
@@ -66,7 +66,7 @@ defmodule Utils.Keys do
   ## Example
       iex> message = "some message"
       iex> secret_key = <<34, 123, 222, 237, 180, 195, 221, 43, 85, 78, 166, 180, 72, 172, 103, 136,251, 230, 109, 241, 180, 248, 112, 147, 164, 80, 187, 167, 72, 242, 150, 245,52, 139, 208, 116, 83, 115, 83, 147, 226, 255, 140, 3, 198, 91, 69, 147, 243,189, 217, 79, 149, 122, 46, 124, 179, 20, 104, 139, 83, 68, 18, 128>>
-      iex> Utils.Keys.sign(message, secret_key)
+      iex> AeppSDK.Utils.Keys.sign(message, secret_key)
       <<94, 26, 208, 168, 230, 154, 158, 226, 188, 217, 155, 170, 157, 33, 100, 22,
       247, 171, 91, 120, 249, 52, 147, 194, 188, 1, 14, 5, 15, 166, 232, 202, 97,
       96, 32, 32, 227, 151, 158, 216, 22, 68, 219, 5, 169, 229, 117, 147, 179, 43,
@@ -81,7 +81,7 @@ defmodule Utils.Keys do
   ## Example
       iex> message = "some message"
       iex> secret_key = <<34, 123, 222, 237, 180, 195, 221, 43, 85, 78, 166, 180, 72, 172, 103, 136,251, 230, 109, 241, 180, 248, 112, 147, 164, 80, 187, 167, 72, 242, 150, 245,52, 139, 208, 116, 83, 115, 83, 147, 226, 255, 140, 3, 198, 91, 69, 147, 243,189, 217, 79, 149, 122, 46, 124, 179, 20, 104, 139, 83, 68, 18, 128>>
-      iex> Utils.Keys.sign(message, secret_key, "ae_uat")
+      iex> AeppSDK.Utils.Keys.sign(message, secret_key, "ae_uat")
       <<15, 246, 136, 55, 63, 30, 144, 154, 249, 161, 243, 93, 52, 0, 218, 22, 43,
       200, 145, 252, 247, 218, 197, 125, 177, 17, 60, 177, 212, 106, 249, 130, 42,
       179, 233, 174, 116, 145, 154, 244, 80, 48, 142, 153, 170, 34, 199, 219, 248,
@@ -98,7 +98,7 @@ defmodule Utils.Keys do
       iex> signature = <<94, 26, 208, 168, 230, 154, 158, 226, 188, 217, 155, 170, 157, 33, 100, 22, 247, 171, 91, 120, 249, 52, 147, 194, 188, 1, 14, 5, 15, 166, 232, 202, 97, 96, 32, 32, 227, 151, 158, 216, 22, 68, 219, 5, 169, 229, 117, 147, 179, 43, 172, 211, 243, 171, 234, 254, 210, 119, 105, 248, 154, 19, 202, 7>>
       iex> message = "some message"
       iex> public_key = <<52, 139, 208, 116, 83, 115, 83, 147, 226, 255, 140, 3, 198, 91, 69, 147, 243, 189, 217, 79, 149, 122, 46, 124, 179, 20, 104, 139, 83, 68, 18, 128>>
-      iex> Utils.Keys.verify(signature, message, public_key)
+      iex> AeppSDK.Utils.Keys.verify(signature, message, public_key)
       {:ok, "some message"}
   """
   @spec verify(message(), signature(), binary()) :: {:ok, message()} | {:error, atom()}
@@ -111,11 +111,11 @@ defmodule Utils.Keys do
   }.pub` for the public key
 
   ## Example
-      iex> keypair = Utils.Keys.generate_keypair()
+      iex> keypair = AeppSDK.Utils.Keys.generate_keypair()
       iex> password = "some password"
       iex> path = "./keys"
       iex> name = "key"
-      iex> Utils.Keys.save_keypair(keypair, password, path, name)
+      iex> AeppSDK.Utils.Keys.save_keypair(keypair, password, path, name)
       :ok
   """
   @spec save_keypair(keypair(), password(), String.t(), String.t()) :: :ok | {:error, String.t()}
@@ -159,7 +159,7 @@ defmodule Utils.Keys do
       iex> password = "some password"
       iex> path = "./keys"
       iex> name = "key"
-      iex> Utils.Keys.read_keypair(password, path, name)
+      iex> AeppSDK.Utils.Keys.read_keypair(password, path, name)
       {:ok,
        %{
          public: "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb",
@@ -198,7 +198,7 @@ defmodule Utils.Keys do
 
   ## Example
       iex> public_key = "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb"
-      iex> Utils.Keys.public_key_to_binary(public_key)
+      iex> AeppSDK.Utils.Keys.public_key_to_binary(public_key)
       <<253, 16, 150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190, 47, 157, 115, 126, 32, 118, 191, 137, 134, 107, 183, 134, 188, 15, 191>>
       ```
   """
@@ -210,7 +210,7 @@ defmodule Utils.Keys do
 
   ## Example
       iex> public_key = "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb"
-      iex> Utils.Keys.public_key_to_binary(public_key, :with_prefix)
+      iex> AeppSDK.Utils.Keys.public_key_to_binary(public_key, :with_prefix)
       {"ak_",
        <<253, 16, 150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190,
          47, 157, 115, 126, 32, 118, 191, 137, 134, 107, 183, 134, 188, 15, 191>>}
@@ -225,7 +225,7 @@ defmodule Utils.Keys do
 
   ## Example
       iex> binary_public_key = <<253, 16, 150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190, 47, 157, 115, 126, 32, 118, 191, 137, 134, 107, 183, 134, 188, 15, 191>>
-      iex> Utils.Keys.public_key_from_binary(binary_public_key)
+      iex> AeppSDK.Utils.Keys.public_key_from_binary(binary_public_key)
       "ak_2vTCdFVAvgkYUDiVpydmByybqSYZHEB189QcfjmdcxRef2W2eb"
   """
   @spec public_key_from_binary(binary()) :: public_key()
@@ -237,7 +237,7 @@ defmodule Utils.Keys do
 
   ## Example
       iex> secret_key = "f9cebe874d90626bfcea1093e72f22e500a92e95052b88aaebd5d30346132cb1fd1096207d3e887091e3c11a953c0238be2f9d737e2076bf89866bb786bc0fbf"
-      iex> Utils.Keys.secret_key_to_binary(secret_key)
+      iex> AeppSDK.Utils.Keys.secret_key_to_binary(secret_key)
       <<249, 206, 190, 135, 77, 144, 98, 107, 252, 234, 16, 147, 231, 47, 34, 229, 0,
       169, 46, 149, 5, 43, 136, 170, 235, 213, 211, 3, 70, 19, 44, 177, 253, 16,
       150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190, 47, 157,
@@ -254,7 +254,7 @@ defmodule Utils.Keys do
 
   ## Example
       iex> binary_secret_key = <<249, 206, 190, 135, 77, 144, 98, 107, 252, 234, 16, 147, 231, 47, 34, 229, 0, 169, 46, 149, 5, 43, 136, 170, 235, 213, 211, 3, 70, 19, 44, 177, 253, 16, 150, 32, 125, 62, 136, 112, 145, 227, 193, 26, 149, 60, 2, 56, 190, 47, 157, 115, 126, 32, 118, 191, 137, 134, 107, 183, 134, 188, 15, 191>>
-      iex> Utils.Keys.secret_key_from_binary(binary_secret_key)
+      iex> AeppSDK.Utils.Keys.secret_key_from_binary(binary_secret_key)
       "f9cebe874d90626bfcea1093e72f22e500a92e95052b88aaebd5d30346132cb1fd1096207d3e887091e3c11a953c0238be2f9d737e2076bf89866bb786bc0fbf"
   """
   @spec secret_key_from_binary(binary()) :: secret_key()

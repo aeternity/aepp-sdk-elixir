@@ -1,7 +1,7 @@
-defmodule Utils.SerializationUtils do
+defmodule AeppSDK.Utils.SerializationUtils do
   @moduledoc false
 
-  alias Utils.{Encoding, Keys}
+  alias AeppSDK.Utils.{Encoding, Keys}
 
   alias AeternityNode.Model.{
     SpendTx,
