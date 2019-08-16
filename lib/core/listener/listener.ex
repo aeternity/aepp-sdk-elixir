@@ -508,6 +508,16 @@ defmodule Core.Listener do
 
     send_general_event_object(event, object, general_event_subscribers)
 
+    send_filtered_events(event, object, subscribers, tx_confirmations, contract_event_subscribers)
+  end
+
+  defp send_filtered_events(
+         event,
+         object,
+         subscribers,
+         tx_confirmations,
+         contract_event_subscribers
+       ) do
     if event in [:transactions, :pool_transactions] do
       send_filtered_event_transaction(event, object, subscribers)
     end
@@ -603,27 +613,31 @@ defmodule Core.Listener do
             sub_contract_id == contract_id
           end)
 
-        Enum.each(subscribers_for_contract, fn %{
-                                                 subscriber: subscriber_pid,
-                                                 connection: connection
-                                               } ->
-          case TransactionApi.get_transaction_info_by_hash(connection, hash) do
-            {:ok,
-             %TxInfoObject{
-               call_info: %ContractCallObject{
-                 log: log
-               }
-             }} ->
-              send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
-
-            _ ->
-              :skip
-          end
-        end)
+        do_send_contract_events(subscribers_for_contract, hash)
 
       _ ->
         :skip
     end
+  end
+
+  defp do_send_contract_events(subscribers, hash) do
+    Enum.each(subscribers, fn %{
+                                subscriber: subscriber_pid,
+                                connection: connection
+                              } ->
+      case TransactionApi.get_transaction_info_by_hash(connection, hash) do
+        {:ok,
+         %TxInfoObject{
+           call_info: %ContractCallObject{
+             log: log
+           }
+         }} ->
+          send(subscriber_pid, {:contract_events, Contract.decode_logs(log)})
+
+        _ ->
+          :skip
+      end
+    end)
   end
 
   defp send_confirmation_info(tx_confirmation_subscribers, current_height) do
