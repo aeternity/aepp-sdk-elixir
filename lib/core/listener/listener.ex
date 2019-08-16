@@ -442,6 +442,27 @@ defmodule AeppSDK.Listener do
      }}
   end
 
+  def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
+    half_count = floor(Enum.count(objects_sent) / 2)
+
+    gc_objects_sent =
+      if half_count > 0 do
+        Enum.drop(objects_sent, half_count)
+      else
+        objects_sent
+      end
+
+    {:noreply, %{state | objects_sent: gc_objects_sent, gc_scheduled: false}}
+  end
+
+  defp add_subscriber(subscribers, subscriber) do
+    if Enum.member?(subscribers, subscriber) do
+      subscribers
+    else
+      [subscriber | subscribers]
+    end
+  end
+
   defp handle_notify(
          event,
          data,
@@ -476,27 +497,6 @@ defmodule AeppSDK.Listener do
     end
   end
 
-  def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
-    half_count = floor(Enum.count(objects_sent) / 2)
-
-    gc_objects_sent =
-      if half_count > 0 do
-        Enum.drop(objects_sent, half_count)
-      else
-        objects_sent
-      end
-
-    {:noreply, %{state | objects_sent: gc_objects_sent, gc_scheduled: false}}
-  end
-
-  defp add_subscriber(subscribers, subscriber) do
-    if Enum.member?(subscribers, subscriber) do
-      subscribers
-    else
-      [subscriber | subscribers]
-    end
-  end
-
   defp send_object_to_subscribers(
          event,
          object,
@@ -507,15 +507,14 @@ defmodule AeppSDK.Listener do
 
     send_general_event_object(event, object, general_event_subscribers)
 
-    send_filtered_events(event, object, subscribers, tx_confirmations, contract_event_subscribers)
+    send_filtered_events(event, object, subscribers)
   end
 
   defp send_filtered_events(
          event,
          object,
-         subscribers,
-         tx_confirmations,
-         contract_event_subscribers
+         %{contract_events: contract_event_subscribers, tx_confirmations: tx_confirmations} =
+           subscribers
        ) do
     if event in [:transactions, :pool_transactions] do
       send_filtered_event_transaction(event, object, subscribers)
