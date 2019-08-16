@@ -1,7 +1,7 @@
 defmodule CoreListenerTest do
   use ExUnit.Case
 
-  alias Core.{Client, Listener, Account, Contract, Chain}
+  alias AeppSDK.{Client, Listener, Account, Chain, Contract}
 
   setup_all do
     client =

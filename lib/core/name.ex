@@ -1,10 +1,10 @@
-defmodule Core.AENS do
+defmodule AeppSDK.AENS do
   @moduledoc """
   Module for Aeternity Naming System, see: [https://github.com/aeternity/protocol/blob/master/AENS.md](https://github.com/aeternity/protocol/blob/master/AENS.md).
   Contains all naming-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Model.{
     NamePreclaimTx,
@@ -18,9 +18,9 @@ defmodule Core.AENS do
 
   alias AeternityNode.Api.NameService
   alias AeternityNode.Api.Chain
-  alias Core.Client
-  alias Utils.Account, as: AccountUtil
-  alias Utils.Transaction
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.Transaction
 
   @prefix_byte_size 2
 
@@ -34,12 +34,12 @@ defmodule Core.AENS do
 
   ## Example
       iex> name = "a123.test"
-      iex> Core.AENS.preclaim(client, name)
+      iex> AeppSDK.AENS.preclaim(client, name)
       {:ok,
         %{
           block_hash: "mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d",
           block_height: 86,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -123,12 +123,12 @@ defmodule Core.AENS do
   Claims a name.
 
   ## Example
-      iex> client |> Core.AENS.preclaim("a123.test") |> Core.AENS.claim()
+      iex> client |> AeppSDK.AENS.preclaim("a123.test") |> AeppSDK.AENS.claim()
       {:ok,
        %{
          block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
          block_height: 23,
-         client: %Core.Client{
+         client: %AeppSDK.Client{
            connection: %Tesla.Client{
              adapter: nil,
              fun: nil,
@@ -170,12 +170,12 @@ defmodule Core.AENS do
   ## Example
       iex> name = "a123.test"
       iex> name_salt = 149218901844062129,
-      iex> Core.AENS.claim(client, name, name_salt)
+      iex> AeppSDK.AENS.claim(client, name, name_salt)
       {:ok,
         %{
           block_hash: "mh_41E9iE61koF8AQLMvjTkRJ3N23yne4UXmqn5jeUn1GDrScV7A",
           block_height: 80,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -248,12 +248,12 @@ defmodule Core.AENS do
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.update(pointers, name_ttl,  client_ttl)
+      iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.update(pointers, name_ttl,  client_ttl)
       {:ok,
         %{
           block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
           block_height: 41,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -281,7 +281,7 @@ defmodule Core.AENS do
         }}
   """
   @spec update(
-          {:ok, %{client: Core.Client.t(), name: binary()}} | {:error, String.t()},
+          {:ok, %{client: AeppSDK.Client.t(), name: binary()}} | {:error, String.t()},
           list(),
           non_neg_integer(),
           non_neg_integer(),
@@ -311,12 +311,12 @@ defmodule Core.AENS do
       iex> name_ttl = 49_999
       iex> pointers = []
       iex> client_ttl = 50_000
-      iex> Core.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
+      iex> AeppSDK.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
       {:ok,
         %{
           block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
           block_height: 41,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -405,12 +405,12 @@ defmodule Core.AENS do
   ## Example
       iex> name = "a123.test"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |>  Core.AENS.transfer(recipient_key)
+      iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |>  AeppSDK.AENS.transfer(recipient_key)
       {:ok,
         %{
           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
           block_height: 35,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
            connection: %Tesla.Client{
              adapter: nil,
              fun: nil,
@@ -436,7 +436,7 @@ defmodule Core.AENS do
        }}
   """
   @spec transfer(
-          {:ok, %{client: Core.Client.t(), name: binary()} | {:error, String.t()}},
+          {:ok, %{client: AeppSDK.Client.t(), name: binary()} | {:error, String.t()}},
           binary(),
           aens_options()
         ) ::
@@ -457,12 +457,12 @@ defmodule Core.AENS do
   ## Example
       iex> name = "a123.test"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> Core.AENS.transfer_name(client, name, recipient_key)
+      iex> AeppSDK.AENS.transfer_name(client, name, recipient_key)
       {:ok,
         %{
           block_hash: "mh_NSyuLSvbB1v4R8nz8ZCLLHQXCHtsBntNyYbWdeKTadFm8Y5nB",
           block_height: 35,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -535,12 +535,12 @@ defmodule Core.AENS do
 
   ## Example
       iex> name = "a123.test"
-      iex> client |> Core.AENS.preclaim(name) |> Core.AENS.claim() |> Core.AENS.revoke()
+      iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.revoke()
       {:ok,
         %{
           block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
           block_height: 24,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -581,12 +581,12 @@ defmodule Core.AENS do
 
   ## Example
       iex> name = "a123.test"
-      iex> Core.AENS.revoke_name(client, name)
+      iex> AeppSDK.AENS.revoke_name(client, name)
       {:ok,
         %{
           block_hash: "mh_21fw4AryJSGKkdaQsigFQwkydfFVbN2mY7G5pRvwq7rp4zmfYC",
           block_height: 24,
-          client: %Core.Client{
+          client: %AeppSDK.Client{
             connection: %Tesla.Client{
               adapter: nil,
               fun: nil,
@@ -662,7 +662,7 @@ defmodule Core.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       preclaim_tx =
         struct(
@@ -698,7 +698,7 @@ defmodule Core.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       claim_tx =
         struct(
@@ -732,7 +732,7 @@ defmodule Core.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       transfer_tx =
         struct(
@@ -771,7 +771,7 @@ defmodule Core.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       name_update_tx =
         struct(
@@ -809,7 +809,7 @@ defmodule Core.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       revoke_tx =
         struct(

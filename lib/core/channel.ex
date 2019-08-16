@@ -1,15 +1,15 @@
-defmodule Core.Channel do
+defmodule AeppSDK.Channel do
   @moduledoc """
   Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
   Contains all channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
-  alias Core.GeneralizedAccount
-  alias Utils.Serialization
+  alias AeppSDK.GeneralizedAccount
+  alias AeppSDK.Utils.Serialization
 
   alias AeternityNode.Model.{
     ChannelCreateTx,
@@ -27,9 +27,9 @@ defmodule Core.Channel do
     Tx
   }
 
-  alias Core.Client
-  alias Utils.Account, as: AccountUtil
-  alias Utils.{Transaction, Serialization, Encoding, Hash}
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Hash}
   alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
@@ -42,7 +42,7 @@ defmodule Core.Channel do
   Gets channel information by its pubkey.
 
   ## Example
-      iex> Core.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> AeppSDK.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok,
          %{
            channel_amount: 16720002000,
@@ -61,7 +61,7 @@ defmodule Core.Channel do
          }}
 
   """
-  @spec get_by_pubkey(Core.Client.t(), String.t()) ::
+  @spec get_by_pubkey(AeppSDK.Client.t(), String.t()) ::
           {:error, Tesla.Env.t()} | {:ok, map()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
     prepare_result(ChannelAPI.get_channel_by_pubkey(connection, channel_pubkey))
@@ -72,7 +72,7 @@ defmodule Core.Channel do
   More information at [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create)
 
   ## Example
-      iex> Core.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
+      iex> AeppSDK.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
       {:ok,
         [
           %AeternityNode.Model.ChannelCreateTx{
@@ -123,7 +123,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when sender_prefix == "ak" and responder_prefix == "ak" do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, create_channel_tx} <-
@@ -170,7 +170,7 @@ defmodule Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_mutual
 
   ## Example
-      iex> Core.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
+      iex> AeppSDK.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
       {:ok,
         [
           %AeternityNode.Model.ChannelCloseMutualTx{
@@ -204,7 +204,7 @@ defmodule Core.Channel do
       )
       when valid_prefixes(sender_prefix, channel_prefix) and initiator_amount_final >= 0 and
              responder_amount_final >= 0 do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
            build_close_mutual_tx(
@@ -257,7 +257,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) and is_binary(payload) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
            build_close_solo_tx(
@@ -297,7 +297,7 @@ defmodule Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_deposit
 
   ## Example
-      iex> Core.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
+      iex> AeppSDK.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
       {:ok,
         [
           %AeternityNode.Model.ChannelDepositTx{
@@ -332,7 +332,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -404,7 +404,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -468,7 +468,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, settle_tx} <-
            build_settle_tx(
@@ -523,7 +523,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
            build_slash_tx(
@@ -578,7 +578,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, snapshot_solo_tx} <-
            build_snapshot_solo_tx(
@@ -617,7 +617,7 @@ defmodule Core.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
 
   ## Example
-      iex> Core.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
+      iex> AeppSDK.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, AeppSDK.Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
       {:ok,
         [
           %AeternityNode.Model.ChannelWithdrawTx{
@@ -661,7 +661,7 @@ defmodule Core.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -705,7 +705,7 @@ defmodule Core.Channel do
   Gets current state hash.
 
   ## Example
-      iex> Core.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> AeppSDK.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
   """
   @spec get_current_state_hash(Client.t(), String.t()) ::
@@ -739,7 +739,7 @@ defmodule Core.Channel do
                   state_hash: "st_11111111111111111111111111111111273Yts",
                   ttl: 0
                 }
-      iex> Core.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
+      iex> AeppSDK.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
           block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",

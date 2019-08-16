@@ -1,4 +1,4 @@
-defmodule Utils.Governance do
+defmodule AeppSDK.Utils.Governance do
   @moduledoc false
   alias AeternityNode.Model.{
     SpendTx,

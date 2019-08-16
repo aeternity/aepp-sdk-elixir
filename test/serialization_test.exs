@@ -1,7 +1,7 @@
 defmodule UtilsSerializationTest do
   use ExUnit.Case
 
-  alias Utils.Serialization
+  alias AeppSDK.Utils.Serialization
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")
