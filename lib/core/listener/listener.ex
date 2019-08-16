@@ -497,12 +497,7 @@ defmodule AeppSDK.Listener do
     end
   end
 
-  defp send_object_to_subscribers(
-         event,
-         object,
-         %{contract_events: contract_event_subscribers, tx_confirmations: tx_confirmations} =
-           subscribers
-       ) do
+  defp send_object_to_subscribers(event, object, subscribers) do
     %{^event => general_event_subscribers} = subscribers
 
     send_general_event_object(event, object, general_event_subscribers)
