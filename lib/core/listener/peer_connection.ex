@@ -1,13 +1,11 @@
-defmodule Core.Listener.PeerConnection do
+defmodule AeppSDK.Listener.PeerConnection do
   @moduledoc false
 
   use GenServer
 
-  require Logger
-
-  alias Core.Listener
-  alias Core.Listener.Peers
-  alias Utils.{Hash, Serialization, Encoding}
+  alias AeppSDK.Listener
+  alias AeppSDK.Listener.Peers
+  alias AeppSDK.Utils.{Hash, Serialization, Encoding}
 
   @behaviour :ranch_protocol
 
@@ -151,7 +149,7 @@ defmodule Core.Listener.PeerConnection do
       ) do
     deserialized_payload = rlp_decode(type, payload)
 
-    payload_hash = Hash.hash(payload)
+    {:ok, payload_hash} = Hash.hash(payload)
 
     case type do
       @p2p_response ->
@@ -165,14 +163,15 @@ defmodule Core.Listener.PeerConnection do
 
       @micro_block ->
         handle_new_micro_block(deserialized_payload, socket)
+
+      _ ->
+        :ok
     end
 
     {:noreply, state}
   end
 
   def handle_info({:tcp_closed, _}, state) do
-    Logger.info("Connection interrupted by peer - #{inspect(state)}")
-
     Peers.remove_peer(state.r_pubkey)
     {:stop, :normal, state}
   end
@@ -233,8 +232,6 @@ defmodule Core.Listener.PeerConnection do
           |> Peers.try_connect()
         end
       end)
-    else
-      Logger.info("Peer is on a different network")
     end
   end
 
@@ -403,6 +400,8 @@ defmodule Core.Listener.PeerConnection do
 
     Enum.map(txs, fn encoded_tx -> decode_tx(encoded_tx) end)
   end
+
+  defp rlp_decode(_, _), do: ""
 
   defp decode_tx(tx) do
     {:ok, binary_hash} = Hash.hash(tx)

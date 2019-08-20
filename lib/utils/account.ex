@@ -1,6 +1,6 @@
-defmodule Utils.Account do
+defmodule AeppSDK.Utils.Account do
   @moduledoc """
-  Account utils.
+  Account AeppSDK.Utils.
   """
 
   alias AeternityNode.Api.Account, as: AccountApi
@@ -13,7 +13,7 @@ defmodule Utils.Account do
   ## Example
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> Utils.Account.next_valid_nonce(connection, public_key)
+      iex> AeppSDK.Utils.Account.next_valid_nonce(connection, public_key)
       {:ok, 8544}
   """
   @spec next_valid_nonce(Tesla.Client.t(), String.t()) ::
@@ -31,7 +31,7 @@ defmodule Utils.Account do
       iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
       iex> public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-      iex> Utils.Account.nonce_at_hash(connection, public_key, block_hash)
+      iex> AeppSDK.Utils.Account.nonce_at_hash(connection, public_key, block_hash)
       {:ok, 8327}
   """
   @spec nonce_at_hash(Tesla.Client.t(), String.t(), String.t()) ::

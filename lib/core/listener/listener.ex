@@ -1,12 +1,12 @@
-defmodule Core.Listener do
+defmodule AeppSDK.Listener do
   @moduledoc """
   A listener service that connects to peers in a network and notifies processes for new blocks and transactions.
   """
   use GenServer
 
-  alias Core.Listener.Supervisor, as: ListenerSup
-  alias Core.Client
-  alias Utils.Encoding
+  alias AeppSDK.Listener.Supervisor, as: ListenerSup
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Encoding
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.{GenericSignedTx, Error}
@@ -34,7 +34,7 @@ defmodule Core.Listener do
   Starting the listener is required before subscribing to any events.
 
   ## Example
-      iex> Core.Listener.start("ae_uat")
+      iex> AeppSDK.Listener.start("ae_uat")
       {:ok, #PID<0.261.0>}
   """
   @spec start(String.t(), non_neg_integer()) :: {:ok, pid()}
@@ -56,7 +56,7 @@ defmodule Core.Listener do
   `"aenode://peer_pubkey@host:port"` i.e. `"aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"`
 
   ## Example
-      iex> Core.Listener.start(
+      iex> AeppSDK.Listener.start(
             ["aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015"],
             "localnet",
             "kh_2Eo9AVWHxTKio278ccANnwtr9hkUpzb1nLePfUzs7StwWyJ2xB"
@@ -78,7 +78,7 @@ defmodule Core.Listener do
   Stop the listener
 
   ## Example
-      iex> Core.Listener.stop()
+      iex> AeppSDK.Listener.stop()
       :ok
   """
   @spec stop() :: :ok
@@ -119,7 +119,7 @@ defmodule Core.Listener do
   will notify for any new transactions added to the pool.
 
   ## Example
-      iex> Core.Listener.subscribe(:key_blocks, self())
+      iex> AeppSDK.Listener.subscribe(:key_blocks, self())
       iex> flush()
       {:key_blocks,
         %{
@@ -174,7 +174,7 @@ defmodule Core.Listener do
     - `:pool_oracle_responses` - oracle query ID
 
   ## Example
-      iex> Core.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
+      iex> AeppSDK.Listener.subscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
       iex> flush()
       {:spend_transactions,
         %{
@@ -212,7 +212,7 @@ defmodule Core.Listener do
   passed as the first argument as it makes requests to a node.
 
   ## Example
-      iex> Core.Client.new(
+      iex> AeppSDK.Client.new(
         %{
           public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
           secret:
@@ -224,7 +224,7 @@ defmodule Core.Listener do
       )
       iex> tx_hash = "th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM"
       iex> block_count = 10
-      iex> Core.Listener.check_tx_confirmations(client, tx_hash, block_count, self())
+      iex> AeppSDK.Listener.check_tx_confirmations(client, tx_hash, block_count, self())
       iex> flush()
       {:tx_confirmations,
        %{
@@ -274,7 +274,7 @@ defmodule Core.Listener do
   Unsubscribe a process from a filterable event.
 
   ## Example
-      iex> Core.Listener.unsubscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
+      iex> AeppSDK.Listener.unsubscribe(:spend_transactions, self(), "ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9")
       :ok
   """
   def unsubscribe(event, subscriber_pid, filter) when event in @filtered_events do
@@ -414,8 +414,17 @@ defmodule Core.Listener do
      }}
   end
 
-  def handle_info(:gc_objects_sent, state) do
-    {:noreply, %{state | objects_sent: [], gc_scheduled: false}}
+  def handle_info(:gc_objects_sent, %{objects_sent: objects_sent} = state) do
+    half_count = floor(Enum.count(objects_sent) / 2)
+
+    gc_objects_sent =
+      if half_count > 0 do
+        Enum.drop(objects_sent, half_count)
+      else
+        objects_sent
+      end
+
+    {:noreply, %{state | objects_sent: gc_objects_sent, gc_scheduled: false}}
   end
 
   defp add_subscriber(subscribers, subscriber) do

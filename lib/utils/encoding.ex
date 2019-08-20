@@ -1,4 +1,4 @@
-defmodule Utils.Encoding do
+defmodule AeppSDK.Utils.Encoding do
   @moduledoc """
   Contains encoding/decoding utils,
   see: [https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md](https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md).
@@ -29,7 +29,7 @@ defmodule Utils.Encoding do
   ## Example
       iex> prefix = "ak"
       iex> binary = <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
-      iex> Utils.Encoding.prefix_encode_base58c(prefix, binary)
+      iex> AeppSDK.Utils.Encoding.prefix_encode_base58c(prefix, binary)
       "ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n"
   """
   @spec prefix_encode_base58c(String.t(), binary()) :: base58c()
@@ -40,7 +40,7 @@ defmodule Utils.Encoding do
   Decode a base58check string to binary and remove its prefix
 
   ## Example
-      iex> Utils.Encoding.prefix_decode_base58c("ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
+      iex> AeppSDK.Utils.Encoding.prefix_decode_base58c("ak_2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
       <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
   """
   @spec prefix_decode_base58c(base58c()) :: binary()
@@ -51,7 +51,7 @@ defmodule Utils.Encoding do
   Encode a binary payload to base58check
 
   ## Example
-      iex> Utils.Encoding.encode_base58c(<<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>)
+      iex> AeppSDK.Utils.Encoding.encode_base58c(<<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>)
       "2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n"
   """
   @spec encode_base58c(binary()) :: base58c()
@@ -67,7 +67,7 @@ defmodule Utils.Encoding do
   @doc """
   Decode a base58check string to binary
 
-      iex> Utils.Encoding.decode_base58c("2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
+      iex> AeppSDK.Utils.Encoding.decode_base58c("2XEob1Ub1DWCzeMLm1CWQKrUBsVfF9zLZBDaUXiu6Lr1qLn55n")
       <<200, 90, 234, 160, 66, 120, 244, 87, 88, 94, 87, 208, 13, 42, 126, 71, 172, 2, 81, 252, 214, 24, 155, 227, 26, 49, 210, 31, 106, 147, 200, 81>>
   """
   @spec decode_base58c(base58c()) :: binary()
@@ -97,7 +97,7 @@ defmodule Utils.Encoding do
           161, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 10, 10, 135, 112, 97, 121, 108, 111, 97,
           100, 93, 73, 89, 98>>
-      iex> Utils.Encoding.prefix_encode_base64(prefix, binary)
+      iex> AeppSDK.Utils.Encoding.prefix_encode_base64(prefix, binary)
       "tx_+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A=="
   """
   @spec prefix_encode_base64(String.t(), binary()) :: base64()
@@ -107,7 +107,7 @@ defmodule Utils.Encoding do
   Encode a binary payload to base64
 
   ## Example
-      iex> Utils.Encoding.encode_base64(<<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
+      iex> AeppSDK.Utils.Encoding.encode_base64(<<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
           138, 106, 29, 17, 149, 151, 170, 181, 55, 176, 222, 189, 77, 127, 227, 78,
           202, 253, 6, 159, 235, 140, 41, 165, 77, 120, 145, 151, 173, 179, 55, 74, 138,
           45, 208, 75, 138, 56, 227, 165, 195, 24, 147, 126, 191, 206, 210, 161, 170,
@@ -131,7 +131,7 @@ defmodule Utils.Encoding do
   Decode a base64 string to binary and remove its prefix
 
   ## Example
-      iex> Utils.Encoding.prefix_decode_base64("tx_+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A==")
+      iex> AeppSDK.Utils.Encoding.prefix_decode_base64("tx_+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A==")
       <<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
         138, 106, 29, 17, 149, 151, 170, 181, 55, 176, 222, 189, 77, 127, 227, 78,
         202, 253, 6, 159, 235, 140, 41, 165, 77, 120, 145, 151, 173, 179, 55, 74, 138,
@@ -149,7 +149,7 @@ defmodule Utils.Encoding do
   Decode a base64 string to binary
 
   ## Example
-      iex> Utils.Encoding.decode_base64("+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A==")
+      iex> AeppSDK.Utils.Encoding.decode_base64("+JwLAfhCuEDvqFLqm4nJBGWKah0RlZeqtTew3r1Nf+NOyv0Gn+uMKaVNeJGXrbM3Soot0EuKOOOlwxiTfr/O0qGqV4jlHgYCuFT4UgwBoQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgoKh3BheWxvYWRdSVlidOin1A==")
       <<248, 156, 11, 1, 248, 66, 184, 64, 239, 168, 82, 234, 155, 137, 201, 4, 101,
         138, 106, 29, 17, 149, 151, 170, 181, 55, 176, 222, 189, 77, 127, 227, 78,
         202, 253, 6, 159, 235, 140, 41, 165, 77, 120, 145, 151, 173, 179, 55, 74, 138,

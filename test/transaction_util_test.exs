@@ -1,8 +1,8 @@
 defmodule TransactionUtilTest do
   use ExUnit.Case
 
-  alias Utils.Transaction
-  alias Core.Account
+  alias AeppSDK.Utils.Transaction
+  alias AeppSDK.Account
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")

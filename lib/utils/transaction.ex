@@ -1,13 +1,13 @@
-defmodule Utils.Transaction do
+defmodule AeppSDK.Utils.Transaction do
   @moduledoc """
-  Transaction utils.
+  Transaction AeppSDK.Utils.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `Core.Client.new/4`.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Account, as: AccountApi
-  alias Core.{Contract, Client, GeneralizedAccount}
+  alias AeppSDK.{Contract, Client, GeneralizedAccount}
 
   alias AeternityNode.Model.{
     Account,
@@ -40,7 +40,7 @@ defmodule Utils.Transaction do
     TxInfoObject
   }
 
-  alias Utils.{Keys, Encoding, Serialization, Governance}
+  alias AeppSDK.Utils.{Keys, Encoding, Serialization, Governance}
   alias Tesla.Env
 
   @struct_type [
@@ -121,7 +121,7 @@ defmodule Utils.Transaction do
                           ttl: 0
                         }
       iex> {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(client.connection)
-      iex> Utils.Transaction.try_post(client, spend_tx, nil, height)
+      iex> AeppSDK.Utils.Transaction.try_post(client, spend_tx, nil, height)
       {:ok,
        %{
          block_hash: "mh_2wRRkfzcHd24cGbqdqaLAhxgpv4iMB8y1Cp5n9FAfhvDZJ7Qh",
@@ -166,7 +166,7 @@ defmodule Utils.Transaction do
         sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
         ttl: 0
       }
-      iex> Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
+      iex> AeppSDK.Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
       16660000000
   """
   @spec calculate_fee(
@@ -199,7 +199,7 @@ defmodule Utils.Transaction do
         nonce: 0,
         ttl: 0
       }
-      iex> Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
+      iex> AeppSDK.Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
       16500000000
   """
   @spec calculate_min_fee(struct(), non_neg_integer(), String.t()) ::
@@ -229,7 +229,7 @@ defmodule Utils.Transaction do
         sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
         ttl: 0
       }
-      iex> Utils.Transaction.min_gas(spend_tx, 50000)
+      iex> AeppSDK.Utils.Transaction.min_gas(spend_tx, 50000)
       16740
   """
   @spec min_gas(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
@@ -260,7 +260,7 @@ defmodule Utils.Transaction do
         response_format: "response_format",
         ttl: 10
       }
-      iex> Utils.Transaction.gas_limit(oracle_register_tx, 5)
+      iex> AeppSDK.Utils.Transaction.gas_limit(oracle_register_tx, 5)
       16581
   """
   @spec gas_limit(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
@@ -350,7 +350,7 @@ defmodule Utils.Transaction do
                           sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
                           ttl: 0
                         }
-      iex> Utils.Transaction.sign_tx(spend_tx, client)
+      iex> AeppSDK.Utils.Transaction.sign_tx(spend_tx, client)
       {:ok,
        [
          %AeternityNode.Model.SpendTx{
@@ -385,7 +385,7 @@ defmodule Utils.Transaction do
                           sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
                           ttl: 0
                         }
-      iex> Utils.Transaction.calculate_n_times_fee(spend_tx, 58_336, "ae_uat", 0, 1_000_000, 5)
+      iex> AeppSDK.Utils.Transaction.calculate_n_times_fee(spend_tx, 58_336, "ae_uat", 0, 1_000_000, 5)
       16820000000
   """
   @spec calculate_n_times_fee(
