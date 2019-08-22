@@ -167,7 +167,7 @@ defmodule AeppSDK.Contract do
         entrypoint init(x : int) =
           { number = x }
 
-        entrypoint add_to_number(x : int) =
+        stateful entrypoint add_to_number(x : int) =
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
       iex> function_name = "add_to_number"
@@ -189,7 +189,6 @@ defmodule AeppSDK.Contract do
          return_value: 75,
          tx_hash: "th_CpexcQGiM86HVtHR6HTzYc3HoakXW2Xjm77wVKctoZmxTH52u"
        }}
-
   """
   @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), call_options()) ::
           {:ok,
@@ -209,150 +208,42 @@ defmodule AeppSDK.Contract do
           | {:error, String.t()}
           | {:error, Env.t()}
   def call(
-        %Client{
-          connection: connection
-        } = client,
+        client,
         contract_address,
         source_code,
         function_name,
         function_args,
         opts \\ []
-      )
-      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
-             is_list(function_args) and is_list(opts) do
-    with {:ok, contract_call_tx} <-
-           build_contract_call_tx(
-             client,
-             contract_address,
-             source_code,
-             function_name,
-             function_args,
-             opts
-           ),
-         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
-             contract_call_tx,
-             Keyword.get(opts, :auth, nil),
-             height
-           ),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, response.return_value, response.return_type) do
-      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
-    else
-      {:error, _} = error ->
-        error
-    end
-  end
+      ) do
+    case :aeso_aci.contract_interface(:json, source_code) do
+      {:ok, [%{contract: %{functions: functions}}]} ->
+        case Enum.find(functions, fn %{name: name} -> name == function_name end) do
+          %{stateful: is_stateful} ->
+            case is_stateful do
+              true ->
+                call_on_chain(
+                  client,
+                  contract_address,
+                  source_code,
+                  function_name,
+                  function_args,
+                  opts
+                )
 
-  @doc """
-  Call a contract without posting a transaction (execute off-chain)
+              false ->
+                call_static(
+                  client,
+                  contract_address,
+                  source_code,
+                  function_name,
+                  function_args,
+                  opts
+                )
+            end
 
-  ## Example
-      iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
-      iex> source_code = "contract Number =
-        record state = { number : int }
-
-        entrypoint init(x : int) =
-          { number = x }
-
-        entrypoint add_to_number(x : int) =
-          state.number + x"
-      iex> function_name = "add_to_number"
-      iex> function_args = ["33"]
-      iex> top_block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-      iex> AeppSDK.Contract.call_static(client, contract_address, source_code, function_name, function_args, [top: top_block_hash])
-      {:ok,
-        %{
-          return_type: "ok",
-          return_value: 75,
-          log: []
-        }}
-  """
-  @spec call_static(
-          Client.t(),
-          String.t(),
-          String.t(),
-          String.t(),
-          list(String.t()),
-          call_options()
-        ) ::
-          {:ok,
-           %{
-             return_value: String.t(),
-             return_type: String.t(),
-             log:
-               list(%{
-                 address: Encoding.base58c(),
-                 data: String.t(),
-                 topics: list(non_neg_integer())
-               })
-           }}
-          | {:error, String.t()}
-          | {:error, Env.t()}
-  def call_static(
-        %Client{
-          connection: connection,
-          internal_connection: internal_connection
-        } = client,
-        contract_address,
-        source_code,
-        function_name,
-        function_args,
-        opts \\ []
-      )
-      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
-             is_list(function_args) and is_list(opts) do
-    with {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
-         {caller_public_key, caller_balance} <-
-           determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
-         {:ok, contract_call_tx} <-
-           build_contract_call_tx(
-             %Client{client | keypair: %{public: caller_public_key}},
-             contract_address,
-             source_code,
-             function_name,
-             function_args,
-             opts
-           ),
-         serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
-         encoded_contract_call_tx =
-           Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
-         {:ok,
-          %DryRunResults{
-            results: [
-              %DryRunResult{
-                call_obj: %ContractCallObject{
-                  return_type: return_type,
-                  return_value: return_value,
-                  log: log
-                }
-              }
-            ]
-          }} <-
-           DebugApi.dry_run_txs(internal_connection, %DryRunInput{
-             top: Keyword.get(opts, :top, top_block_hash),
-             accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
-             txs: [encoded_contract_call_tx]
-           }),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, return_value, return_type) do
-      {:ok,
-       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
-    else
-      {:ok,
-       %DryRunResults{
-         results: [
-           %DryRunResult{call_obj: nil, reason: message, result: "error", type: "contract_call"}
-         ]
-       }} ->
-        {:error, message}
-
-      {:ok, %Error{reason: message}} ->
-        {:error, message}
+          nil ->
+            {:error, "Undefined function #{function_name}"}
+        end
 
       {:error, _} = error ->
         error
@@ -585,15 +476,18 @@ defmodule AeppSDK.Contract do
   def get_function_return_type(source_code, function_name) do
     case :aeso_aci.contract_interface(:json, source_code) do
       {:ok, [%{contract: %{functions: functions}}]} ->
-        %{returns: function_return_type} =
-          Enum.find(functions, fn %{name: name} -> name == function_name end)
+        case Enum.find(functions, fn %{name: name} -> name == function_name end) do
+          %{returns: function_return_type} ->
+            case aci_to_sophia_type(function_return_type) do
+              {:error, _} = err ->
+                err
 
-        case aci_to_sophia_type(function_return_type) do
-          {:error, _} = err ->
-            err
+              type ->
+                {:ok, type}
+            end
 
-          type ->
-            {:ok, type}
+          nil ->
+            {:error, "Undefined function #{function_name}"}
         end
 
       {:error, _} = error ->
@@ -631,6 +525,112 @@ defmodule AeppSDK.Contract do
       string_data = Encoding.prefix_decode_base64(log.data)
       log |> Map.from_struct() |> Map.replace!(:data, string_data)
     end)
+  end
+
+  def call_on_chain(
+        %Client{
+          connection: connection
+        } = client,
+        contract_address,
+        source_code,
+        function_name,
+        function_args,
+        opts
+      )
+      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
+             is_list(function_args) and is_list(opts) do
+    with {:ok, contract_call_tx} <-
+           build_contract_call_tx(
+             client,
+             contract_address,
+             source_code,
+             function_name,
+             function_args,
+             opts
+           ),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
+         {:ok, response} <-
+           Transaction.try_post(
+             client,
+             contract_call_tx,
+             Keyword.get(opts, :auth, nil),
+             height
+           ),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, response.return_value, response.return_type) do
+      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
+    else
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp call_static(
+         %Client{
+           connection: connection,
+           internal_connection: internal_connection
+         } = client,
+         contract_address,
+         source_code,
+         function_name,
+         function_args,
+         opts
+       )
+       when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
+              is_list(function_args) and is_list(opts) do
+    with {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
+         {caller_public_key, caller_balance} <-
+           determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
+         {:ok, contract_call_tx} <-
+           build_contract_call_tx(
+             %Client{client | keypair: %{public: caller_public_key}},
+             contract_address,
+             source_code,
+             function_name,
+             function_args,
+             opts
+           ),
+         serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
+         encoded_contract_call_tx =
+           Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
+         {:ok,
+          %DryRunResults{
+            results: [
+              %DryRunResult{
+                call_obj: %ContractCallObject{
+                  return_type: return_type,
+                  return_value: return_value,
+                  log: log
+                }
+              }
+            ]
+          }} <-
+           DebugApi.dry_run_txs(internal_connection, %DryRunInput{
+             top: Keyword.get(opts, :top, top_block_hash),
+             accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
+             txs: [encoded_contract_call_tx]
+           }),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, return_value, return_type) do
+      {:ok,
+       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
+    else
+      {:ok,
+       %DryRunResults{
+         results: [
+           %DryRunResult{call_obj: nil, reason: message, result: "error", type: "contract_call"}
+         ]
+       }} ->
+        {:error, message}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   defp aci_to_sophia_type(type) do
