@@ -1,7 +1,7 @@
 defmodule CoreContractTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Client, Contract}
+  alias AeppSDK.{Account, Client, Contract, Utils.Keys}
 
   setup_all do
     client =
@@ -21,10 +21,10 @@ defmodule CoreContractTest do
 
       record state = { number : int }
 
-      function init(x : int) =
+      entrypoint init(x : int) =
         { number = x }
 
-      function add_to_number(x : int) =
+      entrypoint add_to_number(x : int) =
         Chain.event(AddedNumberEvent(x, \"Added a number\"))
         state.number + x"
     [client: client, source_code: source_code]
@@ -76,6 +76,35 @@ defmodule CoreContractTest do
                "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
                "ok"
              )
+
+    %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
+    Account.spend(setup_data.client, low_balance_public_key, 1)
+
+    call_static_result =
+      Contract.call_static(
+        %Client{setup_data.client | keypair: low_balance_keypair},
+        ct_address,
+        setup_data.source_code,
+        "add_to_number",
+        ["33"],
+        fee: 10_000_000_000_000_000
+      )
+
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)
+
+    non_existing_keypair = Keys.generate_keypair()
+
+    call_static_result =
+      Contract.call_static(
+        %Client{setup_data.client | keypair: non_existing_keypair},
+        ct_address,
+        setup_data.source_code,
+        "add_to_number",
+        ["33"],
+        fee: 10_000_000_000_000_000
+      )
+
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)
   end
 
   @tag :travis_test

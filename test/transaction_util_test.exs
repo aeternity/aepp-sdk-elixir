@@ -37,7 +37,7 @@ defmodule TransactionUtilTest do
     assert 17_180_000_000 ==
              Transaction.calculate_min_fee(fields.name_transfer_tx, 50_000, "ae_mainnet")
 
-    assert 80_400_000_000 ==
+    assert 80_480_000_000 ==
              Transaction.calculate_min_fee(fields.contract_create_tx, 50_000, "ae_mainnet")
 
     assert 451_880_000_000 ==

@@ -22,10 +22,10 @@ defmodule CoreChainTest do
 
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
 
