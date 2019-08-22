@@ -1,4 +1,4 @@
-# Example `Core.Listener` usage
+# Example `AeppSDK.Listener` usage
 
 The listener service notifies processes for the events that they've subscribed to. This is done by sending messages to them, meaning that they must be able to handle incoming messages. Here's an example implementation of a `GenServer` that handles a number of different events:
 
@@ -6,7 +6,7 @@ The listener service notifies processes for the events that they've subscribed t
 defmodule EventHandler do
   use GenServer
 
-  alias Core.Listener
+  alias AeppSDK.Listener
 
   require Logger
 

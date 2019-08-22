@@ -1,11 +1,11 @@
-defmodule Core.Oracle do
+defmodule AeppSDK.Oracle do
   @moduledoc """
   Module for oracle interaction, see: [https://github.com/aeternity/protocol/blob/master/oracles/oracles.md](https://github.com/aeternity/protocol/blob/master/oracles/oracles.md).
   """
-  alias Utils.Transaction
-  alias Utils.Account, as: AccountUtils
-  alias Utils.{Keys, Hash, Encoding}
-  alias Core.Client
+  alias AeppSDK.Utils.Transaction
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Keys, Hash, Encoding}
+  alias AeppSDK.Client
 
   alias AeternityNode.Model.{
     RegisteredOracle,
@@ -49,7 +49,7 @@ defmodule Core.Oracle do
       iex> response_format = "map(string, string)"
       iex> oracle_ttl = %{type: :relative, value: 10}
       iex> query_fee = 100
-      iex> Core.Oracle.register(client, query_format, response_format, oracle_ttl, query_fee)
+      iex> AeppSDK.Oracle.register(client, query_format, response_format, oracle_ttl, query_fee)
       {:ok,
         %{
           block_hash: "mh_5zfVXCDwsBRjukTPjKRaS7T3TCc4Mn5PMTS19cWbcjRjeXjcF",
@@ -127,7 +127,7 @@ defmodule Core.Oracle do
       iex> query = "a query"
       iex> query_ttl = %{type: :relative, value: 10}
       iex> response_ttl = 10
-      iex> Core.Oracle.query(client, oracle_id, query, query_ttl, response_ttl)
+      iex> AeppSDK.Oracle.query(client, oracle_id, query, query_ttl, response_ttl)
       {:ok,
        %{
          block_hash: "mh_2SgSB1yeekq8JseSfkKhAPuvs7RF3YUjm896g4aj2GPpSa9AnJ",
@@ -212,7 +212,7 @@ defmodule Core.Oracle do
       iex> response = %{"a" => "response"}
       iex> query_ttl = %{type: :relative, value: 10}
       iex> response_ttl = 10
-      iex> Core.Oracle.respond(client, oracle_id, response, response_ttl)
+      iex> AeppSDK.Oracle.respond(client, oracle_id, response, response_ttl)
       {:ok,
        %{
          block_hash: "mh_QTXMDn8Ln6fiBBXByXJkEeD6wq6QzQZHMVuApbouTFaqWMkSt",
@@ -280,7 +280,7 @@ defmodule Core.Oracle do
   ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> ttl = 10
-      iex> Core.Oracle.extend(client, oracle_id, ttl)
+      iex> AeppSDK.Oracle.extend(client, oracle_id, ttl)
       {:ok,
        %{
          block_hash: "mh_21HxnSLJRhqB9S3aUfLDAqR3BMFKPj62vT1zuy1MsS7N4Ps94s",
@@ -334,7 +334,7 @@ defmodule Core.Oracle do
 
   ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> Core.Oracle.get_oracle(client, oracle_id)
+      iex> AeppSDK.Oracle.get_oracle(client, oracle_id)
       {:ok,
        %{
          abi_version: 1,
@@ -396,7 +396,7 @@ defmodule Core.Oracle do
 
   ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> Core.Oracle.get_queries(client, oracle_id)
+      iex> AeppSDK.Oracle.get_queries(client, oracle_id)
       {:ok,
        [
          %{
@@ -457,7 +457,7 @@ defmodule Core.Oracle do
   ## Example
       iex> oracle_id = "ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
       iex> query_id = "oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP"
-      iex> Core.Oracle.get_query(client, oracle_id, query_id)
+      iex> AeppSDK.Oracle.get_query(client, oracle_id, query_id)
       {:ok,
        %{
          fee: 30,

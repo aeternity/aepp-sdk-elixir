@@ -1,13 +1,11 @@
-defmodule Core.Listener.Supervisor do
+defmodule AeppSDK.Listener.Supervisor do
   @moduledoc false
 
   use Supervisor
 
-  alias Core.Listener
-  alias Core.Listener.Peers
-  alias Core.Listener.PeerConnection
-  alias Core.Listener.PeerConnectionSupervisor
-  alias Utils.Keys
+  alias AeppSDK.Listener
+  alias AeppSDK.Listener.{Peers, PeerConnection, PeerConnectionSupervisor}
+  alias AeppSDK.Utils.Keys
 
   @acceptors_count 10
 

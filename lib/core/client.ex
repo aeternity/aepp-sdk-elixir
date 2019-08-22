@@ -1,4 +1,4 @@
-defmodule Core.Client do
+defmodule AeppSDK.Client do
   @moduledoc """
   Contains the Client structure, holding all the data that is needed in order to use the SDK.
   """
@@ -39,8 +39,8 @@ defmodule Core.Client do
       iex> network_id = "ae_uat"
       iex> url = "https://sdk-testnet.aepps.com/v2"
       iex> internal_url = "https://sdk-testnet.aepps.com/v2"
-      iex> Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
-      %Core.Client{
+      iex> AeppSDK.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
+      %AeppSDK.Client{
         connection: %Tesla.Client{
           adapter: nil,
           fun: nil,

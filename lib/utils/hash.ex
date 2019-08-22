@@ -1,4 +1,4 @@
-defmodule Utils.Hash do
+defmodule AeppSDK.Utils.Hash do
   @moduledoc """
   Contains hash-related functions.
   """

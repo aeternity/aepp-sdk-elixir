@@ -1,7 +1,7 @@
 defmodule CoreContractTest do
   use ExUnit.Case
 
-  alias Core.{Client, Contract}
+  alias AeppSDK.{Client, Contract}
 
   setup_all do
     client =
