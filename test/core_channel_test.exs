@@ -55,7 +55,7 @@ defmodule CoreChannelTest do
 
     source_code = "contract Authorization =
 
-        function auth(auth_value : bool) =
+        entrypoint auth(auth_value : bool) =
           auth_value"
     auth = [auth_contract_source: source_code, auth_args: ["true"], fee: 100_000_000_000]
 
@@ -205,7 +205,8 @@ defmodule CoreChannelTest do
                auth: auth
              )
 
-    assert {:ok, [^tx, create_meta_tx1, []]} = AeppSDK.Utils.Transaction.sign_tx(tx, client3, auth)
+    assert {:ok, [^tx, create_meta_tx1, []]} =
+             AeppSDK.Utils.Transaction.sign_tx(tx, client3, auth)
 
     assert {:ok, %{channel_id: channel_id}} =
              AeppSDK.Channel.post(client2, create_meta_tx, inner_tx: create_meta_tx1, tx: tx)
@@ -411,7 +412,8 @@ defmodule CoreChannelTest do
                auth: auth
              )
 
-    assert {:ok, [^deposit_tx, deposit_sig]} = AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client)
+    assert {:ok, [^deposit_tx, deposit_sig]} =
+             AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client)
 
     assert {:ok, _} =
              AeppSDK.Channel.post(client2, deposit_meta_tx,
@@ -433,7 +435,8 @@ defmodule CoreChannelTest do
                auth: auth
              )
 
-    assert {:ok, [^withdraw_tx, withdraw_sig]} = AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client)
+    assert {:ok, [^withdraw_tx, withdraw_sig]} =
+             AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client)
 
     assert {:ok, _} =
              AeppSDK.Channel.post(client2, withdraw_meta_tx,
