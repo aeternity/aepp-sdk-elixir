@@ -61,10 +61,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
       iex> AeppSDK.Contract.deploy(client, source_code, init_args)
@@ -164,10 +164,10 @@ defmodule AeppSDK.Contract do
 
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
       iex> function_name = "add_to_number"
@@ -255,10 +255,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
@@ -404,10 +404,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> AeppSDK.Contract.compile(source_code)
       {:ok,
@@ -431,10 +431,10 @@ defmodule AeppSDK.Contract do
          contract_source: 'contract Number =
            record state = { number : int }
 
-           function init(x : int) =
+           entrypoint init(x : int) =
              { number = x }
 
-           function add_to_number(x : int) =
+           entrypoint add_to_number(x : int) =
              state.number + x',
          type_info: [
            {<<112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2,
@@ -508,10 +508,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
@@ -571,10 +571,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Identity =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
       iex> AeppSDK.Contract.get_function_return_type(source_code, function_name)
