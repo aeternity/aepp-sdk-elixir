@@ -686,17 +686,24 @@ defmodule AeppSDK.Contract do
   end
 
   defp aci_to_sophia_type(type) do
-    case type do
+    string_type =
+      if is_atom(type) do
+        Atom.to_string(type)
+      else
+        type
+      end
+
+    case string_type do
       %{} ->
-        structure_type = type |> Map.keys() |> List.first()
-        field_types = type |> Map.values() |> List.first()
+        structure_type = string_type |> Map.keys() |> List.first()
+        field_types = string_type |> Map.values() |> List.first()
         aci_to_sophia_type(structure_type, field_types)
 
       [type] ->
-        aci_to_sophia_type(type)
+        aci_to_sophia_type(string_type)
 
-      type ->
-        type
+      string_type ->
+        string_type
     end
   end
 
