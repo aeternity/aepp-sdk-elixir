@@ -50,8 +50,20 @@ defmodule CoreListenerTest do
       )
 
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address)
-    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent")
-    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "AnotherEvent")
+
+    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent", [
+      :bool,
+      :bits,
+      :bytse
+    ])
+
+    Listener.subscribe_for_contract_events(
+      setup_data.client,
+      self(),
+      ct_address,
+      "AnotherEvent",
+      [:address, :oracle, :oracle_query]
+    )
 
     {:ok, %{return_type: "ok"}} =
       Contract.call(
