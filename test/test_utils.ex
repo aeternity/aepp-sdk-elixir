@@ -257,9 +257,9 @@ defmodule TestUtils do
       nonce: 0,
       code: "contract Identity =
                record state = { number : int }
-               function init(x : int) =
+               entrypoint init(x : int) =
                  { number = x }
-               function add_to_number(x : int) = state.number + x",
+               entrypoint add_to_number(x : int) = state.number + x",
       abi_version: 0x30001,
       deposit: 1000,
       amount: 1000,

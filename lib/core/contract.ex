@@ -5,13 +5,17 @@ defmodule AeppSDK.Contract do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
+
+  alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
 
   alias AeternityNode.Model.{
+    Account,
     ContractCallObject,
     ContractCallTx,
     ContractCreateTx,
+    DryRunAccount,
     DryRunInput,
     DryRunResult,
     DryRunResults,
@@ -31,6 +35,7 @@ defmodule AeppSDK.Contract do
   @default_gas_price 1_000_000_000
   @init_function "init"
   @abi_version 0x01
+  @genesis_beneficiary "ak_11111111111111111111111111111111273Yts"
 
   @type deploy_options :: [
           deposit: non_neg_integer(),
@@ -56,10 +61,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
       iex> AeppSDK.Contract.deploy(client, source_code, init_args)
@@ -160,10 +165,10 @@ defmodule AeppSDK.Contract do
 
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
       iex> function_name = "add_to_number"
@@ -251,10 +256,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
       iex> function_args = ["33"]
@@ -301,9 +306,12 @@ defmodule AeppSDK.Contract do
       )
       when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
              is_list(function_args) and is_list(opts) do
-    with {:ok, contract_call_tx} <-
+    with {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
+         {caller_public_key, caller_balance} <-
+           determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
+         {:ok, contract_call_tx} <-
            build_contract_call_tx(
-             client,
+             %Client{client | keypair: %{public: caller_public_key}},
              contract_address,
              source_code,
              function_name,
@@ -311,7 +319,6 @@ defmodule AeppSDK.Contract do
              opts
            ),
          serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
-         {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
          encoded_contract_call_tx =
            Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
          {:ok,
@@ -328,7 +335,7 @@ defmodule AeppSDK.Contract do
           }} <-
            DebugApi.dry_run_txs(internal_connection, %DryRunInput{
              top: Keyword.get(opts, :top, top_block_hash),
-             accounts: [],
+             accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
              txs: [encoded_contract_call_tx]
            }),
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
@@ -343,6 +350,9 @@ defmodule AeppSDK.Contract do
            %DryRunResult{call_obj: nil, reason: message, result: "error", type: "contract_call"}
          ]
        }} ->
+        {:error, message}
+
+      {:ok, %Error{reason: message}} ->
         {:error, message}
 
       {:error, _} = error ->
@@ -395,10 +405,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> AeppSDK.Contract.compile(source_code)
       {:ok,
@@ -422,10 +432,10 @@ defmodule AeppSDK.Contract do
          contract_source: 'contract Number =
            record state = { number : int }
 
-           function init(x : int) =
+           entrypoint init(x : int) =
              { number = x }
 
-           function add_to_number(x : int) =
+           entrypoint add_to_number(x : int) =
              state.number + x',
          type_info: [
            {<<112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2,
@@ -499,10 +509,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
@@ -532,7 +542,7 @@ defmodule AeppSDK.Contract do
       end)
 
     try do
-      {:ok, calldata, _, _} =
+      {:ok, calldata} =
         :aeso_compiler.create_calldata(
           charlist_source_code,
           charlist_function_name,
@@ -562,10 +572,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Identity =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
       iex> AeppSDK.Contract.get_function_return_type(source_code, function_name)
@@ -574,17 +584,12 @@ defmodule AeppSDK.Contract do
   @spec get_function_return_type(String.t(), String.t()) ::
           {:ok, String.t()} | {:error, String.t()}
   def get_function_return_type(source_code, function_name) do
-    charlist_source = String.to_charlist(source_code)
+    case :aeso_aci.contract_interface(:json, source_code) do
+      {:ok, [%{contract: %{functions: functions}}]} ->
+        %{returns: function_return_type} =
+          Enum.find(functions, fn %{name: name} -> name == function_name end)
 
-    case :aeso_aci.encode(charlist_source) do
-      {:ok, json_contract_info} ->
-        contract_info = Poison.decode!(json_contract_info)
-        functions = contract_info["contract"]["functions"]
-
-        function_object =
-          Enum.find(functions, fn function -> function["name"] == function_name end)
-
-        case aci_to_sophia_type(function_object["returns"]) do
+        case aci_to_sophia_type(function_return_type) do
           {:error, _} = err ->
             err
 
@@ -747,6 +752,7 @@ defmodule AeppSDK.Contract do
     nonce_result =
       if Keyword.has_key?(opts, :top) do
         top_block_hash = Keyword.get(opts, :top)
+
         AccountUtils.nonce_at_hash(connection, public_key, top_block_hash)
       else
         AccountUtils.next_valid_nonce(connection, public_key)
@@ -776,6 +782,32 @@ defmodule AeppSDK.Contract do
 
       {:error, _} = error ->
         error
+    end
+  end
+
+  defp determine_caller(
+         %Client{keypair: %{public: public_key}, connection: connection},
+         block_hash,
+         opts
+       ) do
+    min_balance =
+      Keyword.get(opts, :gas, @default_gas) * Keyword.get(opts, :gas_price, @default_gas_price) +
+        Keyword.get(opts, :fee, 0)
+
+    with {:ok, %Account{balance: balance}} <-
+           AccountApi.get_account_by_pubkey_and_hash(
+             connection,
+             public_key,
+             block_hash
+           ),
+         true <- balance >= min_balance do
+      {public_key, balance}
+    else
+      false ->
+        {public_key, min_balance}
+
+      _ ->
+        {@genesis_beneficiary, min_balance}
     end
   end
 end

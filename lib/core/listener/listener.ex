@@ -766,15 +766,12 @@ defmodule AeppSDK.Listener do
              log: log
            }
          }} ->
-          encoded_logs = Contract.encode_logs(log, topic_types)
-
           matching_events =
-            Enum.reduce(encoded_logs, [], fn %{topics: [hash | _rest]} = event, acc ->
+            Enum.reduce(log, [], fn %{topics: [hash | _rest]} = event, acc ->
               event_hash = event_name |> Hash.hash() |> elem(1) |> :binary.decode_unsigned()
 
               if event_hash == hash do
-                event_with_name =
-                  update_in(event, [:topics], fn [_hash | rest] -> [event_name | rest] end)
+                event_with_name = %{event | topics: List.replace_at(event.topics, 0, event_name)}
 
                 [event_with_name | acc]
               else
@@ -783,7 +780,10 @@ defmodule AeppSDK.Listener do
             end)
 
           if !Enum.empty?(matching_events) do
-            send(subscriber_pid, {:contract_events, event_name, matching_events})
+            send(
+              subscriber_pid,
+              {:contract_events, event_name, Contract.encode_logs(matching_events, topic_types)}
+            )
           end
 
         _ ->

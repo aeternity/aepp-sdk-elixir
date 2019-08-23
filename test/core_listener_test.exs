@@ -17,11 +17,17 @@ defmodule CoreListenerTest do
       )
 
     source_code = "contract Identity =
-        datatype event = SomeEvent(indexed int, string)
+      datatype event =
+        SomeEvent(bool, bits, bytes(8))
+        | AnotherEvent(address, oracle(int, int), oracle_query(int, int))
 
-        type state = ()
+      type state = ()
 
-        function emit_event() = Chain.event(SomeEvent(10, \"Some data\"))"
+      entrypoint emit_event() =
+        Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))
+        Chain.event(AnotherEvent(ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG,
+          ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5,
+          oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY))"
     [client: client, source_code: source_code]
   end
 
@@ -45,6 +51,7 @@ defmodule CoreListenerTest do
 
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address)
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent")
+    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "AnotherEvent")
 
     {:ok, %{return_type: "ok"}} =
       Contract.call(
@@ -66,7 +73,7 @@ defmodule CoreListenerTest do
 
     # receive one of each of the events that we've subscribed to,
     # we don't know the order in which the messages have been sent
-    Enum.each(0..8, fn _ ->
+    Enum.each(0..9, fn _ ->
       receive_and_check_message(public_key, setup_data.client, ct_address)
     end)
 
@@ -102,7 +109,11 @@ defmodule CoreListenerTest do
            [
              %{
                address: ^contract_address,
-               data: "Some data"
+               data: ""
+             },
+             %{
+               address: ^contract_address,
+               data: ""
              }
            ]} ->
             :ok
@@ -111,7 +122,28 @@ defmodule CoreListenerTest do
            [
              %{
                address: ^contract_address,
-               data: "Some data"
+               data: "",
+               topics: [
+                 "SomeEvent",
+                 true,
+                 115_792_089_237_316_195_423_570_985_008_687_907_853_269_984_665_640_564_039_457_584_007_913_129_639_935,
+                 81_985_529_216_486_895
+               ]
+             }
+           ]} ->
+            :ok
+
+          {:contract_events, "AnotherEvent",
+           [
+             %{
+               address: ^contract_address,
+               data: "",
+               topics: [
+                 "AnotherEvent",
+                 "ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG",
+                 "ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5",
+                 "oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY"
+               ]
              }
            ]} ->
             :ok
