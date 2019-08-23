@@ -23,7 +23,7 @@ defmodule CoreListenerTest do
 
       type state = ()
 
-      entrypoint emit_event() =
+      stateful entrypoint emit_event() =
         Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))
         Chain.event(AnotherEvent(ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG,
           ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5,
