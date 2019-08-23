@@ -54,7 +54,7 @@ defmodule CoreListenerTest do
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent", [
       :bool,
       :bits,
-      :bytse
+      :bytes
     ])
 
     Listener.subscribe_for_contract_events(
