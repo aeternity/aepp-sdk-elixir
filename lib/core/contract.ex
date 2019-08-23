@@ -696,8 +696,8 @@ defmodule AeppSDK.Contract do
   defp aci_to_sophia_type(type) do
     case type do
       %{} ->
-        structure_type = string_type |> Map.keys() |> List.first() |> type_to_string()
-        field_types = string_type |> Map.values() |> List.first() |> type_to_string()
+        structure_type = type |> Map.keys() |> List.first() |> type_to_string()
+        field_types = type |> Map.values() |> List.first() |> type_to_string()
         aci_to_sophia_type(structure_type, field_types)
 
       [type] ->
