@@ -685,25 +685,26 @@ defmodule AeppSDK.Contract do
     Encoding.prefix_encode_base58c(prefix, binary_hash)
   end
 
-  defp aci_to_sophia_type(type) do
-    string_type =
-      if is_atom(type) do
-        Atom.to_string(type)
-      else
-        type
-      end
+  defp type_to_string(type) do
+    if is_atom(type) do
+      Atom.to_string(type)
+    else
+      type
+    end
+  end
 
-    case string_type do
+  defp aci_to_sophia_type(type) do
+    case type do
       %{} ->
-        structure_type = string_type |> Map.keys() |> List.first()
-        field_types = string_type |> Map.values() |> List.first()
+        structure_type = string_type |> Map.keys() |> List.first() |> type_to_string()
+        field_types = string_type |> Map.values() |> List.first() |> type_to_string()
         aci_to_sophia_type(structure_type, field_types)
 
       [type] ->
-        aci_to_sophia_type(string_type)
+        type |> type_to_string() |> aci_to_sophia_type()
 
-      string_type ->
-        string_type
+      type ->
+        type
     end
   end
 
