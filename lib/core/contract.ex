@@ -144,7 +144,8 @@ defmodule AeppSDK.Contract do
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok, Map.merge(response, %{contract_id: contract_account, log: decode_logs(response.log)})}
+      {:ok,
+       Map.merge(response, %{contract_id: contract_account, log: encode_logs(response.log, [])})}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -520,10 +521,32 @@ defmodule AeppSDK.Contract do
   """
   def default_gas_price(), do: @default_gas_price
 
-  def decode_logs(logs) do
+  @doc """
+  false
+  """
+  def encode_logs(logs, topic_types) do
     Enum.map(logs, fn log ->
       string_data = Encoding.prefix_decode_base64(log.data)
-      log |> Map.from_struct() |> Map.replace!(:data, string_data)
+
+      log
+      |> Map.from_struct()
+      |> Map.replace!(:data, string_data)
+      |> Map.update!(:topics, fn [event_name | rest_topics] = topics ->
+        case topic_types do
+          [] ->
+            topics
+
+          _ ->
+            {encoded_topics, _} =
+              Enum.reduce(rest_topics, {[], topic_types}, fn topic,
+                                                             {encoded_topics,
+                                                              [topic_type | rest_types]} ->
+                {[encode_topic(topic_type, topic) | encoded_topics], rest_types}
+              end)
+
+            [event_name | Enum.reverse(encoded_topics)]
+        end
+      end)
     end)
   end
 
@@ -559,7 +582,7 @@ defmodule AeppSDK.Contract do
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, response.return_value, response.return_type) do
-      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
+      {:ok, %{response | return_value: decoded_return_value, log: encode_logs(response.log, [])}}
     else
       {:error, _} = error ->
         error
@@ -615,7 +638,7 @@ defmodule AeppSDK.Contract do
          {:ok, decoded_return_value} <-
            decode_return_value(function_return_type, return_value, return_type) do
       {:ok,
-       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
+       %{return_value: decoded_return_value, return_type: return_type, log: encode_logs(log, [])}}
     else
       {:ok,
        %DryRunResults{
@@ -633,15 +656,52 @@ defmodule AeppSDK.Contract do
     end
   end
 
+  defp encode_topic(:address, topic), do: encode_hash(topic, "ak")
+
+  defp encode_topic(:contract, topic), do: encode_hash(topic, "ct")
+
+  defp encode_topic(:oracle, topic), do: encode_hash(topic, "ok")
+
+  defp encode_topic(:oracle_query, topic), do: encode_hash(topic, "oq")
+
+  defp encode_topic(:int, topic), do: topic
+
+  defp encode_topic(:bits, topic), do: topic
+
+  defp encode_topic(:bytes, topic), do: topic
+
+  defp encode_topic(:bool, topic) do
+    case topic do
+      1 ->
+        true
+
+      0 ->
+        false
+    end
+  end
+
+  defp encode_hash(hash, prefix) do
+    binary_hash = :binary.encode_unsigned(hash)
+    Encoding.prefix_encode_base58c(prefix, binary_hash)
+  end
+
+  defp type_to_string(type) do
+    if is_atom(type) do
+      Atom.to_string(type)
+    else
+      type
+    end
+  end
+
   defp aci_to_sophia_type(type) do
     case type do
       %{} ->
-        structure_type = type |> Map.keys() |> List.first()
-        field_types = type |> Map.values() |> List.first()
+        structure_type = type |> Map.keys() |> List.first() |> type_to_string()
+        field_types = type |> Map.values() |> List.first() |> type_to_string()
         aci_to_sophia_type(structure_type, field_types)
 
       [type] ->
-        aci_to_sophia_type(type)
+        type |> type_to_string() |> aci_to_sophia_type()
 
       type ->
         type

@@ -17,16 +17,17 @@ defmodule CoreListenerTest do
       )
 
     source_code = "contract Identity =
-        datatype event = AddedNumberEvent(indexed int, string)
+      datatype event =
+        SomeEvent(bool, bits, bytes(8))
+        | AnotherEvent(address, oracle(int, int), oracle_query(int, int))
 
-        record state = { number : int }
+      type state = ()
 
-        entrypoint init(x : int) =
-          { number = x }
-
-        stateful entrypoint add_to_number(x : int) =
-          Chain.event(AddedNumberEvent(x, \"Added a number\"))
-          state.number + x"
+      stateful entrypoint emit_event() =
+        Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))
+        Chain.event(AnotherEvent(ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG,
+          ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5,
+          oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY))"
     [client: client, source_code: source_code]
   end
 
@@ -45,18 +46,32 @@ defmodule CoreListenerTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        ["42"]
+        []
       )
 
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address)
 
-    {:ok, %{return_value: _, return_type: "ok"}} =
+    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent", [
+      :bool,
+      :bits,
+      :bytes
+    ])
+
+    Listener.subscribe_for_contract_events(
+      setup_data.client,
+      self(),
+      ct_address,
+      "AnotherEvent",
+      [:address, :oracle, :oracle_query]
+    )
+
+    {:ok, %{return_type: "ok"}} =
       Contract.call(
         setup_data.client,
         ct_address,
         setup_data.source_code,
-        "add_to_number",
-        ["33"]
+        "emit_event",
+        []
       )
 
     Listener.subscribe(:key_blocks, self())
@@ -70,7 +85,7 @@ defmodule CoreListenerTest do
 
     # receive one of each of the events that we've subscribed to,
     # we don't know the order in which the messages have been sent
-    Enum.each(0..7, fn _ ->
+    Enum.each(0..9, fn _ ->
       receive_and_check_message(public_key, setup_data.client, ct_address)
     end)
 
@@ -106,7 +121,41 @@ defmodule CoreListenerTest do
            [
              %{
                address: ^contract_address,
-               data: "Added a number"
+               data: ""
+             },
+             %{
+               address: ^contract_address,
+               data: ""
+             }
+           ]} ->
+            :ok
+
+          {:contract_events, "SomeEvent",
+           [
+             %{
+               address: ^contract_address,
+               data: "",
+               topics: [
+                 "SomeEvent",
+                 true,
+                 115_792_089_237_316_195_423_570_985_008_687_907_853_269_984_665_640_564_039_457_584_007_913_129_639_935,
+                 81_985_529_216_486_895
+               ]
+             }
+           ]} ->
+            :ok
+
+          {:contract_events, "AnotherEvent",
+           [
+             %{
+               address: ^contract_address,
+               data: "",
+               topics: [
+                 "AnotherEvent",
+                 "ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG",
+                 "ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5",
+                 "oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY"
+               ]
              }
            ]} ->
             :ok
@@ -117,7 +166,7 @@ defmodule CoreListenerTest do
 
         Listener.unsubscribe(elem(message, 0), self())
     after
-      20000 -> flunk("Didn't receive message")
+      30000 -> flunk("Didn't receive message")
     end
   end
 
