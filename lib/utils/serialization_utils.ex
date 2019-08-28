@@ -29,7 +29,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
     ChannelWithdrawTx
   }
 
-  @ct_version 0x40001
+  @ct_version 0x60001
 
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{

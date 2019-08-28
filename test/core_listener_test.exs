@@ -21,7 +21,7 @@ defmodule CoreListenerTest do
         SomeEvent(bool, bits, bytes(8))
         | AnotherEvent(address, oracle(int, int), oracle_query(int, int))
 
-      type state = ()
+      type state = unit
 
       stateful entrypoint emit_event() =
         Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))

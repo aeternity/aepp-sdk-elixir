@@ -114,12 +114,20 @@ defmodule AeppSDK.Contract do
     {:ok, source_hash} = Hash.hash(source_code)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
-         {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),
+         {:ok,
+          %{
+            byte_code: byte_code,
+            compiler_version: compiler_version,
+            type_info: type_info,
+            payable: payable
+          }} <- compile(source_code),
          {:ok, calldata} <- create_calldata(source_code, @init_function, init_args),
          byte_code_fields = [
            source_hash,
            type_info,
-           byte_code
+           byte_code,
+           compiler_version,
+           payable
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
          contract_create_tx = %ContractCreateTx{
@@ -274,7 +282,8 @@ defmodule AeppSDK.Contract do
     with "ok" <- return_type,
          {:ok, decoded_return_value} <-
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value),
-         {:ok, typerep} <- :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
+         {:ok, typerep} <-
+           :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
       :aeb_heap.from_binary(typerep, decoded_return_value)
     else
       {:error, _} = error ->

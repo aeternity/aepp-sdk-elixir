@@ -14,7 +14,7 @@ defmodule AeppSDK.GeneralizedAccount do
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.{Client, Contract}
 
-  @ct_version 0x40001
+  @ct_version 0x60001
   @init_function "init"
   @default_gas 50000
 
@@ -72,7 +72,13 @@ defmodule AeppSDK.GeneralizedAccount do
         opts \\ []
       ) do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
-         {:ok, %{byte_code: byte_code, type_info: type_info}} <-
+         {:ok,
+          %{
+            byte_code: byte_code,
+            compiler_version: compiler_version,
+            type_info: type_info,
+            payable: payable
+          }} <-
            Contract.compile(source_code),
          {:ok, function_hash} <- :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info),
          {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args),
@@ -80,7 +86,9 @@ defmodule AeppSDK.GeneralizedAccount do
          byte_code_fields = [
            source_hash,
            type_info,
-           byte_code
+           byte_code,
+           compiler_version,
+           payable
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
          ga_attach_tx = %{
