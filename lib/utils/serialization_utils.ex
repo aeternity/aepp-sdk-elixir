@@ -29,8 +29,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
     ChannelWithdrawTx
   }
 
-  @ct_version 0x60001
-
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
         recipient_id: tx_recipient_id,
@@ -288,7 +286,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
         owner_id: tx_owner_id,
         nonce: nonce,
         code: code,
-        abi_version: _abi_version,
+        abi_version: ct_version,
         deposit: deposit,
         amount: amount,
         gas: gas,
@@ -304,7 +302,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
        owner_id,
        nonce,
        code,
-       @ct_version,
+       ct_version,
        fee,
        ttl,
        deposit,

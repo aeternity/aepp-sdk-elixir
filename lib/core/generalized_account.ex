@@ -14,7 +14,6 @@ defmodule AeppSDK.GeneralizedAccount do
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.{Client, Contract}
 
-  @ct_version 0x60001
   @init_function "init"
   @default_gas 50000
 
@@ -72,6 +71,7 @@ defmodule AeppSDK.GeneralizedAccount do
         opts \\ []
       ) do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
+         {:ok, ct_version} <- Contract.get_ct_version(opts),
          {:ok,
           %{
             byte_code: byte_code,
@@ -96,7 +96,7 @@ defmodule AeppSDK.GeneralizedAccount do
            nonce: nonce,
            code: serialized_wrapped_code,
            auth_fun: function_hash,
-           ct_version: @ct_version,
+           ct_version: ct_version,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            gas: Keyword.get(opts, :gas, Contract.default_gas()),

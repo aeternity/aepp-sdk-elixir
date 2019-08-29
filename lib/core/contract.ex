@@ -34,7 +34,9 @@ defmodule AeppSDK.Contract do
   @default_gas 1_000_000
   @default_gas_price 1_000_000_000
   @init_function "init"
-  @abi_version 0x01
+  @abi_version 0x1
+  @fate_ct_version 0x50001
+  @aevm_ct_version 0x60001
   @genesis_beneficiary "ak_11111111111111111111111111111111273Yts"
 
   @type deploy_options :: [
@@ -43,7 +45,8 @@ defmodule AeppSDK.Contract do
           gas: non_neg_integer(),
           gas_price: non_neg_integer(),
           fee: non_neg_integer(),
-          ttl: non_neg_integer()
+          ttl: non_neg_integer(),
+          vm: :fate | :aevm
         ]
 
   @type call_options :: [
@@ -113,7 +116,8 @@ defmodule AeppSDK.Contract do
     public_key_binary = Keys.public_key_to_binary(public_key)
     {:ok, source_hash} = Hash.hash(source_code)
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
+    with {:ok, ct_version} <- get_ct_version(opts),
+         {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok,
           %{
             byte_code: byte_code,
@@ -134,7 +138,7 @@ defmodule AeppSDK.Contract do
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
-           abi_version: :unused,
+           abi_version: ct_version,
            deposit: Keyword.get(opts, :deposit, @default_deposit),
            amount: Keyword.get(opts, :amount, @default_amount),
            gas: Keyword.get(opts, :gas, @default_gas),
@@ -279,11 +283,30 @@ defmodule AeppSDK.Contract do
       when is_binary(sophia_type) and is_binary(return_value) and is_binary(return_type) do
     sophia_type_charlist = String.to_charlist(sophia_type)
 
+    case :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
+      {:ok, typerep} ->
+        typerep_decode_return_value(
+          typerep,
+          return_value,
+          return_type
+        )
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  @doc """
+  false
+  """
+  def typerep_decode_return_value(
+        typerep,
+        return_value,
+        return_type
+      ) do
     with "ok" <- return_type,
          {:ok, decoded_return_value} <-
-           :aeser_api_encoder.safe_decode(:contract_bytearray, return_value),
-         {:ok, typerep} <-
-           :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
+           :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
       :aeb_heap.from_binary(typerep, decoded_return_value)
     else
       {:error, _} = error ->
@@ -484,17 +507,30 @@ defmodule AeppSDK.Contract do
   @spec get_function_return_type(String.t(), String.t()) ::
           {:ok, String.t()} | {:error, String.t()}
   def get_function_return_type(source_code, function_name) do
+    case get_function_return_typerep(source_code, function_name) do
+      {:ok, typerep} ->
+        case aci_to_sophia_type(typerep) do
+          {:error, _} = err ->
+            err
+
+          type ->
+            {:ok, type}
+        end
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  @doc """
+  false
+  """
+  def get_function_return_typerep(source_code, function_name) do
     case :aeso_aci.contract_interface(:json, source_code) do
       {:ok, [%{contract: %{functions: functions}}]} ->
         case Enum.find(functions, fn %{name: name} -> name == function_name end) do
           %{returns: function_return_type} ->
-            case aci_to_sophia_type(function_return_type) do
-              {:error, _} = err ->
-                err
-
-              type ->
-                {:ok, type}
-            end
+            {:ok, function_return_type}
 
           nil ->
             {:error, "Undefined function #{function_name}"}
@@ -559,18 +595,31 @@ defmodule AeppSDK.Contract do
     end)
   end
 
-  def call_on_chain(
-        %Client{
-          connection: connection
-        } = client,
-        contract_address,
-        source_code,
-        function_name,
-        function_args,
-        opts
-      )
-      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
-             is_list(function_args) and is_list(opts) do
+  def get_ct_version(opts) do
+    case Keyword.get(opts, :vm, :fate) do
+      :fate ->
+        @fate_ct_version
+
+      :aevm ->
+        @aevm_ct_version
+
+      _ ->
+        {:error, "Invalid VM"}
+    end
+  end
+
+  defp call_on_chain(
+         %Client{
+           connection: connection
+         } = client,
+         contract_address,
+         source_code,
+         function_name,
+         function_args,
+         opts
+       )
+       when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
+              is_list(function_args) and is_list(opts) do
     with {:ok, contract_call_tx} <-
            build_contract_call_tx(
              client,
@@ -590,7 +639,11 @@ defmodule AeppSDK.Contract do
            ),
          {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
          {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, response.return_value, response.return_type) do
+           typerep_decode_return_value(
+             function_return_type,
+             response.return_value,
+             response.return_type
+           ) do
       {:ok, %{response | return_value: decoded_return_value, log: encode_logs(response.log, [])}}
     else
       {:error, _} = error ->
@@ -717,6 +770,8 @@ defmodule AeppSDK.Contract do
     end
   end
 
+  defp aci_to_sophia_type("tuple", []), do: "unit"
+
   defp aci_to_sophia_type("tuple", fields) do
     fields
     |> Enum.map(fn field ->
@@ -746,7 +801,7 @@ defmodule AeppSDK.Contract do
 
   defp aci_to_sophia_type(type, _), do: {:error, "Can't decode type: #{type}"}
 
-  defp into_tuple(fields), do: "(#{Enum.join(fields, ", ")})"
+  defp into_tuple(fields), do: Enum.join(fields, " * ")
 
   defp compute_contract_account(owner_address, nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)
