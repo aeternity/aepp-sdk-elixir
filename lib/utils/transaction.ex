@@ -7,6 +7,7 @@ defmodule AeppSDK.Utils.Transaction do
   """
   alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Account, as: AccountApi
+  alias AeternityNode.Api.Contract, as: ContractApi
   alias AeppSDK.{Contract, Client, GeneralizedAccount}
 
   alias AeternityNode.Model.{
@@ -528,20 +529,23 @@ defmodule AeppSDK.Utils.Transaction do
          },
          auth_opts
        ) do
-    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun, contract_id: contract_address}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
+           ContractApi.get_contract(connection, contract_address),
          {:ok, calldata} =
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
              auth_fun,
-             Keyword.get(auth_opts, :auth_args)
+             Keyword.get(auth_opts, :auth_args),
+             Contract.get_vm(vm_version)
            ),
          serialized_tx = wrap_in_empty_signed_tx(tx),
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
-           abi_version: Contract.abi_version(),
+           abi_version: abi_version,
            fee: @dummy_fee,
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
@@ -687,20 +691,23 @@ defmodule AeppSDK.Utils.Transaction do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)
 
-    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun, contract_id: contract_address}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
+           ContractApi.get_contract(connection, contract_address),
          {:ok, calldata} =
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
              auth_fun,
-             Keyword.get(auth_opts, :auth_args)
+             Keyword.get(auth_opts, :auth_args),
+             Contract.get_vm(vm_version)
            ),
          serialized_tx = wrap_in_empty_signed_tx(tx),
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
-           abi_version: Contract.abi_version(),
+           abi_version: abi_version,
            fee: @dummy_fee,
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),

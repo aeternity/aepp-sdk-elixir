@@ -9,10 +9,10 @@ defmodule AeppSDK.Contract do
   alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Api.Contract, as: ContractApi
 
   alias AeternityNode.Model.{
     Account,
-    ContractCallObject,
     ContractCallTx,
     ContractCreateTx,
     DryRunAccount,
@@ -34,8 +34,7 @@ defmodule AeppSDK.Contract do
   @default_gas 1_000_000
   @default_gas_price 1_000_000_000
   @init_function "init"
-  @abi_version 0x1
-  @fate_ct_version 0x50001
+  @fate_ct_version 0x50003
   @aevm_ct_version 0x60001
   @genesis_beneficiary "ak_11111111111111111111111111111111273Yts"
 
@@ -124,8 +123,9 @@ defmodule AeppSDK.Contract do
             compiler_version: compiler_version,
             type_info: type_info,
             payable: payable
-          }} <- compile(source_code),
-         {:ok, calldata} <- create_calldata(source_code, @init_function, init_args),
+          }} <- compile(source_code, Keyword.get(opts, :vm, :fate)),
+         {:ok, calldata} <-
+           create_calldata(source_code, @init_function, init_args, Keyword.get(opts, :vm, :fate)),
          byte_code_fields = [
            source_hash,
            type_info,
@@ -148,7 +148,7 @@ defmodule AeppSDK.Contract do
            call_data: calldata
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
+         {:ok, %{log: log} = response} <-
            Transaction.try_post(
              client,
              contract_create_tx,
@@ -156,8 +156,7 @@ defmodule AeppSDK.Contract do
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok,
-       Map.merge(response, %{contract_id: contract_account, log: encode_logs(response.log, [])})}
+      {:ok, Map.merge(response, %{contract_id: contract_account, log: encode_logs(log, [])})}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -267,6 +266,35 @@ defmodule AeppSDK.Contract do
   Decode a return value
 
   ## Example
+      iex> return_value = "cb_VNLOFXc="
+      iex> return_type = "ok"
+      iex> AeppSDK.Contract.decode_return_value(return_value, return_type)
+      {:ok, 42}
+  """
+  @spec decode_return_value(String.t(), String.t()) :: {:ok, tuple()} | {:error, atom()}
+  def decode_return_value(return_value, return_type)
+      when is_binary(return_value) and is_binary(return_type) do
+    with "ok" <- return_type,
+         {:ok, decoded_return_value} <-
+           :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
+      {:ok, :aeb_fate_encoding.deserialize(decoded_return_value)}
+    else
+      {:error, _} = error ->
+        error
+
+      _ ->
+        {:ok, decoded_return_value} =
+          :aeser_api_encoder.safe_decode(:contract_bytearray, return_value)
+
+        message = :aeb_fate_encoding.deserialize(decoded_return_value)
+        {:error, message}
+    end
+  end
+
+  @doc """
+  Decode a return value
+
+  ## Example
       iex> sophia_type = "int"
       iex> return_value = "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA"
       iex> return_type = "ok"
@@ -285,11 +313,7 @@ defmodule AeppSDK.Contract do
 
     case :aeso_compiler.sophia_type_to_typerep(sophia_type_charlist) do
       {:ok, typerep} ->
-        typerep_decode_return_value(
-          typerep,
-          return_value,
-          return_type
-        )
+        typerep_decode_return_value(typerep, return_value, return_type)
 
       {:error, _} = error ->
         error
@@ -299,15 +323,11 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def typerep_decode_return_value(
-        typerep,
-        return_value,
-        return_type
-      ) do
+  def typerep_decode_return_value(typerep, return_value, return_type) do
     with "ok" <- return_type,
          {:ok, decoded_return_value} <-
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
-      :aeb_heap.from_binary(typerep, decoded_return_value)
+      :aeb_heap.from_binary({:tuple, []}, decoded_return_value)
     else
       {:error, _} = error ->
         error
@@ -333,7 +353,7 @@ defmodule AeppSDK.Contract do
 
         entrypoint add_to_number(x : int) =
           state.number + x"
-      iex> AeppSDK.Contract.compile(source_code)
+      iex> AeppSDK.Contract.compile(source_code, :aevm)
       {:ok,
        %{
          byte_code: <<98, 0, 0, 100, 98, 0, 0, 151, 145, 128, 128, 128, 81, 127, 112,
@@ -412,11 +432,11 @@ defmodule AeppSDK.Contract do
        }}
   """
   @spec compile(String.t()) :: {:ok, map()} | {:error, String.t()}
-  def compile(source_code) when is_binary(source_code) do
+  def compile(source_code, vm \\ :fate) when is_binary(source_code) do
     charlist_source = String.to_charlist(source_code)
 
     try do
-      :aeso_compiler.from_string(charlist_source, [])
+      :aeso_compiler.from_string(charlist_source, backend: vm)
     rescue
       e in ErlangError ->
         %ErlangError{original: {_, message}} = e
@@ -439,7 +459,7 @@ defmodule AeppSDK.Contract do
           state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
-      iex> AeppSDK.Contract.create_calldata(source_code, function_name, function_args)
+      iex> AeppSDK.Contract.create_calldata(source_code, function_name, function_args, :aevm)
       {:ok,
          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 32, 226, 35, 29, 108, 223, 201, 57, 22, 222, 76, 179, 169,
@@ -453,7 +473,8 @@ defmodule AeppSDK.Contract do
   def create_calldata(
         source_code,
         function_name,
-        function_args
+        function_args,
+        vm \\ :fate
       )
       when is_binary(source_code) and is_binary(function_name) and is_list(function_args) do
     charlist_source_code = String.to_charlist(source_code)
@@ -469,7 +490,8 @@ defmodule AeppSDK.Contract do
         :aeso_compiler.create_calldata(
           charlist_source_code,
           charlist_function_name,
-          charlist_function_args
+          charlist_function_args,
+          backend: vm
         )
 
       {:ok, calldata}
@@ -544,11 +566,6 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def abi_version(), do: @abi_version
-
-  @doc """
-  false
-  """
   def default_amount(), do: @default_amount
 
   @doc """
@@ -595,18 +612,28 @@ defmodule AeppSDK.Contract do
     end)
   end
 
+  @doc """
+  false
+  """
   def get_ct_version(opts) do
     case Keyword.get(opts, :vm, :fate) do
       :fate ->
-        @fate_ct_version
+        {:ok, @fate_ct_version}
 
       :aevm ->
-        @aevm_ct_version
+        {:ok, @aevm_ct_version}
 
       _ ->
         {:error, "Invalid VM"}
     end
   end
+
+  @doc """
+  false
+  """
+  def get_vm(5), do: :fate
+
+  def get_vm(6), do: :aevm
 
   defp call_on_chain(
          %Client{
@@ -620,31 +647,28 @@ defmodule AeppSDK.Contract do
        )
        when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
               is_list(function_args) and is_list(opts) do
-    with {:ok, contract_call_tx} <-
+    with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
+           ContractApi.get_contract(connection, contract_address),
+         {:ok, contract_call_tx} <-
            build_contract_call_tx(
              client,
              contract_address,
              source_code,
              function_name,
              function_args,
+             abi_version,
+             vm_version,
              opts
            ),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
+         {:ok, transaction_info} <-
            Transaction.try_post(
              client,
              contract_call_tx,
              Keyword.get(opts, :auth, nil),
              height
-           ),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           typerep_decode_return_value(
-             function_return_type,
-             response.return_value,
-             response.return_type
            ) do
-      {:ok, %{response | return_value: decoded_return_value, log: encode_logs(response.log, [])}}
+      internal_decode_return_value(transaction_info, source_code, function_name, vm_version)
     else
       {:error, _} = error ->
         error
@@ -664,7 +688,9 @@ defmodule AeppSDK.Contract do
        )
        when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
               is_list(function_args) and is_list(opts) do
-    with {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
+    with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
+           ContractApi.get_contract(connection, contract_address),
+         {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
          {caller_public_key, caller_balance} <-
            determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
          {:ok, contract_call_tx} <-
@@ -674,6 +700,8 @@ defmodule AeppSDK.Contract do
              source_code,
              function_name,
              function_args,
+             abi_version,
+             vm_version,
              opts
            ),
          serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
@@ -683,11 +711,7 @@ defmodule AeppSDK.Contract do
           %DryRunResults{
             results: [
               %DryRunResult{
-                call_obj: %ContractCallObject{
-                  return_type: return_type,
-                  return_value: return_value,
-                  log: log
-                }
+                call_obj: transaction_info
               }
             ]
           }} <-
@@ -695,12 +719,8 @@ defmodule AeppSDK.Contract do
              top: Keyword.get(opts, :top, top_block_hash),
              accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
              txs: [encoded_contract_call_tx]
-           }),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, return_value, return_type) do
-      {:ok,
-       %{return_value: decoded_return_value, return_type: return_type, log: encode_logs(log, [])}}
+           }) do
+      internal_decode_return_value(transaction_info, source_code, function_name, vm_version)
     else
       {:ok,
        %DryRunResults{
@@ -716,6 +736,33 @@ defmodule AeppSDK.Contract do
       {:error, _} = error ->
         error
     end
+  end
+
+  defp internal_decode_return_value(
+         %{return_value: return_value, return_type: return_type, log: log} = transaction_info,
+         source_code,
+         function_name,
+         vm_version
+       ) do
+    decoded_return_value =
+      case vm_version do
+        5 ->
+          decode_return_value(return_value, return_type)
+
+        6 ->
+          {:ok, function_typerep} = get_function_return_typerep(source_code, function_name)
+
+          {:ok, decoded_return_value} =
+            typerep_decode_return_value(
+              function_typerep,
+              return_value,
+              return_type
+            )
+
+          decoded_return_value
+      end
+
+    {:ok, %{transaction_info | return_value: decoded_return_value, log: encode_logs(log, [])}}
   end
 
   defp encode_topic(:address, topic), do: encode_hash(topic, "ak")
@@ -819,6 +866,8 @@ defmodule AeppSDK.Contract do
          source_code,
          function_name,
          function_args,
+         abi_version,
+         vm_version,
          opts
        ) do
     nonce_result =
@@ -831,12 +880,13 @@ defmodule AeppSDK.Contract do
       end
 
     with {:ok, nonce} <- nonce_result,
-         {:ok, calldata} <- create_calldata(source_code, function_name, function_args),
+         {:ok, calldata} <-
+           create_calldata(source_code, function_name, function_args, get_vm(vm_version)),
          contract_call_tx = %ContractCallTx{
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,
-           abi_version: @abi_version,
+           abi_version: abi_version,
            fee: Keyword.get(opts, :fee, 0),
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            amount: Keyword.get(opts, :amount, @default_amount),
