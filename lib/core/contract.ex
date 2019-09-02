@@ -327,7 +327,7 @@ defmodule AeppSDK.Contract do
     with "ok" <- return_type,
          {:ok, decoded_return_value} <-
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
-      :aeb_heap.from_binary({:tuple, []}, decoded_return_value)
+      :aeb_heap.from_binary(typerep, decoded_return_value)
     else
       {:error, _} = error ->
         error
@@ -552,7 +552,8 @@ defmodule AeppSDK.Contract do
       {:ok, [%{contract: %{functions: functions}}]} ->
         case Enum.find(functions, fn %{name: name} -> name == function_name end) do
           %{returns: function_return_type} ->
-            {:ok, function_return_type}
+            typerep = aci_return_to_typerep(function_return_type)
+            {:ok, typerep}
 
           nil ->
             {:error, "Undefined function #{function_name}"}
@@ -634,6 +635,14 @@ defmodule AeppSDK.Contract do
   def get_vm(5), do: :fate
 
   def get_vm(6), do: :aevm
+
+  defp aci_return_to_typerep(return_type) when is_map(return_type) do
+    key = return_type |> Map.keys() |> List.first()
+    values = return_type |> Map.values() |> List.first() |> aci_return_to_typerep()
+    {key, values}
+  end
+
+  defp aci_return_to_typerep(return_type), do: return_type
 
   defp call_on_chain(
          %Client{
