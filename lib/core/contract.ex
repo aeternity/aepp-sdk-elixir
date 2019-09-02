@@ -529,9 +529,9 @@ defmodule AeppSDK.Contract do
   @spec get_function_return_type(String.t(), String.t()) ::
           {:ok, String.t()} | {:error, String.t()}
   def get_function_return_type(source_code, function_name) do
-    case get_function_return_typerep(source_code, function_name) do
-      {:ok, typerep} ->
-        case aci_to_sophia_type(typerep) do
+    case get_aci_function_return_type(source_code, function_name) do
+      {:ok, aci_type} ->
+        case aci_to_sophia_type(aci_type) do
           {:error, _} = err ->
             err
 
@@ -547,13 +547,12 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def get_function_return_typerep(source_code, function_name) do
+  def get_aci_function_return_type(source_code, function_name) do
     case :aeso_aci.contract_interface(:json, source_code) do
       {:ok, [%{contract: %{functions: functions}}]} ->
         case Enum.find(functions, fn %{name: name} -> name == function_name end) do
           %{returns: function_return_type} ->
-            typerep = aci_return_to_typerep(function_return_type)
-            {:ok, typerep}
+            {:ok, function_return_type}
 
           nil ->
             {:error, "Undefined function #{function_name}"}
@@ -634,15 +633,7 @@ defmodule AeppSDK.Contract do
   """
   def get_vm(5), do: :fate
 
-  def get_vm(6), do: :aevm
-
-  defp aci_return_to_typerep(return_type) when is_map(return_type) do
-    key = return_type |> Map.keys() |> List.first()
-    values = return_type |> Map.values() |> List.first() |> aci_return_to_typerep()
-    {key, values}
-  end
-
-  defp aci_return_to_typerep(return_type), do: return_type
+  def get_vm(6), do: :aevmg
 
   defp call_on_chain(
          %Client{
@@ -759,11 +750,11 @@ defmodule AeppSDK.Contract do
           decode_return_value(return_value, return_type)
 
         6 ->
-          {:ok, function_typerep} = get_function_return_typerep(source_code, function_name)
+          {:ok, sophia_return_type} = get_aci_function_return_type(source_code, function_name)
 
           {:ok, decoded_return_value} =
-            typerep_decode_return_value(
-              function_typerep,
+            decode_return_value(
+              sophia_return_type,
               return_value,
               return_type
             )
