@@ -53,6 +53,78 @@ defmodule CoreChannelTest do
         "http://localhost:3113/v2"
       )
 
+    client4 =
+      Client.new(
+        %{
+          public: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+          secret:
+            "1ff1c56cf2679c044c52b8da67bd1b042fea415bf860e539b2cf407b252fb6349a85f286b60b8ee376be835925d6ac15b94c63b3d0ed9708fc62f9bbd1dde07b"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    client5 =
+      Client.new(
+        %{
+          public: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
+          secret:
+            "40441c3007c712337f58919fe487def196f4de027bf14be542ce21f7707192c6243bb2e9296cfe273a0d0566dcc076f8f8eef0f60fd97682fe40e46db49e1e48"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    client6 =
+      Client.new(
+        %{
+          public: "ak_2QMwfcRqwxf1FFqdCYmkYrHbNBqJy1RKyTugEK2A5WtusbGa9w",
+          secret:
+            "19a5698cb636f81607b8ed55b3ae366712813f6f13e0f03b57211f7626ae2a62b8bd8302338dff66643c639c37ac60f810e43497526cd278a778b5d8a5175ce2"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    client7 =
+      Client.new(
+        %{
+          public: "ak_2EcM58EbynxZaiRvK9Ccis8y9bvAbvHRqoY83Zs4BrUs11a9Lm",
+          secret:
+            "461c34577692bb4353aaf9687f15afe5b60a68fa7e5cc872897548d0cf1b38eea299125ac1dd2ee55d20489d4ee67fa459fb0ded2ea0e343038dd5a32db42e31"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    client8 =
+      Client.new(
+        %{
+          public: "ak_7ZQ885tCvrFnPDfckds75SYVdNEaUX8XQaJ2k2gQZRy9Rwg7o",
+          secret:
+            "4d366d4024ff74c9f55965b6ab8b30f313e4b8e14e1507f225ef55b0511c6ff90ee460913d08e819815154bf37b2478b7563fad8489d03ce4ad547cda0fa1534"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    client9 =
+      Client.new(
+        %{
+          public: "ak_UNqFo8p82KNCHg8mvs3XATtNQoaS6LKq61tYY1MA7fERmgiTY",
+          secret:
+            "c50ba51d801734372462c14313536c908ea94cbdc342e48f34063e28f9f406593e2957cc5b8b024bf597b6f591109fe6ac97eb3e7708ca5861b544a3cfa8c501"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
     source_code = "contract Authorization =
 
         function auth(auth_value : bool) =
@@ -64,6 +136,12 @@ defmodule CoreChannelTest do
       client1: client1,
       client2: client2,
       client3: client3,
+      client4: client4,
+      client5: client5,
+      client6: client6,
+      client7: client7,
+      client8: client8,
+      client9: client9,
       auth: auth,
       source_code: source_code
     ]
@@ -455,5 +533,261 @@ defmodule CoreChannelTest do
                signatures_list: [close_mutual_sig],
                inner_tx: close_mutual_tx
              )
+  end
+
+  @tag :travis_test
+  test "create channel, close_solo, slash and settle", setup_data do
+    %{client: client, client4: client4, client5: client5} = setup_data
+    initiator_amt = 30_000_000_000
+    responder_amt = 70_000_000_000
+
+    assert match?(
+             {:ok, _},
+             Account.spend(
+               client,
+               client4.keypair.public,
+               1_000_000_000_000_000
+             )
+           )
+
+    assert match?(
+             {:ok, _},
+             Account.spend(
+               client,
+               client5.keypair.public,
+               1_000_000_000_000_000
+             )
+           )
+
+    # Create channel
+    assert {:ok, [create_tx, create_sig]} =
+             Channel.create(
+               client4,
+               initiator_amt,
+               client5.keypair.public,
+               responder_amt,
+               1,
+               20,
+               10,
+               Encoding.prefix_encode_base58c(
+                 "st",
+                 <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
+                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>
+               )
+             )
+
+    assert {:ok, [^create_tx, create_sig1]} = Transaction.sign_tx(create_tx, client5)
+
+    assert {:ok, %{channel_id: channel_id}} =
+             Channel.post(client4, create_tx, signatures_list: [create_sig, create_sig1])
+
+    # Close solo tx
+    assert {:ok, _} =
+             Channel.close_solo(
+               client4,
+               channel_id,
+               <<>>,
+               accounts:
+                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
+                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
+                  %{
+                    cache:
+                      {3,
+                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
+                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
+                          240>>,
+                        [
+                          <<>>,
+                          <<>>,
+                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
+                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
+                            30>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
+                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
+                            112, 176>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>
+                        ],
+                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
+                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
+                           112, 176>>,
+                         [
+                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
+                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
+                             221, 224, 123>>,
+                           <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
+                         ], nil,
+                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
+                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
+                            30>>,
+                          [
+                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
+                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
+                              158, 30, 72>>,
+                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
+                          ], nil, nil}}, nil}}
+                  }}
+             )
+
+    # Slash tx
+    assert {:ok, _} =
+             Channel.slash(
+               client4,
+               channel_id,
+               <<248, 211, 11, 1, 248, 132, 184, 64, 103, 143, 97, 54, 143, 62, 96, 188, 175, 138,
+                 69, 94, 189, 154, 187, 232, 24, 124, 227, 118, 222, 228, 194, 201, 138, 30, 163,
+                 139, 234, 56, 102, 49, 147, 29, 134, 97, 135, 69, 62, 62, 89, 133, 45, 99, 164,
+                 238, 174, 83, 132, 129, 253, 64, 92, 8, 33, 203, 46, 197, 115, 87, 191, 250, 221,
+                 0, 184, 64, 218, 115, 120, 42, 135, 32, 185, 172, 64, 147, 81, 28, 252, 62, 61,
+                 174, 23, 187, 214, 191, 235, 45, 229, 160, 92, 36, 8, 248, 130, 109, 163, 27, 57,
+                 181, 80, 131, 182, 231, 33, 13, 76, 193, 217, 176, 176, 134, 228, 122, 52, 81,
+                 237, 128, 105, 191, 57, 99, 140, 104, 242, 118, 170, 157, 214, 6, 184, 73, 248,
+                 71, 57, 1, 161, 6, 79, 170, 117, 156, 23, 1, 16, 54, 197, 235, 149, 116, 88, 255,
+                 224, 120, 70, 14, 30, 170, 25, 182, 198, 157, 53, 41, 226, 230, 204, 75, 170,
+                 223, 3, 192, 160, 104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46,
+                 166, 249, 5, 206, 185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144,
+                 107>>,
+               accounts:
+                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
+                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
+                  %{
+                    cache:
+                      {3,
+                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
+                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
+                          240>>,
+                        [
+                          <<>>,
+                          <<>>,
+                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
+                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
+                            30>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
+                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
+                            112, 176>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>
+                        ],
+                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
+                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
+                           112, 176>>,
+                         [
+                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
+                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
+                             221, 224, 123>>,
+                           <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
+                         ], nil,
+                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
+                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
+                            30>>,
+                          [
+                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
+                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
+                              158, 30, 72>>,
+                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
+                          ], nil, nil}}, nil}}
+                  }}
+             )
+
+    # Settle tx
+    assert {:ok, _} = Channel.settle(client4, channel_id, initiator_amt, responder_amt)
+
+    assert match?(
+             {:ok, %{reason: "Channel not found"}},
+             Channel.get_by_pubkey(client4, channel_id)
+           )
+  end
+
+  @tag :travis_test
+  test "create channel, snapshot", setup_data do
+    %{client: client, client6: client6, client7: client7} = setup_data
+
+    initiator_amt = 30_000_000_000
+    responder_amt = 70_000_000_000
+
+    assert match?(
+             {:ok, _},
+             Account.spend(
+               client,
+               client6.keypair.public,
+               1_000_000_000_000_000
+             )
+           )
+
+    assert match?(
+             {:ok, _},
+             Account.spend(
+               client,
+               client7.keypair.public,
+               1_000_000_000_000_000
+             )
+           )
+
+    # Create channel
+    assert {:ok, [create_tx, create_sig]} =
+             Channel.create(
+               client6,
+               initiator_amt,
+               client7.keypair.public,
+               responder_amt,
+               1,
+               20,
+               10,
+               Encoding.prefix_encode_base58c(
+                 "st",
+                 <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
+                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>
+               )
+             )
+
+    assert {:ok, [^create_tx, create_sig1]} = Transaction.sign_tx(create_tx, client7)
+
+    assert {:ok, %{channel_id: channel_id}} =
+             Channel.post(client6, create_tx, signatures_list: [create_sig, create_sig1])
+
+    {:ok, %{state_hash: state_hash_create}} = Channel.get_by_pubkey(client6, channel_id)
+
+    assert {:ok, _} =
+             Channel.snapshot_solo(
+               client6,
+               channel_id,
+               <<248, 211, 11, 1, 248, 132, 184, 64, 189, 85, 177, 158, 63, 228, 58, 49, 130, 243,
+                 140, 226, 243, 148, 27, 45, 181, 131, 160, 118, 17, 83, 57, 252, 79, 125, 17, 66,
+                 24, 141, 36, 201, 246, 103, 197, 220, 243, 55, 208, 220, 242, 184, 218, 232, 239,
+                 180, 68, 197, 198, 67, 148, 46, 244, 215, 183, 104, 6, 116, 105, 147, 163, 30,
+                 71, 8, 184, 64, 56, 168, 162, 166, 91, 36, 180, 37, 49, 220, 215, 99, 239, 45,
+                 121, 175, 128, 207, 45, 52, 168, 149, 50, 107, 38, 226, 64, 63, 54, 236, 238,
+                 150, 104, 159, 232, 14, 24, 134, 12, 33, 108, 232, 158, 222, 210, 242, 63, 78,
+                 134, 146, 242, 211, 11, 122, 230, 252, 254, 103, 150, 139, 88, 80, 47, 6, 184,
+                 73, 248, 71, 57, 1, 161, 6, 76, 31, 36, 226, 145, 19, 154, 231, 247, 12, 200,
+                 250, 255, 20, 63, 23, 196, 86, 255, 190, 186, 6, 111, 186, 119, 166, 86, 126, 7,
+                 231, 197, 244, 43, 192, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43>>
+             )
+
+    {:ok, %{state_hash: state_hash_snapshot}} = Channel.get_by_pubkey(client6, channel_id)
+    assert state_hash_create != state_hash_snapshot
   end
 end
