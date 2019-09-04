@@ -26,7 +26,7 @@ defmodule CoreGeneralizedAccountTest do
 
     source_code = "contract Authorization =
 
-      function auth(auth_value : bool) =
+      entrypoint auth(auth_value : bool) =
         auth_value"
 
     [spend_client: spend_client, auth_client: auth_client, source_code: source_code]

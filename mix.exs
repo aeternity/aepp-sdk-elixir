@@ -33,7 +33,7 @@ defmodule AeppSdkElixir.MixProject do
       {:aesophia,
        git: "https://github.com/aeternity/aesophia.git",
        manager: :rebar,
-       ref: "dcae96ed21580b3b081cb955da9d8e6fd6879da1"},
+       ref: "8c3b675b0ddd1fb04d98ef3b86dbe431d699ac6e"},
       {:enoise,
        git: "https://github.com/aeternity/enoise.git",
        manager: :rebar,

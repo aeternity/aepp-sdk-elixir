@@ -127,7 +127,7 @@ defmodule CoreChannelTest do
 
     source_code = "contract Authorization =
 
-        function auth(auth_value : bool) =
+        entrypoint auth(auth_value : bool) =
           auth_value"
     auth = [auth_contract_source: source_code, auth_args: ["true"], fee: 100_000_000_000]
 

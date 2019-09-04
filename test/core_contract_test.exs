@@ -1,7 +1,7 @@
 defmodule CoreContractTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Client, Contract}
+  alias AeppSDK.{Account, Client, Contract, Utils.Keys}
 
   setup_all do
     client =
@@ -21,10 +21,13 @@ defmodule CoreContractTest do
 
       record state = { number : int }
 
-      function init(x : int) =
+      entrypoint init(x : int) =
         { number = x }
 
-      function add_to_number(x : int) =
+      entrypoint get_number() =
+        state.number
+
+      stateful entrypoint add_to_number(x : int) =
         Chain.event(AddedNumberEvent(x, \"Added a number\"))
         state.number + x"
     [client: client, source_code: source_code]
@@ -43,7 +46,7 @@ defmodule CoreContractTest do
 
     {:ok, %{contract_id: ct_address}} = deploy_result
 
-    call_result =
+    on_chain_call_result =
       Contract.call(
         setup_data.client,
         ct_address,
@@ -52,23 +55,23 @@ defmodule CoreContractTest do
         ["33"]
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, on_chain_call_result)
 
-    refute call_result |> elem(1) |> Map.get(:log) |> Enum.empty?()
+    refute on_chain_call_result |> elem(1) |> Map.get(:log) |> Enum.empty?()
 
-    call_static_result =
-      Contract.call_static(
+    static_call_result =
+      Contract.call(
         setup_data.client,
         ct_address,
         setup_data.source_code,
-        "add_to_number",
-        ["33"],
+        "get_number",
+        [],
         fee: 10_000_000_000_000_000
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_static_result)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = call_result
+    {:ok, %{return_value: data, return_type: "ok"}} = on_chain_call_result
 
     assert {:ok, data} ==
              Contract.decode_return_value(
@@ -76,6 +79,35 @@ defmodule CoreContractTest do
                "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
                "ok"
              )
+
+    %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
+    Account.spend(setup_data.client, low_balance_public_key, 1)
+
+    static_call_result =
+      Contract.call(
+        %Client{setup_data.client | keypair: low_balance_keypair},
+        ct_address,
+        setup_data.source_code,
+        "get_number",
+        [],
+        fee: 10_000_000_000_000_000
+      )
+
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
+
+    non_existing_keypair = Keys.generate_keypair()
+
+    static_call_result =
+      Contract.call(
+        %Client{setup_data.client | keypair: non_existing_keypair},
+        ct_address,
+        setup_data.source_code,
+        "get_number",
+        [],
+        fee: 10_000_000_000_000_000
+      )
+
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
   end
 
   @tag :travis_test
@@ -100,7 +132,7 @@ defmodule CoreContractTest do
 
     {:ok, %{contract_id: ct_address}} = deploy_result
 
-    call_result =
+    on_chain_call_result =
       Contract.call(
         setup_data.client,
         ct_address,
@@ -109,7 +141,7 @@ defmodule CoreContractTest do
         ["33"]
       )
 
-    assert match?({:error, _}, call_result)
+    assert match?({:error, "Undefined function non_existing_function"}, on_chain_call_result)
   end
 
   @tag :travis_test
@@ -125,8 +157,8 @@ defmodule CoreContractTest do
 
     {:ok, %{contract_id: ct_address}} = deploy_result
 
-    call_result =
-      Contract.call_static(
+    static_call_result =
+      Contract.call(
         setup_data.client,
         ct_address,
         setup_data.source_code,
@@ -135,7 +167,7 @@ defmodule CoreContractTest do
         fee: 10_000_000_000_000_000
       )
 
-    assert match?({:error, _}, call_result)
+    assert match?({:error, "Undefined function non_existing_function"}, static_call_result)
   end
 
   @tag :travis_test
@@ -151,7 +183,7 @@ defmodule CoreContractTest do
 
     {:ok, %{contract_id: ct_address}} = deploy_result
 
-    call_result =
+    on_chain_call_result =
       Contract.call(
         setup_data.client,
         ct_address,
@@ -160,9 +192,9 @@ defmodule CoreContractTest do
         ["33"]
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, call_result)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, on_chain_call_result)
 
-    {:ok, %{return_value: _, return_type: "ok"}} = call_result
+    {:ok, %{return_value: _, return_type: "ok"}} = on_chain_call_result
 
     assert {:error,
             {:badmatch,

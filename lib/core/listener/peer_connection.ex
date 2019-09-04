@@ -35,6 +35,9 @@ defmodule AeppSDK.Listener.PeerConnection do
 
   @hash_size 256
 
+  @pool_tx_hash_prefix <<0>>
+  @block_tx_hash_prefix <<1>>
+
   def start_link(ref, socket, transport, opts) do
     args = [ref, socket, transport, opts]
     {:ok, pid} = :proc_lib.start_link(__MODULE__, :accept_init, args)
@@ -149,17 +152,15 @@ defmodule AeppSDK.Listener.PeerConnection do
       ) do
     deserialized_payload = rlp_decode(type, payload)
 
-    {:ok, payload_hash} = Hash.hash(payload)
-
     case type do
       @p2p_response ->
-        handle_response(deserialized_payload, payload_hash, network, genesis)
+        handle_response(deserialized_payload, network, genesis)
 
       @txs ->
-        handle_new_pool_txs(deserialized_payload, payload_hash)
+        handle_new_pool_txs(deserialized_payload)
 
       @key_block ->
-        handle_new_key_block(deserialized_payload, payload_hash)
+        handle_new_key_block(deserialized_payload)
 
       @micro_block ->
         handle_new_micro_block(deserialized_payload, socket)
@@ -194,7 +195,6 @@ defmodule AeppSDK.Listener.PeerConnection do
 
   defp handle_response(
          %{result: true, type: type, object: object, reason: nil},
-         hash,
          network,
          genesis
        ) do
@@ -203,17 +203,20 @@ defmodule AeppSDK.Listener.PeerConnection do
         handle_ping_msg(object, network, genesis)
 
       @block_txs ->
-        handle_block_txs(object, hash)
+        handle_block_txs(object)
     end
   end
 
-  defp handle_new_pool_txs(txs, hash) do
+  defp handle_new_pool_txs(txs) do
     serialized_txs =
-      Enum.map(txs, fn {tx, type, hash} ->
-        %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
+      Enum.map(txs, fn {tx, type, binary_hash} ->
+        hash = Encoding.prefix_encode_base58c("th", binary_hash)
+
+        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)},
+         @pool_tx_hash_prefix <> binary_hash}
       end)
 
-    Listener.notify(:pool_transactions, serialized_txs, hash)
+    Listener.notify(:pool_transactions, serialized_txs)
   end
 
   defp handle_ping_msg(
@@ -235,24 +238,27 @@ defmodule AeppSDK.Listener.PeerConnection do
     end
   end
 
-  defp handle_new_key_block(key_block, key_block_hash),
-    do: Listener.notify(:key_blocks, key_block, key_block_hash)
+  defp handle_new_key_block(%{block_info: block_info, hash: hash}),
+    do: Listener.notify(:key_blocks, {block_info, hash})
 
   defp handle_new_micro_block(
          %{block_info: block_info, hash: hash, tx_hashes: tx_hashes},
          socket
        ) do
-    Listener.notify(:micro_blocks, block_info, hash)
+    Listener.notify(:micro_blocks, {block_info, hash})
     do_get_block_txs(hash, tx_hashes, socket)
   end
 
-  defp handle_block_txs(txs, hash) do
+  defp handle_block_txs(txs) do
     serialized_txs =
-      Enum.map(txs, fn {tx, type, hash} ->
-        %{hash: hash, tx: Serialization.serialize_for_client(tx, type)}
+      Enum.map(txs, fn {tx, type, binary_hash} ->
+        hash = Encoding.prefix_encode_base58c("th", binary_hash)
+
+        {%{hash: hash, tx: Serialization.serialize_for_client(tx, type)},
+         @block_tx_hash_prefix <> binary_hash}
       end)
 
-    Listener.notify(:transactions, serialized_txs, hash)
+    Listener.notify(:transactions, serialized_txs)
   end
 
   defp rlp_decode(@p2p_response, encoded_response) do
@@ -328,9 +334,11 @@ defmodule AeppSDK.Listener.PeerConnection do
 
     deserialized_pow_evidence = for <<x::32 <- bin_pow_evidence>>, do: x
 
+    {:ok, key_block_hash} = Hash.hash(key_block_bin)
+
     prev_block_type = prev_block_type(prev_hash, prev_key_hash)
 
-    %{
+    block_info = %{
       version: version,
       height: height,
       prev_hash: :aeser_api_encoder.encode(prev_block_type, <<prev_hash::256>>),
@@ -344,6 +352,8 @@ defmodule AeppSDK.Listener.PeerConnection do
       time: time,
       info: :aeser_api_encoder.encode(:contract_bytearray, info)
     }
+
+    %{block_info: block_info, hash: key_block_hash}
   end
 
   defp rlp_decode(@micro_block, encoded_micro_block) do
@@ -405,7 +415,6 @@ defmodule AeppSDK.Listener.PeerConnection do
 
   defp decode_tx(tx) do
     {:ok, binary_hash} = Hash.hash(tx)
-    hash = Encoding.prefix_encode_base58c("th", binary_hash)
 
     [signatures: _signatures, transaction: transaction] =
       Serialization.deserialize(tx, :signed_tx)
@@ -413,7 +422,7 @@ defmodule AeppSDK.Listener.PeerConnection do
     {type, _version, _fields} = :aeser_chain_objects.deserialize_type_and_vsn(transaction)
     deserialized_tx = Serialization.deserialize(transaction, type)
 
-    {deserialized_tx, type, hash}
+    {deserialized_tx, type, binary_hash}
   end
 
   defp do_ping(socket, genesis, port) do

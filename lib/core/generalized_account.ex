@@ -74,7 +74,7 @@ defmodule AeppSDK.GeneralizedAccount do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <-
            Contract.compile(source_code),
-         {:ok, function_hash} <- :aeb_abi.type_hash_from_function_name(auth_fun, type_info),
+         {:ok, function_hash} <- :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info),
          {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args),
          {:ok, source_hash} <- Hash.hash(source_code),
          byte_code_fields = [

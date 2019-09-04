@@ -5,13 +5,17 @@ defmodule AeppSDK.Contract do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
+
+  alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
 
   alias AeternityNode.Model.{
+    Account,
     ContractCallObject,
     ContractCallTx,
     ContractCreateTx,
+    DryRunAccount,
     DryRunInput,
     DryRunResult,
     DryRunResults,
@@ -31,6 +35,7 @@ defmodule AeppSDK.Contract do
   @default_gas_price 1_000_000_000
   @init_function "init"
   @abi_version 0x01
+  @genesis_beneficiary "ak_11111111111111111111111111111111273Yts"
 
   @type deploy_options :: [
           deposit: non_neg_integer(),
@@ -56,10 +61,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
       iex> AeppSDK.Contract.deploy(client, source_code, init_args)
@@ -139,7 +144,8 @@ defmodule AeppSDK.Contract do
              height
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
-      {:ok, Map.merge(response, %{contract_id: contract_account, log: decode_logs(response.log)})}
+      {:ok,
+       Map.merge(response, %{contract_id: contract_account, log: encode_logs(response.log, [])})}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
@@ -159,10 +165,10 @@ defmodule AeppSDK.Contract do
 
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        stateful entrypoint add_to_number(x : int) =
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
       iex> function_name = "add_to_number"
@@ -184,7 +190,6 @@ defmodule AeppSDK.Contract do
          return_value: 75,
          tx_hash: "th_CpexcQGiM86HVtHR6HTzYc3HoakXW2Xjm77wVKctoZmxTH52u"
        }}
-
   """
   @spec call(Client.t(), String.t(), String.t(), String.t(), list(String.t()), call_options()) ::
           {:ok,
@@ -204,145 +209,42 @@ defmodule AeppSDK.Contract do
           | {:error, String.t()}
           | {:error, Env.t()}
   def call(
-        %Client{
-          connection: connection
-        } = client,
+        client,
         contract_address,
         source_code,
         function_name,
         function_args,
         opts \\ []
-      )
-      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
-             is_list(function_args) and is_list(opts) do
-    with {:ok, contract_call_tx} <-
-           build_contract_call_tx(
-             client,
-             contract_address,
-             source_code,
-             function_name,
-             function_args,
-             opts
-           ),
-         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
-             contract_call_tx,
-             Keyword.get(opts, :auth, nil),
-             height
-           ),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, response.return_value, response.return_type) do
-      {:ok, %{response | return_value: decoded_return_value, log: decode_logs(response.log)}}
-    else
-      {:error, _} = error ->
-        error
-    end
-  end
+      ) do
+    case :aeso_aci.contract_interface(:json, source_code) do
+      {:ok, [%{contract: %{functions: functions}}]} ->
+        case Enum.find(functions, fn %{name: name} -> name == function_name end) do
+          %{stateful: is_stateful} ->
+            case is_stateful do
+              true ->
+                call_on_chain(
+                  client,
+                  contract_address,
+                  source_code,
+                  function_name,
+                  function_args,
+                  opts
+                )
 
-  @doc """
-  Call a contract without posting a transaction (execute off-chain)
+              false ->
+                call_static(
+                  client,
+                  contract_address,
+                  source_code,
+                  function_name,
+                  function_args,
+                  opts
+                )
+            end
 
-  ## Example
-      iex> contract_address = "ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR"
-      iex> source_code = "contract Number =
-        record state = { number : int }
-
-        function init(x : int) =
-          { number = x }
-
-        function add_to_number(x : int) =
-          state.number + x"
-      iex> function_name = "add_to_number"
-      iex> function_args = ["33"]
-      iex> top_block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
-      iex> AeppSDK.Contract.call_static(client, contract_address, source_code, function_name, function_args, [top: top_block_hash])
-      {:ok,
-        %{
-          return_type: "ok",
-          return_value: 75,
-          log: []
-        }}
-  """
-  @spec call_static(
-          Client.t(),
-          String.t(),
-          String.t(),
-          String.t(),
-          list(String.t()),
-          call_options()
-        ) ::
-          {:ok,
-           %{
-             return_value: String.t(),
-             return_type: String.t(),
-             log:
-               list(%{
-                 address: Encoding.base58c(),
-                 data: String.t(),
-                 topics: list(non_neg_integer())
-               })
-           }}
-          | {:error, String.t()}
-          | {:error, Env.t()}
-  def call_static(
-        %Client{
-          connection: connection,
-          internal_connection: internal_connection
-        } = client,
-        contract_address,
-        source_code,
-        function_name,
-        function_args,
-        opts \\ []
-      )
-      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
-             is_list(function_args) and is_list(opts) do
-    with {:ok, contract_call_tx} <-
-           build_contract_call_tx(
-             client,
-             contract_address,
-             source_code,
-             function_name,
-             function_args,
-             opts
-           ),
-         serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
-         {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
-         encoded_contract_call_tx =
-           Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
-         {:ok,
-          %DryRunResults{
-            results: [
-              %DryRunResult{
-                call_obj: %ContractCallObject{
-                  return_type: return_type,
-                  return_value: return_value,
-                  log: log
-                }
-              }
-            ]
-          }} <-
-           DebugApi.dry_run_txs(internal_connection, %DryRunInput{
-             top: Keyword.get(opts, :top, top_block_hash),
-             accounts: [],
-             txs: [encoded_contract_call_tx]
-           }),
-         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
-         {:ok, decoded_return_value} <-
-           decode_return_value(function_return_type, return_value, return_type) do
-      {:ok,
-       %{return_value: decoded_return_value, return_type: return_type, log: decode_logs(log)}}
-    else
-      {:ok,
-       %DryRunResults{
-         results: [
-           %DryRunResult{call_obj: nil, reason: message, result: "error", type: "contract_call"}
-         ]
-       }} ->
-        {:error, message}
+          nil ->
+            {:error, "Undefined function #{function_name}"}
+        end
 
       {:error, _} = error ->
         error
@@ -394,10 +296,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> AeppSDK.Contract.compile(source_code)
       {:ok,
@@ -421,10 +323,10 @@ defmodule AeppSDK.Contract do
          contract_source: 'contract Number =
            record state = { number : int }
 
-           function init(x : int) =
+           entrypoint init(x : int) =
              { number = x }
 
-           function add_to_number(x : int) =
+           entrypoint add_to_number(x : int) =
              state.number + x',
          type_info: [
            {<<112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34, 30, 100, 222, 2,
@@ -498,10 +400,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Number =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "init"
       iex> function_args = ["42"]
@@ -531,7 +433,7 @@ defmodule AeppSDK.Contract do
       end)
 
     try do
-      {:ok, calldata, _, _} =
+      {:ok, calldata} =
         :aeso_compiler.create_calldata(
           charlist_source_code,
           charlist_function_name,
@@ -561,10 +463,10 @@ defmodule AeppSDK.Contract do
       iex> source_code = "contract Identity =
         record state = { number : int }
 
-        function init(x : int) =
+        entrypoint init(x : int) =
           { number = x }
 
-        function add_to_number(x : int) =
+        entrypoint add_to_number(x : int) =
           state.number + x"
       iex> function_name = "add_to_number"
       iex> AeppSDK.Contract.get_function_return_type(source_code, function_name)
@@ -573,22 +475,20 @@ defmodule AeppSDK.Contract do
   @spec get_function_return_type(String.t(), String.t()) ::
           {:ok, String.t()} | {:error, String.t()}
   def get_function_return_type(source_code, function_name) do
-    charlist_source = String.to_charlist(source_code)
+    case :aeso_aci.contract_interface(:json, source_code) do
+      {:ok, [%{contract: %{functions: functions}}]} ->
+        case Enum.find(functions, fn %{name: name} -> name == function_name end) do
+          %{returns: function_return_type} ->
+            case aci_to_sophia_type(function_return_type) do
+              {:error, _} = err ->
+                err
 
-    case :aeso_aci.encode(charlist_source) do
-      {:ok, json_contract_info} ->
-        contract_info = Poison.decode!(json_contract_info)
-        functions = contract_info["contract"]["functions"]
+              type ->
+                {:ok, type}
+            end
 
-        function_object =
-          Enum.find(functions, fn function -> function["name"] == function_name end)
-
-        case aci_to_sophia_type(function_object["returns"]) do
-          {:error, _} = err ->
-            err
-
-          type ->
-            {:ok, type}
+          nil ->
+            {:error, "Undefined function #{function_name}"}
         end
 
       {:error, _} = error ->
@@ -621,22 +521,187 @@ defmodule AeppSDK.Contract do
   """
   def default_gas_price(), do: @default_gas_price
 
-  defp decode_logs(logs) do
+  @doc """
+  false
+  """
+  def encode_logs(logs, topic_types) do
     Enum.map(logs, fn log ->
       string_data = Encoding.prefix_decode_base64(log.data)
-      log |> Map.from_struct() |> Map.replace!(:data, string_data)
+
+      log
+      |> Map.from_struct()
+      |> Map.replace!(:data, string_data)
+      |> Map.update!(:topics, fn [event_name | rest_topics] = topics ->
+        case topic_types do
+          [] ->
+            topics
+
+          _ ->
+            {encoded_topics, _} =
+              Enum.reduce(rest_topics, {[], topic_types}, fn topic,
+                                                             {encoded_topics,
+                                                              [topic_type | rest_types]} ->
+                {[encode_topic(topic_type, topic) | encoded_topics], rest_types}
+              end)
+
+            [event_name | Enum.reverse(encoded_topics)]
+        end
+      end)
     end)
+  end
+
+  def call_on_chain(
+        %Client{
+          connection: connection
+        } = client,
+        contract_address,
+        source_code,
+        function_name,
+        function_args,
+        opts
+      )
+      when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
+             is_list(function_args) and is_list(opts) do
+    with {:ok, contract_call_tx} <-
+           build_contract_call_tx(
+             client,
+             contract_address,
+             source_code,
+             function_name,
+             function_args,
+             opts
+           ),
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
+         {:ok, response} <-
+           Transaction.try_post(
+             client,
+             contract_call_tx,
+             Keyword.get(opts, :auth, nil),
+             height
+           ),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, response.return_value, response.return_type) do
+      {:ok, %{response | return_value: decoded_return_value, log: encode_logs(response.log, [])}}
+    else
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp call_static(
+         %Client{
+           connection: connection,
+           internal_connection: internal_connection
+         } = client,
+         contract_address,
+         source_code,
+         function_name,
+         function_args,
+         opts
+       )
+       when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
+              is_list(function_args) and is_list(opts) do
+    with {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
+         {caller_public_key, caller_balance} <-
+           determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
+         {:ok, contract_call_tx} <-
+           build_contract_call_tx(
+             %Client{client | keypair: %{public: caller_public_key}},
+             contract_address,
+             source_code,
+             function_name,
+             function_args,
+             opts
+           ),
+         serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
+         encoded_contract_call_tx =
+           Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
+         {:ok,
+          %DryRunResults{
+            results: [
+              %DryRunResult{
+                call_obj: %ContractCallObject{
+                  return_type: return_type,
+                  return_value: return_value,
+                  log: log
+                }
+              }
+            ]
+          }} <-
+           DebugApi.dry_run_txs(internal_connection, %DryRunInput{
+             top: Keyword.get(opts, :top, top_block_hash),
+             accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
+             txs: [encoded_contract_call_tx]
+           }),
+         {:ok, function_return_type} <- get_function_return_type(source_code, function_name),
+         {:ok, decoded_return_value} <-
+           decode_return_value(function_return_type, return_value, return_type) do
+      {:ok,
+       %{return_value: decoded_return_value, return_type: return_type, log: encode_logs(log, [])}}
+    else
+      {:ok,
+       %DryRunResults{
+         results: [
+           %DryRunResult{call_obj: nil, reason: message, result: "error", type: "contract_call"}
+         ]
+       }} ->
+        {:error, message}
+
+      {:ok, %Error{reason: message}} ->
+        {:error, message}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  defp encode_topic(:address, topic), do: encode_hash(topic, "ak")
+
+  defp encode_topic(:contract, topic), do: encode_hash(topic, "ct")
+
+  defp encode_topic(:oracle, topic), do: encode_hash(topic, "ok")
+
+  defp encode_topic(:oracle_query, topic), do: encode_hash(topic, "oq")
+
+  defp encode_topic(:int, topic), do: topic
+
+  defp encode_topic(:bits, topic), do: topic
+
+  defp encode_topic(:bytes, topic), do: topic
+
+  defp encode_topic(:bool, topic) do
+    case topic do
+      1 ->
+        true
+
+      0 ->
+        false
+    end
+  end
+
+  defp encode_hash(hash, prefix) do
+    binary_hash = :binary.encode_unsigned(hash)
+    Encoding.prefix_encode_base58c(prefix, binary_hash)
+  end
+
+  defp type_to_string(type) do
+    if is_atom(type) do
+      Atom.to_string(type)
+    else
+      type
+    end
   end
 
   defp aci_to_sophia_type(type) do
     case type do
       %{} ->
-        structure_type = type |> Map.keys() |> List.first()
-        field_types = type |> Map.values() |> List.first()
+        structure_type = type |> Map.keys() |> List.first() |> type_to_string()
+        field_types = type |> Map.values() |> List.first() |> type_to_string()
         aci_to_sophia_type(structure_type, field_types)
 
       [type] ->
-        aci_to_sophia_type(type)
+        type |> type_to_string() |> aci_to_sophia_type()
 
       type ->
         type
@@ -695,6 +760,7 @@ defmodule AeppSDK.Contract do
     nonce_result =
       if Keyword.has_key?(opts, :top) do
         top_block_hash = Keyword.get(opts, :top)
+
         AccountUtils.nonce_at_hash(connection, public_key, top_block_hash)
       else
         AccountUtils.next_valid_nonce(connection, public_key)
@@ -724,6 +790,32 @@ defmodule AeppSDK.Contract do
 
       {:error, _} = error ->
         error
+    end
+  end
+
+  defp determine_caller(
+         %Client{keypair: %{public: public_key}, connection: connection},
+         block_hash,
+         opts
+       ) do
+    min_balance =
+      Keyword.get(opts, :gas, @default_gas) * Keyword.get(opts, :gas_price, @default_gas_price) +
+        Keyword.get(opts, :fee, 0)
+
+    with {:ok, %Account{balance: balance}} <-
+           AccountApi.get_account_by_pubkey_and_hash(
+             connection,
+             public_key,
+             block_hash
+           ),
+         true <- balance >= min_balance do
+      {public_key, balance}
+    else
+      false ->
+        {public_key, min_balance}
+
+      _ ->
+        {@genesis_beneficiary, min_balance}
     end
   end
 end
