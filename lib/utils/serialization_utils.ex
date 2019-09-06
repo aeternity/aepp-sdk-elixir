@@ -29,6 +29,8 @@ defmodule AeppSDK.Utils.SerializationUtils do
     ChannelWithdrawTx
   }
 
+  alias Core.Channel.OffchainTx
+
   @ct_version 0x40001
 
   @spec process_tx_fields(struct()) :: tuple()

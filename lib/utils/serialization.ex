@@ -1119,6 +1119,10 @@ defmodule AeppSDK.Utils.Serialization do
     ]
   end
 
+  defp serialization_template(:channel_offchain_tx) do
+    [channel_id: :id, round: :int, state_hash: :binary]
+  end
+
   defp serialization_template(:channel_offchain_update_transfer) do
     [from: :id, to: :id, amount: :int]
   end

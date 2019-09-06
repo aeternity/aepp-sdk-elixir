@@ -1,7 +1,8 @@
 defmodule CoreChannelTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Account, Client, Channel, GeneralizedAccount}
+  alias AeppSDK.Channel.OnChain, as: Channel
+  alias AeppSDK.{Account, Client, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Transaction}
 
   setup_all do

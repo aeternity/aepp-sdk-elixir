@@ -1,15 +1,16 @@
-defmodule AeppSDK.Channel do
+# TODO alias problem
+defmodule AeppSDK.Channel.OnChain do
   @moduledoc """
   Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
   Contains all channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
-  Client example can be found at: `AeppSDK.Client.new/4`.
+  Client example can be found at: `Core.Client.new/4`.
   """
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Chain
   alias AeppSDK.GeneralizedAccount
-  alias AeppSDK.Utils.{Hash, Serialization}
+  alias AeppSDK.Utils.Serialization
 
   alias AeternityNode.Model.{
     ChannelCreateTx,
@@ -28,15 +29,12 @@ defmodule AeppSDK.Channel do
   }
 
   alias AeppSDK.Client
-  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.Account, as: AccountUtil
   alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Hash}
   alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
-  @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
-  @empty_tree_hash <<0::256>>
-  @poi_version 1
 
   defguard valid_prefixes(sender_pubkey_prefix, channel_prefix)
            when sender_pubkey_prefix == "ak" and channel_prefix == "ch"
@@ -45,25 +43,26 @@ defmodule AeppSDK.Channel do
   Gets channel information by its pubkey.
 
   ## Example
-      iex> AeppSDK.Channel.get_by_pubkey(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C")
+      iex> Core.Channel.get_by_pubkey(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok,
-          %{
-            channel_amount: 100000000000,
-            channel_reserve: 20,
-            delegate_ids: [],
-            id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-            initiator_amount: 30000000000,
-            initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
-            lock_period: 10,
-            locked_until: 0,
-            responder_amount: 70000000000,
-            responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-            round: 1,
-            solo_round: 0,
-            state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-          }}
+         %{
+           channel_amount: 16720002000,
+           channel_reserve: 1000,
+           delegate_ids: [],
+           id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+           initiator_amount: 1000,
+           initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+           lock_period: 100,
+           locked_until: 0,
+           responder_amount: 1000,
+           responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+           round: 2,
+           solo_round: 0,
+           state_hash: "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"
+         }}
+
   """
-  @spec get_by_pubkey(AeppSDK.Client.t(), String.t()) ::
+  @spec get_by_pubkey(Core.Client.t(), String.t()) ::
           {:error, Tesla.Env.t()} | {:ok, map()}
   def get_by_pubkey(%Client{connection: connection}, channel_pubkey) do
     prepare_result(ChannelAPI.get_channel_by_pubkey(connection, channel_pubkey))
@@ -74,22 +73,28 @@ defmodule AeppSDK.Channel do
   More information at [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_create)
 
   ## Example
-      iex> initiator_amt = 30_000_000_000
-      iex> responder_amt = 70_000_000_000
-      iex> {:ok, [create_tx, create_sig]} =
-             AeppSDK.Channel.create(client1, initiator_amt, client5.keypair.public, responder_amt, 1, 20, 10,
-                AeppSDK.Utils.Encoding.prefix_encode_base58c(
-                 "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
-                  185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
-      iex> {:ok, [^create_tx, create_sig1]} = AeppSDK.Utils.Transaction.sign_tx(create_tx, client2)
-      iex> {:ok, %{channel_id: channel_id}} = AeppSDK.Channel.post(client1, create_tx, signatures_list: [create_sig, create_sig1])
+      iex> Core.Channel.Channel.create(client, 1000, client1.keypair.public ,1000, 1000, 1000, 100, "st_11111111111111111111111111111111273Yts")
       {:ok,
-         %{
-           block_hash: "mh_yqm5TQjwtB5sxhDCSbDJk59VXyd1VMVViA2JtEsNBaGqaLm49",
-           block_height: 619,
-           channel_id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-           tx_hash: "th_VZFXHi74qS66J3Q8EE76sYHWA3GTmbsiPs6ZfrSiViLBpuvx3"
-          }}
+        [
+          %AeternityNode.Model.ChannelCreateTx{
+            channel_reserve: 1000,
+            delegate_ids: [],
+            fee: 17480000000,
+            initiator_amount: 1000,
+            initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            lock_period: 100,
+            nonce: 2,
+            push_amount: 1000,
+            responder_amount: 1000,
+            responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+            state_hash:"st_11111111111111111111111111111111273Yts",
+            ttl: 0
+          },
+          <<57, 30, 45, 155, 161, 147, 152, 117, 167, 202, 127, 50, 186, 142, 248, 183,
+            245, 237, 11, 198, 95, 30, 247, 78, 16, 18, 109, 90, 182, 112, 241, 61, 92,
+            97, 212, 128, 172, 40, 96, 81, 201, 207, 100, 15, 133, 174, 95, 140, 88, 96,
+            253, 85, 93, 32, 78, 78, 61, 230, 29, 58, 14, 104, 157, 5>>
+        ]}
   """
   @spec create(
           Client.t(),
@@ -119,7 +124,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when sender_prefix == "ak" and responder_prefix == "ak" do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, create_channel_tx} <-
@@ -166,17 +171,23 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_mutual
 
   ## Example
-      iex> {:ok, [close_mutual_tx, close_mutual_sig]} =
-              AeppSDK.Channel.close_mutual(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 0, 70_000_000_000)
-      iex> {:ok, [^close_mutual_tx, close_mutual_sig1]} = AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client2)
-      iex> Channel.post(client1, close_mutual_tx, signatures_list: [close_mutual_sig, close_mutual_sig1])
+      iex> Core.Channel.Channel.close_mutual(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",2000,12000000)
       {:ok,
-          %{
-            block_hash: "mh_kk1Xzo8GEmpdnAz4yZPXngcLGWjRYnGBAZ4ZtFoPHNHioJ7Di",
-            block_height: 574,
-            info: %{reason: "Channel not found"},
-            tx_hash: "th_t7z2VjPFPr54XD8mwdtojm62ZL6NmLkdJzgsmGWTdSaGqc4Ab"
-          }}
+        [
+          %AeternityNode.Model.ChannelCloseMutualTx{
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 16740000000,
+            from_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            initiator_amount_final: 2000,
+            nonce: 5,
+            responder_amount_final: 12000000,
+            ttl: 0
+          },
+          <<154, 198, 126, 220, 52, 91, 55, 178, 103, 155, 224, 160, 38, 97, 203, 251, 95,
+            184, 237, 184, 100, 14, 142, 198, 103, 42, 119, 49, 90, 193, 111, 86, 233,
+            167, 125, 207, 57, 66, 91, 211, 225, 192, 219, 245, 99, 50, 214, 2, 10, 130,
+            165, 215, 161, 72, 62, 202, 98, 170, 134, 52, 200, 23, 85, 7>>
+        ]}
   """
   @spec close_mutual(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, list()} | {:error, String.t()}
@@ -194,7 +205,7 @@ defmodule AeppSDK.Channel do
       )
       when valid_prefixes(sender_prefix, channel_prefix) and initiator_amount_final >= 0 and
              responder_amount_final >= 0 do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
            build_close_mutual_tx(
@@ -231,86 +242,6 @@ defmodule AeppSDK.Channel do
   @doc """
   Closes a channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_solo
-
-  ## Example
-      iex> AeppSDK.Channel.close_solo(
-               client1,
-               "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<>>,
-               accounts:
-                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
-                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
-                  %{
-                    cache:
-                      {3,
-                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
-                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
-                          240>>,
-                        [
-                          <<>>,
-                          <<>>,
-                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                            112, 176>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>
-                        ],
-                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                           112, 176>>,
-                         [
-                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
-                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
-                             221, 224, 123>>,
-                           <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
-                         ], nil,
-                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          [
-                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
-                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
-                              158, 30, 72>>,
-                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
-                          ], nil, nil}}, nil}}
-                  }}
-                 )
-
-      {:ok,
-          %{
-            block_hash: "mh_2cfm1y1zokwu467fLdZrp2VWgNZaTmeXGGw4jHdQGh6sZZctrd",
-            block_height: 74,
-            info: %{
-              channel_amount: 100000000000,
-              channel_reserve: 20,
-              delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-              initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
-              lock_period: 10,
-              locked_until: 106,
-              responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-              round: 1,
-              solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-            },
-            tx_hash: "th_276gHMqrNWX7ucMTokWz5eUEV4cgreumvXB5casY1cNVKKApYD"
-          }}
   """
   @spec close_solo(Client.t(), binary(), binary(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -327,7 +258,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) and is_binary(payload) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
            build_close_solo_tx(
@@ -348,15 +279,14 @@ defmodule AeppSDK.Channel do
              client.gas_price,
              5
            ),
-         {:ok, response} <-
+         {:ok, _response} = response <-
            Transaction.try_post(
              client,
              %{close_solo_tx | fee: fee},
              Keyword.get(opts, :auth, nil),
              height
            ) do
-      {:ok, channel_info} = get_by_pubkey(client, channel_id)
-      {:ok, Map.put(response, :info, channel_info)}
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelCloseSoloTx : #{inspect(error)}"}
@@ -368,34 +298,24 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_deposit
 
   ## Example
-      iex> {:ok, [deposit_tx, deposit_sig]} =
-             AeppSDK.Channel.deposit(client1, 16740000000, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 2,
-                AeppSDK.Utils.Encoding.prefix_encode_base58c(
-                  "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
-                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
-      iex> {:ok, [^deposit_tx, deposit_sig1]} = AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client2)
-      iex> AeppSDK.Channel.post(client1, deposit_tx, signatures_list: [deposit_sig, deposit_sig1])
+      iex> Core.Channel.Channel.deposit(client, 16720000000, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", 2, Encoding.prefix_encode_base58c("st", <<0::256>>))
       {:ok,
-          %{
-            block_hash: "mh_rRcR3puQg4iAuBkR9yCfJtJTN5nzuaoqvr3oJdENXcyPQPTbY",
-            block_height: 947,
-            info: %{
-              channel_amount: 116720000000,
-              channel_reserve: 20,
-              delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-              initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
-              lock_period: 10,
-              locked_until: 0,
-              responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-              round: 2,
-              solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-            },
-            tx_hash: "th_LxmSCW1jHdaKiHJ32WidK8n2VyeJfarLzYsDA8N9DhN54HJMJ"
-          }}
+        [
+          %AeternityNode.Model.ChannelDepositTx{
+            amount: 16720000000,
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 17400000000,
+            from_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            nonce: 3,
+            round: 2,
+            state_hash: "st_11111111111111111111111111111111273Yts",
+            ttl: 0
+          },
+          <<44, 241, 124, 7, 189, 254, 202, 235, 78, 79, 88, 185, 235, 90, 234, 213, 246,
+            149, 239, 157, 69, 42, 234, 50, 68, 76, 194, 42, 21, 200, 29, 82, 134, 126,
+            53, 228, 12, 77, 80, 150, 65, 211, 194, 127, 22, 93, 106, 254, 143, 15, 216,
+            79, 56, 104, 96, 48, 45, 9, 137, 108, 15, 29, 121, 1>>
+        ]}
   """
   @spec deposit(Client.t(), non_neg_integer(), binary(), non_neg_integer(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -413,7 +333,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -485,7 +405,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -533,16 +453,6 @@ defmodule AeppSDK.Channel do
   but only required if the parties involved did not manage to cooperate when
   trying to close the channel.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
-
-  ## Example
-      iex> AeppSDK.Channel.settle(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", initiator_amt, responder_amt)
-      {:ok,
-       %{
-         block_hash: "mh_5793UoBfCJUiMGKMMmfPxqZTJPo44HM3HCSBtjwVj8JyVntL6",
-         block_height: 299,
-         info: %{reason: "Channel not found"},
-         tx_hash: "th_2DGD2VmRZ798LxRxTb8TcqzLaEgtuZUk5VJtUvC9MsPzHEELEc"
-       }}
   """
   @spec settle(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -559,7 +469,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, settle_tx} <-
            build_settle_tx(
@@ -580,15 +490,14 @@ defmodule AeppSDK.Channel do
              client.gas_price,
              5
            ),
-         {:ok, response} <-
+         {:ok, _response} = response <-
            Transaction.try_post(
              client,
              %{settle_tx | fee: fee},
              Keyword.get(opts, :auth, nil),
              height
            ) do
-      {:ok, channel_info} = get_by_pubkey(client, channel_id)
-      {:ok, Map.put(response, :info, channel_info)}
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSettleTx : #{inspect(error)}"}
@@ -599,97 +508,6 @@ defmodule AeppSDK.Channel do
   If a malicious party sent a channel_close_solo or channel_force_progress_tx with an outdated state,
   the honest party has the opportunity to issue a channel_slash transaction
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
-
-  ## Example
-      iex> AeppSDK.Channel.slash(
-               client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<248, 211, 11, 1, 248, 132, 184, 64, 103, 143, 97, 54, 143, 62, 96, 188, 175, 138,
-                 69, 94, 189, 154, 187, 232, 24, 124, 227, 118, 222, 228, 194, 201, 138, 30, 163,
-                 139, 234, 56, 102, 49, 147, 29, 134, 97, 135, 69, 62, 62, 89, 133, 45, 99, 164,
-                 238, 174, 83, 132, 129, 253, 64, 92, 8, 33, 203, 46, 197, 115, 87, 191, 250, 221,
-                 0, 184, 64, 218, 115, 120, 42, 135, 32, 185, 172, 64, 147, 81, 28, 252, 62, 61,
-                 174, 23, 187, 214, 191, 235, 45, 229, 160, 92, 36, 8, 248, 130, 109, 163, 27, 57,
-                 181, 80, 131, 182, 231, 33, 13, 76, 193, 217, 176, 176, 134, 228, 122, 52, 81,
-                 237, 128, 105, 191, 57, 99, 140, 104, 242, 118, 170, 157, 214, 6, 184, 73, 248,
-                 71, 57, 1, 161, 6, 79, 170, 117, 156, 23, 1, 16, 54, 197, 235, 149, 116, 88, 255,
-                 224, 120, 70, 14, 30, 170, 25, 182, 198, 157, 53, 41, 226, 230, 204, 75, 170,
-                 223, 3, 192, 160, 104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46,
-                 166, 249, 5, 206, 185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144,
-                 107>>,
-               accounts:
-                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
-                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
-                  %{
-                    cache:
-                      {3,
-                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
-                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
-                          240>>,
-                        [
-                          <<>>,
-                          <<>>,
-                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                            112, 176>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>,
-                          <<>>
-                        ],
-                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                           112, 176>>,
-                         [
-                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
-                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
-                             221, 224, 123>>,
-                           <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
-                         ], nil,
-                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          [
-                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
-                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
-                              158, 30, 72>>,
-                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
-                          ], nil, nil}}, nil}}
-                  }}
-             )
-
-      {:ok,
-          %{
-            block_hash: "mh_oVXWg8Ws7vLJocaobvbK54RdTkQqPzz34whk7t2XnqTRCEHJV",
-            block_height: 193,
-            info: %{
-              channel_amount: 100000000000,
-              channel_reserve: 20,
-              delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-              initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
-              lock_period: 10,
-              locked_until: 203,
-              responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-              round: 3,
-              solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-            },
-            tx_hash: "th_3XdMojFEg5kMSVwpxCKLXfjtnp5dfzerNYyuYTAp5ypwxedHy"
-          }}
   """
   @spec slash(Client.t(), binary(), binary() | map(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -706,7 +524,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
            build_slash_tx(
@@ -727,15 +545,14 @@ defmodule AeppSDK.Channel do
              client.gas_price,
              5
            ),
-         {:ok, response} <-
+         {:ok, _response} = response <-
            Transaction.try_post(
              client,
              %{slash_tx | fee: fee},
              Keyword.get(opts, :auth, nil),
              height
            ) do
-      {:ok, channel_info} = get_by_pubkey(client, channel_id)
-      {:ok, Map.put(response, :info, channel_info)}
+      response
     else
       error ->
         {:error, "#{__MODULE__}: Unsuccessful post of ChannelSlashTx : #{inspect(error)}"}
@@ -747,30 +564,6 @@ defmodule AeppSDK.Channel do
   we provide the functionality of snapshots. Snapshots provide a recent off-chain state
   to be recorded on-chain.
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
-
-  ## Example
-     iex> Channel.snapshot_solo(
-               client,
-               "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<248, 211, 11, 1, 248, 132, 184, 64, 189, 85, 177, 158, 63, 228, 58, 49, 130, 243,
-                 140, 226, 243, 148, 27, 45, 181, 131, 160, 118, 17, 83, 57, 252, 79, 125, 17, 66,
-                 24, 141, 36, 201, 246, 103, 197, 220, 243, 55, 208, 220, 242, 184, 218, 232, 239,
-                 180, 68, 197, 198, 67, 148, 46, 244, 215, 183, 104, 6, 116, 105, 147, 163, 30,
-                 71, 8, 184, 64, 56, 168, 162, 166, 91, 36, 180, 37, 49, 220, 215, 99, 239, 45,
-                 121, 175, 128, 207, 45, 52, 168, 149, 50, 107, 38, 226, 64, 63, 54, 236, 238,
-                 150, 104, 159, 232, 14, 24, 134, 12, 33, 108, 232, 158, 222, 210, 242, 63, 78,
-                 134, 146, 242, 211, 11, 122, 230, 252, 254, 103, 150, 139, 88, 80, 47, 6, 184,
-                 73, 248, 71, 57, 1, 161, 6, 76, 31, 36, 226, 145, 19, 154, 231, 247, 12, 200,
-                 250, 255, 20, 63, 23, 196, 86, 255, 190, 186, 6, 111, 186, 119, 166, 86, 126, 7,
-                 231, 197, 244, 43, 192, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43>>
-             )
-      {:ok,
-          %{
-            block_hash: "mh_Xwp5ZAU3i8dQNxSSuUEtyBSwy8tjvjiHExYQHKSf32Wq3mtXn",
-            block_height: 391,
-            tx_hash: "th_2PqtPUxY2gzBrTmkYP3ZKDtbPH5HjZFQtitAJMBqGa6Pa2yuLT"
-          }}
   """
   @spec snapshot_solo(Client.t(), binary(), binary() | map(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -786,7 +579,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, snapshot_solo_tx} <-
            build_snapshot_solo_tx(
@@ -825,34 +618,24 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_withdraw
 
   ## Example
-      iex> {:ok, [withdraw_tx, withdraw_sig]} =
-             AeppSDK.Channel.withdraw(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", client4.keypair.public, 30000000000,
-                AeppSDK.Utils.Encoding.prefix_encode_base58c(
-                  "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
-                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>), 3)
-      iex> {:ok, [^withdraw_tx, withdraw_sig1]} = AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client2)
-      iex> AeppSDK.Channel.post(client1, withdraw_tx, signatures_list: [withdraw_sig, withdraw_sig1])
+      iex> Core.Channel.Channel.withdraw(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay", "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU", 2000, Utils.Encoding.prefix_encode_base58c("st", <<0::256>>), 3)
       {:ok,
-          %{
-            block_hash: "mh_2V4FWJtsu7YJ8MnyTCGV56B8aAR5sgbgmMD99GgZQds7BBko1L",
-            block_height: 1575,
-            info: %{
-              channel_amount: 86720000000,
-              channel_reserve: 20,
-              delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-              initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
-              lock_period: 10,
-              locked_until: 0,
-              responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-              round: 3,
-              solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-            },
-            tx_hash: "th_227fHhhY1A9iqSnNwGgmPU5dWi25r8exZ9JhdG4h6EKLwgBK5K"
-          }}
+        [
+          %AeternityNode.Model.ChannelWithdrawTx{
+            amount: 2000,
+            channel_id: "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay",
+            fee: 17340000000,
+            nonce: 3,
+            round: 3,
+            state_hash: "st_11111111111111111111111111111111273Yts",
+            to_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+            ttl: 0
+          },
+          <<125, 128, 179, 4, 157, 39, 210, 210, 55, 199, 175, 101, 22, 45, 219, 123, 131,
+            88, 103, 91, 30, 140, 190, 109, 26, 212, 188, 82, 174, 253, 2, 148, 205, 112,
+            94, 106, 218, 54, 250, 185, 144, 170, 227, 114, 36, 232, 24, 157, 164, 143,
+            66, 47, 177, 190, 24, 69, 60, 65, 119, 133, 147, 191, 191, 8>>
+        ]}
   """
   @spec withdraw(
           Client.t(),
@@ -879,7 +662,7 @@ defmodule AeppSDK.Channel do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtil.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -923,7 +706,7 @@ defmodule AeppSDK.Channel do
   Gets current state hash.
 
   ## Example
-      iex> AeppSDK.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> Core.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
   """
   @spec get_current_state_hash(Client.t(), String.t()) ::
@@ -937,22 +720,6 @@ defmodule AeppSDK.Channel do
       {:ok, %Error{} = error} -> {:error, error}
       error -> error
     end
-  end
-
-  @doc """
-    Calculates state hash by provided Proof of Inclusion
-  """
-  @spec calculate_state_hash(Serialization.poi_keyword()) :: {:ok, binary()}
-  def calculate_state_hash(poi) when is_list(poi) do
-    packed_state_hashes =
-      for tree <- @all_trees_names, into: <<@poi_version::64>> do
-        {state_hash, _proof_db} = Keyword.get(poi, tree, {@empty_tree_hash, %{cache: {0, nil}}})
-        state_hash
-      end
-
-    {:ok, state_hash} = Hash.hash(packed_state_hashes)
-
-    {:ok, Encoding.prefix_encode_base58c("st", state_hash)}
   end
 
   @doc """
@@ -973,7 +740,7 @@ defmodule AeppSDK.Channel do
                   state_hash: "st_11111111111111111111111111111111273Yts",
                   ttl: 0
                 }
-      iex> AeppSDK.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
+      iex> Core.Channel.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
           block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
