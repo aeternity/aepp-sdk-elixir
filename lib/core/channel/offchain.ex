@@ -1,19 +1,19 @@
 defmodule AeppSDK.Channel.OffChain do
   # 2 is a supported version, as we support generalized accounts, 1 is without meta data support
   @update_vsn 2
-  @transfer_fields_template [from_id: :id, to_id: :id, amount: :id]
-  @deposit_fields_template [from_id: :id, amount: :int]
-  @withdraw_fields_template [to_id: :id, amount: :int]
+  @transfer_fields_template [from: :id, to: :id, amount: :int]
+  @deposit_fields_template [from: :id, amount: :int]
+  @withdraw_fields_template [to: :id, amount: :int]
   @create_contract_fields_template [
-    owner_id: :id,
+    owner: :id,
     ct_version: :int,
     code: :binary,
     deposit: :int,
     call_data: :binary
   ]
   @call_contract_fields_template [
-    caller_id: :id,
-    contract_id: :id,
+    caller: :id,
+    contract: :id,
     abi_version: :int,
     amount: :int,
     gas: :int,
@@ -28,17 +28,29 @@ defmodule AeppSDK.Channel.OffChain do
   def new(<<"ch_", _channel_id>> = channel_id, round, state_hash, updates \\ []) do
   end
 
-  def serialize_updates(update) do
+  def serialize_updates(update) when is_list(update) do
     serialize_update(update, [])
+  end
+
+  # TODO should be handled better than it is now
+  def serialize_updates(%{type: _} = valid_update_struct) do
+    serialize_update([valid_update_struct], [])
   end
 
   defp serialize_update([], acc) do
     acc
   end
 
+  # TODO maybe remove strict matching on identified binaries
+
   defp serialize_update(
          [
-           %{type: :transfer, from_id: _from_id, to_id: _to_id, amount: _amount} = update
+           %{
+             type: :transfer,
+             from: {:id, :account, _from_id},
+             to: {:id, :account, _to_id},
+             amount: _amount
+           } = update
            | updates
          ],
          acc
@@ -54,11 +66,14 @@ defmodule AeppSDK.Channel.OffChain do
         fields
       )
 
-    serialize_update(updates, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp serialize_update(
-         [%{type: :withdraw, to_id: _to_id, amount: _amount} = update | updates],
+         [
+           %{type: :withdraw, to: {:id, :account, _account_id}, amount: _amount} = update
+           | updates
+         ],
          acc
        ) do
     template = @withdraw_fields_template
@@ -72,11 +87,14 @@ defmodule AeppSDK.Channel.OffChain do
         fields
       )
 
-    serialize_update(updates, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp serialize_update(
-         [%{type: :deposit, from_id: _from_id, amount: _amount} = update | updates],
+         [
+           %{type: :deposit, from: {:id, :account, _caller_id}, amount: _amount} = update
+           | updates
+         ],
          acc
        ) do
     template = @deposit_fields_template
@@ -90,14 +108,15 @@ defmodule AeppSDK.Channel.OffChain do
         fields
       )
 
-    serialize_update(updates, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp serialize_update(
          [
+           # TODO: maybe type of contract identifier is also/only a possible entity?
            %{
              type: :create_contract,
-             owner_id: _owner_id,
+             owner_id: {:id, :account, _owner_id},
              ct_version: _ct_version,
              code: _code,
              deposit: _deposit,
@@ -118,15 +137,16 @@ defmodule AeppSDK.Channel.OffChain do
         fields
       )
 
-    serialize_update(updates, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp serialize_update(
          [
+           # TODO: who are exactly callers? can oracle/other contract entity also call the contract?
            %{
              type: :call_contract,
-             caller_id: _caller_id,
-             contract_id: _contract_id,
+             caller: {:id, :account, _caller_id},
+             contract: {:id, :contract, _contract_id},
              abi_version: _abi_version,
              amount: _amount,
              call_data: _call_data,
@@ -149,7 +169,7 @@ defmodule AeppSDK.Channel.OffChain do
         fields
       )
 
-    serialize_update(updates, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp serialize_update([%{type: :meta} = update | updates], acc) do
@@ -160,7 +180,7 @@ defmodule AeppSDK.Channel.OffChain do
     serialized_update =
       :aeser_chain_objects.serialize(:channel_offchain_update_meta, @update_vsn, template, fields)
 
-    serialize_update(fields, [acc | serialized_update])
+    serialize_update(updates, [serialized_update | acc])
   end
 
   defp prepare_fields(update, template) do
