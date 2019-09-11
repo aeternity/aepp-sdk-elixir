@@ -617,6 +617,42 @@ defmodule AeppSDK.Utils.SerializationUtils do
      ], :ga_meta_tx}
   end
 
+  def process_tx_fields(%{
+        channel_id: channel_id,
+        round: round,
+        state_hash: <<"st_", state_hash::binary>>,
+        version: 1,
+        updates: updates
+      }) do
+    channel_id_record = proccess_id_to_record(channel_id)
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
+
+    {:ok,
+     [
+       channel_id_record,
+       round,
+       updates,
+       decoded_state_hash
+     ], :channel_offchain_tx}
+  end
+
+  def process_tx_fields(%{
+        channel_id: channel_id,
+        round: round,
+        state_hash: <<"st_", state_hash::binary>>,
+        version: 2
+      }) do
+    channel_id_record = proccess_id_to_record(channel_id)
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
+
+    {:ok,
+     [
+       channel_id_record,
+       round,
+       decoded_state_hash
+     ], :channel_offchain_tx_no_updates}
+  end
+
   def process_tx_fields(tx) do
     {:error, "Unknown or invalid tx: #{inspect(tx)}"}
   end

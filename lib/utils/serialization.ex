@@ -28,6 +28,7 @@ defmodule AeppSDK.Utils.Serialization do
   @tag_channel_close_solo_tx 54
   @tag_channel_slash_tx 55
   @tag_channel_settle_tx 56
+  @tag_offchain_tx 57
   @tag_channel_snapshot_solo_tx 59
   @tag_channel_force_progress_tx 521
   @tag_channel_offchain_update_transfer 570
@@ -63,6 +64,8 @@ defmodule AeppSDK.Utils.Serialization do
   @version_channel_snapshot_solo_tx 1
   @version_channel_force_progress_tx 1
   @version_poi 1
+  @version_channel_offchain_tx_no_updates 2
+  @version_channel_offchain_tx 1
   @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
   @empty_tree_hash <<0::256>>
 
@@ -1080,6 +1083,23 @@ defmodule AeppSDK.Utils.Serialization do
     ]
   end
 
+  defp serialization_template(:channel_offchain_tx_no_updates) do
+    [
+      channel_id: :id,
+      round: :int,
+      state_hash: :binary
+    ]
+  end
+
+  defp serialization_template(:channel_offchain_tx) do
+    [
+      channel_id: :id,
+      round: :int,
+      updates: [:binary],
+      state_hash: :binary
+    ]
+  end
+
   defp serialization_template(:ga_attach_tx) do
     [
       owner_id: :id,
@@ -1164,6 +1184,8 @@ defmodule AeppSDK.Utils.Serialization do
   defp type_to_tag(:sophia_byte_code), do: @tag_sophia_byte_code
   defp type_to_tag(:ga_attach_tx), do: @tag_ga_attach_tx
   defp type_to_tag(:ga_meta_tx), do: @tag_ga_meta_tx
+  defp type_to_tag(:channel_offchain_tx), do: @tag_offchain_tx
+  defp type_to_tag(:channel_offchain_tx_no_updates), do: @tag_offchain_tx
 
   defp type_to_tag(:channel_create_tx), do: @tag_channel_create_tx
   defp type_to_tag(:channel_deposit_tx), do: @tag_channel_deposit_tx
@@ -1213,6 +1235,8 @@ defmodule AeppSDK.Utils.Serialization do
   defp version(:channel_offchain_update_transfer), do: @version_channel_offchain_update_transfer
   defp version(:channel_offchain_update_deposit), do: @version_channel_offchain_update_deposit
   defp version(:channel_offchain_update_withdraw), do: @version_channel_offchain_update_withdraw
+  defp version(:channel_offchain_tx_no_updates), do: @version_channel_offchain_tx_no_updates
+  defp version(:channel_offchain_tx), do: @version_channel_offchain_tx
 
   defp version(:channel_offchain_update_create_contract),
     do: @version_channel_offchain_update_create_contract
