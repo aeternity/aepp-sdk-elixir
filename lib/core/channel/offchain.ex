@@ -1,7 +1,10 @@
 defmodule AeppSDK.Channel.OffChain do
   alias AeppSDK.Utils.Serialization
+
+  @update_vsn 1
   @updates_version 1
   @no_updates_version 2
+  @meta_fields_template [data: :binary]
   @transfer_fields_template [from: :id, to: :id, amount: :int]
   @deposit_fields_template [from: :id, amount: :int]
   @withdraw_fields_template [to: :id, amount: :int]
@@ -22,38 +25,86 @@ defmodule AeppSDK.Channel.OffChain do
     call_data: :binary,
     call_stack: [:int]
   ]
-  @update_vsn 1
-  @meta_fields_template [data: :binary]
 
-  defstruct channel_id: <<>>, round: 0, state_hash: <<>>, updates: []
+  @doc """
+  Creates a new off-chain transactions, supporting updates, with given parameters.
 
-  def new(
-        <<"ch_", _channel_id>> = channel_id,
-        round,
-        <<"st_", _state_hash>> = encoded_state_hash,
-        version,
-        updates
-      )
-      when is_list(updates) and version == @updates_version do
-    %{
-      channel_id: channel_id,
-      round: round,
-      state_hash: encoded_state_hash,
-      version: version,
-      updates: serialize_updates(updates)
-    }
-  end
+  ## Example
 
+    iex> channel = "ch_11111111111111111111111111111111273Yts"
+    iex> state_hash = "st_11111111111111111111111111111111273Yts"
+    iex> AeppSDK.Channel.OffChain.new channel, 1, state_hash, 1, []
+      %{
+        channel_id: "ch_11111111111111111111111111111111273Yts",
+        round: 1,
+        state_hash: "st_11111111111111111111111111111111273Yts",
+        updates: [],
+        version: 1
+      }
+  """
+  @spec new(String.t(), integer(), String.t(), integer(), list()) :: map()
   def new(
         <<"ch_", _channel_id::binary>> = channel_id,
         round,
         <<"st_", _state_hash::binary>> = encoded_state_hash,
-        version
+        @updates_version,
+        updates
       )
-      when version == @no_updates_version do
-    %{channel_id: channel_id, round: round, version: version, state_hash: encoded_state_hash}
+      when is_list(updates) do
+    %{
+      channel_id: channel_id,
+      round: round,
+      state_hash: encoded_state_hash,
+      version: @updates_version,
+      updates: serialize_updates(updates)
+    }
   end
 
+  @doc """
+  Creates a new off-chain transactions, without supporting updates, with given parameters.
+
+  ## Example
+
+    iex> channel = "ch_11111111111111111111111111111111273Yts"
+    iex> state_hash = "st_11111111111111111111111111111111273Yts"
+    iex> AeppSDK.Channel.OffChain.new channel, 1, state_hash, 2
+      %{
+        channel_id: "ch_11111111111111111111111111111111273Yts",
+        round: 1,
+        state_hash: "st_11111111111111111111111111111111273Yts",
+        version: 2
+      }
+  """
+
+  @spec new(String.t(), integer(), String.t(), integer()) :: map()
+  def new(
+        <<"ch_", _channel_id::binary>> = channel_id,
+        round,
+        <<"st_", _state_hash::binary>> = encoded_state_hash,
+        @no_updates_version
+      ) do
+    %{
+      channel_id: channel_id,
+      round: round,
+      version: @no_updates_version,
+      state_hash: encoded_state_hash
+    }
+  end
+
+  @doc """
+  Serializes a off-chain transactions, supports both updates and no-updates versions.
+
+  ## Example
+
+    iex> channel = "ch_11111111111111111111111111111111273Yts"
+    iex> state_hash = "st_11111111111111111111111111111111273Yts"
+    iex> channel_off_chain_tx = AeppSDK.Channel.OffChain.new channel, 1, state_hash, 2
+    iex> AeppSDK.Channel.OffChain.serialize_tx channel_off_chain_tx
+      <<248,70,57,2,161,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+      160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0>>
+
+  """
+  @spec serialize_tx(map()) :: binary()
   def serialize_tx(
         %{
           channel_id: _channel_id,
@@ -65,6 +116,18 @@ defmodule AeppSDK.Channel.OffChain do
     Serialization.serialize(offchain_tx)
   end
 
+  @doc """
+  Serializes off-chain updates.
+
+  ## Example
+
+    iex> update = %{type: :transfer, from: {:id, :account, <<0::256>>}, to: {:id, :account, <<0::256>>}, amount: 100}
+    iex> AeppSDK.Channel.OffChain.serialize_updates update
+      [<<248,73,130,2,58,1,161,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      161,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100>>]
+
+  """
+  @spec serialize_updates(list()) :: list(binary())
   def serialize_updates(update) when is_list(update) do
     serialize_update(update, [])
   end
