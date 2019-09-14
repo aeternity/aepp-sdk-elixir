@@ -6,21 +6,22 @@ defmodule AeppSDK.AENS do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-  alias AeternityNode.Model.{
-    NamePreclaimTx,
-    NameClaimTx,
-    NameRevokeTx,
-    NameTransferTx,
-    NameUpdateTx,
-    CommitmentId,
-    NameEntry
-  }
 
-  alias AeternityNode.Api.NameService
-  alias AeternityNode.Api.Chain
   alias AeppSDK.Client
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.Transaction
+  alias AeternityNode.Api.Chain
+  alias AeternityNode.Api.NameService
+
+  alias AeternityNode.Model.{
+    CommitmentId,
+    NameClaimTx,
+    NameEntry,
+    NamePreclaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx
+  }
 
   @prefix_byte_size 2
 

@@ -135,11 +135,11 @@ defmodule CoreChainTest do
     {:ok, %{key_block: %{hash: key_block_hash, height: ^height}, micro_blocks: _}} =
       generation_result
 
-    generation_result = Chain.get_generation(setup_data.client, key_block_hash)
+    generation_result_ = Chain.get_generation(setup_data.client, key_block_hash)
 
     assert match?(
              {:ok, %{key_block: %{hash: ^key_block_hash, height: ^height}}},
-             generation_result
+             generation_result_
            )
 
     micro_block_transactions_result =
@@ -153,8 +153,8 @@ defmodule CoreChainTest do
     key_block_result = Chain.get_key_block(setup_data.client, key_block_hash)
     assert match?({:ok, %{hash: ^key_block_hash, height: ^height}}, key_block_result)
 
-    key_block_result = Chain.get_key_block(setup_data.client, height)
-    assert match?({:ok, %{hash: ^key_block_hash, height: ^height}}, key_block_result)
+    key_block_result_ = Chain.get_key_block(setup_data.client, height)
+    assert match?({:ok, %{hash: ^key_block_hash, height: ^height}}, key_block_result_)
   end
 
   @tag :travis_test

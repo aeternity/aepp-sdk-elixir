@@ -5,7 +5,7 @@ defmodule AeppSDK.Listener.PeerConnection do
 
   alias AeppSDK.Listener
   alias AeppSDK.Listener.Peers
-  alias AeppSDK.Utils.{Hash, Serialization, Encoding}
+  alias AeppSDK.Utils.{Encoding, Hash, Serialization}
 
   @behaviour :ranch_protocol
 
@@ -374,7 +374,7 @@ defmodule AeppSDK.Listener.PeerConnection do
         micro_block_bin
       )
 
-    <<version::32, @micro_header::1, pof_tag::1, 0::30, height::64, prev_hash::@hash_size,
+    <<version_::32, @micro_header::1, pof_tag::1, 0::30, height::64, prev_hash::@hash_size,
       prev_key_hash::@hash_size, root_hash::@hash_size, txs_hash::@hash_size, time::64,
       rest::binary()>> = header_bin
 
@@ -389,7 +389,7 @@ defmodule AeppSDK.Listener.PeerConnection do
     block_info = %{
       pof_hash: encode_pof_hash(<<pof_hash::size(pof_hash_size)>>),
       signature: :aeser_api_encoder.encode(:signature, signature),
-      version: version,
+      version: version_,
       height: height,
       prev_hash: :aeser_api_encoder.encode(prev_block_type, <<prev_hash::256>>),
       prev_key_hash: :aeser_api_encoder.encode(:key_block_hash, <<prev_key_hash::256>>),

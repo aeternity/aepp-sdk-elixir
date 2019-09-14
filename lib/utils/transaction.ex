@@ -5,42 +5,43 @@ defmodule AeppSDK.Utils.Transaction do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-  alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias AeppSDK.{Client, Contract, GeneralizedAccount}
+  alias AeppSDK.Utils.{Encoding, Governance, Keys, Serialization}
+
   alias AeternityNode.Api.Account, as: AccountApi
-  alias AeppSDK.{Contract, Client, GeneralizedAccount}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   alias AeternityNode.Model.{
     Account,
-    PostTxResponse,
-    Tx,
-    Error,
-    GenericSignedTx,
-    ContractCallObject,
-    SpendTx,
-    OracleRegisterTx,
-    OracleQueryTx,
-    OracleRespondTx,
-    OracleExtendTx,
-    NamePreclaimTx,
-    NameClaimTx,
-    NameTransferTx,
-    NameRevokeTx,
-    NameUpdateTx,
-    ContractCallTx,
-    ContractCreateTx,
-    ChannelCreateTx,
     ChannelCloseMutualTx,
     ChannelCloseSoloTx,
+    ChannelCreateTx,
     ChannelDepositTx,
     ChannelForceProgressTx,
     ChannelSettleTx,
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
+    ContractCallObject,
+    ContractCallTx,
+    ContractCreateTx,
+    Error,
+    GenericSignedTx,
+    NameClaimTx,
+    NamePreclaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx,
+    OracleExtendTx,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    PostTxResponse,
+    SpendTx,
+    Tx,
     TxInfoObject
   }
 
-  alias AeppSDK.Utils.{Keys, Encoding, Serialization, Governance}
   alias Tesla.Env
 
   @struct_type [
@@ -75,7 +76,7 @@ defmodule AeppSDK.Utils.Transaction do
   @dummy_fee 0
   @tx_posting_attempts 5
   @default_payload ""
-  @fortuna_height 90800
+  @fortuna_height 90_800
 
   @type tx_types ::
           SpendTx.t()
@@ -97,8 +98,8 @@ defmodule AeppSDK.Utils.Transaction do
   @spec default_payload :: String.t()
   def default_payload, do: @default_payload
 
-  @spec dummy_fee() :: non_neg_integer()
-  def dummy_fee(), do: @dummy_fee
+  @spec dummy_fee :: non_neg_integer()
+  def dummy_fee, do: @dummy_fee
 
   @spec default_await_attempts() :: non_neg_integer()
   def default_await_attempts, do: @await_attempts
@@ -531,38 +532,41 @@ defmodule AeppSDK.Utils.Transaction do
     with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
          :ok <- ensure_auth_opts(auth_opts),
-         {:ok, calldata} =
+         {:ok, calldata} <-
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
              auth_fun,
              Keyword.get(auth_opts, :auth_args)
-           ),
-         serialized_tx = wrap_in_empty_signed_tx(tx),
-         meta_tx_dummy_fee = %{
-           ga_id: public_key,
-           auth_data: calldata,
-           abi_version: Contract.abi_version(),
-           fee: @dummy_fee,
-           gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
-           gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
-           ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
-           tx: serialized_tx
-         },
-         meta_tx = %{
-           meta_tx_dummy_fee
-           | fee:
-               Keyword.get(
-                 auth_opts,
-                 :fee,
-                 calculate_fee(
-                   tx,
-                   @fortuna_height,
-                   network_id,
-                   @dummy_fee,
-                   meta_tx_dummy_fee.gas_price
-                 )
-               )
-         } do
+           ) do
+      serialized_tx = wrap_in_empty_signed_tx(tx)
+
+      meta_tx_dummy_fee = %{
+        ga_id: public_key,
+        auth_data: calldata,
+        abi_version: Contract.abi_version(),
+        fee: @dummy_fee,
+        gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
+        gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
+        ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
+        tx: serialized_tx
+      }
+
+      meta_tx = %{
+        meta_tx_dummy_fee
+        | fee:
+            Keyword.get(
+              auth_opts,
+              :fee,
+              calculate_fee(
+                tx,
+                @fortuna_height,
+                network_id,
+                @dummy_fee,
+                meta_tx_dummy_fee.gas_price
+              )
+            )
+      }
+
       {:ok, [tx, meta_tx, []]}
     else
       {:ok, %Account{kind: "basic"}} ->

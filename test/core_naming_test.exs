@@ -1,7 +1,9 @@
 defmodule CoreNamingTest do
   use ExUnit.Case
+
+  alias AeppSDK.{Account, AENS}
   alias AeppSDK.Utils.{Keys, Serialization}
-  alias AeppSDK.{AENS, Account}
+  alias AeternityNode.Api.NameService
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")
@@ -21,7 +23,7 @@ defmodule CoreNamingTest do
 
     # Update a name
     list_of_pointers = [
-      {AeppSDK.Utils.Keys.public_key_to_binary(setup.valid_pub_key),
+      {Keys.public_key_to_binary(setup.valid_pub_key),
        Serialization.id_to_record(
          Keys.public_key_to_binary(setup.valid_pub_key),
          :account
@@ -55,16 +57,16 @@ defmodule CoreNamingTest do
     assert match?({:ok, _}, transfer)
 
     # Pre-claim a new name (name_salt = 888)
-    pre_claim = AENS.preclaim(setup.client, "newtest.test", 888)
-    assert match?({:ok, _}, pre_claim)
+    pre_claim_new = AENS.preclaim(setup.client, "newtest.test", 888)
+    assert match?({:ok, _}, pre_claim_new)
 
     # Claim a new name
-    claim = AENS.claim(setup.client, "newtest.test", 888)
-    assert match?({:ok, _}, claim)
+    claim_new = AENS.claim(setup.client, "newtest.test", 888)
+    assert match?({:ok, _}, claim_new)
 
     # Revoke a new name
-    revoke = AENS.revoke_name(setup.client, "newtest.test")
-    assert match?({:ok, _}, revoke)
+    revoke_new = AENS.revoke_name(setup.client, "newtest.test")
+    assert match?({:ok, _}, revoke_new)
   end
 
   @tag :travis_test
@@ -98,8 +100,8 @@ defmodule CoreNamingTest do
       |> AENS.revoke()
 
     assert match?(
-             {:ok, %AeternityNode.Model.Error{reason: "Name revoked"}},
-             AeternityNode.Api.NameService.get_name_entry_by_name(
+             {:ok, %{reason: "Name revoked"}},
+             NameService.get_name_entry_by_name(
                setup.client.connection,
                new_revoke_result.name
              )

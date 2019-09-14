@@ -1,19 +1,9 @@
 defmodule AeppSDK.Utils.Governance do
   @moduledoc false
   alias AeternityNode.Model.{
-    SpendTx,
-    OracleRegisterTx,
-    OracleQueryTx,
-    OracleRespondTx,
-    OracleExtendTx,
-    NamePreclaimTx,
-    NameClaimTx,
-    NameTransferTx,
-    NameRevokeTx,
-    NameUpdateTx,
-    ChannelCreateTx,
     ChannelCloseMutualTx,
     ChannelCloseSoloTx,
+    ChannelCreateTx,
     ChannelDepositTx,
     ChannelForceProgressTx,
     ChannelSettleTx,
@@ -21,7 +11,17 @@ defmodule AeppSDK.Utils.Governance do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     ContractCallTx,
-    ContractCreateTx
+    ContractCreateTx,
+    NameClaimTx,
+    NamePreclaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx,
+    OracleExtendTx,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    SpendTx
   }
 
   @byte_gas 20
@@ -80,8 +80,8 @@ defmodule AeppSDK.Utils.Governance do
   def gas(%ChannelWithdrawTx{}), do: 0
   def gas(%{gas: gas}), do: gas
 
-  @spec byte_gas() :: non_neg_integer()
-  def byte_gas(), do: @byte_gas
+  @spec byte_gas :: non_neg_integer()
+  def byte_gas, do: @byte_gas
 
   @spec state_gas_per_block(
           OracleRegisterTx.t()

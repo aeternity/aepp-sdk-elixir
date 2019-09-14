@@ -8,15 +8,15 @@ defmodule AeppSDK.GeneralizedAccount do
   For more information: [https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md](https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md)
   """
 
-  alias AeppSDK.Utils.{Hash, Serialization, Transaction, Encoding}
+  alias AeppSDK.{Client, Contract}
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Encoding, Hash, Serialization, Transaction}
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.Error
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.{Client, Contract}
 
   @ct_version 0x40001
   @init_function "init"
-  @default_gas 50000
+  @default_gas 50_000
 
   @doc """
   Attach a generalized account to a basic account. After a generalized account has been attached, it's possible
@@ -125,5 +125,5 @@ defmodule AeppSDK.GeneralizedAccount do
   @doc """
   false
   """
-  def default_gas(), do: @default_gas
+  def default_gas, do: @default_gas
 end

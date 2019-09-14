@@ -6,15 +6,19 @@ defmodule AeppSDK.Channel do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-  alias AeternityNode.Api.Channel, as: ChannelAPI
-  alias AeternityNode.Api.Chain
+  alias AeppSDK.Client
   alias AeppSDK.GeneralizedAccount
-  alias AeppSDK.Utils.{Hash, Serialization}
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Encoding, Hash, Serialization, Transaction}
+  alias AeternityNode.Api.Chain
+  alias AeternityNode.Api.Channel, as: ChannelAPI
+  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   alias AeternityNode.Model.{
-    ChannelCreateTx,
+    Channel,
     ChannelCloseMutualTx,
     ChannelCloseSoloTx,
+    ChannelCreateTx,
     ChannelDepositTx,
     ChannelForceProgressTx,
     ChannelSettleTx,
@@ -22,15 +26,9 @@ defmodule AeppSDK.Channel do
     ChannelSnapshotSoloTx,
     ChannelWithdrawTx,
     Error,
-    Channel,
     PostTxResponse,
     Tx
   }
-
-  alias AeppSDK.Client
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Hash}
-  alias AeternityNode.Api.Transaction, as: TransactionApi
 
   @prefix_byte_size 2
   @state_hash_byte_size 32
@@ -138,7 +136,7 @@ defmodule AeppSDK.Channel do
              encoded_state_hash
            ),
          {:ok, %{height: height}} <-
-           AeternityNode.Api.Chain.get_current_key_block_height(client.connection),
+           Chain.get_current_key_block_height(client.connection),
          fee <-
            Transaction.calculate_n_times_fee(
              create_channel_tx,
@@ -999,7 +997,7 @@ defmodule AeppSDK.Channel do
        )
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
-    {:ok, %{height: height}} = AeternityNode.Api.Chain.get_current_key_block_height(connection)
+    {:ok, %{height: height}} = Chain.get_current_key_block_height(connection)
     {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
     channel_info(client, tx, res)
   end

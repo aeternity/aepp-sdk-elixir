@@ -6,9 +6,14 @@ defmodule AeppSDK.Contract do
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
 
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.Chain, as: ChainUtils
+  alias AeppSDK.Utils.{Encoding, Keys, Serialization, Transaction}
+  alias AeppSDK.Utils.Hash
   alias AeternityNode.Api.Account, as: AccountApi
-  alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
+  alias AeternityNode.Api.Debug, as: DebugApi
 
   alias AeternityNode.Model.{
     Account,
@@ -22,11 +27,6 @@ defmodule AeppSDK.Contract do
     Error
   }
 
-  alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Keys}
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Utils.Chain, as: ChainUtils
-  alias AeppSDK.Utils.Hash
-  alias AeppSDK.Client
   alias Tesla.Env
 
   @default_deposit 0
@@ -116,13 +116,13 @@ defmodule AeppSDK.Contract do
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),
          {:ok, calldata} <- create_calldata(source_code, @init_function, init_args),
-         byte_code_fields = [
+         byte_code_fields <- [
            source_hash,
            type_info,
            byte_code
          ],
-         serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
-         contract_create_tx = %ContractCreateTx{
+         serialized_wrapped_code <- Serialization.serialize(byte_code_fields, :sophia_byte_code),
+         contract_create_tx <- %ContractCreateTx{
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
@@ -142,8 +142,9 @@ defmodule AeppSDK.Contract do
              contract_create_tx,
              Keyword.get(opts, :auth, nil),
              height
-           ),
-         contract_account = compute_contract_account(public_key_binary, nonce) do
+           ) do
+      contract_account = compute_contract_account(public_key_binary, nonce)
+
       {:ok,
        Map.merge(response, %{contract_id: contract_account, log: encode_logs(response.log, [])})}
     else
@@ -499,27 +500,27 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def abi_version(), do: @abi_version
+  def abi_version, do: @abi_version
 
   @doc """
   false
   """
-  def default_amount(), do: @default_amount
+  def default_amount, do: @default_amount
 
   @doc """
   false
   """
-  def default_deposit(), do: @default_deposit
+  def default_deposit, do: @default_deposit
 
   @doc """
   false
   """
-  def default_gas(), do: @default_gas
+  def default_gas, do: @default_gas
 
   @doc """
   false
   """
-  def default_gas_price(), do: @default_gas_price
+  def default_gas_price, do: @default_gas_price
 
   @doc """
   false
@@ -767,19 +768,20 @@ defmodule AeppSDK.Contract do
       end
 
     with {:ok, nonce} <- nonce_result,
-         {:ok, calldata} <- create_calldata(source_code, function_name, function_args),
-         contract_call_tx = %ContractCallTx{
-           caller_id: public_key,
-           nonce: nonce,
-           contract_id: contract_address,
-           abi_version: @abi_version,
-           fee: Keyword.get(opts, :fee, 0),
-           ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-           amount: Keyword.get(opts, :amount, @default_amount),
-           gas: Keyword.get(opts, :gas, @default_gas),
-           gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
-           call_data: calldata
-         } do
+         {:ok, calldata} <- create_calldata(source_code, function_name, function_args) do
+      contract_call_tx = %ContractCallTx{
+        caller_id: public_key,
+        nonce: nonce,
+        contract_id: contract_address,
+        abi_version: @abi_version,
+        fee: Keyword.get(opts, :fee, 0),
+        ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
+        amount: Keyword.get(opts, :amount, @default_amount),
+        gas: Keyword.get(opts, :gas, @default_gas),
+        gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
+        call_data: calldata
+      }
+
       {:ok, contract_call_tx}
     else
       {:ok, %Error{reason: message}} ->

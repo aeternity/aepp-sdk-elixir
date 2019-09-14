@@ -2,26 +2,24 @@ defmodule AeppSDK.Oracle do
   @moduledoc """
   Module for oracle interaction, see: [https://github.com/aeternity/protocol/blob/master/oracles/oracles.md](https://github.com/aeternity/protocol/blob/master/oracles/oracles.md).
   """
-  alias AeppSDK.Utils.Transaction
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Utils.{Keys, Hash, Encoding}
   alias AeppSDK.Client
-
-  alias AeternityNode.Model.{
-    RegisteredOracle,
-    OracleRegisterTx,
-    OracleQueryTx,
-    OracleRespondTx,
-    OracleExtendTx,
-    Ttl,
-    RelativeTtl,
-    Error,
-    OracleQueries,
-    OracleQuery
-  }
-
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Encoding, Hash, Keys, Transaction}
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Oracle, as: OracleApi
+
+  alias AeternityNode.Model.{
+    Error,
+    OracleExtendTx,
+    OracleQueries,
+    OracleQuery,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    RegisteredOracle,
+    RelativeTtl,
+    Ttl
+  }
 
   @abi_version 0x01
   @nonce_size 256
