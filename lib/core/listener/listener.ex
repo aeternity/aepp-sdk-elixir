@@ -4,12 +4,12 @@ defmodule AeppSDK.Listener do
   """
   use GenServer
 
-  alias AeppSDK.Listener.Supervisor, as: ListenerSup
   alias AeppSDK.{Client, Contract}
+  alias AeppSDK.Listener.Supervisor, as: ListenerSup
   alias AeppSDK.Utils.{Encoding, Hash}
-  alias AeternityNode.Api.Transaction, as: TransactionApi
   alias AeternityNode.Api.Chain, as: ChainApi
-  alias AeternityNode.Model.{ContractCallObject, GenericSignedTx, TxInfoObject, Error}
+  alias AeternityNode.Api.Transaction, as: TransactionApi
+  alias AeternityNode.Model.{ContractCallObject, Error, GenericSignedTx, TxInfoObject}
 
   @gc_objects_sent_interval 10_000
   @general_events [:micro_blocks, :key_blocks, :transactions, :pool_transactions]
@@ -87,8 +87,8 @@ defmodule AeppSDK.Listener do
       iex> AeppSDK.Listener.stop()
       :ok
   """
-  @spec stop() :: :ok
-  def stop(), do: Supervisor.stop(ListenerSup)
+  @spec stop :: :ok
+  def stop, do: Supervisor.stop(ListenerSup)
 
   @doc false
   def init(_) do
@@ -598,7 +598,7 @@ defmodule AeppSDK.Listener do
          event,
          object,
          subscribers
-       ), objects_sent ++ [hash]}
+       ), List.insert_at(objects_sent, -1, hash)}
     end
   end
 
@@ -696,7 +696,7 @@ defmodule AeppSDK.Listener do
     @pool_transactions_filtered_events
   end
 
-  defp do_gc_objects_sent() do
+  defp do_gc_objects_sent do
     Process.send_after(self(), :gc_objects_sent, @gc_objects_sent_interval)
   end
 
@@ -820,7 +820,7 @@ defmodule AeppSDK.Listener do
     end)
   end
 
-  defp assert_listener_started() do
+  defp assert_listener_started do
     case Process.whereis(ListenerSup) do
       nil ->
         {:error, "Listener not started, use start/1 or start/3"}

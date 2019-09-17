@@ -5,11 +5,12 @@ defmodule AeppSDK.Chain do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Transaction, as: TransactionUtils
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.NodeInfo, as: NodeInfoApi
   alias AeternityNode.Api.Transaction, as: TransactionApi
-  alias AeternityNode.Model.InlineResponse2001, as: HeightResponse
 
   alias AeternityNode.Model.{
     ContractCallObject,
@@ -17,11 +18,12 @@ defmodule AeppSDK.Chain do
     DryRunInput,
     DryRunResult,
     DryRunResults,
+    Error,
     Event,
+    Generation,
+    GenericSignedTx,
     GenericTx,
     GenericTxs,
-    GenericSignedTx,
-    Generation,
     KeyBlock,
     MicroBlockHeader,
     PeerPubKey,
@@ -29,12 +31,10 @@ defmodule AeppSDK.Chain do
     Protocol,
     PubKey,
     Status,
-    TxInfoObject,
-    Error
+    TxInfoObject
   }
 
-  alias AeppSDK.Utils.Transaction, as: TransactionUtils
-  alias AeppSDK.Client
+  alias AeternityNode.Model.InlineResponse2001, as: HeightResponse
   alias Tesla.Env
 
   @type await_options :: [attempts: non_neg_integer(), interval: non_neg_integer()]

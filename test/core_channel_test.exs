@@ -1,8 +1,8 @@
 defmodule CoreChannelTest do
   use ExUnit.Case
 
+  alias AeppSDK.{Account, Channel, Client, GeneralizedAccount}
   alias AeppSDK.Channel.OnChain, as: Channel
-  alias AeppSDK.{Account, Client, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Transaction}
 
   setup_all do
@@ -164,11 +164,11 @@ defmodule CoreChannelTest do
     assert {:ok, [create_tx, create_sig]} =
              Channel.create(
                client,
-               1000,
+               1_000,
                client1.keypair.public,
-               1000,
-               1000,
-               1000,
+               1_000,
+               1_000,
+               1_000,
                100,
                Encoding.prefix_encode_base58c("st", <<0::256>>)
              )
@@ -274,11 +274,11 @@ defmodule CoreChannelTest do
     assert {:ok, [tx, create_meta_tx, []]} =
              Channel.create(
                client2,
-               1000,
+               1_000,
                client3.keypair.public,
-               1000,
-               1000,
-               1000,
+               1_000,
+               1_000,
+               1_000,
                100,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                auth: auth
@@ -313,17 +313,17 @@ defmodule CoreChannelTest do
                tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = Channel.get_by_pubkey(client2, channel_id)
-    next_round = round + 1
+    {:ok, %{round: round_}} = Channel.get_by_pubkey(client2, channel_id)
+    next_round_ = round_ + 1
 
     assert {:ok, [withdraw_tx, withdraw_meta_tx, withdraw_sig]} =
              Channel.withdraw(
                client2,
                channel_id,
                client2.keypair.public,
-               2000,
+               2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
-               next_round,
+               next_round_,
                auth: auth
              )
 
@@ -337,7 +337,7 @@ defmodule CoreChannelTest do
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_meta_tx, close_mutual_sig]} =
-             Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
+             Channel.close_mutual(client2, channel_id, 1_000, 1_000, auth: auth)
 
     assert {:ok, [^close_mutual_tx, close_mutual_meta_tx1, close_mutual_sig1]} =
              Transaction.sign_tx(close_mutual_tx, client3, auth)
@@ -367,11 +367,11 @@ defmodule CoreChannelTest do
     assert {:ok, [tx, sig]} =
              Channel.create(
                client,
-               1000,
+               1_000,
                client2.keypair.public,
-               1000,
-               1000,
-               1000,
+               1_000,
+               1_000,
+               1_000,
                100,
                Encoding.prefix_encode_base58c("st", <<0::256>>)
              )
@@ -403,17 +403,17 @@ defmodule CoreChannelTest do
                inner_tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = Channel.get_by_pubkey(client, channel_id)
-    next_round = round + 1
+    {:ok, %{round: round_}} = Channel.get_by_pubkey(client, channel_id)
+    next_round_ = round_ + 1
 
     assert {:ok, [withdraw_tx, withdraw_sig]} =
              Channel.withdraw(
                client,
                channel_id,
                client2.keypair.public,
-               2000,
+               2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
-               next_round
+               next_round_
              )
 
     assert {:ok, [^withdraw_tx, withdraw_meta_tx, []]} =
@@ -456,11 +456,11 @@ defmodule CoreChannelTest do
     assert {:ok, [tx, create_meta_tx, []]} =
              Channel.create(
                client2,
-               1000,
+               1_000,
                client.keypair.public,
-               1000,
-               1000,
-               1000,
+               1_000,
+               1_000,
+               1_000,
                100,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                auth: auth
@@ -496,17 +496,17 @@ defmodule CoreChannelTest do
                inner_tx: deposit_tx
              )
 
-    {:ok, %{round: round}} = Channel.get_by_pubkey(client, channel_id)
-    next_round = round + 1
+    {:ok, %{round: round_}} = Channel.get_by_pubkey(client, channel_id)
+    next_round_ = round_ + 1
 
     assert {:ok, [withdraw_tx, withdraw_meta_tx, []]} =
              Channel.withdraw(
                client2,
                channel_id,
                client.keypair.public,
-               2000,
+               2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
-               next_round,
+               next_round_,
                auth: auth
              )
 

@@ -1,7 +1,7 @@
 defmodule CoreListenerTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Client, Listener, Account, Chain, Contract}
+  alias AeppSDK.{Account, Chain, Client, Contract, Listener}
 
   setup_all do
     client =
@@ -166,7 +166,7 @@ defmodule CoreListenerTest do
 
         Listener.unsubscribe(elem(message, 0), self())
     after
-      30000 -> flunk("Didn't receive message")
+      30_000 -> flunk("Didn't receive message")
     end
   end
 

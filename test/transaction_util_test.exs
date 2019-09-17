@@ -1,8 +1,8 @@
 defmodule TransactionUtilTest do
   use ExUnit.Case
 
-  alias AeppSDK.Utils.Transaction
   alias AeppSDK.Account
+  alias AeppSDK.Utils.Transaction
 
   setup_all do
     Code.require_file("test_utils.ex", "test/")
@@ -11,7 +11,7 @@ defmodule TransactionUtilTest do
 
   test "minimum fee calculation", fields do
     assert 16_740_000_000 == Transaction.calculate_min_fee(fields.spend_tx, 50_000, "ae_mainnet")
-    assert 16581 == Transaction.calculate_min_fee(fields.oracle_register_tx, 5, "ae_mainnet")
+    assert 16_581 == Transaction.calculate_min_fee(fields.oracle_register_tx, 5, "ae_mainnet")
 
     assert 16_842_000_000 ==
              Transaction.calculate_min_fee(fields.oracle_respond_tx, 50_000, "ae_mainnet")

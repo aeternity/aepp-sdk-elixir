@@ -4,7 +4,7 @@ defmodule AeppSDK.Listener.Supervisor do
   use Supervisor
 
   alias AeppSDK.Listener
-  alias AeppSDK.Listener.{Peers, PeerConnection, PeerConnectionSupervisor}
+  alias AeppSDK.Listener.{PeerConnection, PeerConnectionSupervisor, Peers}
   alias AeppSDK.Utils.Keys
 
   @acceptors_count 10

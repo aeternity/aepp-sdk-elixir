@@ -4,29 +4,29 @@ defmodule AeppSDK.Utils.SerializationUtils do
   alias AeppSDK.Utils.{Encoding, Keys}
 
   alias AeternityNode.Model.{
-    SpendTx,
-    OracleRegisterTx,
-    OracleRespondTx,
-    OracleQueryTx,
-    OracleExtendTx,
-    NamePreclaimTx,
-    NameClaimTx,
-    NameRevokeTx,
-    NameTransferTx,
-    NameUpdateTx,
-    ContractCreateTx,
-    ContractCallTx,
-    RelativeTtl,
-    Ttl,
-    ChannelCreateTx,
     ChannelCloseMutualTx,
     ChannelCloseSoloTx,
+    ChannelCreateTx,
     ChannelDepositTx,
     ChannelForceProgressTx,
     ChannelSettleTx,
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
-    ChannelWithdrawTx
+    ChannelWithdrawTx,
+    ContractCallTx,
+    ContractCreateTx,
+    NameClaimTx,
+    NamePreclaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx,
+    OracleExtendTx,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    RelativeTtl,
+    SpendTx,
+    Ttl
   }
 
   @ct_version 0x40001
@@ -424,7 +424,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        channel_id,
        from_id,
        payload,
-       # TODO: check if its needed to be preprocessed
        poi,
        ttl,
        fee,
@@ -523,7 +522,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        channel_id,
        from_id,
        payload,
-       # TODO: check if its needed to be preprocessed
        poi,
        ttl,
        fee,

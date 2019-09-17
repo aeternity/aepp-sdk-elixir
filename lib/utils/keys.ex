@@ -266,10 +266,10 @@ defmodule AeppSDK.Utils.Keys do
   end
 
   defp mkdir(path) do
-    if !File.exists?(path) do
-      File.mkdir(path)
-    else
+    if File.exists?(path) do
       :ok
+    else
+      File.mkdir(path)
     end
   end
 

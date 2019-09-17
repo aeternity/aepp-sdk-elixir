@@ -1024,7 +1024,6 @@ defmodule AeppSDK.Utils.Serialization do
       channel_id: :id,
       from_id: :id,
       payload: :binary,
-      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
       poi: :binary,
       ttl: :int,
       fee: :int,
@@ -1037,7 +1036,6 @@ defmodule AeppSDK.Utils.Serialization do
       channel_id: :id,
       from_id: :id,
       payload: :binary,
-      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
       poi: :binary,
       ttl: :int,
       fee: :int,

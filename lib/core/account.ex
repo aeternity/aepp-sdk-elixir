@@ -6,11 +6,13 @@ defmodule AeppSDK.Account do
    Client example can be found at: `AeppSDK.Client.new/4`
   """
   alias AeppSDK.Client
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.{Encoding, Transaction}
+
   alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Chain, as: ChainApi
-  alias AeternityNode.Model.{Account, SpendTx, Error}
-  alias AeppSDK.Utils.{Transaction, Encoding}
-  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeternityNode.Model.{Account, Error, SpendTx}
+
   alias Tesla.Env
 
   @prefix_byte_size 2
