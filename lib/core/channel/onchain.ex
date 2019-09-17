@@ -1,7 +1,7 @@
 defmodule AeppSDK.Channel.OnChain do
   @moduledoc """
-  Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
-  Contains all channel-related functionality.
+  Module for Aeternity On-Chain channel system, see: [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md)
+  Contains On-Chain channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.

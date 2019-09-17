@@ -1,4 +1,8 @@
 defmodule AeppSDK.Channel.OffChain do
+  @moduledoc """
+  Module for Aeternity Off-chain channel activities, see: [https://github.com/aeternity/protocol/blob/master/channels/OFF-CHAIN.md](https://github.com/aeternity/protocol/blob/master/channels/OFF-CHAIN.md)
+  Contains Off-Chain channel-related functionality.
+  """
   alias AeppSDK.Utils.Serialization
 
   @update_vsn 1
@@ -27,7 +31,7 @@ defmodule AeppSDK.Channel.OffChain do
   ]
 
   @doc """
-  Creates a new off-chain transactions, supporting updates, with given parameters.
+  Creates new off-chain transactions, supporting updates, with given parameters.
 
   ## Example
 
@@ -61,7 +65,7 @@ defmodule AeppSDK.Channel.OffChain do
   end
 
   @doc """
-  Creates a new off-chain transactions, without supporting updates, with given parameters.
+  Creates new off-chain transactions, without supporting updates, with given parameters.
 
   ## Example
 
@@ -92,7 +96,7 @@ defmodule AeppSDK.Channel.OffChain do
   end
 
   @doc """
-  Serializes a off-chain transactions, supports both updates and no-updates versions.
+  Serializes off-chain transactions, supports both updates and no-updates versions.
 
   ## Example
 
