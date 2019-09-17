@@ -707,7 +707,6 @@ defmodule CoreChannelTest do
                   }}
              )
 
-    Process.sleep(100)
     # Settle tx
     assert {:ok, _} = Channel.settle(client4, channel_id, initiator_amt, responder_amt)
 
