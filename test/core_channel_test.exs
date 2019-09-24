@@ -2,6 +2,7 @@ defmodule CoreChannelTest do
   use ExUnit.Case
 
   alias AeppSDK.{Account, Channel, Client, GeneralizedAccount}
+  alias AeppSDK.Channel.OnChain, as: Channel
   alias AeppSDK.Utils.{Encoding, Transaction}
 
   setup_all do
@@ -473,8 +474,7 @@ defmodule CoreChannelTest do
                inner_tx: tx
              )
 
-    assert {:ok, %{id: ^channel_id, round: round}} =
-             AeppSDK.Channel.get_by_pubkey(client, channel_id)
+    assert {:ok, %{id: ^channel_id, round: round}} = Channel.get_by_pubkey(client, channel_id)
 
     next_round = round + 1
 

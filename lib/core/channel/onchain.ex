@@ -1,15 +1,17 @@
-defmodule AeppSDK.Channel do
+defmodule AeppSDK.Channel.OnChain do
   @moduledoc """
-  Module for Aeternity Channel System, see: [https://github.com/aeternity/protocol/blob/master/channels/README.md](https://github.com/aeternity/protocol/blob/master/channels/README.md)
-  Contains all channel-related functionality.
+  Module for Aeternity On-Chain channel system, see: [https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md](https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md)
+  Contains On-Chain channel-related functionality.
 
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
+
   alias AeppSDK.Client
   alias AeppSDK.GeneralizedAccount
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.{Encoding, Hash, Serialization, Transaction}
+
   alias AeternityNode.Api.Chain
   alias AeternityNode.Api.Channel, as: ChannelAPI
   alias AeternityNode.Api.Transaction, as: TransactionApi
@@ -43,7 +45,7 @@ defmodule AeppSDK.Channel do
   Gets channel information by its pubkey.
 
   ## Example
-      iex> AeppSDK.Channel.get_by_pubkey(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C")
+      iex> AeppSDK.Channel.OnChain.get_by_pubkey(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C")
       {:ok,
           %{
             channel_amount: 100000000000,
@@ -75,12 +77,12 @@ defmodule AeppSDK.Channel do
       iex> initiator_amt = 30_000_000_000
       iex> responder_amt = 70_000_000_000
       iex> {:ok, [create_tx, create_sig]} =
-             AeppSDK.Channel.create(client1, initiator_amt, client5.keypair.public, responder_amt, 1, 20, 10,
+             AeppSDK.Channel.OnChain.create(client1, initiator_amt, client5.keypair.public, responder_amt, 1, 20, 10,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                  "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
       iex> {:ok, [^create_tx, create_sig1]} = AeppSDK.Utils.Transaction.sign_tx(create_tx, client2)
-      iex> {:ok, %{channel_id: channel_id}} = AeppSDK.Channel.post(client1, create_tx, signatures_list: [create_sig, create_sig1])
+      iex> {:ok, %{channel_id: channel_id}} = AeppSDK.Channel.OnChain.post(client1, create_tx, signatures_list: [create_sig, create_sig1])
       {:ok,
          %{
            block_hash: "mh_yqm5TQjwtB5sxhDCSbDJk59VXyd1VMVViA2JtEsNBaGqaLm49",
@@ -165,9 +167,9 @@ defmodule AeppSDK.Channel do
 
   ## Example
       iex> {:ok, [close_mutual_tx, close_mutual_sig]} =
-              AeppSDK.Channel.close_mutual(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 0, 70_000_000_000)
+              AeppSDK.Channel.OnChain.close_mutual(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 0, 70_000_000_000)
       iex> {:ok, [^close_mutual_tx, close_mutual_sig1]} = AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client2)
-      iex> Channel.post(client1, close_mutual_tx, signatures_list: [close_mutual_sig, close_mutual_sig1])
+      iex> AeppSDK.Channel.OnChain.post(client1, close_mutual_tx, signatures_list: [close_mutual_sig, close_mutual_sig1])
       {:ok,
           %{
             block_hash: "mh_kk1Xzo8GEmpdnAz4yZPXngcLGWjRYnGBAZ4ZtFoPHNHioJ7Di",
@@ -231,7 +233,7 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_close_solo
 
   ## Example
-      iex> AeppSDK.Channel.close_solo(
+      iex> AeppSDK.Channel.OnChain.close_solo(
                client1,
                "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
                <<>>,
@@ -367,12 +369,12 @@ defmodule AeppSDK.Channel do
 
   ## Example
       iex> {:ok, [deposit_tx, deposit_sig]} =
-             AeppSDK.Channel.deposit(client1, 16740000000, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 2,
+             AeppSDK.Channel.OnChain.deposit(client1, 16740000000, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 2,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
       iex> {:ok, [^deposit_tx, deposit_sig1]} = AeppSDK.Utils.Transaction.sign_tx(deposit_tx, client2)
-      iex> AeppSDK.Channel.post(client1, deposit_tx, signatures_list: [deposit_sig, deposit_sig1])
+      iex> AeppSDK.Channel.OnChain.post(client1, deposit_tx, signatures_list: [deposit_sig, deposit_sig1])
       {:ok,
           %{
             block_hash: "mh_rRcR3puQg4iAuBkR9yCfJtJTN5nzuaoqvr3oJdENXcyPQPTbY",
@@ -533,7 +535,7 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
 
   ## Example
-      iex> AeppSDK.Channel.settle(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", initiator_amt, responder_amt)
+      iex> AeppSDK.Channel.OnChain.settle(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", initiator_amt, responder_amt)
       {:ok,
        %{
          block_hash: "mh_5793UoBfCJUiMGKMMmfPxqZTJPo44HM3HCSBtjwVj8JyVntL6",
@@ -599,7 +601,7 @@ defmodule AeppSDK.Channel do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_slash
 
   ## Example
-      iex> AeppSDK.Channel.slash(
+      iex> AeppSDK.Channel.OnChain.slash(
                client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
                <<248, 211, 11, 1, 248, 132, 184, 64, 103, 143, 97, 54, 143, 62, 96, 188, 175, 138,
                  69, 94, 189, 154, 187, 232, 24, 124, 227, 118, 222, 228, 194, 201, 138, 30, 163,
@@ -824,12 +826,12 @@ defmodule AeppSDK.Channel do
 
   ## Example
       iex> {:ok, [withdraw_tx, withdraw_sig]} =
-             AeppSDK.Channel.withdraw(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", client4.keypair.public, 30000000000,
+             AeppSDK.Channel.OnChain.withdraw(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", client4.keypair.public, 30000000000,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>), 3)
       iex> {:ok, [^withdraw_tx, withdraw_sig1]} = AeppSDK.Utils.Transaction.sign_tx(withdraw_tx, client2)
-      iex> AeppSDK.Channel.post(client1, withdraw_tx, signatures_list: [withdraw_sig, withdraw_sig1])
+      iex> AeppSDK.Channel.OnChain.post(client1, withdraw_tx, signatures_list: [withdraw_sig, withdraw_sig1])
       {:ok,
           %{
             block_hash: "mh_2V4FWJtsu7YJ8MnyTCGV56B8aAR5sgbgmMD99GgZQds7BBko1L",
@@ -921,7 +923,7 @@ defmodule AeppSDK.Channel do
   Gets current state hash.
 
   ## Example
-      iex> AeppSDK.Channel.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
+      iex> AeppSDK.Channel.OnChain.get_current_state_hash(client, "ch_27i3QZiotznX4LiVKzpUhUZmTYeEC18vREioxJxSN93ckn4Gay")
       {:ok, "st_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts"}
   """
   @spec get_current_state_hash(Client.t(), String.t()) ::
@@ -971,7 +973,7 @@ defmodule AeppSDK.Channel do
                   state_hash: "st_11111111111111111111111111111111273Yts",
                   ttl: 0
                 }
-      iex> AeppSDK.Channel.post(client, tx, [signatures_list: [signature1, signature2]])
+      iex> AeppSDK.Channel.OnChain.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{
           block_hash: "mh_23unT6UB5U1DycXrYdAfVAumuXQqTsnccrMNp3w6hYW3Wry4X",
