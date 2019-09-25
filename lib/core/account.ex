@@ -6,14 +6,9 @@ defmodule AeppSDK.Account do
    Client example can be found at: `AeppSDK.Client.new/4`
   """
   alias AeppSDK.Client
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Utils.{Encoding, Transaction}
-
-  alias AeternityNode.Api.Account, as: AccountApi
-  alias AeternityNode.Api.Chain, as: ChainApi
-  alias AeternityNode.Model.{Account, Error, SpendTx}
-
-  alias Tesla.Env
+  alias AeppSDK.Utils.{Keys, SerializationUtils}
+  #   alias AeppSDK.Utils.Account, as: AccountUtils
+  #   alias AeppSDK.Utils.{Encoding, Transaction}
 
   @prefix_byte_size 2
   @allowed_recipient_tags ["ak", "ct", "ok", "nm"]
@@ -50,39 +45,75 @@ defmodule AeppSDK.Account do
   def spend(
         %Client{
           keypair: %{
-            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
+            public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender,
+            secret: secret
           },
-          connection: connection
+          network_id: network_id,
+          node_name: node_name
         } = client,
-        <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
+        <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient,
         amount,
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_id),
-         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         %SpendTx{} = spend_tx <-
-           struct(
-             SpendTx,
-             sender_id: sender_id,
-             recipient_id: recipient_id,
-             amount: amount,
-             fee: Keyword.get(opts, :fee, Transaction.dummy_fee()),
-             ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-             nonce: nonce,
-             payload: Keyword.get(opts, :payload, Transaction.default_payload())
-           ),
-         {:ok, _response} = response <-
-           Transaction.try_post(
-             client,
-             spend_tx,
-             Keyword.get(opts, :auth, nil),
-             height
-           ) do
-      response
-    else
-      err -> prepare_result(err)
-    end
+    sender_id = {_, _, pub_key} = SerializationUtils.proccess_id_to_record(sender)
+    recipient_id = SerializationUtils.proccess_id_to_record(recipient)
+    height = get_height(client)
+    next_nonce = next_nonce(client)
+
+    spend_tx = %{
+      sender_id: sender_id,
+      recipient_id: recipient_id,
+      amount: amount,
+      fee: Keyword.get(opts, :fee, 0),
+      nonce: next_nonce,
+      payload: Keyword.get(opts, :payload, <<>>)
+    }
+
+    {:ok, aetx} = :rpc.call(node_name, :aec_spend_tx, :new, [spend_tx])
+    fee = :rpc.call(node_name, :aetx, :min_fee, [aetx, height])
+    {_, _, _, _, spend_tx} = aetx
+
+    new_spend_tx =
+      spend_tx
+      |> Tuple.delete_at(4)
+      |> Tuple.insert_at(4, fee)
+
+    new_aetx =
+      aetx
+      |> Tuple.delete_at(4)
+      |> Tuple.insert_at(4, new_spend_tx)
+
+    serialized_aetx = :rpc.call(node_name, :aetx, :serialize_to_binary, [new_aetx])
+    secret_key_to_binary = Keys.secret_key_to_binary(secret)
+    signatures = Keys.sign(serialized_aetx, secret_key_to_binary, network_id)
+    signed_tx = :rpc.call(node_name, :aetx_sign, :new, [new_aetx, [signatures]])
+    :rpc.call(node_name, :aec_tx_pool, :push, [signed_tx])
+  end
+
+  def next_nonce(%{keypair: %{public: public_key}, node_name: node_name}) do
+    public_key_binary = Keys.public_key_to_binary(public_key)
+
+    {_, {_, _, _, nonce, _, _, _}} =
+      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
+
+    nonce + 1
+  end
+
+  def next_nonce(client, public_key) do
+    public_key_binary = Keys.public_key_to_binary(public_key)
+
+    {_, {_, _, _, nonce, _, _, _}} =
+      :rpc.call(client.node_name, :aec_chain, :get_account, [public_key_binary])
+
+    nonce + 1
+  end
+
+  def get_height(%{node_name: node_name}) do
+    {_, {_, height, _, _, _, _, _, _, _, _, _, _, _}} =
+      :rpc.call(node_name, :aec_chain, :top_block, [])
+
+    height
   end
 
   @doc """
@@ -95,118 +126,127 @@ defmodule AeppSDK.Account do
   """
   @spec balance(Client.t(), String.t()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
-    case AccountApi.get_account_by_pubkey(connection, pubkey) do
-      {:ok, %Account{balance: balance}} ->
-        {:ok, balance}
+  def balance(%Client{node_name: node_name, keypair: %{public: public_key}})
+      when is_binary(public_key) do
+    public_key_binary = Keys.public_key_to_binary(public_key)
 
-      _ = response ->
-        prepare_result(response)
-    end
+    {_, {_, _, balance, _, _, _, _}} =
+      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
+
+    balance
   end
 
-  @doc """
-  Get an account's balance at a given height
+  def balance(%Client{node_name: node_name}, public_key) when is_binary(public_key) do
+    public_key_binary = Keys.public_key_to_binary(public_key)
 
-  ## Example
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
-      iex> AeppSDK.Account.balance(client, pubkey, height)
-      {:ok, 1641606227460612819475}
-  """
-  @spec balance(Client.t(), String.t(), non_neg_integer()) ::
-          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
-    response = get(client, pubkey, height)
+    {_, {_, _, balance, _, _, _, _}} =
+      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
 
-    prepare_result(response)
+    balance
   end
 
-  @doc """
-  Get an account's balance at a given block hash
+  #   @doc """
+  #   Get an account's balance at a given height
 
-  ## Example
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
-      iex> AeppSDK.Account.balance(client, pubkey, block_hash)
-      {:ok, 1653014562214254044805}
-  """
-  @spec balance(Client.t(), String.t(), String.t()) ::
-          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  def balance(%Client{} = client, pubkey, block_hash)
-      when is_binary(pubkey) and is_binary(block_hash) do
-    response = get(client, pubkey, block_hash)
+  #   ## Example
+  #       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  #       iex> height = 80000
+  #       iex> AeppSDK.Account.balance(client, pubkey, height)
+  #       {:ok, 1641606227460612819475}
+  #   """
+  #   @spec balance(Client.t(), String.t(), non_neg_integer()) ::
+  #           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  #   def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
+  #     response = get(client, pubkey, height)
 
-    prepare_result(response)
-  end
+  #     prepare_result(response)
+  #   end
 
-  @doc """
-  Get an account at a given height
+  #   @doc """
+  #   Get an account's balance at a given block hash
 
-  ## Example
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
-      iex> AeppSDK.Account.get(client, pubkey, height)
-      {:ok,
-       %{
-         auth_fun: nil,
-         balance: 1641606227460612819475,
-         contract_id: nil,
-         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-         kind: "basic",
-         nonce: 11215
-       }}
-  """
-  @spec get(Client.t(), String.t(), non_neg_integer()) ::
-          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
-  def get(%Client{connection: connection}, pubkey, height)
-      when is_binary(pubkey) and is_integer(height) do
-    response = AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height)
+  #   ## Example
+  #       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  #       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+  #       iex> AeppSDK.Account.balance(client, pubkey, block_hash)
+  #       {:ok, 1653014562214254044805}
+  #   """
+  #   @spec balance(Client.t(), String.t(), String.t()) ::
+  #           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  #   def balance(%Client{} = client, pubkey, block_hash)
+  #       when is_binary(pubkey) and is_binary(block_hash) do
+  #     response = get(client, pubkey, block_hash)
 
-    prepare_result(response)
-  end
+  #     prepare_result(response)
+  #   end
 
-  @doc """
-  Get an account at a given block hash
+  #   @doc """
+  #   Get an account at a given height
 
-  ## Example
-      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
-      iex> AeppSDK.Account.get(client, pubkey, block_hash)
-      {:ok,
-       %{
-         auth_fun: nil,
-         balance: 1653014562214254044805,
-         contract_id: nil,
-         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-         kind: "basic",
-         nonce: 11837
-       }}
-  """
-  @spec get(Client.t(), String.t(), String.t()) ::
-          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
-  def get(%Client{connection: connection}, pubkey, block_hash)
-      when is_binary(pubkey) and is_binary(block_hash) do
-    response = AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash)
+  #   ## Example
+  #       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  #       iex> height = 80000
+  #       iex> AeppSDK.Account.get(client, pubkey, height)
+  #       {:ok,
+  #        %{
+  #          auth_fun: nil,
+  #          balance: 1641606227460612819475,
+  #          contract_id: nil,
+  #          id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+  #          kind: "basic",
+  #          nonce: 11215
+  #        }}
+  #   """
+  #   @spec get(Client.t(), String.t(), non_neg_integer()) ::
+  #           {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  #   def get(%Client{connection: connection}, pubkey, height)
+  #       when is_binary(pubkey) and is_integer(height) do
+  #     response = AccountApi.get_account_by_pubkey_and_height(connection, pubkey, height)
 
-    prepare_result(response)
-  end
+  #     prepare_result(response)
+  #   end
 
-  defp prepare_result({:ok, %Account{} = account}) do
-    account_map = Map.from_struct(account)
+  #   @doc """
+  #   Get an account at a given block hash
 
-    {:ok, account_map}
-  end
+  #   ## Example
+  #       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  #       iex> block_hash = "kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P"
+  #       iex> AeppSDK.Account.get(client, pubkey, block_hash)
+  #       {:ok,
+  #        %{
+  #          auth_fun: nil,
+  #          balance: 1653014562214254044805,
+  #          contract_id: nil,
+  #          id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+  #          kind: "basic",
+  #          nonce: 11837
+  #        }}
+  #   """
+  #   @spec get(Client.t(), String.t(), String.t()) ::
+  #           {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  #   def get(%Client{connection: connection}, pubkey, block_hash)
+  #       when is_binary(pubkey) and is_binary(block_hash) do
+  #     response = AccountApi.get_account_by_pubkey_and_hash(connection, pubkey, block_hash)
 
-  defp prepare_result({:ok, %{balance: balance}}) do
-    {:ok, balance}
-  end
+  #     prepare_result(response)
+  #   end
 
-  defp prepare_result({:ok, %Error{reason: message}}) do
-    {:error, message}
-  end
+  #   defp prepare_result({:ok, %Account{} = account}) do
+  #     account_map = Map.from_struct(account)
 
-  defp prepare_result({:error, _} = error) do
-    error
-  end
+  #     {:ok, account_map}
+  #   end
+
+  #   defp prepare_result({:ok, %{balance: balance}}) do
+  #     {:ok, balance}
+  #   end
+
+  #   defp prepare_result({:ok, %Error{reason: message}}) do
+  #     {:error, message}
+  #   end
+
+  #   defp prepare_result({:error, _} = error) do
+  #     error
+  #   end
 end
