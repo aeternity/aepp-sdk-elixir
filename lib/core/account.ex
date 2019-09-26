@@ -56,10 +56,10 @@ defmodule AeppSDK.Account do
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
-    sender_id = {_, _, pub_key} = SerializationUtils.proccess_id_to_record(sender)
+    sender_id = SerializationUtils.proccess_id_to_record(sender)
     recipient_id = SerializationUtils.proccess_id_to_record(recipient)
-    height = get_height(client)
-    next_nonce = next_nonce(client)
+    {:ok, height} = get_height(client)
+    {:ok, next_nonce} = next_nonce(client)
 
     spend_tx = %{
       sender_id: sender_id,
@@ -91,29 +91,32 @@ defmodule AeppSDK.Account do
     :rpc.call(node_name, :aec_tx_pool, :push, [signed_tx])
   end
 
-  def next_nonce(%{keypair: %{public: public_key}, node_name: node_name}) do
-    public_key_binary = Keys.public_key_to_binary(public_key)
+  @spec next_nonce(Client.t()) :: {:ok, non_neg_integer()}
+  def next_nonce(%Client{keypair: %{public: public_key}, node_name: node_name}) do
+    public_key_to_binary = Keys.public_key_to_binary(public_key)
 
     {_, {_, _, _, nonce, _, _, _}} =
-      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
+      :rpc.call(node_name, :aec_chain, :get_account, [public_key_to_binary])
 
-    nonce + 1
+    {:ok, nonce + 1}
   end
 
+  @spec next_nonce(Client.t(), binary()) :: {:ok, non_neg_integer()}
   def next_nonce(client, public_key) do
-    public_key_binary = Keys.public_key_to_binary(public_key)
+    public_key_to_binary = Keys.public_key_to_binary(public_key)
 
     {_, {_, _, _, nonce, _, _, _}} =
-      :rpc.call(client.node_name, :aec_chain, :get_account, [public_key_binary])
+      :rpc.call(client.node_name, :aec_chain, :get_account, [public_key_to_binary])
 
-    nonce + 1
+    {:ok, nonce + 1}
   end
 
-  def get_height(%{node_name: node_name}) do
+  @spec get_height(Client.t()) :: {:ok, non_neg_integer()}
+  def get_height(%Client{node_name: node_name}) do
     {_, {_, height, _, _, _, _, _, _, _, _, _, _, _}} =
       :rpc.call(node_name, :aec_chain, :top_block, [])
 
-    height
+    {:ok, height}
   end
 
   @doc """
@@ -124,43 +127,34 @@ defmodule AeppSDK.Account do
       iex> AeppSDK.Account.balance(client, pubkey)
       {:ok, 1652992279192254044805}
   """
-  @spec balance(Client.t(), String.t()) ::
-          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  @spec balance(Client.t()) ::
+          {:ok, non_neg_integer()} | {:error, atom()}
   def balance(%Client{node_name: node_name, keypair: %{public: public_key}})
       when is_binary(public_key) do
-    public_key_binary = Keys.public_key_to_binary(public_key)
-
-    {_, {_, _, balance, _, _, _, _}} =
-      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
-
-    balance
+    get_account_balance(node_name, :get_account, public_key)
   end
 
+  @spec balance(Client.t(), String.t()) ::
+          {:ok, non_neg_integer()} | {:error, atom()}
   def balance(%Client{node_name: node_name}, public_key) when is_binary(public_key) do
-    public_key_binary = Keys.public_key_to_binary(public_key)
-
-    {_, {_, _, balance, _, _, _, _}} =
-      :rpc.call(node_name, :aec_chain, :get_account, [public_key_binary])
-
-    balance
+    get_account_balance(node_name, :get_account, public_key)
   end
 
-  #   @doc """
-  #   Get an account's balance at a given height
+  @doc """
+  Get an account's balance at a given height
 
-  #   ## Example
-  #       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-  #       iex> height = 80000
-  #       iex> AeppSDK.Account.balance(client, pubkey, height)
-  #       {:ok, 1641606227460612819475}
-  #   """
-  #   @spec balance(Client.t(), String.t(), non_neg_integer()) ::
-  #           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  #   def balance(%Client{} = client, pubkey, height) when is_binary(pubkey) and is_integer(height) do
-  #     response = get(client, pubkey, height)
-
-  #     prepare_result(response)
-  #   end
+  ## Example
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> height = 80000
+      iex> AeppSDK.Account.balance(client, pubkey, height)
+      {:ok, 1641606227460612819475}
+  """
+  @spec balance(Client.t(), String.t(), non_neg_integer()) ::
+          {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
+  def balance(%Client{node_name: node_name}, public_key, height)
+      when is_binary(public_key) and is_integer(height) do
+    get_account_balance(node_name, :get_account_at_height, public_key, height)
+  end
 
   #   @doc """
   #   Get an account's balance at a given block hash
@@ -249,4 +243,22 @@ defmodule AeppSDK.Account do
   #   defp prepare_result({:error, _} = error) do
   #     error
   #   end
+
+  defp get_account_balance(node_name, fun, public_key) do
+    public_key_to_binary = Keys.public_key_to_binary(public_key)
+
+    case :rpc.call(node_name, :aec_chain, fun, [public_key_to_binary]) do
+      {_, {_, _, balance, _, _, _, _}} -> {:ok, balance}
+      :none -> {:error, "Account does not exist"}
+    end
+  end
+
+  defp get_account_balance(node_name, fun, public_key, height) do
+    public_key_to_binary = Keys.public_key_to_binary(public_key)
+
+    case :rpc.call(node_name, :aec_chain, fun, [public_key_to_binary, height]) do
+      {_, {_, _, balance, _, _, _, _}} -> {:ok, balance}
+      :none -> {:error, "Account does not exist"}
+    end
+  end
 end
