@@ -5,7 +5,7 @@ First, add **Aepp SDK Elixir** to your `mix.exs` dependencies:
 ``` elixir
 defp deps do
   [
-    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.1.0"}
+    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.3.0"}
   ]
 end
 ```
@@ -31,6 +31,11 @@ url = "https://sdk-testnet.aepps.com/v2"
 internal_url = "https://sdk-testnet.aepps.com/v2"
 client = AeppSDK.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
 ```
+**NOTE:** If you are using one of these tags `v0.1.0` or `v0.2.0` you have to call the function like: 
+``` elixir
+Core.Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url)
+```
+The naming conventions were changed. `Core` is `AeppSDK` now and `Utils` is `AeppSDK.Utils`.
 
 Every module and function is documented and you can get the documentation by using, for example:
 ``` elixir
