@@ -153,12 +153,12 @@ defmodule AeppSDK.AENS do
          tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
        }}
   """
-  @spec claim({:ok, map()} | {:error, String.t()}, aens_options()) ::
+  @spec claim({:ok, map()} | {:error, String.t()}, non_neg_integer, aens_options()) ::
           {:error, String.t()} | {:ok, map()}
-  def claim(preclaim_result, opts \\ []) do
+  def claim(preclaim_result, name_fee, opts \\ []) do
     case preclaim_result do
       {:ok, %{client: client, name: name, name_salt: name_salt}} ->
-        claim(client, name, name_salt, opts)
+        claim(client, name, name_salt, name_fee, opts)
 
       {:error, _reason} = error ->
         error
@@ -200,7 +200,13 @@ defmodule AeppSDK.AENS do
           tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
         }}
   """
-  @spec claim(Client.t(), String.t(), integer(), aens_options()) ::
+  @spec claim(
+          Client.t(),
+          String.t(),
+          non_neg_integer(),
+          non_neg_integer(),
+          aens_options()
+        ) ::
           {:error, String.t()} | {:ok, map()}
   def claim(
         %Client{
@@ -211,6 +217,7 @@ defmodule AeppSDK.AENS do
         } = client,
         name,
         name_salt,
+        name_fee,
         opts \\ []
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
@@ -219,6 +226,7 @@ defmodule AeppSDK.AENS do
              client,
              name,
              name_salt,
+             name_fee,
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
@@ -696,6 +704,7 @@ defmodule AeppSDK.AENS do
          },
          name,
          name_salt,
+         name_fee,
          fee,
          ttl
        ) do
@@ -708,6 +717,7 @@ defmodule AeppSDK.AENS do
           nonce: nonce,
           name: name,
           name_salt: name_salt,
+          name_fee: name_fee,
           fee: fee,
           ttl: ttl
         )

@@ -75,7 +75,7 @@ defmodule AeppSdkElixir.MixProject do
         {"wget",
          [
            "--verbose",
-           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/config/#{
+           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/apps/aehttp/priv/#{
              get_file_name(:specification)
            }.yaml"
          ]},

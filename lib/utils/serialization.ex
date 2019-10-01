@@ -453,6 +453,7 @@ defmodule AeppSDK.Utils.Serialization do
          nonce: nonce,
          name: name,
          name_salt: name_salt,
+         name_fee: name_fee,
          fee: fee,
          ttl: ttl
        ) do
@@ -461,6 +462,7 @@ defmodule AeppSDK.Utils.Serialization do
       nonce: nonce,
       name: name,
       name_salt: name_salt,
+      name_fee: name_fee,
       fee: fee,
       ttl: ttl
     }
@@ -898,7 +900,15 @@ defmodule AeppSDK.Utils.Serialization do
   end
 
   defp serialization_template(:name_claim_tx) do
-    [account_id: :id, nonce: :int, name: :binary, name_salt: :int, fee: :int, ttl: :int]
+    [
+      account_id: :id,
+      nonce: :int,
+      name: :binary,
+      name_salt: :int,
+      name_fee: :int,
+      fee: :int,
+      ttl: :int
+    ]
   end
 
   defp serialization_template(:name_preclaim_tx) do

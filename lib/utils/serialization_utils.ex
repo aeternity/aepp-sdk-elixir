@@ -177,6 +177,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
   def process_tx_fields(%NameClaimTx{
         name: name,
         name_salt: name_salt,
+        name_fee: name_fee,
         fee: fee,
         ttl: ttl,
         account_id: tx_account_id,
@@ -190,6 +191,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
        nonce,
        name,
        name_salt,
+       name_fee,
        fee,
        ttl
      ], :name_claim_tx}
