@@ -27,7 +27,9 @@ defmodule AeppSDK.AENS do
 
   @max_name_ttl 50_000
   @max_client_ttl 86_000
-
+  @label_separator "."
+  @allowed_registrars ["aet", "test"]
+  @multiplier_14 100_000_000_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
 
   @doc """
@@ -153,12 +155,12 @@ defmodule AeppSDK.AENS do
          tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
        }}
   """
-  @spec claim({:ok, map()} | {:error, String.t()}, non_neg_integer, aens_options()) ::
+  @spec claim({:ok, map()} | {:error, String.t()}, aens_options()) ::
           {:error, String.t()} | {:ok, map()}
-  def claim(preclaim_result, name_fee, opts \\ []) do
+  def claim(preclaim_result, opts \\ []) do
     case preclaim_result do
       {:ok, %{client: client, name: name, name_salt: name_salt}} ->
-        claim(client, name, name_salt, name_fee, opts)
+        claim(client, name, name_salt, opts)
 
       {:error, _reason} = error ->
         error
@@ -204,7 +206,6 @@ defmodule AeppSDK.AENS do
           Client.t(),
           String.t(),
           non_neg_integer(),
-          non_neg_integer(),
           aens_options()
         ) ::
           {:error, String.t()} | {:ok, map()}
@@ -217,7 +218,6 @@ defmodule AeppSDK.AENS do
         } = client,
         name,
         name_salt,
-        name_fee,
         opts \\ []
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
@@ -226,7 +226,7 @@ defmodule AeppSDK.AENS do
              client,
              name,
              name_salt,
-             name_fee,
+             Keyword.get(opts, :name_fee, calculate_name_fee(name)),
              Keyword.get(opts, :fee, 0),
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
@@ -655,6 +655,91 @@ defmodule AeppSDK.AENS do
       {:ok, result}
     else
       error -> error
+    end
+  end
+
+  defp calculate_name_fee(name) when is_binary(name) do
+    case validate_name(name) do
+      {:ok, _name} ->
+        {:ok, ascii_name} = name_to_ascii(name)
+        {:ok, domain} = name_domain(ascii_name)
+
+        name_claim_size_fee(byte_size(ascii_name) - byte_size(domain) - 1)
+
+      {:error, _error} = error ->
+        error
+    end
+  end
+
+  defp name_claim_size_fee(size) when size >= 31, do: 3 * @multiplier_14
+  defp name_claim_size_fee(30), do: 5 * @multiplier_14
+  defp name_claim_size_fee(29), do: 8 * @multiplier_14
+  defp name_claim_size_fee(28), do: 13 * @multiplier_14
+  defp name_claim_size_fee(27), do: 21 * @multiplier_14
+  defp name_claim_size_fee(26), do: 34 * @multiplier_14
+  defp name_claim_size_fee(25), do: 55 * @multiplier_14
+  defp name_claim_size_fee(24), do: 89 * @multiplier_14
+  defp name_claim_size_fee(23), do: 144 * @multiplier_14
+  defp name_claim_size_fee(22), do: 233 * @multiplier_14
+  defp name_claim_size_fee(21), do: 377 * @multiplier_14
+  defp name_claim_size_fee(20), do: 610 * @multiplier_14
+  defp name_claim_size_fee(19), do: 987 * @multiplier_14
+  defp name_claim_size_fee(18), do: 1597 * @multiplier_14
+  defp name_claim_size_fee(17), do: 2584 * @multiplier_14
+  defp name_claim_size_fee(16), do: 4181 * @multiplier_14
+  defp name_claim_size_fee(15), do: 6765 * @multiplier_14
+  defp name_claim_size_fee(14), do: 10946 * @multiplier_14
+  defp name_claim_size_fee(13), do: 17711 * @multiplier_14
+  defp name_claim_size_fee(12), do: 28657 * @multiplier_14
+  defp name_claim_size_fee(11), do: 46368 * @multiplier_14
+  defp name_claim_size_fee(10), do: 75025 * @multiplier_14
+  defp name_claim_size_fee(9), do: 121_393 * @multiplier_14
+  defp name_claim_size_fee(8), do: 196_418 * @multiplier_14
+  defp name_claim_size_fee(7), do: 317_811 * @multiplier_14
+  defp name_claim_size_fee(6), do: 514_229 * @multiplier_14
+  defp name_claim_size_fee(5), do: 832_040 * @multiplier_14
+  defp name_claim_size_fee(4), do: 1_346_269 * @multiplier_14
+  defp name_claim_size_fee(3), do: 2_178_309 * @multiplier_14
+  defp name_claim_size_fee(2), do: 3_524_578 * @multiplier_14
+  defp name_claim_size_fee(1), do: 5_702_887 * @multiplier_14
+
+  defp name_to_ascii(name) do
+    unicode_list = :unicode.characters_to_list(name, :utf8)
+
+    case :idna.encode(unicode_list, [{:uts46, true}, {:std3_rules, true}]) do
+      name_ascii ->
+        case length(:string.split(name_ascii, @label_separator, :all)) === 1 do
+          true -> {:error, :no_label_in_registrar}
+          false -> {:ok, :erlang.list_to_binary(name_ascii)}
+        end
+    end
+  end
+
+  defp validate_name(name) do
+    case name_parts(name) do
+      [_label, ns_registrar] ->
+        if Enum.member?(@allowed_registrars, ns_registrar) do
+          {:ok, name}
+        else
+          {:error, :registrar_unknown}
+        end
+
+      [_name] ->
+        {:error, :no_registrar}
+
+      [_label | _namespaces] ->
+        {:error, :multiple_namespaces}
+    end
+  end
+
+  defp name_parts(name) do
+    :binary.split(name, @label_separator, [:global, :trim])
+  end
+
+  defp name_domain(name) do
+    case Enum.reverse(name_parts(name)) do
+      [domain | _] -> {:ok, domain}
+      _ -> {:error, :invalid_name}
     end
   end
 

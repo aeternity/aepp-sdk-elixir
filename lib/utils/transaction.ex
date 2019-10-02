@@ -397,7 +397,6 @@ defmodule AeppSDK.Utils.Transaction do
           non_neg_integer(),
           non_neg_integer()
         ) :: non_neg_integer()
-
   def calculate_n_times_fee(tx, height, network_id, fee, gas_price, times) do
     calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, 0)
   end
@@ -620,7 +619,7 @@ defmodule AeppSDK.Utils.Transaction do
       {:error, "Invalid tx"} ->
         try_post(
           client,
-          %{tx | fee: calculate_fee(tx, height, network_id, @dummy_fee, gas_price)},
+          %{tx | fee: calculate_n_times_fee(tx, height, network_id, @dummy_fee, gas_price, 3)},
           auth_options,
           height,
           signatures_list,

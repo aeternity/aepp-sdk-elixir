@@ -43,7 +43,7 @@ defmodule AeppSDK.Utils.Serialization do
   @version_oracle_query_tx 1
   @version_oracle_response_tx 1
   @version_oracle_extend_tx 1
-  @version_name_claim_tx 1
+  @version_name_claim_tx 2
   @version_name_preclaim_tx 1
   @version_name_update_tx 1
   @version_name_revoke_tx 1
