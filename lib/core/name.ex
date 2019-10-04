@@ -256,9 +256,9 @@ defmodule AeppSDK.AENS do
       iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
       iex> pointers = [
-            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
-             Serialization.id_to_record(
-               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+            {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+             AeppSDK.Utils.Serialization.id_to_record(
+               AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
                :account
              )}]
       iex> client_ttl = 50_000
@@ -290,7 +290,14 @@ defmodule AeppSDK.AENS do
           client_ttl: 50000,
           name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
@@ -324,11 +331,11 @@ defmodule AeppSDK.AENS do
       iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
       iex> pointers = [
-            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
-             Serialization.id_to_record(
-               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
-               :account
-             )}]
+             {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+              AeppSDK.Utils.Serialization.id_to_record(
+                AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+                :account
+              )}]
       iex> client_ttl = 50_000
       iex> AeppSDK.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
       {:ok,
@@ -358,7 +365,14 @@ defmodule AeppSDK.AENS do
           client_ttl: 50000,
           name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
