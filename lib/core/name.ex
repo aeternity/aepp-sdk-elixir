@@ -36,7 +36,7 @@ defmodule AeppSDK.AENS do
   Preclaims a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> AeppSDK.AENS.preclaim(client, name)
       {:ok,
         %{
@@ -62,7 +62,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           name_salt: 149218901844062129,,
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
@@ -126,7 +126,7 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> client |> AeppSDK.AENS.preclaim("a123.test") |> AeppSDK.AENS.claim()
+      iex> client |> AeppSDK.AENS.preclaim("a1234567890asdfghjkl.aet") |> AeppSDK.AENS.claim()
       {:ok,
        %{
          block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
@@ -151,7 +151,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
          },
-         name: "a123.test",
+         name: "a1234567890asdfghjkl.aet",
          tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
        }}
   """
@@ -171,8 +171,8 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> name = "a123.test"
-      iex> name_salt = 149218901844062129,
+      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name_salt = 149218901844062129
       iex> AeppSDK.AENS.claim(client, name, name_salt)
       {:ok,
         %{
@@ -198,7 +198,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
         }}
   """
@@ -253,9 +253,14 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
-      iex> pointers = []
+      iex> pointers = [
+            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+             Serialization.id_to_record(
+               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+               :account
+             )}]
       iex> client_ttl = 50_000
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.update(pointers, name_ttl,  client_ttl)
       {:ok,
@@ -283,7 +288,7 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
           pointers: [],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
@@ -316,9 +321,14 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
-      iex> pointers = []
+      iex> pointers = [
+            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+             Serialization.id_to_record(
+               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+               :account
+             )}]
       iex> client_ttl = 50_000
       iex> AeppSDK.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
       {:ok,
@@ -346,7 +356,7 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
           pointers: [],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
@@ -412,7 +422,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |>  AeppSDK.AENS.transfer(recipient_key)
       {:ok,
@@ -439,7 +449,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
        }}
@@ -464,7 +474,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> AeppSDK.AENS.transfer_name(client, name, recipient_key)
       {:ok,
@@ -491,7 +501,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
         }}
@@ -543,7 +553,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.revoke()
       {:ok,
         %{
@@ -569,7 +579,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
@@ -589,7 +599,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a123.test"
+      iex> name = "a1234567890asdfghjkl.aet"
       iex> AeppSDK.AENS.revoke_name(client, name)
       {:ok,
         %{
@@ -615,7 +625,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a123.test",
+          name: "a1234567890asdfghjkl.aet",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
