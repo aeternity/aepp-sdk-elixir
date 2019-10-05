@@ -77,7 +77,7 @@ defmodule AeppSDK.Channel.OnChain do
       iex> initiator_amt = 30_000_000_000
       iex> responder_amt = 70_000_000_000
       iex> {:ok, [create_tx, create_sig]} =
-             AeppSDK.Channel.OnChain.create(client1, initiator_amt, client5.keypair.public, responder_amt, 1, 20, 10,
+             AeppSDK.Channel.OnChain.create(client1, initiator_amt, client2.keypair.public, responder_amt, 1, 20, 10,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                  "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                   185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))

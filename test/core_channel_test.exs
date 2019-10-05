@@ -148,7 +148,7 @@ defmodule CoreChannelTest do
     ]
   end
 
-  @tag :travis_test
+  @tag :channel
   test "create, deposit, withdraw and close_mutual channel", setup_data do
     %{client: client, client1: client1} = setup_data
 
@@ -245,7 +245,7 @@ defmodule CoreChannelTest do
            )
   end
 
-  @tag :travis_test
+  @tag :channel
   test "Channel workflow with generalized accounts", setup_data do
     %{client: client, client2: client2, client3: client3, auth: auth, source_code: source_code} =
       setup_data
@@ -349,7 +349,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :travis_test
+  @tag :channel
   test "Channel workflow with initiator basic and responder generalized accounts", setup_data do
     %{client: client, client2: client2, auth: auth, source_code: source_code} = setup_data
 
@@ -438,7 +438,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :travis_test
+  @tag :channel
   test "Channel workflow with initiator generalized and responder basic accounts", setup_data do
     %{client: client, client2: client2, auth: auth, source_code: source_code} = setup_data
 
@@ -531,7 +531,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :travis_test
+  @tag :channel
   test "create channel, close_solo, slash and settle", setup_data do
     %{client: client, client4: client4, client5: client5} = setup_data
     initiator_amt = 30_000_000_000
@@ -716,7 +716,7 @@ defmodule CoreChannelTest do
            )
   end
 
-  @tag :travis_test
+  @tag :channel
   test "create channel, snapshot", setup_data do
     %{client: client, client6: client6, client7: client7} = setup_data
 
