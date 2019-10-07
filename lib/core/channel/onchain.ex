@@ -85,10 +85,10 @@ defmodule AeppSDK.Channel.OnChain do
       iex> {:ok, %{channel_id: channel_id}} = AeppSDK.Channel.OnChain.post(client1, create_tx, signatures_list: [create_sig, create_sig1])
       {:ok,
          %{
-           block_hash: "mh_yqm5TQjwtB5sxhDCSbDJk59VXyd1VMVViA2JtEsNBaGqaLm49",
-           block_height: 619,
-           channel_id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-           tx_hash: "th_VZFXHi74qS66J3Q8EE76sYHWA3GTmbsiPs6ZfrSiViLBpuvx3"
+           block_hash: "mh_2CwWebt7UpAu5RuwiCTatWA4BXddUM4xSTED3dRxdzs6FjFzY2",
+           block_height: 55,
+           channel_id: "ch_2WxZjGhqPurmGQrVtJ2LkzgNK4xEg6KViAhd6t9sHRKCiwws3a",
+           tx_hash: "th_2PkYGBQJxDNhsWKs5yGQ41wP2y32HHiN4qwNUpcbKiGd1n1rdx"
           }}
   """
   @spec create(
@@ -167,16 +167,16 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> {:ok, [close_mutual_tx, close_mutual_sig]} =
-              AeppSDK.Channel.OnChain.close_mutual(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 0, 70_000_000_000)
+              AeppSDK.Channel.OnChain.close_mutual(client1, "ch_2WxZjGhqPurmGQrVtJ2LkzgNK4xEg6KViAhd6t9sHRKCiwws3a", 0, 70_000_000_000)
       iex> {:ok, [^close_mutual_tx, close_mutual_sig1]} = AeppSDK.Utils.Transaction.sign_tx(close_mutual_tx, client2)
       iex> AeppSDK.Channel.OnChain.post(client1, close_mutual_tx, signatures_list: [close_mutual_sig, close_mutual_sig1])
       {:ok,
           %{
-            block_hash: "mh_kk1Xzo8GEmpdnAz4yZPXngcLGWjRYnGBAZ4ZtFoPHNHioJ7Di",
-            block_height: 574,
+            block_hash: "mh_2rhgaqaHC8Xiroamfd6rNfRRemjpVdWBJY1jfTS1F2Gub3fU14",
+            block_height: 136,
             info: %{reason: "Channel not found"},
-            tx_hash: "th_t7z2VjPFPr54XD8mwdtojm62ZL6NmLkdJzgsmGWTdSaGqc4Ab"
-          }}
+            tx_hash: "th_2DW1XZRUdYmojKVU8yQDzMgq2jupFL8ZgANzLsseiGAsUq4s4Z"
+      }}
   """
   @spec close_mutual(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, list()} | {:error, String.t()}
@@ -234,33 +234,43 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> AeppSDK.Channel.OnChain.close_solo(
-               client1,
-               "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<>>,
+               client,
+               channel_id,
+               <<248, 210, 11, 1, 248, 132, 184, 64, 201, 113, 103, 241, 42, 81, 62, 1, 103, 105,
+                 22, 251, 213, 10, 40, 106, 197, 217, 39, 51, 5, 44, 73, 142, 50, 78, 40, 208, 88,
+                 116, 43, 53, 81, 6, 23, 241, 250, 225, 60, 76, 4, 174, 160, 24, 130, 33, 72, 1,
+                 185, 121, 0, 233, 109, 122, 143, 66, 188, 5, 160, 35, 142, 26, 220, 2, 184, 64,
+                 90, 28, 241, 181, 193, 50, 161, 54, 69, 243, 124, 105, 122, 228, 172, 8, 199,
+                 166, 32, 131, 229, 16, 81, 237, 37, 44, 86, 1, 202, 62, 176, 168, 89, 137, 245,
+                 105, 120, 166, 242, 61, 238, 182, 172, 144, 224, 208, 122, 177, 35, 133, 90, 76,
+                 250, 235, 23, 132, 124, 23, 226, 16, 137, 50, 85, 5, 184, 72, 248, 70, 57, 2,
+                 161, 6, 67, 28, 253, 157, 52, 56, 167, 245, 195, 204, 105, 111, 179, 9, 174, 138,
+                 170, 157, 22, 18, 121, 142, 124, 182, 178, 196, 189, 31, 111, 81, 64, 49, 2, 160,
+                 154, 233, 243, 226, 108, 37, 138, 14, 209, 86, 39, 89, 167, 191, 182, 94, 106,
+                 233, 189, 108, 94, 31, 187, 28, 192, 85, 168, 253, 98, 98, 99, 158>>,
                accounts:
-                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
-                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
+                 {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73, 245,
+                    75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212, 51>>,
                   %{
                     cache:
                       {3,
-                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
-                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
-                          240>>,
+                       {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73,
+                          245, 75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212,
+                          51>>,
                         [
                           <<>>,
                           <<>>,
-                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
                           <<>>,
                           <<>>,
                           <<>>,
+                          <<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                            105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                            16>>,
                           <<>>,
                           <<>>,
                           <<>>,
-                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                            112, 176>>,
+                          <<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                            52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
                           <<>>,
                           <<>>,
                           <<>>,
@@ -269,48 +279,47 @@ defmodule AeppSDK.Channel.OnChain do
                           <<>>,
                           <<>>
                         ],
-                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                           112, 176>>,
+                        {<<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                           105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                           16>>,
                          [
-                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
-                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
-                             221, 224, 123>>,
+                           <<60, 23, 175, 26, 217, 146, 152, 11, 103, 81, 151, 214, 147, 110, 187,
+                             210, 92, 78, 171, 45, 72, 28, 247, 161, 167, 18, 61, 234, 180, 217,
+                             133, 6>>,
                            <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
-                         ], nil,
-                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          [
-                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
-                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
-                              158, 30, 72>>,
-                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
-                          ], nil, nil}}, nil}}
+                         ], nil, nil},
+                        {<<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                           52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
+                         [
+                           <<51, 216, 132, 73, 112, 198, 24, 252, 160, 107, 12, 223, 138, 22, 165,
+                             77, 67, 150, 195, 81, 35, 223, 36, 71, 96, 42, 48, 91, 69, 136, 247,
+                             142>>,
+                           <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
+                         ], nil, nil}}}
                   }}
-                 )
+             )
 
       {:ok,
           %{
-            block_hash: "mh_2cfm1y1zokwu467fLdZrp2VWgNZaTmeXGGw4jHdQGh6sZZctrd",
-            block_height: 74,
+            block_hash: "mh_JnaZ2mMaVLxGw4hooGB1chTpgh6ifokC9h4xqgdbRMGvACibX",
+            block_height: 111,
             info: %{
               channel_amount: 100000000000,
               channel_reserve: 20,
               delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
+              id: "ch_WZKRxaPhrfBZ1mKD5gLnU9jxrW9u3gjJNBCJ4hndEiNKs9CND",
               initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+              initiator_id: "ak_hZP2M8FamBSM6kNoMVwFK3JEsy4fZ9e7pRAw7HXKrSUg3B8nQ",
               lock_period: 10,
-              locked_until: 106,
+              locked_until: 121,
               responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
-              round: 1,
+              responder_id: "ak_287XG6Fied7M1W54mAtTnEzWbAPn6zHSf5Y84wXtp4nQBS7vmv",
+              round: 2,
               solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
+              state_hash: "st_munz4mwlig7RVidZp7+2XmrpvWxeH7scwFWo/WJiY55yXpaq"
             },
-            tx_hash: "th_276gHMqrNWX7ucMTokWz5eUEV4cgreumvXB5casY1cNVKKApYD"
-          }}
+            tx_hash: "th_2X8iGZkZvavsmG8udFENqnfqsKrYyBBpAuif7RZoZUUog8Y7Yq"
+      }}
   """
   @spec close_solo(Client.t(), binary(), binary(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -369,7 +378,7 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> {:ok, [deposit_tx, deposit_sig]} =
-             AeppSDK.Channel.OnChain.deposit(client1, 16740000000, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", 2,
+             AeppSDK.Channel.OnChain.deposit(client1, 16740000000, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 2,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
@@ -377,25 +386,25 @@ defmodule AeppSDK.Channel.OnChain do
       iex> AeppSDK.Channel.OnChain.post(client1, deposit_tx, signatures_list: [deposit_sig, deposit_sig1])
       {:ok,
           %{
-            block_hash: "mh_rRcR3puQg4iAuBkR9yCfJtJTN5nzuaoqvr3oJdENXcyPQPTbY",
-            block_height: 947,
+            block_hash: "mh_ZFvg7gqiZrAyrcAn1RPM7mi2e1CFmq4f5wfauwdiARoDFep4F",
+            block_height: 280,
             info: %{
-              channel_amount: 116720000000,
+              channel_amount: 116740000000,
               channel_reserve: 20,
               delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
+              id: "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK",
               initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+              initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
               lock_period: 10,
               locked_until: 0,
               responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
+              responder_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
               round: 2,
               solo_round: 0,
               state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
             },
-            tx_hash: "th_LxmSCW1jHdaKiHJ32WidK8n2VyeJfarLzYsDA8N9DhN54HJMJ"
-          }}
+          tx_hash: "th_279M3NYh19PfHCmnWZpYXTaFf6PVfbB5aZe5TazjTNUiTSaVsZ"
+      }}
   """
   @spec deposit(Client.t(), non_neg_integer(), binary(), non_neg_integer(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -535,14 +544,14 @@ defmodule AeppSDK.Channel.OnChain do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
 
   ## Example
-      iex> AeppSDK.Channel.OnChain.settle(client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", initiator_amt, responder_amt)
+      iex> AeppSDK.Channel.OnChain.settleChannel.settle(client, channel_id, initiator_amt, responder_amt)
       {:ok,
        %{
-         block_hash: "mh_5793UoBfCJUiMGKMMmfPxqZTJPo44HM3HCSBtjwVj8JyVntL6",
-         block_height: 299,
+         block_hash: "mh_jH89m5ACnV5rsoo1vhg5D6jTXThotcY48B1DWADF8A7kFCvTf",
+         block_height: 255,
          info: %{reason: "Channel not found"},
-         tx_hash: "th_2DGD2VmRZ798LxRxTb8TcqzLaEgtuZUk5VJtUvC9MsPzHEELEc"
-       }}
+         tx_hash: "th_2NubsEBfPPF2cup9Hd9zuu9Evy9V1EHGhxS1D8eVinBZRL4CcC"
+      }}
   """
   @spec settle(Client.t(), binary(), non_neg_integer(), non_neg_integer(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -602,44 +611,44 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> AeppSDK.Channel.OnChain.slash(
-               client, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<248, 211, 11, 1, 248, 132, 184, 64, 103, 143, 97, 54, 143, 62, 96, 188, 175, 138,
-                 69, 94, 189, 154, 187, 232, 24, 124, 227, 118, 222, 228, 194, 201, 138, 30, 163,
-                 139, 234, 56, 102, 49, 147, 29, 134, 97, 135, 69, 62, 62, 89, 133, 45, 99, 164,
-                 238, 174, 83, 132, 129, 253, 64, 92, 8, 33, 203, 46, 197, 115, 87, 191, 250, 221,
-                 0, 184, 64, 218, 115, 120, 42, 135, 32, 185, 172, 64, 147, 81, 28, 252, 62, 61,
-                 174, 23, 187, 214, 191, 235, 45, 229, 160, 92, 36, 8, 248, 130, 109, 163, 27, 57,
-                 181, 80, 131, 182, 231, 33, 13, 76, 193, 217, 176, 176, 134, 228, 122, 52, 81,
-                 237, 128, 105, 191, 57, 99, 140, 104, 242, 118, 170, 157, 214, 6, 184, 73, 248,
-                 71, 57, 1, 161, 6, 79, 170, 117, 156, 23, 1, 16, 54, 197, 235, 149, 116, 88, 255,
-                 224, 120, 70, 14, 30, 170, 25, 182, 198, 157, 53, 41, 226, 230, 204, 75, 170,
-                 223, 3, 192, 160, 104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46,
-                 166, 249, 5, 206, 185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144,
-                 107>>,
+               client,
+               channel_id,
+               <<248, 210, 11, 1, 248, 132, 184, 64, 145, 148, 30, 197, 5, 240, 183, 26, 184, 110,
+                 253, 83, 1, 240, 198, 71, 193, 214, 193, 22, 202, 70, 234, 30, 157, 24, 219, 67,
+                 15, 0, 223, 68, 118, 143, 137, 154, 195, 231, 18, 82, 28, 33, 169, 105, 139, 44,
+                 139, 184, 115, 249, 149, 202, 50, 234, 107, 252, 10, 163, 184, 236, 43, 84, 34,
+                 11, 184, 64, 232, 63, 222, 177, 255, 229, 215, 175, 11, 119, 122, 12, 47, 88,
+                 143, 199, 191, 170, 176, 3, 163, 44, 192, 125, 35, 127, 69, 169, 247, 201, 234,
+                 1, 204, 85, 143, 19, 156, 213, 69, 155, 252, 218, 91, 162, 99, 192, 26, 71, 122,
+                 199, 100, 141, 109, 8, 158, 38, 100, 121, 194, 189, 237, 160, 78, 0, 184, 72,
+                 248, 70, 57, 2, 161, 6, 67, 28, 253, 157, 52, 56, 167, 245, 195, 204, 105, 111,
+                 179, 9, 174, 138, 170, 157, 22, 18, 121, 142, 124, 182, 178, 196, 189, 31, 111,
+                 81, 64, 49, 3, 160, 154, 233, 243, 226, 108, 37, 138, 14, 209, 86, 39, 89, 167,
+                 191, 182, 94, 106, 233, 189, 108, 94, 31, 187, 28, 192, 85, 168, 253, 98, 98, 99,
+                 158>>,
                accounts:
-                 {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184, 167,
-                    123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54, 240>>,
+                 {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73, 245,
+                    75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212, 51>>,
                   %{
                     cache:
                       {3,
-                       {<<192, 111, 88, 20, 45, 33, 69, 2, 151, 130, 233, 71, 11, 221, 101, 184,
-                          167, 123, 74, 128, 115, 113, 34, 233, 205, 57, 169, 234, 11, 204, 54,
-                          240>>,
+                       {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73,
+                          245, 75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212,
+                          51>>,
                         [
                           <<>>,
                           <<>>,
-                          <<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
                           <<>>,
                           <<>>,
                           <<>>,
+                          <<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                            105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                            16>>,
                           <<>>,
                           <<>>,
                           <<>>,
-                          <<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                            118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                            112, 176>>,
+                          <<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                            52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
                           <<>>,
                           <<>>,
                           <<>>,
@@ -648,48 +657,47 @@ defmodule AeppSDK.Channel.OnChain do
                           <<>>,
                           <<>>
                         ],
-                        {<<7, 136, 134, 164, 145, 33, 39, 79, 153, 107, 203, 149, 176, 234, 74,
-                           118, 68, 253, 71, 192, 23, 88, 107, 255, 169, 105, 39, 183, 41, 43,
-                           112, 176>>,
+                        {<<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                           105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                           16>>,
                          [
-                           <<58, 133, 242, 134, 182, 11, 142, 227, 118, 190, 131, 89, 37, 214,
-                             172, 21, 185, 76, 99, 179, 208, 237, 151, 8, 252, 98, 249, 187, 209,
-                             221, 224, 123>>,
+                           <<60, 23, 175, 26, 217, 146, 152, 11, 103, 81, 151, 214, 147, 110, 187,
+                             210, 92, 78, 171, 45, 72, 28, 247, 161, 167, 18, 61, 234, 180, 217,
+                             133, 6>>,
                            <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
-                         ], nil,
-                         {<<181, 54, 180, 239, 130, 16, 187, 166, 170, 125, 75, 101, 25, 218, 209,
-                            128, 212, 56, 75, 225, 21, 47, 4, 89, 95, 58, 5, 165, 128, 110, 47,
-                            30>>,
-                          [
-                            <<52, 59, 178, 233, 41, 108, 254, 39, 58, 13, 5, 102, 220, 192, 118,
-                              248, 248, 238, 240, 246, 15, 217, 118, 130, 254, 64, 228, 109, 180,
-                              158, 30, 72>>,
-                            <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
-                          ], nil, nil}}, nil}}
+                         ], nil, nil},
+                        {<<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                           52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
+                         [
+                           <<51, 216, 132, 73, 112, 198, 24, 252, 160, 107, 12, 223, 138, 22, 165,
+                             77, 67, 150, 195, 81, 35, 223, 36, 71, 96, 42, 48, 91, 69, 136, 247,
+                             142>>,
+                           <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
+                         ], nil, nil}}}
                   }}
              )
 
       {:ok,
           %{
-            block_hash: "mh_oVXWg8Ws7vLJocaobvbK54RdTkQqPzz34whk7t2XnqTRCEHJV",
-            block_height: 193,
+            block_hash: "mh_azf8sDtinbauus1qK9f2o1h6EePUiuNt12ZqZFwWrR8J3JCsC",
+            block_height: 181,
             info: %{
               channel_amount: 100000000000,
               channel_reserve: 20,
               delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
+              id: "ch_WZKRxaPhrfBZ1mKD5gLnU9jxrW9u3gjJNBCJ4hndEiNKs9CND",
               initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+              initiator_id: "ak_hZP2M8FamBSM6kNoMVwFK3JEsy4fZ9e7pRAw7HXKrSUg3B8nQ",
               lock_period: 10,
-              locked_until: 203,
+              locked_until: 191,
               responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
+              responder_id: "ak_287XG6Fied7M1W54mAtTnEzWbAPn6zHSf5Y84wXtp4nQBS7vmv",
               round: 3,
               solo_round: 0,
-              state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
-            },
-            tx_hash: "th_3XdMojFEg5kMSVwpxCKLXfjtnp5dfzerNYyuYTAp5ypwxedHy"
-          }}
+              state_hash: "st_munz4mwlig7RVidZp7+2XmrpvWxeH7scwFWo/WJiY55yXpaq"
+          },
+          tx_hash: "th_hgEEnpcjPdLk5CEdmeXETmQTYcHvuVBnMi5d85kPRBawGQLek"
+      }}
   """
   @spec slash(Client.t(), binary(), binary() | map(), list(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -749,28 +757,29 @@ defmodule AeppSDK.Channel.OnChain do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_snapshot_solo
 
   ## Example
-     iex> Channel.snapshot_solo(
+     iex> AeppSDK.Channel.OnChain.snapshot_solo(
                client,
-               "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
-               <<248, 211, 11, 1, 248, 132, 184, 64, 189, 85, 177, 158, 63, 228, 58, 49, 130, 243,
-                 140, 226, 243, 148, 27, 45, 181, 131, 160, 118, 17, 83, 57, 252, 79, 125, 17, 66,
-                 24, 141, 36, 201, 246, 103, 197, 220, 243, 55, 208, 220, 242, 184, 218, 232, 239,
-                 180, 68, 197, 198, 67, 148, 46, 244, 215, 183, 104, 6, 116, 105, 147, 163, 30,
-                 71, 8, 184, 64, 56, 168, 162, 166, 91, 36, 180, 37, 49, 220, 215, 99, 239, 45,
-                 121, 175, 128, 207, 45, 52, 168, 149, 50, 107, 38, 226, 64, 63, 54, 236, 238,
-                 150, 104, 159, 232, 14, 24, 134, 12, 33, 108, 232, 158, 222, 210, 242, 63, 78,
-                 134, 146, 242, 211, 11, 122, 230, 252, 254, 103, 150, 139, 88, 80, 47, 6, 184,
-                 73, 248, 71, 57, 1, 161, 6, 76, 31, 36, 226, 145, 19, 154, 231, 247, 12, 200,
-                 250, 255, 20, 63, 23, 196, 86, 255, 190, 186, 6, 111, 186, 119, 166, 86, 126, 7,
-                 231, 197, 244, 43, 192, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43>>
+               channel_id,
+               <<248, 210, 11, 1, 248, 132, 184, 64, 198, 42, 55, 37, 192, 126, 199, 229, 22, 222,
+                 103, 86, 51, 29, 17, 238, 229, 17, 124, 160, 247, 28, 39, 30, 186, 138, 206, 3,
+                 179, 46, 224, 25, 32, 48, 25, 220, 61, 218, 161, 170, 122, 123, 30, 8, 122, 62,
+                 232, 246, 47, 128, 64, 151, 153, 128, 69, 221, 3, 174, 6, 148, 197, 125, 192, 15,
+                 184, 64, 33, 185, 19, 26, 171, 135, 138, 163, 121, 250, 122, 152, 34, 168, 11,
+                 254, 89, 49, 219, 158, 93, 207, 98, 1, 229, 10, 163, 193, 8, 10, 81, 82, 239, 13,
+                 219, 133, 175, 134, 76, 195, 134, 43, 166, 76, 59, 36, 53, 83, 120, 238, 252,
+                 229, 166, 219, 165, 153, 61, 214, 128, 86, 52, 137, 51, 14, 184, 72, 248, 70, 57,
+                 2, 161, 6, 245, 169, 216, 57, 28, 40, 9, 221, 141, 60, 227, 220, 162, 91, 220,
+                 255, 107, 28, 150, 170, 195, 164, 93, 50, 116, 244, 179, 80, 127, 154, 153, 182,
+                 43, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                 0, 0, 0, 0, 0, 0, 0, 43>>
              )
+
       {:ok,
           %{
-            block_hash: "mh_Xwp5ZAU3i8dQNxSSuUEtyBSwy8tjvjiHExYQHKSf32Wq3mtXn",
-            block_height: 391,
-            tx_hash: "th_2PqtPUxY2gzBrTmkYP3ZKDtbPH5HjZFQtitAJMBqGa6Pa2yuLT"
-          }}
+            block_hash: "mh_k84aBRvAYSQSxpWVj6ZJ9Z4wiUJhcAStoBLpRkLM1u7U74PZo",
+            block_height: 112,
+            tx_hash: "th_2AAhNgLfWdy5MoPhagi39mAXY5YgBn3i5E611D3stWVD8GxKbT"
+      }}
   """
   @spec snapshot_solo(Client.t(), binary(), binary() | map(), list()) ::
           {:ok, map()} | {:error, String.t()}
@@ -826,7 +835,7 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> {:ok, [withdraw_tx, withdraw_sig]} =
-             AeppSDK.Channel.OnChain.withdraw(client1, "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C", client4.keypair.public, 30000000000,
+             AeppSDK.Channel.OnChain.withdraw(client1, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 30000000000,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>), 3)
@@ -834,32 +843,31 @@ defmodule AeppSDK.Channel.OnChain do
       iex> AeppSDK.Channel.OnChain.post(client1, withdraw_tx, signatures_list: [withdraw_sig, withdraw_sig1])
       {:ok,
           %{
-            block_hash: "mh_2V4FWJtsu7YJ8MnyTCGV56B8aAR5sgbgmMD99GgZQds7BBko1L",
-            block_height: 1575,
+            block_hash: "mh_EhHcf36PdKcfAgBB1A7yhxpYFVqTLwk1xNFYZ1oNYjNHkUcNt",
+            block_height: 419,
             info: %{
-              channel_amount: 86720000000,
+              channel_amount: 86740000000,
               channel_reserve: 20,
               delegate_ids: [],
-              id: "ch_c5xXgW54ZkJHcN8iQ8j6zSyUWqSFJ9XgP9PHV7fiiL8og5K1C",
+              id: "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK",
               initiator_amount: 30000000000,
-              initiator_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+              initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
               lock_period: 10,
               locked_until: 0,
               responder_amount: 70000000000,
-              responder_id: "ak_GxXeeEKHfiK3f6qR8Rdt6ik1xYviC3z6SN3kMzKiUfQrjpz1B",
+              responder_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
               round: 3,
               solo_round: 0,
               state_hash: "st_aCjRv7ZrunE31mKFLqb5Bc65HkE9ocKMXaPWHCx+kGtBh/0M"
             },
-            tx_hash: "th_227fHhhY1A9iqSnNwGgmPU5dWi25r8exZ9JhdG4h6EKLwgBK5K"
-          }}
+          tx_hash: "th_232xnsXwTmU49oCbu6NK7wvG9c84KybkDUXE3TjuGvqNkNBZob
+      }}
   """
   @spec withdraw(
           Client.t(),
           binary(),
           binary(),
           non_neg_integer(),
-          binary(),
           non_neg_integer(),
           list()
         ) ::
@@ -872,7 +880,6 @@ defmodule AeppSDK.Channel.OnChain do
           connection: connection
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
-        to_id,
         amount,
         <<"st_", state_hash::binary>> = encoded_state_hash,
         round,
@@ -886,7 +893,7 @@ defmodule AeppSDK.Channel.OnChain do
          {:ok, withdraw_tx} <-
            build_withdraw_tx(
              channel_id,
-             to_id,
+             sender_pubkey,
              amount,
              Keyword.get(opts, :ttl, 0),
              Keyword.get(opts, :fee, 0),
