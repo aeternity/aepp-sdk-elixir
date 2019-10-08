@@ -31,6 +31,18 @@ defmodule AeppSDK.AENS do
   @allowed_registrars ["aet", "test"]
   @multiplier_14 100_000_000_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
+  @type preclaim_options :: [
+          fee: non_neg_integer(),
+          ttl: non_neg_integer(),
+          salt: atom() | non_neg_integer()
+        ]
+  @type update_options :: [
+          fee: non_neg_integer(),
+          ttl: non_neg_integer(),
+          pointers: list(),
+          client_ttl: non_neg_integer(),
+          name_ttl: non_neg_integer()
+        ]
 
   @doc """
   Preclaims a name.
@@ -67,7 +79,7 @@ defmodule AeppSDK.AENS do
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
   """
-  @spec preclaim(Client.t(), String.t(), non_neg_integer() | atom(), aens_options()) ::
+  @spec preclaim(Client.t(), String.t(), preclaim_options()) ::
           {:error, String.t()} | {:ok, map()}
   def preclaim(
         %Client{
@@ -75,15 +87,16 @@ defmodule AeppSDK.AENS do
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
           connection: connection,
-          internal_connection: internal_connection
+          internal_connection: internal_connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         name,
-        salt \\ :auto,
         opts \\ []
       )
       when sender_prefix == "ak" do
     name_salt =
-      case salt do
+      case Keyword.get(opts, :salt, :auto) do
         :auto ->
           <<a::32, b::32, c::32>> = :crypto.strong_rand_bytes(12)
           {state, _} = :rand.seed(:exsplus, {a, b, c})
@@ -93,6 +106,8 @@ defmodule AeppSDK.AENS do
           num
       end
 
+    user_fee = Keyword.get(opts, :fee, 0)
+
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
            NameService.get_commitment_id(internal_connection, name, name_salt),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
@@ -100,15 +115,24 @@ defmodule AeppSDK.AENS do
            build_preclaim_tx(
              client,
              commitment_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              preclaim_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{preclaim_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       result =
         response
@@ -214,29 +238,42 @@ defmodule AeppSDK.AENS do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         name,
         name_salt,
         opts \\ []
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
+    user_fee = Keyword.get(opts, :fee, 0)
+
     with {:ok, claim_tx} <-
            build_claim_tx(
              client,
              name,
              name_salt,
              Keyword.get(opts, :name_fee, calculate_name_fee(name)),
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              claim_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{claim_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       result =
         response
@@ -296,21 +333,15 @@ defmodule AeppSDK.AENS do
   """
   @spec update(
           {:ok, %{client: AeppSDK.Client.t(), name: binary()}} | {:error, String.t()},
-          list(),
-          non_neg_integer(),
-          non_neg_integer(),
-          aens_options()
+          list()
         ) :: {:error, String.t()} | {:ok, map()}
   def update(
         claim_result,
-        pointers \\ [],
-        name_ttl \\ @max_name_ttl,
-        client_ttl \\ @max_client_ttl,
         opts \\ []
       ) do
     case claim_result do
       {:ok, %{client: client, name: name}} ->
-        update_name(client, name, name_ttl, pointers, client_ttl, opts)
+        update_name(client, name, opts)
 
       {:error, _reason} = error ->
         error
@@ -365,26 +396,26 @@ defmodule AeppSDK.AENS do
   @spec update_name(
           Client.t(),
           String.t(),
-          non_neg_integer(),
-          list(),
-          non_neg_integer(),
-          aens_options()
+          update_options()
         ) :: {:error, String.t()} | {:ok, map()}
   def update_name(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         name,
-        name_ttl \\ @max_name_ttl,
-        pointers \\ [],
-        client_ttl \\ @max_client_ttl,
         opts \\ []
       )
-      when is_integer(name_ttl) and is_integer(client_ttl) and is_list(pointers) and
-             sender_prefix == "ak" do
+      when sender_prefix == "ak" do
+    pointers = Keyword.get(opts, :pointers, [])
+    client_ttl = Keyword.get(opts, :client_ttl, @max_client_ttl)
+    name_ttl = Keyword.get(opts, :name_ttl, @max_name_ttl)
+    user_fee = Keyword.get(opts, :fee, 0)
+
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, update_tx} <-
            build_update_tx(
@@ -393,16 +424,25 @@ defmodule AeppSDK.AENS do
              name_ttl,
              pointers,
              client_ttl,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              update_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{update_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       result =
         response
@@ -506,36 +546,49 @@ defmodule AeppSDK.AENS do
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
         }}
   """
-  @spec transfer_name(Client.t(), String.t(), binary(), aens_options()) ::
+  @spec transfer_name(Client.t(), String.t(), String.t(), aens_options()) ::
           {:error, String.t()} | {:ok, map()}
   def transfer_name(
         %Client{
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         name,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         opts \\ []
       )
       when recipient_prefix == "ak" and sender_prefix == "ak" do
+    user_fee = Keyword.get(opts, :fee, 0)
+
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, transfer_tx} <-
            build_transfer_tx(
              client,
              name_id,
              recipient_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              transfer_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{transfer_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       result =
         response
@@ -635,27 +688,40 @@ defmodule AeppSDK.AENS do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>>
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         name,
         opts \\ []
       )
       when sender_prefix == "ak" do
+    user_fee = Keyword.get(opts, :fee, 0)
+
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, revoke_tx} <-
            build_revoke_tx(
              client,
              name_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :ttl, Transaction.default_ttl())
            ),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              revoke_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{revoke_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       result =
         response

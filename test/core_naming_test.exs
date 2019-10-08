@@ -36,9 +36,9 @@ defmodule CoreNamingTest do
       AENS.update_name(
         setup.client,
         @test_name,
-        49_999,
-        list_of_pointers,
-        50_000
+        name_ttl: 49_999,
+        pointers: list_of_pointers,
+        client_ttl: 50_000
       )
 
     assert match?({:ok, _}, update)
@@ -59,7 +59,7 @@ defmodule CoreNamingTest do
     assert match?({:ok, _}, transfer)
 
     # Pre-claim a new name (name_salt = 888)
-    pre_claim_new = AENS.preclaim(setup.client, @new_test_name, 888)
+    pre_claim_new = AENS.preclaim(setup.client, @new_test_name, name_salt: 888)
     assert match?({:ok, _}, pre_claim_new)
 
     # Claim a new name
