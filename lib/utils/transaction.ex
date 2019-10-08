@@ -469,8 +469,23 @@ defmodule AeppSDK.Utils.Transaction do
   end
 
   defp calculate_fee_n_times(tx, height, network_id, fee, gas_price, times, _acc) do
-    acc = calculate_fee(tx, height, network_id, 0, gas_price)
-    calculate_fee_n_times(%{tx | fee: acc}, height, network_id, fee, gas_price, times - 1, acc)
+    case fee do
+      0 ->
+        acc = calculate_fee(tx, height, network_id, 0, gas_price)
+
+        calculate_fee_n_times(
+          %{tx | fee: acc},
+          height,
+          network_id,
+          fee,
+          gas_price,
+          times - 1,
+          acc
+        )
+
+      fee ->
+        calculate_fee_n_times(%{tx | fee: fee}, height, network_id, fee, gas_price, 0, fee)
+    end
   end
 
   defp ttl_delta(_height, {:relative, _value} = ttl) do

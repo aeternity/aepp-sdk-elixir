@@ -144,7 +144,7 @@ defmodule AeppSDK.Channel.OnChain do
              create_channel_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -211,7 +211,7 @@ defmodule AeppSDK.Channel.OnChain do
              close_mutual_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -353,7 +353,7 @@ defmodule AeppSDK.Channel.OnChain do
              close_solo_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -442,7 +442,7 @@ defmodule AeppSDK.Channel.OnChain do
              deposit_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -516,7 +516,7 @@ defmodule AeppSDK.Channel.OnChain do
              force_progress_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -585,7 +585,7 @@ defmodule AeppSDK.Channel.OnChain do
              settle_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -731,7 +731,7 @@ defmodule AeppSDK.Channel.OnChain do
              slash_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -811,7 +811,7 @@ defmodule AeppSDK.Channel.OnChain do
              snapshot_solo_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -906,7 +906,7 @@ defmodule AeppSDK.Channel.OnChain do
              withdraw_tx,
              height,
              client.network_id,
-             0,
+             Keyword.get(opts, :fee, 0),
              client.gas_price,
              5
            ),
@@ -1007,8 +1007,14 @@ defmodule AeppSDK.Channel.OnChain do
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
     {:ok, %{height: height}} = Chain.get_current_key_block_height(connection)
-    {:ok, res} = Transaction.try_post(client, tx, nil, height, sig_list)
-    channel_info(client, tx, res)
+
+    case Transaction.try_post(client, tx, nil, height, sig_list) do
+      {:ok, res} ->
+        channel_info(client, tx, res)
+
+      {:error, _} = err ->
+        err
+    end
   end
 
   # POST GA + GA
@@ -1031,13 +1037,16 @@ defmodule AeppSDK.Channel.OnChain do
             wrap_in_signature_signed_tx(new_meta_tx, [])
           )
 
-        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-          TransactionApi.post_transaction(client.connection, %Tx{
-            tx: signed_tx
-          })
-
-        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-        channel_info(client, tx, res, meta_tx, inner_meta_tx)
+        with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+               TransactionApi.post_transaction(client.connection, %Tx{
+                 tx: signed_tx
+               }),
+             {:ok, res} <- Transaction.await_mining(client.connection, tx_hash, :no_type) do
+          channel_info(client, tx, res, meta_tx, inner_meta_tx)
+        else
+          {:error, _} = err -> err
+          {:ok, %AeternityNode.Model.Error{} = err} -> {:error, err}
+        end
 
       false ->
         {:error,
@@ -1067,13 +1076,16 @@ defmodule AeppSDK.Channel.OnChain do
             wrap_in_signature_signed_tx(new_meta_tx, [])
           )
 
-        {:ok, %PostTxResponse{tx_hash: tx_hash}} =
-          TransactionApi.post_transaction(client.connection, %Tx{
-            tx: signed_tx
-          })
-
-        {:ok, res} = Transaction.await_mining(client.connection, tx_hash, :no_type)
-        channel_info(client, res, meta_tx, inner_tx)
+        with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
+               TransactionApi.post_transaction(client.connection, %Tx{
+                 tx: signed_tx
+               }),
+             {:ok, res} <- Transaction.await_mining(client.connection, tx_hash, :no_type) do
+          channel_info(client, res, meta_tx, inner_tx)
+        else
+          {:error, _} = err -> err
+          {:ok, %AeternityNode.Model.Error{} = err} -> {:error, err}
+        end
 
       false ->
         {:error,
