@@ -106,7 +106,7 @@ defmodule AeppSDK.AENS do
           num
       end
 
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, %CommitmentId{commitment_id: commitment_id}} <-
            NameService.get_commitment_id(internal_connection, name, name_salt),
@@ -247,7 +247,7 @@ defmodule AeppSDK.AENS do
         opts \\ []
       )
       when is_binary(name) and is_integer(name_salt) and sender_prefix == "ak" do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, claim_tx} <-
            build_claim_tx(
@@ -414,7 +414,7 @@ defmodule AeppSDK.AENS do
     pointers = Keyword.get(opts, :pointers, [])
     client_ttl = Keyword.get(opts, :client_ttl, @max_client_ttl)
     name_ttl = Keyword.get(opts, :name_ttl, @max_name_ttl)
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, update_tx} <-
@@ -562,7 +562,7 @@ defmodule AeppSDK.AENS do
         opts \\ []
       )
       when recipient_prefix == "ak" and sender_prefix == "ak" do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, transfer_tx} <-
@@ -696,7 +696,7 @@ defmodule AeppSDK.AENS do
         opts \\ []
       )
       when sender_prefix == "ak" do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, %NameEntry{id: name_id}} <- NameService.get_name_entry_by_name(connection, name),
          {:ok, revoke_tx} <-

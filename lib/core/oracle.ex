@@ -88,7 +88,7 @@ defmodule AeppSDK.Oracle do
       )
       when is_binary(query_format) and is_binary(response_format) and is_integer(query_fee) and
              query_fee > 0 and is_list(opts) do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          {:ok, binary_query_format} <- sophia_type_to_binary(query_format),
@@ -178,7 +178,7 @@ defmodule AeppSDK.Oracle do
         opts \\ []
       )
       when is_binary(oracle_id) and is_integer(response_ttl_value) and is_list(opts) do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok,
           %RegisteredOracle{
@@ -275,7 +275,7 @@ defmodule AeppSDK.Oracle do
       )
       when is_binary(oracle_id) and is_binary(query_id) and is_integer(response_ttl) and
              is_list(opts) do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, binary_response} <- sophia_data_to_binary(response),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
@@ -346,7 +346,7 @@ defmodule AeppSDK.Oracle do
         opts \\ []
       )
       when is_binary(oracle_id) and is_integer(oracle_ttl) and is_list(opts) do
-    user_fee = Keyword.get(opts, :fee, 0)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          extend_tx = %OracleExtendTx{
