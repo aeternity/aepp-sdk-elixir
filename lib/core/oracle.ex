@@ -45,7 +45,7 @@ defmodule AeppSDK.Oracle do
   ## Example
       iex> query_format = "string"
       iex> response_format = "map(string, string)"
-      iex> oracle_ttl = %{type: :relative, value: 10}
+      iex> oracle_ttl = %{type: :relative, value: 10000}
       iex> query_fee = 100
       iex> AeppSDK.Oracle.register(client, query_format, response_format, oracle_ttl, query_fee)
       {:ok,
@@ -136,8 +136,8 @@ defmodule AeppSDK.Oracle do
   ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query = "a query"
-      iex> query_ttl = %{type: :relative, value: 10}
-      iex> response_ttl = 10
+      iex> query_ttl = %{type: :relative, value: 1000}
+      iex> response_ttl = 1000
       iex> AeppSDK.Oracle.query(client, oracle_id, query, query_ttl, response_ttl)
       {:ok,
        %{
@@ -234,9 +234,9 @@ defmodule AeppSDK.Oracle do
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
-      iex> query_ttl = %{type: :relative, value: 10}
-      iex> response_ttl = 10
-      iex> AeppSDK.Oracle.respond(client, oracle_id, response, response_ttl)
+      iex> query_ttl = %{type: :relative, value: 1000}
+      iex> response_ttl = 1000
+      iex> AeppSDK.Oracle.respond(client, oracle_id, query_id, response, response_ttl)
       {:ok,
        %{
          block_hash: "mh_QTXMDn8Ln6fiBBXByXJkEeD6wq6QzQZHMVuApbouTFaqWMkSt",
