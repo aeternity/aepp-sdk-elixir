@@ -544,7 +544,7 @@ defmodule AeppSDK.Channel.OnChain do
   More information at https://github.com/aeternity/protocol/blob/master/channels/ON-CHAIN.md#channel_settle
 
   ## Example
-      iex> AeppSDK.Channel.OnChain.settleChannel.settle(client, channel_id, initiator_amt, responder_amt)
+      iex> AeppSDK.Channel.OnChain.settle(client, channel_id, initiator_amt, responder_amt)
       {:ok,
        %{
          block_hash: "mh_jH89m5ACnV5rsoo1vhg5D6jTXThotcY48B1DWADF8A7kFCvTf",
