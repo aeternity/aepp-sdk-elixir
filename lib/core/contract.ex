@@ -112,6 +112,7 @@ defmodule AeppSDK.Contract do
       when is_binary(source_code) and is_list(init_args) and is_list(opts) do
     public_key_binary = Keys.public_key_to_binary(public_key)
     {:ok, source_hash} = Hash.hash(source_code)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, %{byte_code: byte_code, type_info: type_info}} <- compile(source_code),

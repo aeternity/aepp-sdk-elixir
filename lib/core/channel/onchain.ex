@@ -107,7 +107,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         initiator_amount,
         <<responder_prefix::binary-size(@prefix_byte_size), _::binary>> = responder_id,
@@ -119,6 +121,8 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when sender_prefix == "ak" and responder_prefix == "ak" do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -132,25 +136,25 @@ defmodule AeppSDK.Channel.OnChain do
              channel_reserve,
              lock_period,
              Keyword.get(opts, :ttl, 0),
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              Keyword.get(opts, :delegate_ids, []),
              nonce,
              encoded_state_hash
            ),
          {:ok, %{height: height}} <-
            Chain.get_current_key_block_height(client.connection),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              create_channel_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _} = res <-
            Transaction.sign_tx(
-             %{create_channel_tx | fee: fee},
+             %{create_channel_tx | fee: new_fee},
              client,
              Keyword.get(opts, :auth, :no_opts)
            ) do
@@ -185,7 +189,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         initiator_amount_final,
@@ -194,30 +200,32 @@ defmodule AeppSDK.Channel.OnChain do
       )
       when valid_prefixes(sender_prefix, channel_prefix) and initiator_amount_final >= 0 and
              responder_amount_final >= 0 do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
            build_close_mutual_tx(
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              initiator_amount_final,
              nonce,
              responder_amount_final,
              Keyword.get(opts, :ttl, 0)
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              close_mutual_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _} = res <-
            Transaction.sign_tx(
-             %{close_mutual_tx | fee: fee},
+             %{close_mutual_tx | fee: new_fee},
              client,
              Keyword.get(opts, :auth, :no_opts)
            ) do
@@ -328,7 +336,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
@@ -336,33 +346,35 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) and is_binary(payload) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
            build_close_solo_tx(
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              nonce,
              payload,
              poi,
              Keyword.get(opts, :ttl, 0)
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              close_solo_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, response} <-
-           Transaction.try_post(
+           Transaction.post(
              client,
-             %{close_solo_tx | fee: fee},
-             Keyword.get(opts, :auth, nil),
-             height
+             %{close_solo_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       {:ok, channel_info} = get_by_pubkey(client, channel_id)
       {:ok, Map.put(response, :info, channel_info)}
@@ -413,7 +425,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         amount,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
@@ -422,6 +436,8 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
@@ -430,25 +446,25 @@ defmodule AeppSDK.Channel.OnChain do
            build_deposit_tx(
              amount,
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              nonce,
              round,
              encoded_state_hash,
              Keyword.get(opts, :ttl, 0)
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              deposit_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _} = res <-
            Transaction.sign_tx(
-             %{deposit_tx | fee: fee},
+             %{deposit_tx | fee: new_fee},
              client,
              Keyword.get(opts, :auth, :no_opts)
            ) do
@@ -483,7 +499,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         offchain_trees,
@@ -494,6 +512,8 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
@@ -501,7 +521,7 @@ defmodule AeppSDK.Channel.OnChain do
          {:ok, force_progress_tx} <-
            build_force_progress_tx(
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              nonce,
              offchain_trees,
@@ -511,21 +531,21 @@ defmodule AeppSDK.Channel.OnChain do
              Keyword.get(opts, :ttl, 0),
              update
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              force_progress_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _response} = response <-
-           Transaction.try_post(
+           Transaction.post(
              client,
-             %{force_progress_tx | fee: fee},
-             Keyword.get(opts, :auth, nil),
-             height
+             %{force_progress_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       response
     else
@@ -560,7 +580,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         initiator_amount_final,
@@ -568,33 +590,35 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, settle_tx} <-
            build_settle_tx(
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              initiator_amount_final,
              nonce,
              responder_amount_final,
              Keyword.get(opts, :ttl, 0)
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              settle_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, response} <-
-           Transaction.try_post(
+           Transaction.post(
              client,
-             %{settle_tx | fee: fee},
-             Keyword.get(opts, :auth, nil),
-             height
+             %{settle_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       {:ok, channel_info} = get_by_pubkey(client, channel_id)
       {:ok, Map.put(response, :info, channel_info)}
@@ -706,7 +730,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
@@ -714,33 +740,35 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
            build_slash_tx(
              channel_id,
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              sender_pubkey,
              nonce,
              payload,
              poi,
              Keyword.get(opts, :ttl, 0)
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              slash_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, response} <-
-           Transaction.try_post(
+           Transaction.post(
              client,
-             %{slash_tx | fee: fee},
-             Keyword.get(opts, :auth, nil),
-             height
+             %{slash_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       {:ok, channel_info} = get_by_pubkey(client, channel_id)
       {:ok, Map.put(response, :info, channel_info)}
@@ -788,13 +816,17 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         payload,
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, snapshot_solo_tx} <-
@@ -803,24 +835,24 @@ defmodule AeppSDK.Channel.OnChain do
              sender_pubkey,
              payload,
              Keyword.get(opts, :ttl, 0),
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              nonce
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              snapshot_solo_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _response} = response <-
-           Transaction.try_post(
+           Transaction.post(
              client,
-             %{snapshot_solo_tx | fee: fee},
-             Keyword.get(opts, :auth, nil),
-             height
+             %{snapshot_solo_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       response
     else
@@ -877,7 +909,9 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<channel_prefix::binary-size(@prefix_byte_size), _::binary>> = channel_id,
         amount,
@@ -886,6 +920,8 @@ defmodule AeppSDK.Channel.OnChain do
         opts \\ []
       )
       when valid_prefixes(sender_prefix, channel_prefix) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
@@ -896,23 +932,23 @@ defmodule AeppSDK.Channel.OnChain do
              sender_pubkey,
              amount,
              Keyword.get(opts, :ttl, 0),
-             Keyword.get(opts, :fee, 0),
+             user_fee,
              nonce,
              encoded_state_hash,
              round
            ),
-         fee <-
+         new_fee <-
            Transaction.calculate_n_times_fee(
              withdraw_tx,
              height,
-             client.network_id,
-             Keyword.get(opts, :fee, 0),
-             client.gas_price,
-             5
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
            ),
          {:ok, _} = res <-
            Transaction.sign_tx(
-             %{withdraw_tx | fee: fee},
+             %{withdraw_tx | fee: new_fee},
              client,
              Keyword.get(opts, :auth, :no_opts)
            ) do
@@ -1006,9 +1042,8 @@ defmodule AeppSDK.Channel.OnChain do
        )
        when is_list(signatures_list) do
     sig_list = :lists.sort(signatures_list)
-    {:ok, %{height: height}} = Chain.get_current_key_block_height(connection)
 
-    case Transaction.try_post(client, tx, nil, height, sig_list) do
+    case Transaction.post(client, tx, :no_auth, sig_list) do
       {:ok, res} ->
         channel_info(client, tx, res)
 
@@ -1018,7 +1053,7 @@ defmodule AeppSDK.Channel.OnChain do
   end
 
   # POST GA + GA
-  defp post_(%Client{} = client, meta_tx,
+  defp post_(%Client{connection: connection} = client, meta_tx,
          signatures_list: :no_signatures,
          inner_tx: inner_meta_tx,
          tx: tx
@@ -1038,10 +1073,10 @@ defmodule AeppSDK.Channel.OnChain do
           )
 
         with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
-               TransactionApi.post_transaction(client.connection, %Tx{
+               TransactionApi.post_transaction(connection, %Tx{
                  tx: signed_tx
                }),
-             {:ok, res} <- Transaction.await_mining(client.connection, tx_hash, :no_type) do
+             {:ok, res} <- Transaction.await_mining(connection, tx_hash, :no_type) do
           channel_info(client, tx, res, meta_tx, inner_meta_tx)
         else
           {:error, _} = err -> err
@@ -1056,7 +1091,7 @@ defmodule AeppSDK.Channel.OnChain do
 
   # POST Basic + GA
   defp post_(
-         client,
+         %Client{connection: connection} = client,
          %{tx: serialized_inner_tx} = meta_tx,
          signatures_list: basic_account_signature,
          inner_tx: inner_tx,
@@ -1077,10 +1112,10 @@ defmodule AeppSDK.Channel.OnChain do
           )
 
         with {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
-               TransactionApi.post_transaction(client.connection, %Tx{
+               TransactionApi.post_transaction(connection, %Tx{
                  tx: signed_tx
                }),
-             {:ok, res} <- Transaction.await_mining(client.connection, tx_hash, :no_type) do
+             {:ok, res} <- Transaction.await_mining(connection, tx_hash, :no_type) do
           channel_info(client, res, meta_tx, inner_tx)
         else
           {:error, _} = err -> err
