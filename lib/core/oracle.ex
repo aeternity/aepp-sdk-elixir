@@ -45,7 +45,7 @@ defmodule AeppSDK.Oracle do
   ## Example
       iex> query_format = "string"
       iex> response_format = "map(string, string)"
-      iex> oracle_ttl = %{type: :relative, value: 10}
+      iex> oracle_ttl = %{type: :relative, value: 10000}
       iex> query_fee = 100
       iex> AeppSDK.Oracle.register(client, query_format, response_format, oracle_ttl, query_fee)
       {:ok,
@@ -76,7 +76,9 @@ defmodule AeppSDK.Oracle do
   def register(
         %Client{
           keypair: %{public: pubkey},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         query_format,
         response_format,
@@ -86,6 +88,8 @@ defmodule AeppSDK.Oracle do
       )
       when is_binary(query_format) and is_binary(response_format) and is_integer(query_fee) and
              query_fee > 0 and is_list(opts) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          {:ok, binary_query_format} <- sophia_type_to_binary(query_format),
          {:ok, binary_response_format} <- sophia_type_to_binary(response_format),
@@ -96,18 +100,27 @@ defmodule AeppSDK.Oracle do
            oracle_ttl: %Ttl{type: ttl_type, value: ttl_value},
            account_id: pubkey,
            nonce: nonce,
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            abi_version: @abi_version
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(ttl, height),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              register_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{register_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       {:ok, Map.put(response, :oracle_id, String.replace_prefix(pubkey, "ak", "ok"))}
     else
@@ -123,8 +136,8 @@ defmodule AeppSDK.Oracle do
   ## Example
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query = "a query"
-      iex> query_ttl = %{type: :relative, value: 10}
-      iex> response_ttl = 10
+      iex> query_ttl = %{type: :relative, value: 1000}
+      iex> response_ttl = 1000
       iex> AeppSDK.Oracle.query(client, oracle_id, query, query_ttl, response_ttl)
       {:ok,
        %{
@@ -154,7 +167,9 @@ defmodule AeppSDK.Oracle do
   def query(
         %Client{
           keypair: %{public: pubkey},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         oracle_id,
         query,
@@ -163,6 +178,8 @@ defmodule AeppSDK.Oracle do
         opts \\ []
       )
       when is_binary(oracle_id) and is_integer(response_ttl_value) and is_list(opts) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok,
           %RegisteredOracle{
             query_fee: oracle_query_fee,
@@ -176,7 +193,7 @@ defmodule AeppSDK.Oracle do
            query_fee: Keyword.get(opts, :query_fee, oracle_query_fee),
            query_ttl: %Ttl{type: query_type, value: query_value},
            response_ttl: %RelativeTtl{type: :unused, value: response_ttl_value},
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            sender_id: pubkey,
            nonce: nonce
@@ -184,12 +201,21 @@ defmodule AeppSDK.Oracle do
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(query_ttl, height),
          :ok <- validate_query_object_ttl(oracle_ttl, query_ttl, response_ttl_value, height),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              query_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{query_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       {:ok, Map.put(response, :query_id, calculate_query_id(pubkey, nonce, oracle_id))}
     else
@@ -208,9 +234,9 @@ defmodule AeppSDK.Oracle do
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
-      iex> query_ttl = %{type: :relative, value: 10}
-      iex> response_ttl = 10
-      iex> AeppSDK.Oracle.respond(client, oracle_id, response, response_ttl)
+      iex> query_ttl = %{type: :relative, value: 1000}
+      iex> response_ttl = 1000
+      iex> AeppSDK.Oracle.respond(client, oracle_id, query_id, response, response_ttl)
       {:ok,
        %{
          block_hash: "mh_QTXMDn8Ln6fiBBXByXJkEeD6wq6QzQZHMVuApbouTFaqWMkSt",
@@ -237,7 +263,9 @@ defmodule AeppSDK.Oracle do
   def respond(
         %Client{
           keypair: %{public: pubkey},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         oracle_id,
         query_id,
@@ -247,24 +275,35 @@ defmodule AeppSDK.Oracle do
       )
       when is_binary(oracle_id) and is_binary(query_id) and is_integer(response_ttl) and
              is_list(opts) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, binary_response} <- sophia_data_to_binary(response),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          response_tx = %OracleRespondTx{
            query_id: query_id,
            response: binary_response,
            response_ttl: %RelativeTtl{type: :relative, value: response_ttl},
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            oracle_id: oracle_id,
            nonce: nonce
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              response_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{response_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       {:ok, response}
     else
@@ -298,28 +337,41 @@ defmodule AeppSDK.Oracle do
   def extend(
         %Client{
           keypair: %{public: pubkey},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         oracle_id,
         oracle_ttl,
         opts \\ []
       )
       when is_binary(oracle_id) and is_integer(oracle_ttl) and is_list(opts) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
          extend_tx = %OracleExtendTx{
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            oracle_ttl: %RelativeTtl{type: :relative, value: oracle_ttl},
            oracle_id: oracle_id,
            nonce: nonce,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl())
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              extend_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{extend_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       {:ok, response}
     else

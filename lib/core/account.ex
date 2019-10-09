@@ -30,7 +30,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> public_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> AeppSDK.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
+      iex> AeppSDK.Account.spend(client, public_key, 10_000_000)
       {:ok,
         %{
         block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
@@ -52,13 +52,17 @@ defmodule AeppSDK.Account do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_id),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
@@ -67,17 +71,26 @@ defmodule AeppSDK.Account do
              sender_id: sender_id,
              recipient_id: recipient_id,
              amount: amount,
-             fee: Keyword.get(opts, :fee, Transaction.dummy_fee()),
+             fee: user_fee,
              ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
              nonce: nonce,
              payload: Keyword.get(opts, :payload, Transaction.default_payload())
            ),
-         {:ok, _response} = response <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              spend_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, _response} = response <-
+           Transaction.post(
+             client,
+             %{spend_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       response
     else
