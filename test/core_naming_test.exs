@@ -58,8 +58,8 @@ defmodule CoreNamingTest do
 
     assert match?({:ok, _}, transfer)
 
-    # Pre-claim a new name (name_salt = 888)
-    pre_claim_new = AENS.preclaim(setup.client, @new_test_name, name_salt: 888)
+    # Pre-claim a new name (name salt = 888)
+    pre_claim_new = AENS.preclaim(setup.client, @new_test_name, salt: 888)
     assert match?({:ok, _}, pre_claim_new)
 
     # Claim a new name

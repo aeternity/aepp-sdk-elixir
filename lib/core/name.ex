@@ -28,7 +28,7 @@ defmodule AeppSDK.AENS do
   @max_name_ttl 50_000
   @max_client_ttl 86_000
   @label_separator "."
-  @allowed_registrars ["aet", "test"]
+  @allowed_registrars ["aet"]
   @multiplier_14 100_000_000_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
   @type preclaim_options :: [
@@ -49,7 +49,7 @@ defmodule AeppSDK.AENS do
 
   ## Example
       iex> name = "a1234567890asdfghjkl.aet"
-      iex> AeppSDK.AENS.preclaim(client, name)
+      iex> AeppSDK.AENS.preclaim(client, name, salt: 149218901844062129)
       {:ok,
         %{
           block_hash: "mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d",
