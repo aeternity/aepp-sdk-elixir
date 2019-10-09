@@ -30,7 +30,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> public_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> AeppSDK.Account.spend(client1, public_key, 10_000_000)
+      iex> AeppSDK.Account.spend(client, public_key, 10_000_000)
       {:ok,
         %{
         block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
