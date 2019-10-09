@@ -293,13 +293,13 @@ defmodule AeppSDK.AENS do
       iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
       iex> pointers = [
-            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
-             Serialization.id_to_record(
-               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+            {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+             AeppSDK.Utils.Serialization.id_to_record(
+               AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
                :account
              )}]
       iex> client_ttl = 50_000
-      iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.update(pointers, name_ttl,  client_ttl)
+      iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.update(pointers: pointers, name_ttl: name_ttl,  client_ttl: client_ttl)
       {:ok,
         %{
           block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
@@ -355,13 +355,13 @@ defmodule AeppSDK.AENS do
       iex> name = "a1234567890asdfghjkl.aet"
       iex> name_ttl = 49_999
       iex> pointers = [
-            {Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
-             Serialization.id_to_record(
-               Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+            {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
+             AeppSDK.Utils.Serialization.id_to_record(
+               AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
                :account
              )}]
       iex> client_ttl = 50_000
-      iex> AeppSDK.AENS.update_name(client, name, name_ttl, pointers, client_ttl)
+      iex> AeppSDK.AENS.update_name(client, name, name_ttl: name_ttl, pointers: pointers, client_ttl: client_ttl)
       {:ok,
         %{
           block_hash: "mh_bDauziEPcfsqZQMyBqLX2grxiD9p9iorsF2utsaCZQtwrEX2T",
