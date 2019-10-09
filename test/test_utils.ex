@@ -1,21 +1,21 @@
 defmodule TestUtils do
-  alias AeppSDK.Utils.Serialization
   alias AeppSDK.Client
+  alias AeppSDK.Utils.Serialization
 
   alias AeternityNode.Model.{
-    SpendTx,
-    OracleRegisterTx,
-    OracleRespondTx,
-    OracleQueryTx,
-    OracleExtendTx,
-    NamePreclaimTx,
+    ContractCallTx,
+    ContractCreateTx,
     NameClaimTx,
+    NamePreclaimTx,
     NameRevokeTx,
     NameTransferTx,
     NameUpdateTx,
-    ContractCreateTx,
-    ContractCallTx,
+    OracleExtendTx,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
     RelativeTtl,
+    SpendTx,
     Ttl
   }
 
@@ -158,7 +158,7 @@ defmodule TestUtils do
     spend_tx = %SpendTx{
       amount: 5_018_857_520_000_000_000,
       fee: 0,
-      nonce: 37181,
+      nonce: 37_181,
       payload: "",
       recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
@@ -171,7 +171,7 @@ defmodule TestUtils do
       query_fee: 10,
       oracle_ttl: %Ttl{type: :absolute, value: 10},
       account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-      nonce: 37122,
+      nonce: 37_122,
       fee: 0,
       ttl: 10,
       abi_version: 0x30001

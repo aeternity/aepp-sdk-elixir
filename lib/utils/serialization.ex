@@ -28,6 +28,7 @@ defmodule AeppSDK.Utils.Serialization do
   @tag_channel_close_solo_tx 54
   @tag_channel_slash_tx 55
   @tag_channel_settle_tx 56
+  @tag_offchain_tx 57
   @tag_channel_snapshot_solo_tx 59
   @tag_channel_force_progress_tx 521
   @tag_channel_offchain_update_transfer 570
@@ -42,7 +43,7 @@ defmodule AeppSDK.Utils.Serialization do
   @version_oracle_query_tx 1
   @version_oracle_response_tx 1
   @version_oracle_extend_tx 1
-  @version_name_claim_tx 1
+  @version_name_claim_tx 2
   @version_name_preclaim_tx 1
   @version_name_update_tx 1
   @version_name_revoke_tx 1
@@ -63,7 +64,10 @@ defmodule AeppSDK.Utils.Serialization do
   @version_channel_snapshot_solo_tx 1
   @version_channel_force_progress_tx 1
   @version_poi 1
+  @version_channel_offchain_tx_no_updates 2
+  @version_channel_offchain_tx 1
   @all_trees_names [:accounts, :calls, :channels, :contracts, :ns, :oracles]
+  @empty_tree_hash <<0::256>>
 
   @type state_hash :: binary()
   @type poi_keyword ::
@@ -291,7 +295,9 @@ defmodule AeppSDK.Utils.Serialization do
   def serialize_poi(state_hashes_list) when is_list(state_hashes_list) do
     fields =
       for tree_name <- @all_trees_names do
-        {state_hash, proof_db} = Keyword.get(state_hashes_list, tree_name, {[], %{}})
+        {state_hash, proof_db} =
+          Keyword.get(state_hashes_list, tree_name, {@empty_tree_hash, %{cache: {0, nil}}})
+
         {tree_name, serialize_poi(state_hash, proof_db)}
       end
 
@@ -303,12 +309,12 @@ defmodule AeppSDK.Utils.Serialization do
     )
   end
 
-  defp serialize_poi(<<_::256>> = root_hash, proof_db) do
-    [{root_hash, serialize_proof_to_list(proof_db)}]
+  defp serialize_poi(@empty_tree_hash, _proof_db) do
+    []
   end
 
-  defp serialize_poi([], _proof_db) do
-    []
+  defp serialize_poi(<<_::256>> = root_hash, proof_db) do
+    [{root_hash, serialize_proof_to_list(proof_db)}]
   end
 
   defp serialize_proof_to_list(%{cache: cache}) do
@@ -447,6 +453,7 @@ defmodule AeppSDK.Utils.Serialization do
          nonce: nonce,
          name: name,
          name_salt: name_salt,
+         name_fee: name_fee,
          fee: fee,
          ttl: ttl
        ) do
@@ -455,6 +462,7 @@ defmodule AeppSDK.Utils.Serialization do
       nonce: nonce,
       name: name,
       name_salt: name_salt,
+      name_fee: name_fee,
       fee: fee,
       ttl: ttl
     }
@@ -892,7 +900,15 @@ defmodule AeppSDK.Utils.Serialization do
   end
 
   defp serialization_template(:name_claim_tx) do
-    [account_id: :id, nonce: :int, name: :binary, name_salt: :int, fee: :int, ttl: :int]
+    [
+      account_id: :id,
+      nonce: :int,
+      name: :binary,
+      name_salt: :int,
+      name_fee: :int,
+      fee: :int,
+      ttl: :int
+    ]
   end
 
   defp serialization_template(:name_preclaim_tx) do
@@ -1020,7 +1036,6 @@ defmodule AeppSDK.Utils.Serialization do
       channel_id: :id,
       from_id: :id,
       payload: :binary,
-      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
       poi: :binary,
       ttl: :int,
       fee: :int,
@@ -1033,7 +1048,6 @@ defmodule AeppSDK.Utils.Serialization do
       channel_id: :id,
       from_id: :id,
       payload: :binary,
-      # TODO: specially for this kind of tx's, which has PoI field,  serializations/deserializations of Proof of Inclusions should be implemented.. ?
       poi: :binary,
       ttl: :int,
       fee: :int,
@@ -1076,6 +1090,23 @@ defmodule AeppSDK.Utils.Serialization do
       ttl: :int,
       fee: :int,
       nonce: :int
+    ]
+  end
+
+  defp serialization_template(:channel_offchain_tx_no_updates) do
+    [
+      channel_id: :id,
+      round: :int,
+      state_hash: :binary
+    ]
+  end
+
+  defp serialization_template(:channel_offchain_tx) do
+    [
+      channel_id: :id,
+      round: :int,
+      updates: [:binary],
+      state_hash: :binary
     ]
   end
 
@@ -1163,6 +1194,8 @@ defmodule AeppSDK.Utils.Serialization do
   defp type_to_tag(:sophia_byte_code), do: @tag_sophia_byte_code
   defp type_to_tag(:ga_attach_tx), do: @tag_ga_attach_tx
   defp type_to_tag(:ga_meta_tx), do: @tag_ga_meta_tx
+  defp type_to_tag(:channel_offchain_tx), do: @tag_offchain_tx
+  defp type_to_tag(:channel_offchain_tx_no_updates), do: @tag_offchain_tx
 
   defp type_to_tag(:channel_create_tx), do: @tag_channel_create_tx
   defp type_to_tag(:channel_deposit_tx), do: @tag_channel_deposit_tx
@@ -1212,6 +1245,8 @@ defmodule AeppSDK.Utils.Serialization do
   defp version(:channel_offchain_update_transfer), do: @version_channel_offchain_update_transfer
   defp version(:channel_offchain_update_deposit), do: @version_channel_offchain_update_deposit
   defp version(:channel_offchain_update_withdraw), do: @version_channel_offchain_update_withdraw
+  defp version(:channel_offchain_tx_no_updates), do: @version_channel_offchain_tx_no_updates
+  defp version(:channel_offchain_tx), do: @version_channel_offchain_tx
 
   defp version(:channel_offchain_update_create_contract),
     do: @version_channel_offchain_update_create_contract

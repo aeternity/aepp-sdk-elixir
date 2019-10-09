@@ -6,7 +6,9 @@ chain:
     persist: false
     hard_forks:
       "1": 0
-      "3": 1
+      "2": 1
+      "3": 2
+      "4": 3
 http:
     external:
       port: 3013
@@ -16,7 +18,7 @@ http:
       debug_endpoints: true
 mining:
     autostart: true
-    expected_mine_rate: 1000
+    expected_mine_rate: 100
     beneficiary_reward_delay: 2
     min_miner_gas_price: 1000000
     # Public key of beneficiary account that will receive fees from mining on a node.

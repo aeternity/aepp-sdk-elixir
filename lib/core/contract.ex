@@ -6,10 +6,15 @@ defmodule AeppSDK.Contract do
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
 
+  alias AeppSDK.Client
+  alias AeppSDK.Utils.Account, as: AccountUtils
+  alias AeppSDK.Utils.Chain, as: ChainUtils
+  alias AeppSDK.Utils.{Encoding, Keys, Serialization, Transaction}
+  alias AeppSDK.Utils.Hash
   alias AeternityNode.Api.Account, as: AccountApi
-  alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Contract, as: ContractApi
+  alias AeternityNode.Api.Debug, as: DebugApi
 
   alias AeternityNode.Model.{
     Account,
@@ -22,11 +27,6 @@ defmodule AeppSDK.Contract do
     Error
   }
 
-  alias AeppSDK.Utils.{Transaction, Serialization, Encoding, Keys}
-  alias AeppSDK.Utils.Account, as: AccountUtils
-  alias AeppSDK.Utils.Chain, as: ChainUtils
-  alias AeppSDK.Utils.Hash
-  alias AeppSDK.Client
   alias Tesla.Env
 
   @default_deposit 0
@@ -62,10 +62,8 @@ defmodule AeppSDK.Contract do
   ## Example
       iex> source_code = "contract Number =
         record state = { number : int }
-
         entrypoint init(x : int) =
           { number = x }
-
         entrypoint add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
@@ -105,7 +103,9 @@ defmodule AeppSDK.Contract do
   def deploy(
         %Client{
           keypair: %{public: public_key},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         source_code,
         init_args,
@@ -114,6 +114,7 @@ defmodule AeppSDK.Contract do
       when is_binary(source_code) and is_list(init_args) and is_list(opts) do
     public_key_binary = Keys.public_key_to_binary(public_key)
     {:ok, source_hash} = Hash.hash(source_code)
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, ct_version} <- get_ct_version(opts),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
@@ -133,8 +134,8 @@ defmodule AeppSDK.Contract do
            compiler_version,
            payable
          ],
-         serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
-         contract_create_tx = %ContractCreateTx{
+         serialized_wrapped_code <- Serialization.serialize(byte_code_fields, :sophia_byte_code),
+         contract_create_tx <- %ContractCreateTx{
            owner_id: public_key,
            nonce: nonce,
            code: serialized_wrapped_code,
@@ -143,17 +144,26 @@ defmodule AeppSDK.Contract do
            amount: Keyword.get(opts, :amount, @default_amount),
            gas: Keyword.get(opts, :gas, @default_gas),
            gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            call_data: calldata
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, %{log: log} = response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              contract_create_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, %{log: log} = response} <-
+           Transaction.post(
+             client,
+             %{contract_create_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
       {:ok, Map.merge(response, %{contract_id: contract_account, log: encode_logs(log, [])})}
@@ -571,17 +581,17 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def default_deposit(), do: @default_deposit
+  def default_deposit, do: @default_deposit
 
   @doc """
   false
   """
-  def default_gas(), do: @default_gas
+  def default_gas, do: @default_gas
 
   @doc """
   false
   """
-  def default_gas_price(), do: @default_gas_price
+  def default_gas_price, do: @default_gas_price
 
   @doc """
   false
@@ -637,7 +647,9 @@ defmodule AeppSDK.Contract do
 
   defp call_on_chain(
          %Client{
-           connection: connection
+           connection: connection,
+           network_id: network_id,
+           gas_price: gas_price
          } = client,
          contract_address,
          source_code,
@@ -647,6 +659,8 @@ defmodule AeppSDK.Contract do
        )
        when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
               is_list(function_args) and is_list(opts) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
            ContractApi.get_contract(connection, contract_address),
          {:ok, contract_call_tx} <-
@@ -661,12 +675,21 @@ defmodule AeppSDK.Contract do
              opts
            ),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, transaction_info} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              contract_call_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, transaction_info} <-
+           Transaction.post(
+             client,
+             %{contract_call_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       internal_decode_return_value(transaction_info, source_code, function_name, vm_version)
     else
@@ -879,6 +902,8 @@ defmodule AeppSDK.Contract do
         AccountUtils.next_valid_nonce(connection, public_key)
       end
 
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
     with {:ok, nonce} <- nonce_result,
          {:ok, calldata} <-
            create_calldata(source_code, function_name, function_args, get_vm(vm_version)),
@@ -887,7 +912,7 @@ defmodule AeppSDK.Contract do
            nonce: nonce,
            contract_id: contract_address,
            abi_version: abi_version,
-           fee: Keyword.get(opts, :fee, 0),
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            amount: Keyword.get(opts, :amount, @default_amount),
            gas: Keyword.get(opts, :gas, @default_gas),

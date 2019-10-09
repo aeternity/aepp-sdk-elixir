@@ -4,29 +4,29 @@ defmodule AeppSDK.Utils.SerializationUtils do
   alias AeppSDK.Utils.{Encoding, Keys}
 
   alias AeternityNode.Model.{
-    SpendTx,
-    OracleRegisterTx,
-    OracleRespondTx,
-    OracleQueryTx,
-    OracleExtendTx,
-    NamePreclaimTx,
-    NameClaimTx,
-    NameRevokeTx,
-    NameTransferTx,
-    NameUpdateTx,
-    ContractCreateTx,
-    ContractCallTx,
-    RelativeTtl,
-    Ttl,
-    ChannelCreateTx,
     ChannelCloseMutualTx,
     ChannelCloseSoloTx,
+    ChannelCreateTx,
     ChannelDepositTx,
     ChannelForceProgressTx,
     ChannelSettleTx,
     ChannelSlashTx,
     ChannelSnapshotSoloTx,
-    ChannelWithdrawTx
+    ChannelWithdrawTx,
+    ContractCallTx,
+    ContractCreateTx,
+    NameClaimTx,
+    NamePreclaimTx,
+    NameRevokeTx,
+    NameTransferTx,
+    NameUpdateTx,
+    OracleExtendTx,
+    OracleQueryTx,
+    OracleRegisterTx,
+    OracleRespondTx,
+    RelativeTtl,
+    SpendTx,
+    Ttl
   }
 
   @spec process_tx_fields(struct()) :: tuple()
@@ -175,6 +175,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
   def process_tx_fields(%NameClaimTx{
         name: name,
         name_salt: name_salt,
+        name_fee: name_fee,
         fee: fee,
         ttl: ttl,
         account_id: tx_account_id,
@@ -188,6 +189,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
        nonce,
        name,
        name_salt,
+       name_fee,
        fee,
        ttl
      ], :name_claim_tx}
@@ -422,7 +424,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        channel_id,
        from_id,
        payload,
-       # TODO: check if its needed to be preprocessed
        poi,
        ttl,
        fee,
@@ -521,7 +522,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        channel_id,
        from_id,
        payload,
-       # TODO: check if its needed to be preprocessed
        poi,
        ttl,
        fee,
@@ -613,6 +613,42 @@ defmodule AeppSDK.Utils.SerializationUtils do
        ttl,
        tx
      ], :ga_meta_tx}
+  end
+
+  def process_tx_fields(%{
+        channel_id: channel_id,
+        round: round,
+        state_hash: <<"st_", state_hash::binary>>,
+        version: 1,
+        updates: updates
+      }) do
+    channel_id_record = proccess_id_to_record(channel_id)
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
+
+    {:ok,
+     [
+       channel_id_record,
+       round,
+       updates,
+       decoded_state_hash
+     ], :channel_offchain_tx}
+  end
+
+  def process_tx_fields(%{
+        channel_id: channel_id,
+        round: round,
+        state_hash: <<"st_", state_hash::binary>>,
+        version: 2
+      }) do
+    channel_id_record = proccess_id_to_record(channel_id)
+    decoded_state_hash = Encoding.decode_base58c(state_hash)
+
+    {:ok,
+     [
+       channel_id_record,
+       round,
+       decoded_state_hash
+     ], :channel_offchain_tx_no_updates}
   end
 
   def process_tx_fields(tx) do
