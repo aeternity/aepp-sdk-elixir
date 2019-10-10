@@ -73,6 +73,7 @@ defmodule AeppSDK.GeneralizedAccount do
         opts \\ []
       ) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+    vm = Keyword.get(opts, :vm, :fate)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
          {:ok, ct_version} <- Contract.get_ct_version(opts),
@@ -83,9 +84,9 @@ defmodule AeppSDK.GeneralizedAccount do
             type_info: type_info,
             payable: payable
           }} <-
-           Contract.compile(source_code),
-         {:ok, function_hash} <- :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info),
-         {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args),
+           Contract.compile(source_code, vm),
+         {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args, vm),
+         {:ok, function_hash} <- hash_from_function_name(auth_fun, type_info, calldata, vm),
          {:ok, source_hash} <- Hash.hash(source_code),
          byte_code_fields = [
            source_hash,
@@ -117,13 +118,12 @@ defmodule AeppSDK.GeneralizedAccount do
              gas_price,
              Transaction.default_fee_calculation_times()
            ),
-         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, response} <-
            Transaction.post(
              client,
              %{ga_attach_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :one_signature
+             :no_channels
            ) do
       {:ok, response}
     else
@@ -148,4 +148,14 @@ defmodule AeppSDK.GeneralizedAccount do
   false
   """
   def default_gas, do: @default_gas
+
+  def hash_from_function_name(auth_fun, type_info, calldata, vm) do
+    case vm do
+      :aevm ->
+        :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info)
+
+      :fate ->
+        :aeb_fate_abi.get_function_hash_from_calldata(calldata)
+    end
+  end
 end
