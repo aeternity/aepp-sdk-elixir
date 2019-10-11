@@ -1,7 +1,7 @@
 %{
-  "aebytecode": {:git, "https://github.com/aeternity/aebytecode.git", "a66dc0a97facdeaad7e5403018ad195d989e4793", [ref: "a66dc0a"]},
+  "aebytecode": {:git, "https://github.com/aeternity/aebytecode.git", "4f4d6d30cd2c46b3830454d650a424d513f69134", [ref: "4f4d6d3"]},
   "aeserialization": {:git, "https://github.com/aeternity/aeserialization.git", "47aaa8f5434b365c50a35bfd1490340b19241991", [ref: "47aaa8f"]},
-  "aesophia": {:git, "https://github.com/aeternity/aesophia.git", "7f86b7d3011d5b5761c74b7559f529e176b430e6", [tag: "v4.0.0-rc5"]},
+  "aesophia": {:git, "https://github.com/aeternity/aesophia.git", "b81312a714a5f618aacc0fe535f5b442373e2533", [tag: "v4.0.0"]},
   "artificery": {:hex, :artificery, "0.4.2", "3ded6e29e13113af52811c72f414d1e88f711410cac1b619ab3a2666bbd7efd4", [:mix], [], "hexpm"},
   "base58": {:git, "https://github.com/aeternity/erl-base58.git", "60a335668a60328a29f9731b67c4a0e9e3d50ab6", [ref: "60a3356"]},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},

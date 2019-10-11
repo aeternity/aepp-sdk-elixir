@@ -29,11 +29,15 @@ defmodule CoreContractTest do
 
       stateful entrypoint add_to_number(x : int) =
         Chain.event(AddedNumberEvent(x, \"Added a number\"))
-        put(state{number = state.number + x})"
+        put(state{number = state.number + x})
+        x"
+
+    # TODO remove x. There is a problem with return type of the function %{tuple: []}
+
     [client: client, source_code: source_code]
   end
 
-  @tag :contracts
+  @tag :contracts_1
   test "create, call, call static and decode contract with aevms", setup_data do
     deploy_result =
       Contract.deploy(

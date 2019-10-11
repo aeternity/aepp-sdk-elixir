@@ -31,7 +31,7 @@ defmodule AeppSdkElixir.MixProject do
       {:excoveralls, "~> 0.10", only: :test},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:aesophia,
-       git: "https://github.com/aeternity/aesophia.git", manager: :rebar, tag: "v4.0.0-rc5"},
+       git: "https://github.com/aeternity/aesophia.git", manager: :rebar, tag: "v4.0.0"},
       {:enoise,
        git: "https://github.com/aeternity/enoise.git",
        manager: :rebar,
