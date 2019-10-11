@@ -86,7 +86,7 @@ defmodule AeppSDK.GeneralizedAccount do
           }} <-
            Contract.compile(source_code, vm),
          {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args, vm),
-         {:ok, function_hash} <- hash_from_function_name(auth_fun, type_info, calldata, vm),
+         {:ok, function_hash} <- hash_from_function_name(auth_fun, type_info, vm),
          {:ok, source_hash} <- Hash.hash(source_code),
          byte_code_fields = [
            source_hash,
@@ -149,13 +149,13 @@ defmodule AeppSDK.GeneralizedAccount do
   """
   def default_gas, do: @default_gas
 
-  def hash_from_function_name(auth_fun, type_info, calldata, vm) do
+  defp hash_from_function_name(auth_fun, type_info, vm) do
     case vm do
       :aevm ->
         :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info)
 
       :fate ->
-        :aeb_fate_abi.get_function_hash_from_calldata(calldata)
+        Hash.hash(auth_fun)
     end
   end
 end

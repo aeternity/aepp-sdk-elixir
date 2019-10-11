@@ -115,6 +115,7 @@ defmodule AeppSDK.Contract do
     public_key_binary = Keys.public_key_to_binary(public_key)
     {:ok, source_hash} = Hash.hash(source_code)
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+    vm = Keyword.get(opts, :vm, :fate)
 
     with {:ok, ct_version} <- get_ct_version(opts),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
@@ -124,7 +125,7 @@ defmodule AeppSDK.Contract do
             compiler_version: compiler_version,
             type_info: type_info,
             payable: payable
-          }} <- compile(source_code, Keyword.get(opts, :vm, :fate)),
+          }} <- compile(source_code, Keyword.get(opts, :vm, vm)),
          {:ok, calldata} <-
            create_calldata(source_code, @init_function, init_args, Keyword.get(opts, :vm, :fate)),
          byte_code_fields = [
@@ -643,7 +644,7 @@ defmodule AeppSDK.Contract do
   """
   def get_vm(5), do: :fate
 
-  def get_vm(6), do: :aevmg
+  def get_vm(6), do: :aevm
 
   defp call_on_chain(
          %Client{
