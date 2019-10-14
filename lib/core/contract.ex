@@ -15,6 +15,7 @@ defmodule AeppSDK.Contract do
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Contract, as: ContractApi
   alias AeternityNode.Api.Debug, as: DebugApi
+  alias AeternityNode.Model.{DryRunCallReq, DryRunCallContext, DryRunInputItem}
 
   alias AeternityNode.Model.{
     Account,
@@ -717,7 +718,15 @@ defmodule AeppSDK.Contract do
          {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
          {caller_public_key, caller_balance} <-
            determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
-         {:ok, contract_call_tx} <-
+         {:ok,
+          %{
+            call_data: call_data,
+            contract_id: contract_address,
+            amount: amount,
+            gas: gas,
+            nonce: nonce,
+            abi_version: abi_version
+          } = contract_call_tx} <-
            build_contract_call_tx(
              %Client{client | keypair: %{public: caller_public_key}},
              contract_address,
@@ -728,7 +737,10 @@ defmodule AeppSDK.Contract do
              vm_version,
              opts
            ),
+         encoded_call_data = Encoding.prefix_encode_base64("cb", call_data),
          serialized_contract_call_tx = Serialization.serialize(contract_call_tx),
+         {:ok, hash} <- Hash.hash(serialized_contract_call_tx),
+         encoded_hash = Encoding.prefix_encode_base58c("th", hash),
          encoded_contract_call_tx =
            Encoding.prefix_encode_base64("tx", serialized_contract_call_tx),
          {:ok,
@@ -742,7 +754,24 @@ defmodule AeppSDK.Contract do
            DebugApi.dry_run_txs(internal_connection, %DryRunInput{
              top: Keyword.get(opts, :top, top_block_hash),
              accounts: [%DryRunAccount{pub_key: caller_public_key, amount: caller_balance}],
-             txs: [encoded_contract_call_tx]
+             txs: [
+               %DryRunInputItem{
+                 tx: encoded_contract_call_tx,
+                 call_req: %DryRunCallReq{
+                   calldata: encoded_call_data,
+                   contract: contract_address,
+                   amount: amount,
+                   gas: gas,
+                   caller: caller_public_key,
+                   nonce: nonce,
+                   abi_version: abi_version,
+                   context: %DryRunCallContext{
+                     stateful: false,
+                     tx_hash: encoded_hash
+                   }
+                 }
+               }
+             ]
            }) do
       internal_decode_return_value(transaction_info, source_code, function_name, vm_version)
     else
@@ -771,7 +800,8 @@ defmodule AeppSDK.Contract do
     decoded_return_value =
       case vm_version do
         5 ->
-          decode_return_value(return_value, return_type)
+          {:ok, decoded_return_value} = decode_return_value(return_value, return_type)
+          decoded_return_value
 
         6 ->
           {:ok, sophia_return_type} = get_aci_function_return_type(source_code, function_name)

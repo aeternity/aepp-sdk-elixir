@@ -198,8 +198,9 @@ defmodule AeppSDK.Utils.Transaction do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)
 
-    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun}} <-
+    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get_account_by_pubkey(connection, public_key),
+         {:ok, %{abi_version: abi_version}} <- ContractApi.get_contract(connection, contract_id),
          :ok <- ensure_auth_opts(auth_opts),
          {:ok, calldata} =
            Contract.create_calldata(
@@ -211,7 +212,7 @@ defmodule AeppSDK.Utils.Transaction do
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
-           abi_version: Contract.abi_version(),
+           abi_version: abi_version,
            fee: @dummy_fee,
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),

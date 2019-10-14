@@ -37,7 +37,7 @@ defmodule CoreContractTest do
     [client: client, source_code: source_code]
   end
 
-  @tag :contracts_1
+  @tag :contracts
   test "create, call, call static and decode contract with aevms", setup_data do
     deploy_result =
       Contract.deploy(
@@ -76,7 +76,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = on_chain_call_result
+    {:ok, %{return_value: data, return_type: "ok"}} = static_call_result
 
     assert {:ok, data} ==
              Contract.decode_return_value(
@@ -91,20 +91,6 @@ defmodule CoreContractTest do
     static_call_result =
       Contract.call(
         %Client{setup_data.client | keypair: low_balance_keypair},
-        ct_address,
-        setup_data.source_code,
-        "get_number",
-        [],
-        fee: 10_000_000_000_000_000
-      )
-
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
-
-    non_existing_keypair = Keys.generate_keypair()
-
-    static_call_result =
-      Contract.call(
-        %Client{setup_data.client | keypair: non_existing_keypair},
         ct_address,
         setup_data.source_code,
         "get_number",
@@ -153,7 +139,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = on_chain_call_result
+    {:ok, %{return_value: data, return_type: "ok"}} = static_call_result
 
     assert {:ok, data} ==
              Contract.decode_return_value(
@@ -176,20 +162,6 @@ defmodule CoreContractTest do
       )
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
-
-    non_existing_keypair = Keys.generate_keypair()
-
-    static_call_result =
-      Contract.call(
-        %Client{setup_data.client | keypair: non_existing_keypair},
-        ct_address,
-        setup_data.source_code,
-        "get_number",
-        [],
-        fee: 10_000_000_000_000_000
-      )
-
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
   end
 
   @tag :contracts
@@ -201,7 +173,7 @@ defmodule CoreContractTest do
     assert match?({:error, _}, deploy_result)
   end
 
-  @tag :travis_test
+  @tag :contracts
   test "call non-existent function", setup_data do
     deploy_result =
       Contract.deploy(
@@ -252,7 +224,7 @@ defmodule CoreContractTest do
     assert match?({:error, "Undefined function non_existing_function"}, static_call_result)
   end
 
-  @tag :travis_test
+  @tag :contracts
   test "decode data wrong type", setup_data do
     deploy_result =
       Contract.deploy(
