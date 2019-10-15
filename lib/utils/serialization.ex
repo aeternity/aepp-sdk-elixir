@@ -50,7 +50,7 @@ defmodule AeppSDK.Utils.Serialization do
   @version_name_transfer_tx 1
   @version_contract_create_tx 1
   @version_contract_call_tx 1
-  @version_sophia_byte_code 1
+  @version_sophia_byte_code 3
   @version_ga_attach_tx 1
   @version_ga_meta_tx 1
 
@@ -970,8 +970,10 @@ defmodule AeppSDK.Utils.Serialization do
   defp serialization_template(:sophia_byte_code) do
     [
       source_code_hash: :binary,
-      type_info: [{:binary, :binary, :binary, :binary}],
-      byte_code: :binary
+      type_info: [{:binary, :binary, :bool, :binary, :binary}],
+      byte_code: :binary,
+      compiler_version: :binary,
+      payable: :bool
     ]
   end
 

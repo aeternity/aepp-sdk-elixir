@@ -14,7 +14,6 @@ defmodule AeppSDK.GeneralizedAccount do
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Model.Error
 
-  @ct_version 0x40001
   @init_function "init"
   @default_gas 50_000
 
@@ -40,7 +39,7 @@ defmodule AeppSDK.GeneralizedAccount do
   ## Examples
       iex> source_code = "contract Authorization =
 
-        function auth(auth_value : bool) =
+        entrypoint auth(auth_value : bool) =
           auth_value"
       iex> auth_fun = "auth"
       iex> init_args = []
@@ -64,23 +63,37 @@ defmodule AeppSDK.GeneralizedAccount do
   def attach(
         %Client{
           keypair: %{public: public_key},
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         source_code,
         auth_fun,
         init_args,
         opts \\ []
       ) do
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+    vm = Keyword.get(opts, :vm, :fate)
+
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
-         {:ok, %{byte_code: byte_code, type_info: type_info}} <-
-           Contract.compile(source_code),
-         {:ok, function_hash} <- :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info),
-         {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args),
+         {:ok, ct_version} <- Contract.get_ct_version(opts),
+         {:ok,
+          %{
+            byte_code: byte_code,
+            compiler_version: compiler_version,
+            type_info: type_info,
+            payable: payable
+          }} <-
+           Contract.compile(source_code, vm),
+         {:ok, calldata} <- Contract.create_calldata(source_code, @init_function, init_args, vm),
+         {:ok, function_hash} <- hash_from_function_name(auth_fun, type_info, vm),
          {:ok, source_hash} <- Hash.hash(source_code),
          byte_code_fields = [
            source_hash,
            type_info,
-           byte_code
+           byte_code,
+           compiler_version,
+           payable
          ],
          serialized_wrapped_code = Serialization.serialize(byte_code_fields, :sophia_byte_code),
          ga_attach_tx = %{
@@ -88,20 +101,29 @@ defmodule AeppSDK.GeneralizedAccount do
            nonce: nonce,
            code: serialized_wrapped_code,
            auth_fun: function_hash,
-           ct_version: @ct_version,
-           fee: Keyword.get(opts, :fee, 0),
+           ct_version: ct_version,
+           fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            gas: Keyword.get(opts, :gas, Contract.default_gas()),
            gas_price: Keyword.get(opts, :gas_price, Contract.default_gas_price()),
            call_data: calldata
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
-         {:ok, response} <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              ga_attach_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, response} <-
+           Transaction.post(
+             client,
+             %{ga_attach_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :no_channels
            ) do
       {:ok, response}
     else
@@ -126,4 +148,14 @@ defmodule AeppSDK.GeneralizedAccount do
   false
   """
   def default_gas, do: @default_gas
+
+  defp hash_from_function_name(auth_fun, type_info, vm) do
+    case vm do
+      :aevm ->
+        :aeb_aevm_abi.type_hash_from_function_name(auth_fun, type_info)
+
+      :fate ->
+        Hash.hash(auth_fun)
+    end
+  end
 end

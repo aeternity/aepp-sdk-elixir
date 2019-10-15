@@ -108,9 +108,9 @@ defmodule AeppSDK.Account do
   """
   @spec balance(Client.t(), String.t()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
-    case AccountApi.get_account_by_pubkey(connection, pubkey) do
-      {:ok, %Account{balance: balance}} ->
+  def balance(%Client{} = client, pubkey) when is_binary(pubkey) do
+    case get(client, pubkey) do
+      {:ok, %{balance: balance}} ->
         {:ok, balance}
 
       _ = response ->
@@ -149,6 +149,32 @@ defmodule AeppSDK.Account do
   def balance(%Client{} = client, pubkey, block_hash)
       when is_binary(pubkey) and is_binary(block_hash) do
     response = get(client, pubkey, block_hash)
+
+    prepare_result(response)
+  end
+
+  @doc """
+  Get an actual account information
+
+  ## Example
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> AeppSDK.Account.get(client, pubkey)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 151688000000000000000,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 0,
+         payable: true
+       }}
+  """
+  @spec get(Client.t(), String.t()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection}, pubkey)
+      when is_binary(pubkey) do
+    response = AccountApi.get_account_by_pubkey(connection, pubkey)
 
     prepare_result(response)
   end
