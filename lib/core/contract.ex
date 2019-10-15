@@ -125,9 +125,9 @@ defmodule AeppSDK.Contract do
             compiler_version: compiler_version,
             type_info: type_info,
             payable: payable
-          }} <- compile(source_code, Keyword.get(opts, :vm, vm)),
+          }} <- compile(source_code, vm),
          {:ok, calldata} <-
-           create_calldata(source_code, @init_function, init_args, Keyword.get(opts, :vm, :fate)),
+           create_calldata(source_code, @init_function, init_args, vm),
          byte_code_fields = [
            source_hash,
            type_info,
