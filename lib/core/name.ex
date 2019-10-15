@@ -132,7 +132,7 @@ defmodule AeppSDK.AENS do
              client,
              %{preclaim_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -273,7 +273,7 @@ defmodule AeppSDK.AENS do
              client,
              %{claim_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -327,7 +327,14 @@ defmodule AeppSDK.AENS do
           client_ttl: 50000,
           name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
@@ -389,7 +396,14 @@ defmodule AeppSDK.AENS do
           client_ttl: 50000,
           name: "a1234567890asdfghjkl.aet",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
@@ -442,7 +456,7 @@ defmodule AeppSDK.AENS do
              client,
              %{update_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -588,7 +602,7 @@ defmodule AeppSDK.AENS do
              client,
              %{transfer_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -721,7 +735,7 @@ defmodule AeppSDK.AENS do
              client,
              %{revoke_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response

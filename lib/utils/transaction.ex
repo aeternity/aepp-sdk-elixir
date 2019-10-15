@@ -124,7 +124,7 @@ defmodule AeppSDK.Utils.Transaction do
                           sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
                           ttl: 0
                         }
-      iex> AeppSDK.Utils.Transaction.post(client, spend_tx, :no_auth, :no_channels)
+      iex> AeppSDK.Utils.Transaction.post(client, spend_tx, :no_auth, :one_signature)
       {:ok,
        %{
          block_hash: "mh_2wRRkfzcHd24cGbqdqaLAhxgpv4iMB8y1Cp5n9FAfhvDZJ7Qh",
@@ -160,7 +160,7 @@ defmodule AeppSDK.Utils.Transaction do
 
     signed_tx_fields =
       case signatures_list do
-        :no_channels -> [[signature], serialized_tx]
+        :one_signature -> [[signature], serialized_tx]
         _ -> [signatures_list, serialized_tx]
       end
 
