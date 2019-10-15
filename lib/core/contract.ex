@@ -5,22 +5,21 @@ defmodule AeppSDK.Contract do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-
+  alias AeppSDK.Account, as: AccountApi
   alias AeppSDK.Client
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.Chain, as: ChainUtils
   alias AeppSDK.Utils.{Encoding, Keys, Serialization, Transaction}
   alias AeppSDK.Utils.Hash
-  alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Contract, as: ContractApi
   alias AeternityNode.Api.Debug, as: DebugApi
   alias AeternityNode.Model.{DryRunCallReq, DryRunCallContext, DryRunInputItem}
 
   alias AeternityNode.Model.{
-    Account,
     ContractCallTx,
     ContractCreateTx,
+    ContractObject,
     DryRunAccount,
     DryRunInput,
     DryRunResult,
@@ -272,6 +271,30 @@ defmodule AeppSDK.Contract do
       {:error, _} = error ->
         error
     end
+  end
+
+  @doc """
+  Get contract information
+
+  ## Example
+      iex> contract_id = "ct_2SrKe33k4pHbXFuBp4q1dx2yEaiTQDyUoA2WqyAni1WuwjtZw"
+      iex> AeppSDK.Contract.get(client, contract_id)
+      {:ok,
+       %{
+         abi_version: 3,
+         active: true,
+         deposit: 0,
+         id: "ct_2SrKe33k4pHbXFuBp4q1dx2yEaiTQDyUoA2WqyAni1WuwjtZw",
+         owner_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         referrer_ids: [],
+         vm_version: 5
+       }}
+  """
+  @spec get(Client.t(), String.t()) :: {:ok, map} | {:error, String.t()}
+  def get(%Client{connection: connection}, contract_id) when is_binary(contract_id) do
+    response = ContractApi.get_contract(connection, contract_id)
+
+    prepare_result(response)
   end
 
   @doc """
@@ -563,8 +586,12 @@ defmodule AeppSDK.Contract do
     case :aeso_aci.contract_interface(:json, source_code) do
       {:ok, [%{contract: %{functions: functions}}]} ->
         case Enum.find(functions, fn %{name: name} -> name == function_name end) do
-          %{returns: function_return_type} ->
+          %{returns: function_return_type} when is_binary(function_return_type) ->
             {:ok, function_return_type}
+
+          # TODO: Temporary work around
+          %{returns: function_return_type} when is_map(function_return_type) ->
+            {:ok, "unit"}
 
           nil ->
             {:error, "Undefined function #{function_name}"}
@@ -664,7 +691,7 @@ defmodule AeppSDK.Contract do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
-           ContractApi.get_contract(connection, contract_address),
+           get(client, contract_address),
          {:ok, contract_call_tx} <-
            build_contract_call_tx(
              client,
@@ -714,7 +741,7 @@ defmodule AeppSDK.Contract do
        when is_binary(contract_address) and is_binary(source_code) and is_binary(function_name) and
               is_list(function_args) and is_list(opts) do
     with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
-           ContractApi.get_contract(connection, contract_address),
+           get(client, contract_address),
          {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
          {caller_public_key, caller_balance} <-
            determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
@@ -964,7 +991,7 @@ defmodule AeppSDK.Contract do
   end
 
   defp determine_caller(
-         %Client{keypair: %{public: public_key}, connection: connection},
+         %Client{keypair: %{public: public_key}} = client,
          block_hash,
          opts
        ) do
@@ -972,9 +999,9 @@ defmodule AeppSDK.Contract do
       Keyword.get(opts, :gas, @default_gas) * Keyword.get(opts, :gas_price, @default_gas_price) +
         Keyword.get(opts, :fee, 0)
 
-    with {:ok, %Account{balance: balance}} <-
-           AccountApi.get_account_by_pubkey_and_hash(
-             connection,
+    with {:ok, %{balance: balance}} <-
+           AccountApi.get(
+             client,
              public_key,
              block_hash
            ),
@@ -987,5 +1014,19 @@ defmodule AeppSDK.Contract do
       _ ->
         {@genesis_beneficiary, min_balance}
     end
+  end
+
+  defp prepare_result({:ok, %ContractObject{} = contract}) do
+    contract_map = Map.from_struct(contract)
+
+    {:ok, contract_map}
+  end
+
+  defp prepare_result({:ok, %Tesla.Env{body: message}}) do
+    {:error, Poison.decode!(message)}
+  end
+
+  defp prepare_result({:error, _} = error) do
+    error
   end
 end

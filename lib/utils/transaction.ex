@@ -5,11 +5,10 @@ defmodule AeppSDK.Utils.Transaction do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
+  alias AeppSDK.Account, as: AccountApi
   alias AeppSDK.{Client, Contract, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Governance, Keys, Serialization}
 
-  alias AeternityNode.Api.Account, as: AccountApi
-  alias AeternityNode.Api.Contract, as: ContractApi
   alias AeternityNode.Api.Transaction, as: TransactionApi
 
   alias AeternityNode.Model.{
@@ -190,7 +189,7 @@ defmodule AeppSDK.Utils.Transaction do
           keypair: %{public: public_key},
           gas_price: gas_price,
           network_id: network_id
-        },
+        } = client,
         tx,
         auth_opts,
         _signatures_list
@@ -198,9 +197,9 @@ defmodule AeppSDK.Utils.Transaction do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)
 
-    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
-           AccountApi.get_account_by_pubkey(connection, public_key),
-         {:ok, %{abi_version: abi_version}} <- ContractApi.get_contract(connection, contract_id),
+    with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
+           AccountApi.get(client, public_key),
+         {:ok, %{abi_version: abi_version}} <- Contract.get(client, contract_id),
          :ok <- ensure_auth_opts(auth_opts),
          {:ok, calldata} =
            Contract.create_calldata(
@@ -243,7 +242,7 @@ defmodule AeppSDK.Utils.Transaction do
          {:ok, _} = response <- await_mining(connection, tx_hash, type) do
       response
     else
-      {:ok, %Account{kind: "basic"}} ->
+      {:ok, %{kind: "basic"}} ->
         {:error, "Account isn't generalized"}
 
       {:ok, %Error{reason: message}} ->
@@ -606,14 +605,13 @@ defmodule AeppSDK.Utils.Transaction do
          tx,
          %Client{
            keypair: %{public: public_key, secret: secret_key},
-           network_id: network_id,
-           connection: connection
-         },
+           network_id: network_id
+         } = client,
          :no_opts
        )
        when is_map(tx) do
-    case AccountApi.get_account_by_pubkey(connection, public_key) do
-      {:ok, %Account{kind: "basic"}} ->
+    case AccountApi.get(client, public_key) do
+      {:ok, %{kind: "basic"}} ->
         serialized_tx = Serialization.serialize(tx)
 
         signature =
@@ -625,7 +623,7 @@ defmodule AeppSDK.Utils.Transaction do
 
         {:ok, [tx, signature]}
 
-      {:ok, %Account{kind: other}} ->
+      {:ok, %{kind: other}} ->
         {:error, "Account can't be authorized as Basic, as it is #{inspect(other)} type"}
 
       {:error, err} ->
@@ -637,17 +635,16 @@ defmodule AeppSDK.Utils.Transaction do
          tx,
          %Client{
            keypair: %{public: public_key},
-           connection: connection,
            gas_price: gas_price,
            network_id: network_id
-         },
+         } = client,
          auth_opts
        ) do
-    with {:ok, %Account{kind: "generalized", auth_fun: auth_fun, contract_id: contract_address}} <-
-           AccountApi.get_account_by_pubkey(connection, public_key),
+    with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
+           AccountApi.get(client, public_key),
          :ok <- ensure_auth_opts(auth_opts),
          {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
-           ContractApi.get_contract(connection, contract_address),
+           Contract.get(client, contract_id),
          {:ok, calldata} =
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
