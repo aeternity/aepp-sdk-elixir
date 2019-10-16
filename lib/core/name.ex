@@ -28,7 +28,7 @@ defmodule AeppSDK.AENS do
   @max_name_ttl 50_000
   @max_client_ttl 86_000
   @label_separator "."
-  @allowed_registrars ["aet"]
+  @allowed_registrars ["chain"]
   @multiplier_14 100_000_000_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
   @type preclaim_options :: [
@@ -48,7 +48,7 @@ defmodule AeppSDK.AENS do
   Preclaims a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> AeppSDK.AENS.preclaim(client, name, salt: 149218901844062129)
       {:ok,
         %{
@@ -74,7 +74,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_salt: 149218901844062129,,
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
@@ -150,7 +150,7 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> client |> AeppSDK.AENS.preclaim("a1234567890asdfghjkl.aet") |> AeppSDK.AENS.claim()
+      iex> client |> AeppSDK.AENS.preclaim("a1234567890asdfghjkl.chain") |> AeppSDK.AENS.claim()
       {:ok,
        %{
          block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
@@ -175,7 +175,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
          },
-         name: "a1234567890asdfghjkl.aet",
+         name: "a1234567890asdfghjkl.chain",
          tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
        }}
   """
@@ -195,7 +195,7 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_salt = 149218901844062129
       iex> AeppSDK.AENS.claim(client, name, name_salt)
       {:ok,
@@ -222,7 +222,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
         }}
   """
@@ -290,7 +290,7 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_ttl = 49_999
       iex> pointers = [
             {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
@@ -325,7 +325,7 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_ttl: 49999,
           pointers: [
             {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
@@ -359,7 +359,7 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_ttl = 49_999
       iex> pointers = [
             {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
@@ -394,7 +394,7 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_ttl: 49999,
           pointers: [
             {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
@@ -476,7 +476,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |>  AeppSDK.AENS.transfer(recipient_key)
       {:ok,
@@ -503,7 +503,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
        }}
@@ -528,7 +528,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> AeppSDK.AENS.transfer_name(client, name, recipient_key)
       {:ok,
@@ -555,7 +555,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
         }}
@@ -620,7 +620,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.revoke()
       {:ok,
         %{
@@ -646,7 +646,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
@@ -666,7 +666,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> AeppSDK.AENS.revoke_name(client, name)
       {:ok,
         %{
@@ -692,7 +692,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
