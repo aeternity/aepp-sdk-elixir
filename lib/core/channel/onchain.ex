@@ -1035,7 +1035,7 @@ defmodule AeppSDK.Channel.OnChain do
   end
 
   # POST Basic + Basic
-  defp post_(%Client{connection: connection} = client, tx,
+  defp post_(%Client{} = client, tx,
          signatures_list: signatures_list,
          inner_tx: :no_inner_tx,
          tx: :no_tx

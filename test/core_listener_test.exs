@@ -31,6 +31,7 @@ defmodule CoreListenerTest do
     [client: client, source_code: source_code]
   end
 
+  @tag :listener
   test "start listener, receive messages", setup_data do
     {:ok, %{peer_pubkey: peer_pubkey}} = Chain.get_node_info(setup_data.client)
 
@@ -46,7 +47,8 @@ defmodule CoreListenerTest do
       Contract.deploy(
         setup_data.client,
         setup_data.source_code,
-        []
+        [],
+        vm: :aevm
       )
 
     Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address)

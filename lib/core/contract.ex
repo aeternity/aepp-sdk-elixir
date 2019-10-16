@@ -164,7 +164,7 @@ defmodule AeppSDK.Contract do
              client,
              %{contract_create_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ),
          contract_account = compute_contract_account(public_key_binary, nonce) do
       {:ok, Map.merge(response, %{contract_id: contract_account, log: encode_logs(log, [])})}
@@ -718,7 +718,7 @@ defmodule AeppSDK.Contract do
              client,
              %{contract_call_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       internal_decode_return_value(transaction_info, source_code, function_name, vm_version)
     else

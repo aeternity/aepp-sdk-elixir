@@ -319,7 +319,6 @@ defmodule CoreChannelTest do
              Channel.withdraw(
                client2,
                channel_id,
-               client2.keypair.public,
                2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                next_round_,
@@ -409,7 +408,6 @@ defmodule CoreChannelTest do
              Channel.withdraw(
                client,
                channel_id,
-               client2.keypair.public,
                2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                next_round_
@@ -502,7 +500,6 @@ defmodule CoreChannelTest do
              Channel.withdraw(
                client2,
                channel_id,
-               client.keypair.public,
                2_000,
                Encoding.prefix_encode_base58c("st", <<0::256>>),
                next_round_,
