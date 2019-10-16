@@ -14,14 +14,16 @@ defmodule AeppSDK.Contract do
   alias AeternityNode.Api.Chain, as: ChainApi
   alias AeternityNode.Api.Contract, as: ContractApi
   alias AeternityNode.Api.Debug, as: DebugApi
-  alias AeternityNode.Model.{DryRunCallReq, DryRunCallContext, DryRunInputItem}
 
   alias AeternityNode.Model.{
     ContractCallTx,
     ContractCreateTx,
     ContractObject,
     DryRunAccount,
+    DryRunCallContext,
+    DryRunCallReq,
     DryRunInput,
+    DryRunInputItem,
     DryRunResult,
     DryRunResults,
     Error
@@ -62,8 +64,10 @@ defmodule AeppSDK.Contract do
   ## Example
       iex> source_code = "contract Number =
         record state = { number : int }
+
         entrypoint init(x : int) =
           { number = x }
+
         entrypoint add_to_number(x : int) =
           state.number + x"
       iex> init_args = ["42"]
@@ -166,7 +170,7 @@ defmodule AeppSDK.Contract do
              Keyword.get(opts, :auth, :no_auth),
              :one_signature
            ),
-         contract_account = compute_contract_account(public_key_binary, nonce) do
+         contract_account <- compute_contract_account(public_key_binary, nonce) do
       {:ok, Map.merge(response, %{contract_id: contract_account, log: encode_logs(log, [])})}
     else
       {:ok, %Error{reason: message}} ->
@@ -277,8 +281,8 @@ defmodule AeppSDK.Contract do
   Get contract information
 
   ## Example
-      iex> contract_id = "ct_2SrKe33k4pHbXFuBp4q1dx2yEaiTQDyUoA2WqyAni1WuwjtZw"
-      iex> AeppSDK.Contract.get(client, contract_id)
+      iex> contract_address = "ct_2SrKe33k4pHbXFuBp4q1dx2yEaiTQDyUoA2WqyAni1WuwjtZw"
+      iex> AeppSDK.Contract.get(client, contract_address)
       {:ok,
        %{
          abi_version: 3,
@@ -291,8 +295,8 @@ defmodule AeppSDK.Contract do
        }}
   """
   @spec get(Client.t(), String.t()) :: {:ok, map} | {:error, String.t()}
-  def get(%Client{connection: connection}, contract_id) when is_binary(contract_id) do
-    response = ContractApi.get_contract(connection, contract_id)
+  def get(%Client{connection: connection}, contract_address) when is_binary(contract_address) do
+    response = ContractApi.get_contract(connection, contract_address)
 
     prepare_result(response)
   end
@@ -589,7 +593,7 @@ defmodule AeppSDK.Contract do
           %{returns: function_return_type} when is_binary(function_return_type) ->
             {:ok, function_return_type}
 
-          # TODO: Temporary work around
+          # Temporary work around
           %{returns: function_return_type} when is_map(function_return_type) ->
             {:ok, "unit"}
 
@@ -605,7 +609,7 @@ defmodule AeppSDK.Contract do
   @doc """
   false
   """
-  def default_amount(), do: @default_amount
+  def default_amount, do: @default_amount
 
   @doc """
   false
@@ -965,7 +969,7 @@ defmodule AeppSDK.Contract do
     with {:ok, nonce} <- nonce_result,
          {:ok, calldata} <-
            create_calldata(source_code, function_name, function_args, get_vm(vm_version)),
-         contract_call_tx = %ContractCallTx{
+         contract_call_tx <- %ContractCallTx{
            caller_id: public_key,
            nonce: nonce,
            contract_id: contract_address,

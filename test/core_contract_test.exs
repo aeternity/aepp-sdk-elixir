@@ -85,7 +85,7 @@ defmodule CoreContractTest do
     %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
     Account.spend(setup_data.client, low_balance_public_key, 1)
 
-    static_call_result =
+    static_call_result_ =
       Contract.call(
         %Client{setup_data.client | keypair: low_balance_keypair},
         ct_address,
@@ -95,7 +95,7 @@ defmodule CoreContractTest do
         fee: 10_000_000_000_000_000
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
   end
 
   @tag :contracts
@@ -148,7 +148,7 @@ defmodule CoreContractTest do
     %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
     Account.spend(setup_data.client, low_balance_public_key, 1)
 
-    static_call_result =
+    static_call_result_ =
       Contract.call(
         %Client{setup_data.client | keypair: low_balance_keypair},
         ct_address,
@@ -158,7 +158,7 @@ defmodule CoreContractTest do
         fee: 10_000_000_000_000_000
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
   end
 
   @tag :contracts

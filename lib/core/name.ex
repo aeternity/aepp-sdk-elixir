@@ -774,15 +774,15 @@ defmodule AeppSDK.AENS do
   defp name_claim_size_fee(21), do: 377 * @multiplier_14
   defp name_claim_size_fee(20), do: 610 * @multiplier_14
   defp name_claim_size_fee(19), do: 987 * @multiplier_14
-  defp name_claim_size_fee(18), do: 1597 * @multiplier_14
-  defp name_claim_size_fee(17), do: 2584 * @multiplier_14
-  defp name_claim_size_fee(16), do: 4181 * @multiplier_14
-  defp name_claim_size_fee(15), do: 6765 * @multiplier_14
-  defp name_claim_size_fee(14), do: 10946 * @multiplier_14
-  defp name_claim_size_fee(13), do: 17711 * @multiplier_14
-  defp name_claim_size_fee(12), do: 28657 * @multiplier_14
-  defp name_claim_size_fee(11), do: 46368 * @multiplier_14
-  defp name_claim_size_fee(10), do: 75025 * @multiplier_14
+  defp name_claim_size_fee(18), do: 1_597 * @multiplier_14
+  defp name_claim_size_fee(17), do: 2_584 * @multiplier_14
+  defp name_claim_size_fee(16), do: 4_181 * @multiplier_14
+  defp name_claim_size_fee(15), do: 6_765 * @multiplier_14
+  defp name_claim_size_fee(14), do: 10_946 * @multiplier_14
+  defp name_claim_size_fee(13), do: 17_711 * @multiplier_14
+  defp name_claim_size_fee(12), do: 28_657 * @multiplier_14
+  defp name_claim_size_fee(11), do: 46_368 * @multiplier_14
+  defp name_claim_size_fee(10), do: 75_025 * @multiplier_14
   defp name_claim_size_fee(9), do: 121_393 * @multiplier_14
   defp name_claim_size_fee(8), do: 196_418 * @multiplier_14
   defp name_claim_size_fee(7), do: 317_811 * @multiplier_14
