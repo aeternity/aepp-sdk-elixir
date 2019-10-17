@@ -29,77 +29,12 @@ defmodule CoreContractTest do
 
       stateful entrypoint add_to_number(x : int) =
         Chain.event(AddedNumberEvent(x, \"Added a number\"))
-        put(state{number = state.number + x})"
-
+        state.number + x"
     [client: client, source_code: source_code]
   end
 
-  @tag :travis_test
-  test "create, call, call static and decode contract with aevms", setup_data do
-    deploy_result =
-      Contract.deploy(
-        setup_data.client,
-        setup_data.source_code,
-        ["42"],
-        vm: :aevm
-      )
-
-    assert match?({:ok, _}, deploy_result)
-
-    {:ok, %{contract_id: ct_address}} = deploy_result
-
-    on_chain_call_result =
-      Contract.call(
-        setup_data.client,
-        ct_address,
-        setup_data.source_code,
-        "add_to_number",
-        ["33"]
-      )
-
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, on_chain_call_result)
-
-    refute on_chain_call_result |> elem(1) |> Map.get(:log) |> Enum.empty?()
-
-    static_call_result =
-      Contract.call(
-        setup_data.client,
-        ct_address,
-        setup_data.source_code,
-        "get_number",
-        [],
-        fee: 10_000_000_000_000_000
-      )
-
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
-
-    {:ok, %{return_value: data, return_type: "ok"}} = static_call_result
-
-    assert {:ok, data} ==
-             Contract.decode_return_value(
-               "int",
-               "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA",
-               "ok"
-             )
-
-    %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
-    Account.spend(setup_data.client, low_balance_public_key, 1)
-
-    static_call_result_ =
-      Contract.call(
-        %Client{setup_data.client | keypair: low_balance_keypair},
-        ct_address,
-        setup_data.source_code,
-        "get_number",
-        [],
-        fee: 10_000_000_000_000_000
-      )
-
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
-  end
-
-  @tag :travis_test
-  test "create, call, call static and decode contract with fate vm", setup_data do
+  @tag :travis_test_1
+  test "create, call, call static and decode contract", setup_data do
     deploy_result =
       Contract.deploy(
         setup_data.client,
@@ -136,7 +71,7 @@ defmodule CoreContractTest do
 
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result)
 
-    {:ok, %{return_value: data, return_type: "ok"}} = static_call_result
+    {:ok, %{return_value: data, return_type: "ok"}} = on_chain_call_result
 
     assert {:ok, data} ==
              Contract.decode_return_value(
@@ -148,7 +83,7 @@ defmodule CoreContractTest do
     %{public: low_balance_public_key} = low_balance_keypair = Keys.generate_keypair()
     Account.spend(setup_data.client, low_balance_public_key, 1)
 
-    static_call_result_ =
+    static_call_result_1 =
       Contract.call(
         %Client{setup_data.client | keypair: low_balance_keypair},
         ct_address,
@@ -158,7 +93,21 @@ defmodule CoreContractTest do
         fee: 10_000_000_000_000_000
       )
 
-    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_1)
+
+    non_existing_keypair = Keys.generate_keypair()
+
+    static_call_result_2 =
+      Contract.call(
+        %Client{setup_data.client | keypair: non_existing_keypair},
+        ct_address,
+        setup_data.source_code,
+        "get_number",
+        [],
+        fee: 10_000_000_000_000_000
+      )
+
+    assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_2)
   end
 
   @tag :travis_test

@@ -38,7 +38,7 @@ defmodule AeppSDK.Contract do
   @init_function "init"
   @fate_ct_version 0x50003
   @aevm_ct_version 0x60001
-  @genesis_beneficiary "ak_11111111111111111111111111111111273Yts"
+  @genesis_beneficiary "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
 
   @type deploy_options :: [
           deposit: non_neg_integer(),
