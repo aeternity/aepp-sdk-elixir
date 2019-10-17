@@ -107,7 +107,6 @@ defmodule AeppSDK.Channel.OnChain do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_pubkey
           },
-          connection: connection,
           network_id: network_id,
           gas_price: gas_price
         } = client,
@@ -123,7 +122,7 @@ defmodule AeppSDK.Channel.OnChain do
       when sender_prefix == "ak" and responder_prefix == "ak" do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
          {:ok, create_channel_tx} <-
@@ -202,7 +201,7 @@ defmodule AeppSDK.Channel.OnChain do
              responder_amount_final >= 0 do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_mutual_tx} <-
            build_close_mutual_tx(
@@ -348,7 +347,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) and is_binary(payload) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, close_solo_tx} <-
            build_close_solo_tx(
@@ -438,7 +437,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -514,7 +513,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,
@@ -592,7 +591,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, settle_tx} <-
            build_settle_tx(
@@ -742,7 +741,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) and is_list(poi) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, slash_tx} <-
            build_slash_tx(
@@ -827,7 +826,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          {:ok, snapshot_solo_tx} <-
            build_snapshot_solo_tx(
@@ -922,7 +921,7 @@ defmodule AeppSDK.Channel.OnChain do
       when valid_prefixes(sender_prefix, channel_prefix) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection),
          decoded_state_hash <- Encoding.decode_base58c(state_hash),
          true <- byte_size(decoded_state_hash) == @state_hash_byte_size,

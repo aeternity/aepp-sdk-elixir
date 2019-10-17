@@ -63,7 +63,7 @@ defmodule AeppSDK.Account do
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_id),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_id),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
            struct(

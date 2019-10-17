@@ -350,7 +350,7 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> oracle_register_tx = %AeternityNode.Model.OracleRegisterTx{
-                                    abi_version: 196_609,
+                                    abi_version: 0x60001,
                                     account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
                                     fee: 0,
                                     nonce: 37_122,
@@ -454,7 +454,7 @@ defmodule AeppSDK.Utils.Transaction do
       {:ok,
        [
          %AeternityNode.Model.SpendTx{
-           amount: 1_000_000_000_000,
+           amount: 1000000000000,
            fee: 0,
            nonce: 1,
            payload: "",

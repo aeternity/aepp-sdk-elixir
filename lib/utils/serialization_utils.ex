@@ -106,7 +106,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        nonce,
        binary_query_id,
        response,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_response_tx.erl#L48
        0,
        value,
        fee,
@@ -143,7 +142,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        query_fee,
        query_ttl_type,
        query_value,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_query_tx.erl#L54
        0,
        response_value,
        fee,
@@ -164,7 +162,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
      [
        oracle_id,
        nonce,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_extend_tx.erl#L43
        0,
        value,
        fee,

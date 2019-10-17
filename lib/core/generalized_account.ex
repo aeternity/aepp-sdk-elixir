@@ -75,7 +75,7 @@ defmodule AeppSDK.GeneralizedAccount do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
     vm = Keyword.get(opts, :vm, :fate)
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, public_key),
          {:ok, ct_version} <- Contract.get_ct_version(opts),
          {:ok,
           %{
@@ -137,6 +137,27 @@ defmodule AeppSDK.GeneralizedAccount do
 
   @doc """
      Computes an authorization id for given GA meta tx
+
+  ## Examples
+      iex> meta_tx = %{
+                        abi_version: 3,
+                        auth_data: <<43, 17, 244, 119, 202, 45, 27, 127>>,
+                        fee: 100000000000000,
+                        ga_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+                        gas: 50000,
+                        gas_price: 1000000,
+                        ttl: 0,
+                        tx: <<248, 87, 11, 1, 192, 184, 82, 248, 80, 12, 1, 161, 1, 124, 169, 154,
+                          140, 216, 36, 178, 163, 239, 195, 198, 197, 213, 0, 88, 87, 19, 67, 5, 117,
+                          212, 206, 105, 153, 178, 2, 203, 32, 248, 96, 25, 216, 161, 1, 11, 180, 237,
+                          121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51, 91, 42, 43, 18,
+                          200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97, 100, 133, 3, 223, 210,
+                          64, 0, 0, 0, 128>>
+                      }
+      iex> AeppSDK.GeneralizedAccount.compute_auth_id(meta_tx)
+      {:ok,
+       <<141, 79, 64, 237, 32, 190, 35, 175, 230, 66, 224, 247, 43, 83, 109, 142, 1,
+         161, 69, 1, 114, 107, 20, 99, 55, 155, 198, 212, 142, 147, 104, 117>>}
   """
   @spec compute_auth_id(map()) :: {:ok, binary()}
   def compute_auth_id(%{ga_id: ga_id, auth_data: auth_data} = _meta_tx) do

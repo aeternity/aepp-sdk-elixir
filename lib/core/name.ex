@@ -49,7 +49,7 @@ defmodule AeppSDK.AENS do
 
   ## Example
       iex> name = "a1234567890asdfghjkl.chain"
-      iex> AeppSDK.AENS.preclaim(client, name, salt: 149218901844062129)
+      iex> AeppSDK.AENS.preclaim(client, name, salt: 149_218_901_844_062_129)
       {:ok,
         %{
           block_hash: "mh_Dumv7aK8Nb8Cedm7z1tMvWDMhVZqoc1VHbEgb1V484tZssK6d",
@@ -196,7 +196,7 @@ defmodule AeppSDK.AENS do
 
   ## Example
       iex> name = "a1234567890asdfghjkl.chain"
-      iex> name_salt = 149218901844062129
+      iex> name_salt = 149_218_901_844_062_129
       iex> AeppSDK.AENS.claim(client, name, name_salt)
       {:ok,
         %{
@@ -841,12 +841,12 @@ defmodule AeppSDK.AENS do
            connection: connection,
            gas_price: gas_price,
            network_id: network_id
-         },
+         } = client,
          commitment_id,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       preclaim_tx =
         struct(
@@ -876,14 +876,14 @@ defmodule AeppSDK.AENS do
            connection: connection,
            gas_price: gas_price,
            network_id: network_id
-         },
+         } = client,
          name,
          name_salt,
          name_fee,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       claim_tx =
         struct(
@@ -912,13 +912,13 @@ defmodule AeppSDK.AENS do
            gas_price: gas_price,
            network_id: network_id,
            connection: connection
-         },
+         } = client,
          name_id,
          recipient_id,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       transfer_tx =
         struct(
@@ -949,7 +949,7 @@ defmodule AeppSDK.AENS do
            gas_price: gas_price,
            network_id: network_id,
            connection: connection
-         },
+         } = client,
          name_id,
          name_ttl,
          pointers,
@@ -957,7 +957,7 @@ defmodule AeppSDK.AENS do
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       name_update_tx =
         struct(
@@ -990,12 +990,12 @@ defmodule AeppSDK.AENS do
            gas_price: gas_price,
            network_id: network_id,
            connection: connection
-         },
+         } = client,
          name_id,
          fee,
          ttl
        ) do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_pubkey),
          {:ok, %{height: height}} <- Chain.get_current_key_block_height(connection) do
       revoke_tx =
         struct(

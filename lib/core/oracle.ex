@@ -1,6 +1,9 @@
 defmodule AeppSDK.Oracle do
   @moduledoc """
   Module for oracle interaction, see: [https://github.com/aeternity/protocol/blob/master/oracles/oracles.md](https://github.com/aeternity/protocol/blob/master/oracles/oracles.md).
+
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeppSDK.Client
   alias AeppSDK.Utils.Account, as: AccountUtils
@@ -90,7 +93,7 @@ defmodule AeppSDK.Oracle do
              query_fee > 0 and is_list(opts) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          {:ok, binary_query_format} <- sophia_type_to_binary(query_format),
          {:ok, binary_response_format} <- sophia_type_to_binary(response_format),
          register_tx = %OracleRegisterTx{
@@ -186,7 +189,7 @@ defmodule AeppSDK.Oracle do
             ttl: oracle_ttl
           }} <- OracleApi.get_oracle_by_pubkey(connection, oracle_id),
          {:ok, binary_query} <- sophia_data_to_binary(query),
-         {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
+         {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          query_tx = %OracleQueryTx{
            oracle_id: oracle_id,
            query: binary_query,
@@ -278,7 +281,7 @@ defmodule AeppSDK.Oracle do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, binary_response} <- sophia_data_to_binary(response),
-         {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
+         {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          response_tx = %OracleRespondTx{
            query_id: query_id,
            response: binary_response,
@@ -348,7 +351,7 @@ defmodule AeppSDK.Oracle do
       when is_binary(oracle_id) and is_integer(oracle_ttl) and is_list(opts) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, pubkey),
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          extend_tx = %OracleExtendTx{
            fee: user_fee,
            oracle_ttl: %RelativeTtl{type: :relative, value: oracle_ttl},

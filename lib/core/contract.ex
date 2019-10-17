@@ -122,7 +122,7 @@ defmodule AeppSDK.Contract do
     vm = Keyword.get(opts, :vm, :fate)
 
     with {:ok, ct_version} <- get_ct_version(opts),
-         {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, public_key),
+         {:ok, nonce} <- AccountUtils.next_valid_nonce(client, public_key),
          {:ok,
           %{
             byte_code: byte_code,
@@ -729,7 +729,6 @@ defmodule AeppSDK.Contract do
 
   defp call_static(
          %Client{
-           connection: connection,
            internal_connection: internal_connection
          } = client,
          contract_address,
@@ -742,7 +741,7 @@ defmodule AeppSDK.Contract do
               is_list(function_args) and is_list(opts) do
     with {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
            get(client, contract_address),
-         {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(connection),
+         {:ok, top_block_hash} <- ChainUtils.get_top_block_hash(client),
          {caller_public_key, caller_balance} <-
            determine_caller(client, Keyword.get(opts, :top, top_block_hash), opts),
          {:ok,
@@ -940,9 +939,8 @@ defmodule AeppSDK.Contract do
 
   defp build_contract_call_tx(
          %Client{
-           keypair: %{public: public_key},
-           connection: connection
-         },
+           keypair: %{public: public_key}
+         } = client,
          contract_address,
          source_code,
          function_name,
@@ -955,9 +953,9 @@ defmodule AeppSDK.Contract do
       if Keyword.has_key?(opts, :top) do
         top_block_hash = Keyword.get(opts, :top)
 
-        AccountUtils.nonce_at_hash(connection, public_key, top_block_hash)
+        AccountUtils.nonce_at_hash(client, public_key, top_block_hash)
       else
-        AccountUtils.next_valid_nonce(connection, public_key)
+        AccountUtils.next_valid_nonce(client, public_key)
       end
 
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
