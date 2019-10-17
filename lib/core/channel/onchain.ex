@@ -1058,13 +1058,13 @@ defmodule AeppSDK.Channel.OnChain do
       iex> tx = %AeternityNode.Model.ChannelCreateTx{
                   channel_reserve: 20,
                   delegate_ids: [],
-                  fee: 17560000000,
-                  initiator_amount: 30000000000,
+                  fee: 17_560_000_000,
+                  initiator_amount: 30_000_000_000,
                   initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
                   lock_period: 10,
                   nonce: 2,
                   push_amount: 1,
-                  responder_amount: 70000000000,
+                  responder_amount: 70_000_000_000,
                   responder_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
                   state_hash: "st_nscaNBmydKEvrWB6492mkpCmptuSExd38Hwf3uvZUCGqKBFU7",
                   ttl: 0
