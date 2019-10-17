@@ -29,8 +29,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
     Ttl
   }
 
-  @ct_version 0x40001
-
   @spec process_tx_fields(struct()) :: tuple()
   def process_tx_fields(%SpendTx{
         recipient_id: tx_recipient_id,
@@ -108,7 +106,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        nonce,
        binary_query_id,
        response,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_response_tx.erl#L48
        0,
        value,
        fee,
@@ -145,7 +142,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
        query_fee,
        query_ttl_type,
        query_value,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_query_tx.erl#L54
        0,
        response_value,
        fee,
@@ -166,7 +162,6 @@ defmodule AeppSDK.Utils.SerializationUtils do
      [
        oracle_id,
        nonce,
-       # Ttl type is always relative https://github.com/aeternity/aeternity/blob/master/apps/aeoracle/src/aeo_extend_tx.erl#L43
        0,
        value,
        fee,
@@ -177,6 +172,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
   def process_tx_fields(%NameClaimTx{
         name: name,
         name_salt: name_salt,
+        name_fee: name_fee,
         fee: fee,
         ttl: ttl,
         account_id: tx_account_id,
@@ -190,6 +186,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
        nonce,
        name,
        name_salt,
+       name_fee,
        fee,
        ttl
      ], :name_claim_tx}
@@ -288,7 +285,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
         owner_id: tx_owner_id,
         nonce: nonce,
         code: code,
-        abi_version: _abi_version,
+        abi_version: ct_version,
         deposit: deposit,
         amount: amount,
         gas: gas,
@@ -304,7 +301,7 @@ defmodule AeppSDK.Utils.SerializationUtils do
        owner_id,
        nonce,
        code,
-       @ct_version,
+       ct_version,
        fee,
        ttl,
        deposit,

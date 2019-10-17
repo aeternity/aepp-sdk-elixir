@@ -30,7 +30,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> public_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
-      iex> AeppSDK.Account.spend(client, public_key, 10_000_000, fee: 1_000_000_000_000_000)
+      iex> AeppSDK.Account.spend(client, public_key, 10_000_000)
       {:ok,
         %{
         block_hash: "mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t",
@@ -52,14 +52,18 @@ defmodule AeppSDK.Account do
           keypair: %{
             public: <<sender_prefix::binary-size(@prefix_byte_size), _::binary>> = sender_id
           },
-          connection: connection
+          connection: connection,
+          network_id: network_id,
+          gas_price: gas_price
         } = client,
         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
         amount,
         opts \\ []
       )
       when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(connection, sender_id),
+    user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+
+    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_id),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
            struct(
@@ -67,17 +71,26 @@ defmodule AeppSDK.Account do
              sender_id: sender_id,
              recipient_id: recipient_id,
              amount: amount,
-             fee: Keyword.get(opts, :fee, Transaction.dummy_fee()),
+             fee: user_fee,
              ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
              nonce: nonce,
              payload: Keyword.get(opts, :payload, Transaction.default_payload())
            ),
-         {:ok, _response} = response <-
-           Transaction.try_post(
-             client,
+         new_fee <-
+           Transaction.calculate_n_times_fee(
              spend_tx,
-             Keyword.get(opts, :auth, nil),
-             height
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ),
+         {:ok, _response} = response <-
+           Transaction.post(
+             client,
+             %{spend_tx | fee: new_fee},
+             Keyword.get(opts, :auth, :no_auth),
+             :one_signature
            ) do
       response
     else
@@ -95,9 +108,9 @@ defmodule AeppSDK.Account do
   """
   @spec balance(Client.t(), String.t()) ::
           {:ok, non_neg_integer()} | {:error, String.t()} | {:error, Env.t()}
-  def balance(%Client{connection: connection}, pubkey) when is_binary(pubkey) do
-    case AccountApi.get_account_by_pubkey(connection, pubkey) do
-      {:ok, %Account{balance: balance}} ->
+  def balance(%Client{} = client, pubkey) when is_binary(pubkey) do
+    case get(client, pubkey) do
+      {:ok, %{balance: balance}} ->
         {:ok, balance}
 
       _ = response ->
@@ -110,7 +123,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
+      iex> height = 80
       iex> AeppSDK.Account.balance(client, pubkey, height)
       {:ok, 1641606227460612819475}
   """
@@ -141,11 +154,37 @@ defmodule AeppSDK.Account do
   end
 
   @doc """
+  Get an actual account information
+
+  ## Example
+      iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+      iex> AeppSDK.Account.get(client, pubkey)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 151688000000000000000,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 0,
+         payable: true
+       }}
+  """
+  @spec get(Client.t(), String.t()) ::
+          {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection}, pubkey)
+      when is_binary(pubkey) do
+    response = AccountApi.get_account_by_pubkey(connection, pubkey)
+
+    prepare_result(response)
+  end
+
+  @doc """
   Get an account at a given height
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
+      iex> height = 80
       iex> AeppSDK.Account.get(client, pubkey, height)
       {:ok,
        %{

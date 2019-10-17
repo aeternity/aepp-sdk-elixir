@@ -1,6 +1,9 @@
 defmodule AeppSDK.Utils.Chain do
   @moduledoc """
   Chain AeppSDK.Utils.
+
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeppSDK.Client
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -10,13 +13,12 @@ defmodule AeppSDK.Utils.Chain do
   Get the hash of the current top block
 
   ## Example
-      iex> connection = AeternityNode.Connection.new("https://sdk-testnet.aepps.com/v2")
-      iex> AeppSDK.Utils.Chain.get_top_block_hash(connection)
+      iex> AeppSDK.Utils.Chain.get_top_block_hash(client)
       {:ok, "kh_7e74Hs2ThcNdjFD1i5XngUbzTHgmXn9jTaXSej1XKio7rkpgM"}
   """
   @spec get_top_block_hash(Client.t()) ::
           {:ok, String.t()} | {:error, String.t()} | {:error, Env.t()}
-  def get_top_block_hash(connection) do
+  def get_top_block_hash(%Client{connection: connection}) do
     case ChainApi.get_top_block(connection) do
       {:ok, %KeyBlockOrMicroBlockHeader{key_block: %KeyBlock{hash: hash}}} ->
         {:ok, hash}

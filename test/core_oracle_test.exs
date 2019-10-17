@@ -27,7 +27,7 @@ defmodule CoreOracleTest do
         setup_data.client,
         "map(string, int)",
         "map(string, int)",
-        %{type: :relative, value: 5},
+        %{type: :relative, value: 500},
         30
       )
 
@@ -39,8 +39,8 @@ defmodule CoreOracleTest do
         setup_data.client,
         oracle_id,
         %{"a" => 1},
-        %{type: :relative, value: 1},
-        1
+        %{type: :relative, value: 100},
+        100
       )
 
     {:ok, queries} = Oracle.get_queries(setup_data.client, oracle_id)
@@ -61,13 +61,13 @@ defmodule CoreOracleTest do
                oracle_id,
                query_id,
                %{"b" => 2},
-               1
+               100
              )
            )
 
     assert match?(
              {:ok, _},
-             Oracle.extend(setup_data.client, oracle_id, 10)
+             Oracle.extend(setup_data.client, oracle_id, 100)
            )
 
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))

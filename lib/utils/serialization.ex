@@ -43,14 +43,14 @@ defmodule AeppSDK.Utils.Serialization do
   @version_oracle_query_tx 1
   @version_oracle_response_tx 1
   @version_oracle_extend_tx 1
-  @version_name_claim_tx 1
+  @version_name_claim_tx 2
   @version_name_preclaim_tx 1
   @version_name_update_tx 1
   @version_name_revoke_tx 1
   @version_name_transfer_tx 1
   @version_contract_create_tx 1
   @version_contract_call_tx 1
-  @version_sophia_byte_code 1
+  @version_sophia_byte_code 3
   @version_ga_attach_tx 1
   @version_ga_meta_tx 1
 
@@ -160,11 +160,11 @@ defmodule AeppSDK.Utils.Serialization do
           <<64, 216, 143, 81, 41, 52, 245, 89, 135, 253, 7, 12, 94, 142, 96, 251, 212,
             96, 76, 248, 1, 152, 97, 16, 144, 62, 43, 186, 148, 174, 76, 114>>},
          1,
-         2000000000000000000,
+         2_000_000_000_000_000_000,
          0,
          0,
-         1000000,
-         1000000000,
+         1_000_000,
+         1_000_000_000,
          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 32, 112, 194, 27, 63, 171, 248, 210, 119, 144, 238, 34,
            30, 100, 222, 2, 111, 12, 11, 11, 82, 86, 82, 53, 206, 145, 155, 60, 13,
@@ -453,6 +453,7 @@ defmodule AeppSDK.Utils.Serialization do
          nonce: nonce,
          name: name,
          name_salt: name_salt,
+         name_fee: name_fee,
          fee: fee,
          ttl: ttl
        ) do
@@ -461,6 +462,7 @@ defmodule AeppSDK.Utils.Serialization do
       nonce: nonce,
       name: name,
       name_salt: name_salt,
+      name_fee: name_fee,
       fee: fee,
       ttl: ttl
     }
@@ -898,7 +900,15 @@ defmodule AeppSDK.Utils.Serialization do
   end
 
   defp serialization_template(:name_claim_tx) do
-    [account_id: :id, nonce: :int, name: :binary, name_salt: :int, fee: :int, ttl: :int]
+    [
+      account_id: :id,
+      nonce: :int,
+      name: :binary,
+      name_salt: :int,
+      name_fee: :int,
+      fee: :int,
+      ttl: :int
+    ]
   end
 
   defp serialization_template(:name_preclaim_tx) do
@@ -960,8 +970,10 @@ defmodule AeppSDK.Utils.Serialization do
   defp serialization_template(:sophia_byte_code) do
     [
       source_code_hash: :binary,
-      type_info: [{:binary, :binary, :binary, :binary}],
-      byte_code: :binary
+      type_info: [{:binary, :binary, :bool, :binary, :binary}],
+      byte_code: :binary,
+      compiler_version: :binary,
+      payable: :bool
     ]
   end
 

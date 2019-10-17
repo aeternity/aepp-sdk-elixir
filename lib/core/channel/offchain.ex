@@ -37,7 +37,7 @@ defmodule AeppSDK.Channel.OffChain do
 
     iex> channel = "ch_11111111111111111111111111111111273Yts"
     iex> state_hash = "st_11111111111111111111111111111111273Yts"
-    iex> AeppSDK.Channel.OffChain.new channel, 1, state_hash, 1, []
+    iex> AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 1, [])
       %{
         channel_id: "ch_11111111111111111111111111111111273Yts",
         round: 1,
@@ -71,7 +71,7 @@ defmodule AeppSDK.Channel.OffChain do
 
     iex> channel = "ch_11111111111111111111111111111111273Yts"
     iex> state_hash = "st_11111111111111111111111111111111273Yts"
-    iex> AeppSDK.Channel.OffChain.new channel, 1, state_hash, 2
+    iex> AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 2)
       %{
         channel_id: "ch_11111111111111111111111111111111273Yts",
         round: 1,
@@ -102,8 +102,8 @@ defmodule AeppSDK.Channel.OffChain do
 
     iex> channel = "ch_11111111111111111111111111111111273Yts"
     iex> state_hash = "st_11111111111111111111111111111111273Yts"
-    iex> channel_off_chain_tx = AeppSDK.Channel.OffChain.new channel, 1, state_hash, 2
-    iex> AeppSDK.Channel.OffChain.serialize_tx channel_off_chain_tx
+    iex> channel_off_chain_tx = AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 2)
+    iex> AeppSDK.Channel.OffChain.serialize_tx(channel_off_chain_tx)
       <<248,70,57,2,161,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
       160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0>>
 
@@ -126,7 +126,7 @@ defmodule AeppSDK.Channel.OffChain do
   ## Example
 
     iex> update = %{type: :transfer, from: {:id, :account, <<0::256>>}, to: {:id, :account, <<0::256>>}, amount: 100}
-    iex> AeppSDK.Channel.OffChain.serialize_updates update
+    iex> AeppSDK.Channel.OffChain.serialize_updates(update)
       [<<248,73,130,2,58,1,161,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
       161,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100>>]
 
