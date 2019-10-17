@@ -590,12 +590,8 @@ defmodule AeppSDK.Contract do
     case :aeso_aci.contract_interface(:json, source_code) do
       {:ok, [%{contract: %{functions: functions}}]} ->
         case Enum.find(functions, fn %{name: name} -> name == function_name end) do
-          %{returns: function_return_type} when is_binary(function_return_type) ->
+          %{returns: function_return_type} ->
             {:ok, function_return_type}
-
-          # Temporary work around
-          %{returns: function_return_type} when is_map(function_return_type) ->
-            {:ok, "unit"}
 
           nil ->
             {:error, "Undefined function #{function_name}"}
@@ -835,7 +831,7 @@ defmodule AeppSDK.Contract do
           decoded_return_value
 
         6 ->
-          {:ok, sophia_return_type} = get_aci_function_return_type(source_code, function_name)
+          {:ok, sophia_return_type} = get_function_return_type(source_code, function_name)
 
           {:ok, decoded_return_value} =
             decode_return_value(
