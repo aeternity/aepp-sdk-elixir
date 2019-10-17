@@ -90,7 +90,7 @@ defmodule AeppSDK.Account do
              client,
              %{spend_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       response
     else
@@ -123,7 +123,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
+      iex> height = 80
       iex> AeppSDK.Account.balance(client, pubkey, height)
       {:ok, 1641606227460612819475}
   """
@@ -184,7 +184,7 @@ defmodule AeppSDK.Account do
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-      iex> height = 80000
+      iex> height = 80
       iex> AeppSDK.Account.get(client, pubkey, height)
       {:ok,
        %{

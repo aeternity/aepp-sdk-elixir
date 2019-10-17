@@ -120,7 +120,7 @@ defmodule AeppSDK.Oracle do
              client,
              %{register_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       {:ok, Map.put(response, :oracle_id, String.replace_prefix(pubkey, "ak", "ok"))}
     else
@@ -215,7 +215,7 @@ defmodule AeppSDK.Oracle do
              client,
              %{query_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       {:ok, Map.put(response, :query_id, calculate_query_id(pubkey, nonce, oracle_id))}
     else
@@ -303,7 +303,7 @@ defmodule AeppSDK.Oracle do
              client,
              %{response_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       {:ok, response}
     else
@@ -371,7 +371,7 @@ defmodule AeppSDK.Oracle do
              client,
              %{extend_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       {:ok, response}
     else

@@ -123,7 +123,7 @@ defmodule AeppSDK.GeneralizedAccount do
              client,
              %{ga_attach_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       {:ok, response}
     else

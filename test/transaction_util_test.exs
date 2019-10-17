@@ -25,7 +25,7 @@ defmodule TransactionUtilTest do
     assert 16_500_000_000 ==
              Transaction.calculate_min_fee(fields.name_pre_claim_tx, 50_000, "ae_mainnet")
 
-    assert 16_900_000_000 ==
+    assert 16_920_000_000 ==
              Transaction.calculate_min_fee(fields.name_claim_tx, 50_000, "ae_mainnet")
 
     assert 16_500_000_000 ==

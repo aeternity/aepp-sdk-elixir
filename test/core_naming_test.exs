@@ -5,8 +5,8 @@ defmodule CoreNamingTest do
   alias AeppSDK.Utils.{Keys, Serialization}
   alias AeternityNode.Api.NameService
 
-  @test_name "a1234567890asdfghjkl.aet"
-  @new_test_name "newa1234567890asdfghjkl.aet"
+  @test_name "a1234567890asdfghjkl.chain"
+  @new_test_name "newa1234567890asdfghjkl.chain"
   setup_all do
     Code.require_file("test_utils.ex", "test/")
     TestUtils.get_test_data()

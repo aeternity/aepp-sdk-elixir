@@ -89,6 +89,7 @@ defmodule TestUtils do
       <<"name">>,
       10,
       10,
+      10,
       10
     ]
 
@@ -219,6 +220,7 @@ defmodule TestUtils do
       name: "nm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       name_salt: 123,
       fee: 0,
+      name_fee: 10,
       ttl: 0,
       account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
       nonce: 0

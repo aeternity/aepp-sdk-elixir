@@ -6,7 +6,7 @@ elixir: '1.9'
 
 env:
   global:
-    - AETERNITY_VERSION=5.0.0-rc.4
+    - AETERNITY_VERSION=5.0.0-rc.5
     - GENERATOR_VERSION=1.2.0
     - LD_LIBRARY_PATH=$HOME/.libsodium/lib:$LD_LIBRARY_PATH
     - LD_RUN_PATH=$HOME/.libsodium/lib:$LD_RUN_PATH
@@ -56,5 +56,5 @@ script:
   - mix format --check-formatted
   - mix compile --warnings-as-errors
   - mix compile.xref --warnings-as-errors
-  - mix credo list
+  - mix credo
   - mix coveralls -u --exclude disabled

@@ -116,15 +116,15 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
-                          amount: 1000000000000000000000,
-                          fee: 0,
+                          amount: 10_000,
+                          fee: 16_680_000_000,
                           nonce: 1,
                           payload: "",
                           recipient_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
                           sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
                           ttl: 0
                         }
-      iex> AeppSDK.Utils.Transaction.post(client, spend_tx, :no_auth, :no_channels)
+      iex> AeppSDK.Utils.Transaction.post(client, spend_tx, :no_auth, :one_signature)
       {:ok,
        %{
          block_hash: "mh_2wRRkfzcHd24cGbqdqaLAhxgpv4iMB8y1Cp5n9FAfhvDZJ7Qh",
@@ -160,7 +160,7 @@ defmodule AeppSDK.Utils.Transaction do
 
     signed_tx_fields =
       case signatures_list do
-        :no_channels -> [[signature], serialized_tx]
+        :one_signature -> [[signature], serialized_tx]
         _ -> [signatures_list, serialized_tx]
       end
 
@@ -258,14 +258,14 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
-        amount: 40000000,
-        fee: 0,
-        nonce: 10624,
-        payload: "",
-        recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-        sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-        ttl: 0
-      }
+                          amount: 40_000_000,
+                          fee: 0,
+                          nonce: 10_624,
+                          payload: "",
+                          recipient_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                          sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                          ttl: 0
+                        }
       iex> AeppSDK.Utils.Transaction.calculate_fee(spend_tx, 51_900, "ae_uat", 0, 1_000_000)
       16660000000
   """
@@ -293,13 +293,13 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> name_pre_claim_tx = %AeternityNode.Model.NamePreclaimTx{
-        account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-        commitment_id: "cm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-        fee: 0,
-        nonce: 0,
-        ttl: 0
-      }
-      iex> AeppSDK.Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50000, "ae_mainnet")
+                                   account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+                                   commitment_id: "cm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+                                   fee: 0,
+                                   nonce: 0,
+                                   ttl: 0
+                                 }
+      iex> AeppSDK.Utils.Transaction.calculate_min_fee(name_pre_claim_tx, 50_000, "ae_mainnet")
       16500000000
   """
   @spec calculate_min_fee(struct(), non_neg_integer(), String.t()) ::
@@ -321,15 +321,15 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
-        amount: 5018857520000000000,
-        fee: 0,
-        nonce: 37181,
-        payload: "",
-        recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-        sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-        ttl: 0
-      }
-      iex> AeppSDK.Utils.Transaction.min_gas(spend_tx, 50000)
+                          amount: 5_018_857_520_000_000_000,
+                          fee: 0,
+                          nonce: 37181,
+                          payload: "",
+                          recipient_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+                          sender_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+                          ttl: 0
+                        }
+      iex> AeppSDK.Utils.Transaction.min_gas(spend_tx, 50_000)
       16740
   """
   @spec min_gas(struct(), non_neg_integer()) :: non_neg_integer() | {:error, String.t()}
@@ -350,16 +350,16 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> oracle_register_tx = %AeternityNode.Model.OracleRegisterTx{
-        abi_version: 196609,
-        account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
-        fee: 0,
-        nonce: 37122,
-        oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
-        query_fee: 10,
-        query_format: "query_format",
-        response_format: "response_format",
-        ttl: 10
-      }
+                                    abi_version: 196_609,
+                                    account_id: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt",
+                                    fee: 0,
+                                    nonce: 37_122,
+                                    oracle_ttl: %AeternityNode.Model.Ttl{type: :absolute, value: 10},
+                                    query_fee: 10,
+                                    query_format: "query_format",
+                                    response_format: "response_format",
+                                    ttl: 10
+                                  }
       iex> AeppSDK.Utils.Transaction.gas_limit(oracle_register_tx, 5)
       16581
   """
@@ -442,7 +442,7 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
-                          amount: 1000000000000000000000,
+                          amount: 1_000_000_000_000,
                           fee: 0,
                           nonce: 1,
                           payload: "",
@@ -454,7 +454,7 @@ defmodule AeppSDK.Utils.Transaction do
       {:ok,
        [
          %AeternityNode.Model.SpendTx{
-           amount: 1000000000000000000000,
+           amount: 1_000_000_000_000,
            fee: 0,
            nonce: 1,
            payload: "",
@@ -462,9 +462,9 @@ defmodule AeppSDK.Utils.Transaction do
            sender_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
            ttl: 0
          },
-         <<98, 147, 149, 133, 116, 38, 125, 207, 118, 243, 11, 168, 75, 187, 207, 249,
-           12, 72, 221, 188, 53, 117, 172, 90, 114, 48, 144, 53, 4, 235, 51, 14, 137,
-           89, 3, 85, 0, 34, 191, 73, 180, 210, 208, 13, 135, 59, ...>>
+         <168, 173, 62, 192, 198, 163, 29, 224, 83, 235, 68, 152, 82, 151, 77, 68,
+          228, 138, 200, 45, 15, 74, 125, 222, 45, 150, 114, 79, 84, 160, 83, 255,
+          63, 165, 45, 146, 164, 168, 144, 116, 200, 253, 80, 119, 6, 147, ...>>
        ]}
   """
   @spec sign_tx(tx_types(), Client.t(), list() | :no_opts) :: {:ok, list()} | {:error, String.t()}
@@ -477,7 +477,7 @@ defmodule AeppSDK.Utils.Transaction do
 
   ## Example
       iex> spend_tx = %AeternityNode.Model.SpendTx{
-                          amount: 1000000000000000000000,
+                          amount: 1_000_000_000_000,
                           fee: 0,
                           nonce: 1,
                           payload: "",
@@ -486,7 +486,7 @@ defmodule AeppSDK.Utils.Transaction do
                           ttl: 0
                         }
       iex> AeppSDK.Utils.Transaction.calculate_n_times_fee(spend_tx, 58_336, "ae_uat", 0, 1_000_000, 5)
-      16820000000
+      16740000000
   """
   @spec calculate_n_times_fee(
           tx_types,
@@ -653,7 +653,7 @@ defmodule AeppSDK.Utils.Transaction do
              Contract.get_vm(vm_version)
            ),
          serialized_tx = wrap_in_empty_signed_tx(tx),
-         meta_tx_dummy_fee = %{
+         meta_tx_dummy_fee <- %{
            ga_id: public_key,
            auth_data: calldata,
            abi_version: abi_version,
@@ -663,7 +663,7 @@ defmodule AeppSDK.Utils.Transaction do
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
            tx: serialized_tx
          },
-         meta_tx = %{
+         meta_tx <- %{
            meta_tx_dummy_fee
            | fee:
                Keyword.get(

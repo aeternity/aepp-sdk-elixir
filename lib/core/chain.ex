@@ -512,12 +512,13 @@ defmodule AeppSDK.Chain do
   ## Example
       iex> transactions = ["tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw=="]
       iex> accounts = [
-        %{
-          pubkey: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-          amount: 1651002120672731042209
-        }
-      ]
+                        %{
+                          pubkey: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+                          amount: 1651002120672731042209
+                        }
+                      ]
       iex> block_hash = "kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT"
+      iex> AeppSDK.Chain.dry_run(client, transactions, accounts, block_hash)
       {:ok,
        [
          %{
@@ -576,15 +577,15 @@ defmodule AeppSDK.Chain do
          peers: %{
            blocked: [],
            peers: ["aenode://pp_DMLqy7Zuhoxe2FzpydyQTgwCJ52wouzxtHWsPGo51XDcxc5c8@13.53.161.215:3015",
-            "aenode://pp_FhecVAucSqWJuMKt8vwsrC14G6Cizet9TppFep1PpGLQwQSpw@13.229.148.230:3015",
-            "aenode://pp_RMzsjgNLZMabSns3gWykAUWQaz218zaUzcQqLCtkbH5mQDGp8@54.245.137.153:3015",
-            "aenode://pp_auNgNxce82JNFd33Z4UVoDvNUJEaSUowwW37v681wMnZgsPfw@34.212.120.93:3015",
-            "aenode://pp_27xmgQ4N1E3QwHyoutLtZsHW5DSW4zneQJ3CxT5JbUejxtFuAu@13.250.162.250:3015",
-            "aenode://pp_2JREXVhMur6RHVDPnEomoc8EP1cgmWdgrJMh9Z7j7a7yebAEKs@52.57.34.16:3015",
-            "aenode://pp_2aKzR7Bnz53amwA1oU55nkkKFD19THF3oxVDudLiksVh52Sypb@3.0.201.37:3015",
-            "aenode://pp_2beMZ7ULM3jye6hdSFVtWmBFRpG1mTevDZ4XNDPfKCgpzqH2Ns@3.122.192.245:3015",
-            "aenode://pp_2vFiJ3LMWVchceNnBPQV3p1fzj4Zd4voCQKNKaU16c3M4UCJok@18.236.142.145:3015",
-            "aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015"]
+                   "aenode://pp_FhecVAucSqWJuMKt8vwsrC14G6Cizet9TppFep1PpGLQwQSpw@13.229.148.230:3015",
+                   "aenode://pp_RMzsjgNLZMabSns3gWykAUWQaz218zaUzcQqLCtkbH5mQDGp8@54.245.137.153:3015",
+                   "aenode://pp_auNgNxce82JNFd33Z4UVoDvNUJEaSUowwW37v681wMnZgsPfw@34.212.120.93:3015",
+                   "aenode://pp_27xmgQ4N1E3QwHyoutLtZsHW5DSW4zneQJ3CxT5JbUejxtFuAu@13.250.162.250:3015",
+                   "aenode://pp_2JREXVhMur6RHVDPnEomoc8EP1cgmWdgrJMh9Z7j7a7yebAEKs@52.57.34.16:3015",
+                   "aenode://pp_2aKzR7Bnz53amwA1oU55nkkKFD19THF3oxVDudLiksVh52Sypb@3.0.201.37:3015",
+                   "aenode://pp_2beMZ7ULM3jye6hdSFVtWmBFRpG1mTevDZ4XNDPfKCgpzqH2Ns@3.122.192.245:3015",
+                   "aenode://pp_2vFiJ3LMWVchceNnBPQV3p1fzj4Zd4voCQKNKaU16c3M4UCJok@18.236.142.145:3015",
+                   "aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015"]
          },
          status: %{
            difficulty: 252791033,

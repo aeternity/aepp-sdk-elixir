@@ -28,7 +28,7 @@ defmodule AeppSDK.AENS do
   @max_name_ttl 50_000
   @max_client_ttl 86_000
   @label_separator "."
-  @allowed_registrars ["aet"]
+  @allowed_registrars ["chain"]
   @multiplier_14 100_000_000_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
   @type preclaim_options :: [
@@ -48,7 +48,7 @@ defmodule AeppSDK.AENS do
   Preclaims a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> AeppSDK.AENS.preclaim(client, name, salt: 149218901844062129)
       {:ok,
         %{
@@ -74,7 +74,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_salt: 149218901844062129,,
           tx_hash: "th_wYo5DLruahJrkFwjH5Jji6HsRMbPZBxeJKmRwg8QEyKVYrXGd"
         }}
@@ -132,7 +132,7 @@ defmodule AeppSDK.AENS do
              client,
              %{preclaim_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -150,7 +150,7 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> client |> AeppSDK.AENS.preclaim("a1234567890asdfghjkl.aet") |> AeppSDK.AENS.claim()
+      iex> client |> AeppSDK.AENS.preclaim("a1234567890asdfghjkl.chain") |> AeppSDK.AENS.claim()
       {:ok,
        %{
          block_hash: "mh_YyiddDH57Azdztir1s8zgtLXZpBAK1xNBSisCMxSUSJA4MNE3",
@@ -175,7 +175,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
          },
-         name: "a1234567890asdfghjkl.aet",
+         name: "a1234567890asdfghjkl.chain",
          tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
        }}
   """
@@ -195,7 +195,7 @@ defmodule AeppSDK.AENS do
   Claims a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_salt = 149218901844062129
       iex> AeppSDK.AENS.claim(client, name, name_salt)
       {:ok,
@@ -222,7 +222,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_257jfXcwXS51z1x3zDBdU5auHTjWPAbhhYJEtAwhM7Aby3Syf4"
         }}
   """
@@ -273,7 +273,7 @@ defmodule AeppSDK.AENS do
              client,
              %{claim_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -290,7 +290,7 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_ttl = 49_999
       iex> pointers = [
             {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
@@ -325,9 +325,16 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
@@ -352,7 +359,7 @@ defmodule AeppSDK.AENS do
   Updates a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> name_ttl = 49_999
       iex> pointers = [
             {AeppSDK.Utils.Keys.public_key_to_binary("ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"),
@@ -387,9 +394,16 @@ defmodule AeppSDK.AENS do
             network_id: "my_test"
           },
           client_ttl: 50000,
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           name_ttl: 49999,
-          pointers: [],
+          pointers: [
+            {<<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18, 51,
+               91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30, 97>>,
+             {:id, :account,
+              <<11, 180, 237, 121, 39, 249, 123, 81, 225, 188, 181, 225, 52, 13, 18,
+                51, 91, 42, 43, 18, 200, 188, 82, 33, 214, 60, 75, 203, 57, 212, 30,
+                97>>}}
+          ],
           tx_hash: "th_XV3mn79qzc5foq67JuiXWCaCK2yZzbHuk8knvkQtTNMDaa7JB"
         }}
   """
@@ -442,7 +456,7 @@ defmodule AeppSDK.AENS do
              client,
              %{update_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -462,7 +476,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |>  AeppSDK.AENS.transfer(recipient_key)
       {:ok,
@@ -489,7 +503,7 @@ defmodule AeppSDK.AENS do
            },
            network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
        }}
@@ -514,7 +528,7 @@ defmodule AeppSDK.AENS do
   Transfers a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> recipient_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
       iex> AeppSDK.AENS.transfer_name(client, name, recipient_key)
       {:ok,
@@ -541,7 +555,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           recipient_id: "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv",
           tx_hash: "th_2Bxxz5j4rexSCRC227oR4E6zBD14MCFh2qhZoNMDiCjzpVv8Qi"
         }}
@@ -588,7 +602,7 @@ defmodule AeppSDK.AENS do
              client,
              %{transfer_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -606,7 +620,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> client |> AeppSDK.AENS.preclaim(name) |> AeppSDK.AENS.claim() |> AeppSDK.AENS.revoke()
       {:ok,
         %{
@@ -632,7 +646,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
@@ -652,7 +666,7 @@ defmodule AeppSDK.AENS do
   Revokes a name.
 
   ## Example
-      iex> name = "a1234567890asdfghjkl.aet"
+      iex> name = "a1234567890asdfghjkl.chain"
       iex> AeppSDK.AENS.revoke_name(client, name)
       {:ok,
         %{
@@ -678,7 +692,7 @@ defmodule AeppSDK.AENS do
             },
             network_id: "my_test"
           },
-          name: "a1234567890asdfghjkl.aet",
+          name: "a1234567890asdfghjkl.chain",
           tx_hash: "th_2sGNfvv59tyGEk3fqQSXryzt25uuShA6Zabb3Wjkyt77cWRWFW"
         }}
   """
@@ -721,7 +735,7 @@ defmodule AeppSDK.AENS do
              client,
              %{revoke_tx | fee: new_fee},
              Keyword.get(opts, :auth, :no_auth),
-             :no_channels
+             :one_signature
            ) do
       result =
         response
@@ -760,15 +774,15 @@ defmodule AeppSDK.AENS do
   defp name_claim_size_fee(21), do: 377 * @multiplier_14
   defp name_claim_size_fee(20), do: 610 * @multiplier_14
   defp name_claim_size_fee(19), do: 987 * @multiplier_14
-  defp name_claim_size_fee(18), do: 1597 * @multiplier_14
-  defp name_claim_size_fee(17), do: 2584 * @multiplier_14
-  defp name_claim_size_fee(16), do: 4181 * @multiplier_14
-  defp name_claim_size_fee(15), do: 6765 * @multiplier_14
-  defp name_claim_size_fee(14), do: 10946 * @multiplier_14
-  defp name_claim_size_fee(13), do: 17711 * @multiplier_14
-  defp name_claim_size_fee(12), do: 28657 * @multiplier_14
-  defp name_claim_size_fee(11), do: 46368 * @multiplier_14
-  defp name_claim_size_fee(10), do: 75025 * @multiplier_14
+  defp name_claim_size_fee(18), do: 1_597 * @multiplier_14
+  defp name_claim_size_fee(17), do: 2_584 * @multiplier_14
+  defp name_claim_size_fee(16), do: 4_181 * @multiplier_14
+  defp name_claim_size_fee(15), do: 6_765 * @multiplier_14
+  defp name_claim_size_fee(14), do: 10_946 * @multiplier_14
+  defp name_claim_size_fee(13), do: 17_711 * @multiplier_14
+  defp name_claim_size_fee(12), do: 28_657 * @multiplier_14
+  defp name_claim_size_fee(11), do: 46_368 * @multiplier_14
+  defp name_claim_size_fee(10), do: 75_025 * @multiplier_14
   defp name_claim_size_fee(9), do: 121_393 * @multiplier_14
   defp name_claim_size_fee(8), do: 196_418 * @multiplier_14
   defp name_claim_size_fee(7), do: 317_811 * @multiplier_14
