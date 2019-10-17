@@ -19,7 +19,7 @@ defmodule CoreOracleTest do
     [client: client]
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "register, query, respond, extend, get oracle, get queries", setup_data do
     {:ok, %{oracle_id: oracle_id}} =
       register =
@@ -73,7 +73,7 @@ defmodule CoreOracleTest do
     assert match?({:ok, _}, Oracle.get_oracle(setup_data.client, oracle_id))
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "get oracle queries with bad oracle_id", setup_data do
     assert match?(
              {:error, _},
@@ -81,7 +81,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "get oracle query with bad query_id", setup_data do
     assert match?(
              {:error, _},
@@ -93,7 +93,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "register oracle with bad formats", setup_data do
     assert match?(
              {:error, "Bad Sophia type: bad format"},
@@ -107,7 +107,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "query non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -121,7 +121,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "respond to non-existent query", setup_data do
     assert match?(
              {:error, _},
@@ -135,7 +135,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "extend non-existent oracle", setup_data do
     assert match?(
              {:error, _},
@@ -147,7 +147,7 @@ defmodule CoreOracleTest do
            )
   end
 
-  @tag :oracles
+  @tag :travis_test
   test "get non-existent oracle", setup_data do
     assert match?(
              {:error, _},

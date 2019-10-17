@@ -390,7 +390,7 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> {:ok, [deposit_tx, deposit_sig]} =
-             AeppSDK.Channel.OnChain.deposit(client1, 16740000000, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 2,
+             AeppSDK.Channel.OnChain.deposit(client1, 16_740_000_000, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 2,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>))
@@ -867,7 +867,7 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> {:ok, [withdraw_tx, withdraw_sig]} =
-             AeppSDK.Channel.OnChain.withdraw(client1, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 30000000000,
+             AeppSDK.Channel.OnChain.withdraw(client1, "ch_215kMreHiB59G3CdfH8ySffdbbJz7eFeLRMxGnVZTt75pHndjK", 30_000_000_000,
                 AeppSDK.Utils.Encoding.prefix_encode_base58c(
                   "st", <<104, 40, 209, 191, 182, 107, 186, 113, 55, 214, 98, 133, 46, 166, 249, 5, 206,
                    185, 30, 65, 61, 161, 194, 140, 93, 163, 214, 28, 44, 126, 144, 107>>), 3)
@@ -984,6 +984,59 @@ defmodule AeppSDK.Channel.OnChain do
 
   @doc """
     Calculates state hash by provided Proof of Inclusion
+
+    ## Example
+      iex> poi = [accounts:
+                 {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73, 245,
+                    75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212, 51>>,
+                  %{
+                    cache:
+                      {3,
+                       {<<140, 209, 91, 235, 172, 88, 191, 47, 80, 136, 11, 102, 92, 245, 219, 73,
+                          245, 75, 162, 83, 27, 159, 121, 157, 30, 240, 117, 178, 254, 221, 212,
+                          51>>,
+                        [
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                            105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                            16>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                            52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>,
+                          <<>>
+                        ],
+                        {<<2, 58, 110, 90, 245, 96, 254, 181, 44, 135, 34, 160, 19, 18, 26, 58,
+                           105, 180, 85, 248, 214, 24, 47, 76, 178, 2, 26, 251, 26, 106, 195,
+                           16>>,
+                         [
+                           <<60, 23, 175, 26, 217, 146, 152, 11, 103, 81, 151, 214, 147, 110, 187,
+                             210, 92, 78, 171, 45, 72, 28, 247, 161, 167, 18, 61, 234, 180, 217,
+                             133, 6>>,
+                           <<201, 10, 1, 0, 133, 6, 252, 35, 172, 0>>
+                         ], nil, nil},
+                        {<<146, 113, 225, 29, 31, 110, 130, 50, 56, 165, 196, 118, 45, 126, 24,
+                           52, 14, 30, 9, 56, 8, 221, 231, 24, 231, 73, 90, 1, 159, 0, 83, 192>>,
+                         [
+                           <<51, 216, 132, 73, 112, 198, 24, 252, 160, 107, 12, 223, 138, 22, 165,
+                             77, 67, 150, 195, 81, 35, 223, 36, 71, 96, 42, 48, 91, 69, 136, 247,
+                             142>>,
+                           <<201, 10, 1, 0, 133, 16, 76, 83, 60, 0>>
+                         ], nil, nil}}}
+                  }}]
+      iex> AeppSDK.Channel.OnChain.calculate_state_hash(poi)
+      {:ok, "st_2BE4tgcWqnLJZjECoYgwnbB1awSgNYzGrunNs5MmWEKWaMFCbT"}
   """
   @spec calculate_state_hash(Serialization.poi_keyword()) :: {:ok, binary()}
   def calculate_state_hash(poi) when is_list(poi) do
@@ -1003,19 +1056,27 @@ defmodule AeppSDK.Channel.OnChain do
 
   ## Example
       iex> tx = %AeternityNode.Model.ChannelCreateTx{
-                  channel_reserve: 1000,
+                  channel_reserve: 20,
                   delegate_ids: [],
-                  fee: 17480000000,
-                  initiator_amount: 1000,
+                  fee: 17560000000,
+                  initiator_amount: 30000000000,
                   initiator_id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-                  lock_period: 100,
+                  lock_period: 10,
                   nonce: 2,
-                  push_amount: 1000,
-                  responder_amount: 1000,
-                  responder_id: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
-                  state_hash: "st_11111111111111111111111111111111273Yts",
+                  push_amount: 1,
+                  responder_amount: 70000000000,
+                  responder_id: "ak_2B468wUNwgHtESYbaeQXZk36fUmndQKsG8aprstgqE6byL18M4",
+                  state_hash: "st_nscaNBmydKEvrWB6492mkpCmptuSExd38Hwf3uvZUCGqKBFU7",
                   ttl: 0
                 }
+      iex> signature1 = <<65,111,24,149,206,121,117,82,192,205,237,44,184,94,82,204,236,
+                          214,24,128,168,113,9,99,104,18,70,147,215,52,233,8,189,150,213,
+                          80,108,8,50,196,106,17,117,204,215,161,175,38,249,220,34,77,226,
+                          164,212,11,242,80,51,82,211,34,97,15>>
+      iex> signature2 = <<169,216,194,56,20,98,158,150,54,133,124,227,96,40,230,236,185,
+                          181,186,48,175,65,130,110,39,254,244,18,155,153,210,170,181,249,
+                          138,249,130,239,245,1,2,164,44,146,105,193,61,79,105,71,176,166,
+                          30,137,239,84,138,188,8,92,182,83,130,1>>
       iex> AeppSDK.Channel.OnChain.post(client, tx, [signatures_list: [signature1, signature2]])
       {:ok,
         %{

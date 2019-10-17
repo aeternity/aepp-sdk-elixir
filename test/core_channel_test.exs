@@ -148,7 +148,7 @@ defmodule CoreChannelTest do
     ]
   end
 
-  @tag :channel_1
+  @tag :travis_test
   test "create, deposit, withdraw and close_mutual channel", setup_data do
     %{client: client, client1: client1} = setup_data
 
@@ -244,7 +244,7 @@ defmodule CoreChannelTest do
            )
   end
 
-  @tag :channel
+  @tag :travis_test
   test "Channel workflow with generalized accounts", setup_data do
     %{client: client, client2: client2, client3: client3, auth: auth, source_code: source_code} =
       setup_data
@@ -347,7 +347,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :channel
+  @tag :travis_test
   test "Channel workflow with initiator basic and responder generalized accounts", setup_data do
     %{client: client, client2: client2, auth: auth, source_code: source_code} = setup_data
 
@@ -423,7 +423,7 @@ defmodule CoreChannelTest do
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_sig]} =
-             Channel.close_mutual(client, channel_id, 1000, 1000)
+             Channel.close_mutual(client, channel_id, 1_000, 1_000)
 
     assert {:ok, [^close_mutual_tx, close_mutual_meta_tx, []]} =
              Transaction.sign_tx(close_mutual_tx, client2, auth)
@@ -435,7 +435,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :channel
+  @tag :travis_test
   test "Channel workflow with initiator generalized and responder basic accounts", setup_data do
     %{client: client, client2: client2, auth: auth, source_code: source_code} = setup_data
 
@@ -515,7 +515,7 @@ defmodule CoreChannelTest do
              )
 
     assert {:ok, [close_mutual_tx, close_mutual_meta_tx, []]} =
-             Channel.close_mutual(client2, channel_id, 1000, 1000, auth: auth)
+             Channel.close_mutual(client2, channel_id, 1_000, 1_000, auth: auth)
 
     assert {:ok, [^close_mutual_tx, close_mutual_sig]} =
              Transaction.sign_tx(close_mutual_tx, client)
@@ -527,7 +527,7 @@ defmodule CoreChannelTest do
              )
   end
 
-  @tag :channel_1
+  @tag :travis_test
   test "create channel, close_solo, slash and settle", setup_data do
     %{client: client, client4: client4, client5: client5} = setup_data
     initiator_amt = 30_000_000_000
@@ -719,7 +719,7 @@ defmodule CoreChannelTest do
            )
   end
 
-  @tag :channel_1
+  @tag :travis_test
   test "create channel, snapshot", setup_data do
     %{client: client, client6: client6, client7: client7} = setup_data
 

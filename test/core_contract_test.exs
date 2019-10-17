@@ -34,7 +34,7 @@ defmodule CoreContractTest do
     [client: client, source_code: source_code]
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "create, call, call static and decode contract with aevms", setup_data do
     deploy_result =
       Contract.deploy(
@@ -98,7 +98,7 @@ defmodule CoreContractTest do
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "create, call, call static and decode contract with fate vm", setup_data do
     deploy_result =
       Contract.deploy(
@@ -161,7 +161,7 @@ defmodule CoreContractTest do
     assert match?({:ok, %{return_value: _, return_type: "ok"}}, static_call_result_)
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "create invalid contract", setup_data do
     invalid_source_code = String.replace(setup_data.source_code, "x : int", "x : list(int)")
 
@@ -170,7 +170,7 @@ defmodule CoreContractTest do
     assert match?({:error, _}, deploy_result)
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "call non-existent function", setup_data do
     deploy_result =
       Contract.deploy(
@@ -195,7 +195,7 @@ defmodule CoreContractTest do
     assert match?({:error, "Undefined function non_existing_function"}, on_chain_call_result)
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "call static non-existent function", setup_data do
     deploy_result =
       Contract.deploy(
@@ -221,7 +221,7 @@ defmodule CoreContractTest do
     assert match?({:error, "Undefined function non_existing_function"}, static_call_result)
   end
 
-  @tag :contracts
+  @tag :travis_test
   test "decode data wrong type", setup_data do
     deploy_result =
       Contract.deploy(

@@ -144,7 +144,7 @@ defmodule AeppSDK.Chain do
   Wait for the chain to reach specific height
 
   ## Example
-      iex> AeppSDK.Chain.await_height(client, 84590)
+      iex> AeppSDK.Chain.await_height(client, 84_590)
       :ok
   """
   @spec await_height(Client.t(), non_neg_integer(), await_options()) ::
@@ -336,7 +336,7 @@ defmodule AeppSDK.Chain do
   Get a generation by height
 
   ## Example
-      iex> height = 84551
+      iex> height = 84_551
       iex> AeppSDK.Chain.get_generation(client, height)
       {:ok,
        %{
@@ -444,7 +444,7 @@ defmodule AeppSDK.Chain do
   Get a key block by height
 
   ## Example
-      iex> key_block_height = 84547
+      iex> key_block_height = 84_547
       iex> AeppSDK.Chain.get_key_block(client, key_block_height)
       {:ok,
        %{

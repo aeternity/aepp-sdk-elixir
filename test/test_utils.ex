@@ -263,8 +263,8 @@ defmodule TestUtils do
                  { number = x }
                entrypoint add_to_number(x : int) = state.number + x",
       abi_version: 0x30001,
-      deposit: 1000,
-      amount: 1000,
+      deposit: 1_000,
+      amount: 1_000,
       gas: 10,
       gas_price: 1,
       fee: 0,
@@ -279,7 +279,7 @@ defmodule TestUtils do
       abi_version: 0x30001,
       fee: 0,
       ttl: 0,
-      amount: 1000,
+      amount: 1_000,
       gas: 10,
       gas_price: 1,
       call_data: "call_data"

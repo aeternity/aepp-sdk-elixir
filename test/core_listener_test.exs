@@ -31,7 +31,7 @@ defmodule CoreListenerTest do
     [client: client, source_code: source_code]
   end
 
-  @tag :listener
+  @tag :travis_test
   test "start listener, receive messages", setup_data do
     {:ok, %{peer_pubkey: peer_pubkey}} = Chain.get_node_info(setup_data.client)
 

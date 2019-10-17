@@ -32,7 +32,7 @@ defmodule CoreGeneralizedAccountTest do
     [spend_client: spend_client, auth_client: auth_client, source_code: source_code]
   end
 
-  @tag :ga
+  @tag :travis_test
   test "attach and spend with auth, attempt to spend with failing auth", setup_data do
     {:ok, _} =
       Account.spend(
