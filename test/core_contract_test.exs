@@ -33,7 +33,7 @@ defmodule CoreContractTest do
     [client: client, source_code: source_code]
   end
 
-  @tag :travis_test_1
+  @tag :travis_test
   test "create, call, call static and decode contract", setup_data do
     deploy_result =
       Contract.deploy(
