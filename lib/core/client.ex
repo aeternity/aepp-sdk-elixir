@@ -67,7 +67,7 @@ defmodule AeppSDK.Client do
   """
   @spec new(keypair(), String.t(), String.t(), String.t(), non_neg_integer()) :: Client.t()
   def new(
-        %{public: public_key, secret: secret_key} = keypair,
+        %{public: public_key, secret: secret_key},
         network_id,
         url,
         internal_url,
@@ -77,6 +77,8 @@ defmodule AeppSDK.Client do
              is_binary(url) and is_binary(internal_url) do
     connection = Connection.new(url)
     internal_connection = Connection.new(internal_url)
+    secret_key_wrapper = fn -> secret_key end
+    keypair = %{public: public_key, secret: secret_key_wrapper}
 
     %Client{
       keypair: keypair,
