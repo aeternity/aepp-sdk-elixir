@@ -70,7 +70,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -171,7 +171,7 @@ defmodule AeppSDK.AENS do
            },
            keypair: %{
              public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
            },
            network_id: "my_test"
          },
@@ -218,7 +218,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -320,7 +320,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -389,7 +389,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -499,7 +499,7 @@ defmodule AeppSDK.AENS do
            },
            keypair: %{
              public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-             secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+             secret: "#Function<1.83545712/0 in AeppSDK.Client.new/5>
            },
            network_id: "my_test"
           },
@@ -551,7 +551,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -642,7 +642,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
@@ -688,7 +688,7 @@ defmodule AeppSDK.AENS do
             },
             keypair: %{
               public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-              secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+              secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>
             },
             network_id: "my_test"
           },
