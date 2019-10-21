@@ -30,6 +30,8 @@ defmodule AeppSDK.Utils.Keys do
   """
   @type password :: String.t()
 
+  defstruct crypto: %{symmetric_alg: "xsalsa20-poly1305"}, id: "", name: "main", version: 1
+
   @doc """
   Generate a Curve25519 keypair
 
@@ -58,6 +60,16 @@ defmodule AeppSDK.Utils.Keys do
     public = :enacl.crypto_sign_ed25519_public_to_curve25519(peer_public_key)
     secret = :enacl.crypto_sign_ed25519_secret_to_curve25519(peer_secret_key)
     %{public: public, secret: secret}
+  end
+
+  def encrypt(msg, nonce, key) do
+    :enacl.secretbox(msg, nonce, key)
+  end
+
+  @spec decrypt(binary() | list(), <<_::192>>, <<_::256>>) ::
+          {:ok, binary() | list()} | {:error, atom()}
+  def decrypt(enc_msg, nonce, key) do
+    :enacl.secretbox_open(enc_msg, nonce, key)
   end
 
   @doc """
