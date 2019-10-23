@@ -3,9 +3,22 @@ defmodule AeppSDK.Utils.Keys do
   Key generation, handling, encoding and crypto.
   """
   alias AeppSDK.Utils.Encoding
+  alias Argon2.Base, as: Argon2Base
 
   @hex_base 16
   @prefix_bits 24
+  # 65536
+  @hash_default_params %{
+    m_cost: 1024 * 65536,
+    parallelism: 1,
+    t_cost: 3,
+    format: :raw_hash,
+    hashlen: 32,
+    argon2_type: 2
+  }
+  # @default_memlimit_kib 65536
+  # @default_parallelism 1
+  # @default_opslimit 3
 
   @typedoc """
   A base58c encoded public key.
@@ -30,7 +43,15 @@ defmodule AeppSDK.Utils.Keys do
   """
   @type password :: String.t()
 
-  defstruct crypto: %{symmetric_alg: "xsalsa20-poly1305"}, id: "", name: "main", version: 1
+  defstruct crypto: %{
+              secret_type: "ed25519",
+              symmetric_alg: "xsalsa20-poly1305",
+              kdf: "argon2id",
+              kdf_params: @hash_default_params
+            },
+            id: "",
+            name: "main",
+            version: 1
 
   @doc """
   Generate a Curve25519 keypair
@@ -70,6 +91,29 @@ defmodule AeppSDK.Utils.Keys do
           {:ok, binary() | list()} | {:error, atom()}
   def decrypt(enc_msg, nonce, key) do
     :enacl.secretbox_open(enc_msg, nonce, key)
+  end
+
+  # @spec derive_key(binary(), binary()) :: binary()
+  def derive_key_argon2(password, salt, kdf_params \\ @hash_default_params)
+      when byte_size(salt) >= 16 do
+    processed_kdf_params =
+      for kdf_param <- Map.keys(@hash_default_params), reduce: %{} do
+        acc ->
+          Map.put(
+            acc,
+            kdf_param,
+            Map.get(kdf_params, kdf_param, Map.get(@hash_default_params, kdf_param))
+          )
+      end
+
+    Argon2Base.hash_password(password, salt, Enum.into(processed_kdf_params, []))
+    # opts = Enum.into(kdf_params, , fn {k, v} -> )
+    # memory_cost  = Map.get(kdf_params, :memlimit_kib, @default_memlimit_kib)
+    # parallelism =  Map.get(kdf_params, :parallelism, @default_parallelism)
+    # time_cost = Map.get(kdf_params,    :opslimit, @default_opslimit)
+  end
+
+  def derive_key() do
   end
 
   @doc """
