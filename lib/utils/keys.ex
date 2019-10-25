@@ -5,21 +5,17 @@ defmodule AeppSDK.Utils.Keys do
   alias AeppSDK.Utils.Encoding
   alias Argon2.Base, as: Argon2Base
 
-  @hex_base 16
   @prefix_bits 24
   @random_salt_bytes 16
   @random_nonce_bytes 24
-  # 65536
   @default_hash_params %{
-    # power of 2
-    #  2^ 16 =  65536, 2^18 = 262144
     m_cost: 16,
     parallelism: 1,
     t_cost: 3,
-    format: :raw_hash
-    # hashlen: 32,
-    # argon2_type: 2
+    format: :raw_hash,
+    argon2_type: 2
   }
+  #  2^ 16 =  65536, 2^18 = 262144
   @default_kdf_params %{
     memlimit_kib: 65536,
     opslimit: 3,
@@ -49,24 +45,6 @@ defmodule AeppSDK.Utils.Keys do
   An arbitrary string password.
   """
   @type password :: String.t()
-
-  defstruct crypto: %{
-              secret_type: "ed25519",
-              symmetric_alg: "xsalsa20-poly1305",
-              kdf: "argon2id",
-              kdf_params: %{
-                # 2^16
-                memlimit_kib: 65536,
-                opslimit: 3,
-                salt: "somesaltyness",
-                parallelism: 1
-              }
-            },
-            id: "",
-            name: "main",
-            version: 1
-
-  alias __MODULE__
 
   @doc """
   Generate a Curve25519 keypair
@@ -98,18 +76,18 @@ defmodule AeppSDK.Utils.Keys do
     %{public: public, secret: secret}
   end
 
+  @spec get_pubkey_from_secret_key(String.t()) :: String.t()
   def get_pubkey_from_secret_key(secret_key) do
     <<_::size(256), pubkey::size(256)>> = Base.decode16!(secret_key, case: :lower)
 
     Encoding.prefix_encode_base58c("ak", :binary.encode_unsigned(pubkey))
   end
 
+  @spec new_keystore(String.t(), String.t(), list()) :: :ok | {:error, atom}
   def new_keystore(secret_key, password, opts \\ []) do
     %{year: year, month: month, day: day} = DateTime.utc_now()
     time = "#{year}-#{month}-#{day}"
     name = Keyword.get(opts, :name, time)
-    # path = Keyword.get(opts, :path, "./keystore")
-    # file_path = Path.join(path, name)
     keystore = create_keystore(secret_key, password, name)
     json = Poison.encode!(keystore)
     {:ok, file} = File.open(name, [:read, :write])
@@ -117,10 +95,32 @@ defmodule AeppSDK.Utils.Keys do
     File.close(file)
   end
 
-  def create_keystore(secret_key, password, name \\ "") do
+  @doc """
+   Example:
+    iex> AeppSDK.Utils.Keys.read_keystore "2019-10-25", "12345a"
+   {:ok,
+    <<248, 61, 185, 58, 105, 216, 168, 128, 228, 22, 8, 120, 14, 162, 220, 34, 187,
+     205, 211, 147, 241, 121, 43, 241, 152, 179, 224, 67, 182, 125, 215, 224, 203,
+    155, 153, 228, 23, 198, 25, 84, 64, 100, 30, 134, 154, 230, 195, 44, ...>>}
+  """
+  @spec read_keystore(String.t(), String.t()) :: {:ok, binary()}
+  def read_keystore(path, password) when is_binary(path) and is_binary(password) do
+    with {:ok, json_keystore} <- File.read(path),
+         {:ok, keystore} <- Poison.decode(json_keystore, keys: :atoms!) do
+      params = process_params(keystore)
+      derived_key = derive_key_argon2(password, params.salt, params.kdf_params)
+      decrypt(params.ciphertext, params.nonce, Base.decode16!(derived_key, case: :lower))
+    else
+      {:error, _} = error -> error
+    end
+  end
+
+  @spec create_keystore(String.t(), String.t(), String.t()) :: map()
+  def create_keystore(secret_key, password, name \\ "")
+      when is_binary(secret_key) and is_binary(password) do
     salt = :enacl.randombytes(@random_salt_bytes)
     nonce = :enacl.randombytes(@random_nonce_bytes)
-    derived_key = derive_key_argon2(password, salt)
+    derived_key = derive_key_argon2(password, salt, @default_hash_params)
 
     encrypted_key =
       encrypt(secret_key_to_binary(secret_key), nonce, Base.decode16!(derived_key, case: :lower))
@@ -141,49 +141,6 @@ defmodule AeppSDK.Utils.Keys do
       name: name,
       version: 1
     }
-  end
-
-  def encrypt(plaintext, nonce, derived_key) do
-    :enacl.secretbox(plaintext, nonce, derived_key)
-  end
-
-  @spec decrypt(binary() | list(), <<_::192>>, <<_::256>>) ::
-          {:ok, binary() | list()} | {:error, atom()}
-  def decrypt(ciphertext, nonce, derived_key) do
-    :enacl.secretbox_open(ciphertext, nonce, derived_key)
-  end
-
-  def derive_key_argon2(
-        password,
-        salt,
-        %{
-          memlimit_kib: _memlimit_kib,
-          opslimit: opslimit,
-          salt: salt,
-          parallelism: parallelism
-        } \\ @default_hash_params
-      ) do
-    #  m_cost = :math.pow(2, 16) |> round
-
-    derive_key_argon2(password, salt, %{
-      m_cost: 16,
-      parallelism: parallelism,
-      t_cost: opslimit
-    })
-  end
-
-  def derive_key_argon2(password, salt, kdf_params) do
-    processed_kdf_params =
-      for kdf_param <- Map.keys(@default_hash_params), reduce: %{} do
-        acc ->
-          Map.put(
-            acc,
-            kdf_param,
-            Map.get(kdf_params, kdf_param, Map.get(@default_hash_params, kdf_param))
-          )
-      end
-
-    Argon2Base.hash_password(password, salt, Enum.into(processed_kdf_params, []))
   end
 
   @doc """
@@ -385,6 +342,95 @@ defmodule AeppSDK.Utils.Keys do
   @spec secret_key_from_binary(binary()) :: secret_key()
   def secret_key_from_binary(binary_secret_key) do
     Base.encode16(binary_secret_key, case: :lower)
+  end
+
+  defp process_params(%{
+         crypto: %{
+           cipher_params: %{nonce: nonce},
+           ciphertext: ciphertext,
+           kdf: kdf,
+           kdf_params: %{
+             memlimit_kib: memlimit,
+             opslimit: opslimit,
+             parallelism: parallelism,
+             salt: salt
+           }
+         }
+       }) do
+    kdf_algorithm = process_param(kdf)
+    m_cost = memlimit |> :math.log2() |> round
+    t_cost = opslimit
+    decoded_salt = Base.decode16!(salt, case: :lower)
+    decoded_ciphertext = Base.decode16!(ciphertext, case: :lower)
+    decoded_nonce = Base.decode16!(nonce, case: :lower)
+
+    %{
+      kdf_params: %{
+        m_cost: m_cost,
+        t_cost: t_cost,
+        parallelism: parallelism,
+        argon2_type: kdf_algorithm
+      },
+      salt: decoded_salt,
+      ciphertext: decoded_ciphertext,
+      nonce: decoded_nonce
+    }
+  end
+
+  defp process_param("argon2d") do
+    0
+  end
+
+  defp process_param("argon2i") do
+    1
+  end
+
+  defp process_param("argon2id") do
+    2
+  end
+
+  defp encrypt(plaintext, nonce, derived_key) do
+    :enacl.secretbox(plaintext, nonce, derived_key)
+  end
+
+  defp decrypt(ciphertext, nonce, derived_key)
+       when is_binary(ciphertext) and byte_size(nonce) == 24 and byte_size(derived_key) == 32 do
+    :enacl.secretbox_open(ciphertext, nonce, derived_key)
+  end
+
+  defp decrypt(_, _, _) do
+    {:error, "#{__MODULE__}: Invalid data"}
+  end
+
+  defp derive_key_argon2(
+         password,
+         salt,
+         %{
+           memlimit_kib: memlimit_kib,
+           opslimit: opslimit,
+           salt: salt,
+           parallelism: parallelism
+         }
+       ) do
+    derive_key_argon2(password, salt, %{
+      m_cost: memlimit_kib |> :math.log2() |> round(),
+      parallelism: parallelism,
+      t_cost: opslimit
+    })
+  end
+
+  defp derive_key_argon2(password, salt, kdf_params) do
+    processed_kdf_params =
+      for kdf_param <- Map.keys(@default_hash_params), reduce: %{} do
+        acc ->
+          Map.put(
+            acc,
+            kdf_param,
+            Map.get(kdf_params, kdf_param, Map.get(@default_hash_params, kdf_param))
+          )
+      end
+
+    Argon2Base.hash_password(password, salt, Enum.into(processed_kdf_params, []))
   end
 
   defp mkdir(path) do
