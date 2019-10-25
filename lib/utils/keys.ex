@@ -83,10 +83,20 @@ defmodule AeppSDK.Utils.Keys do
     Encoding.prefix_encode_base58c("ak", :binary.encode_unsigned(pubkey))
   end
 
+  @doc """
+  Create a new keystore
+
+  ## Example
+      iex> secret = "227bdeedb4c3dd2b554ea6b448ac6788fbe66df1b4f87093a450bba748f296f5348bd07453735393e2ff8c03c65b4593f3bdd94f957a2e7cb314688b53441280"
+      iex> AeppSDK.Utils.Keys.new_keystore(secret, "1234")
+      :ok
+  """
   @spec new_keystore(String.t(), String.t(), list()) :: :ok | {:error, atom}
   def new_keystore(secret_key, password, opts \\ []) do
-    %{year: year, month: month, day: day} = DateTime.utc_now()
-    time = "#{year}-#{month}-#{day}"
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second} =
+      DateTime.utc_now()
+
+    time = "#{year}-#{month}-#{day}-#{hour}-#{minute}-#{second}"
     name = Keyword.get(opts, :name, time)
     keystore = create_keystore(secret_key, password, name)
     json = Poison.encode!(keystore)
@@ -96,51 +106,25 @@ defmodule AeppSDK.Utils.Keys do
   end
 
   @doc """
-   Example:
-    iex> AeppSDK.Utils.Keys.read_keystore "2019-10-25", "12345a"
-   {:ok,
-    <<248, 61, 185, 58, 105, 216, 168, 128, 228, 22, 8, 120, 14, 162, 220, 34, 187,
-     205, 211, 147, 241, 121, 43, 241, 152, 179, 224, 67, 182, 125, 215, 224, 203,
-    155, 153, 228, 23, 198, 25, 84, 64, 100, 30, 134, 154, 230, 195, 44, ...>>}
+  Read the private key from the keystore
+
+  ## Example:
+      iex> AeppSDK.Utils.Keys.read_keystore("2019-10-25-9-48-48", "1234")
+      "227bdeedb4c3dd2b554ea6b448ac6788fbe66df1b4f87093a450bba748f296f5348bd07453735393e2ff8c03c65b4593f3bdd94f957a2e7cb314688b53441280"
   """
-  @spec read_keystore(String.t(), String.t()) :: {:ok, binary()}
+  @spec read_keystore(String.t(), String.t()) :: binary() | {:error, atom()}
   def read_keystore(path, password) when is_binary(path) and is_binary(password) do
     with {:ok, json_keystore} <- File.read(path),
-         {:ok, keystore} <- Poison.decode(json_keystore, keys: :atoms!) do
-      params = process_params(keystore)
-      derived_key = derive_key_argon2(password, params.salt, params.kdf_params)
-      decrypt(params.ciphertext, params.nonce, Base.decode16!(derived_key, case: :lower))
+         {:ok, keystore} <- Poison.decode(json_keystore, keys: :atoms!),
+         params = process_params(keystore),
+         derived_key = derive_key_argon2(password, params.salt, params.kdf_params),
+         {:ok, secret} <-
+           decrypt(params.ciphertext, params.nonce, Base.decode16!(derived_key, case: :lower)) do
+      Base.encode16(secret, case: :lower)
     else
-      {:error, _} = error -> error
+      {:error, _} = error ->
+        error
     end
-  end
-
-  @spec create_keystore(String.t(), String.t(), String.t()) :: map()
-  def create_keystore(secret_key, password, name \\ "")
-      when is_binary(secret_key) and is_binary(password) do
-    salt = :enacl.randombytes(@random_salt_bytes)
-    nonce = :enacl.randombytes(@random_nonce_bytes)
-    derived_key = derive_key_argon2(password, salt, @default_hash_params)
-
-    encrypted_key =
-      encrypt(secret_key_to_binary(secret_key), nonce, Base.decode16!(derived_key, case: :lower))
-
-    %{
-      public_key: get_pubkey_from_secret_key(secret_key),
-      crypto: %{
-        secret_type: "ed25519",
-        symmetric_alg: "xsalsa20-poly1305",
-        ciphertext: Base.encode16(encrypted_key, case: :lower),
-        cipher_params: %{
-          nonce: Base.encode16(nonce, case: :lower)
-        },
-        kdf: "argon2id",
-        kdf_params: %{@default_kdf_params | salt: Base.encode16(salt, case: :lower)}
-      },
-      id: UUID.uuid4(),
-      name: name,
-      version: 1
-    }
   end
 
   @doc """
@@ -400,6 +384,33 @@ defmodule AeppSDK.Utils.Keys do
 
   defp decrypt(_, _, _) do
     {:error, "#{__MODULE__}: Invalid data"}
+  end
+
+  defp create_keystore(secret_key, password, name \\ "")
+       when is_binary(secret_key) and is_binary(password) do
+    salt = :enacl.randombytes(@random_salt_bytes)
+    nonce = :enacl.randombytes(@random_nonce_bytes)
+    derived_key = derive_key_argon2(password, salt, @default_hash_params)
+
+    encrypted_key =
+      encrypt(secret_key_to_binary(secret_key), nonce, Base.decode16!(derived_key, case: :lower))
+
+    %{
+      public_key: get_pubkey_from_secret_key(secret_key),
+      crypto: %{
+        secret_type: "ed25519",
+        symmetric_alg: "xsalsa20-poly1305",
+        ciphertext: Base.encode16(encrypted_key, case: :lower),
+        cipher_params: %{
+          nonce: Base.encode16(nonce, case: :lower)
+        },
+        kdf: "argon2id",
+        kdf_params: %{@default_kdf_params | salt: Base.encode16(salt, case: :lower)}
+      },
+      id: UUID.uuid4(),
+      name: name,
+      version: 1
+    }
   end
 
   defp derive_key_argon2(
