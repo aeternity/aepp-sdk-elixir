@@ -1,7 +1,7 @@
 defmodule UtilsKeysTest do
   use ExUnit.Case
 
-  doctest AeppSDK.Utils.Keys, except: [generate_keypair: 0, read_keypair: 3]
+  doctest AeppSDK.Utils.Keys, except: [generate_keypair: 0, read_keypair: 3, read_keystore: 2]
 
   alias AeppSDK.Utils.Keys
 
@@ -55,6 +55,16 @@ defmodule UtilsKeysTest do
       assert keys.public == Keys.public_key_from_binary(keys.public_key_binary)
       assert keys.secret == Keys.secret_key_from_binary(keys.secret_key_binary)
     end)
+  end
+
+  test "keystore create, read", _setup_data do
+    %{secret: secret_key} = Keys.generate_keypair()
+    keystore_filename = "keystore.json"
+    keystore_password = "12345a"
+    assert :ok = Keys.new_keystore(secret_key, keystore_password, name: keystore_filename)
+    path_to_the_file = Path.join(File.cwd!(), keystore_filename)
+    assert true = File.exists?(path_to_the_file)
+    assert secret_key === Keys.read_keystore(path_to_the_file, keystore_password)
   end
 
   defp bundle_keys(%{public: public_key, secret: secret_key} = keypair) do
