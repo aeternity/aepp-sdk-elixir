@@ -1,11 +1,13 @@
 defmodule UtilsKeysTest do
   use ExUnit.Case
 
-  doctest AeppSDK.Utils.Keys, except: [generate_keypair: 0, read_keypair: 3, read_keystore: 2]
+  doctest AeppSDK.Utils.Keys,
+    except: [generate_keypair: 0, read_keypair: 3, read_keystore: 2, new_keystore: 3]
 
   alias AeppSDK.Utils.Keys
 
   @keys_path "./keys"
+  @keystore_name "keystore.json"
 
   setup_all do
     js_cli_keypair = %{
@@ -20,6 +22,7 @@ defmodule UtilsKeysTest do
 
     on_exit(fn ->
       File.rm_rf!(@keys_path)
+      File.rm_rf!(@keystore_name)
     end)
 
     [
@@ -59,10 +62,9 @@ defmodule UtilsKeysTest do
 
   test "keystore create, read", _setup_data do
     %{secret: secret_key} = Keys.generate_keypair()
-    keystore_filename = "keystore.json"
     keystore_password = "12345a"
-    assert :ok = Keys.new_keystore(secret_key, keystore_password, name: keystore_filename)
-    path_to_the_file = Path.join(File.cwd!(), keystore_filename)
+    assert :ok = Keys.new_keystore(secret_key, keystore_password, name: @keystore_name)
+    path_to_the_file = Path.join(File.cwd!(), @keystore_name)
     assert true = File.exists?(path_to_the_file)
     assert secret_key === Keys.read_keystore(path_to_the_file, keystore_password)
   end

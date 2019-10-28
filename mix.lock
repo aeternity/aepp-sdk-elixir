@@ -2,7 +2,7 @@
   "aebytecode": {:git, "https://github.com/aeternity/aebytecode.git", "4f4d6d30cd2c46b3830454d650a424d513f69134", [ref: "4f4d6d3"]},
   "aeserialization": {:git, "https://github.com/aeternity/aeserialization.git", "47aaa8f5434b365c50a35bfd1490340b19241991", [ref: "47aaa8f"]},
   "aesophia": {:git, "https://github.com/aeternity/aesophia.git", "b81312a714a5f618aacc0fe535f5b442373e2533", [tag: "v4.0.0"]},
-  "argon2_elixir": {:hex, :argon2_elixir, "2.1.0", "649cc781b4b32b72eca8bb4a3cba4bd1c02698163bb6a6e51015340d3ef342b9", [:make, :mix], [{:comeonin, "~> 5.1", [hex: :comeonin, repo: "hexpm", optional: false]}, {:elixir_make, "~> 0.5", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
+  "argon2_elixir": {:hex, :argon2_elixir, "2.1.1", "0a6640c2bb2bb3eef025093cd0aa26f529148a7c32306aa435b90837a845ade6", [:make, :mix], [{:comeonin, "~> 5.1", [hex: :comeonin, repo: "hexpm", optional: false]}, {:elixir_make, "~> 0.5", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
   "artificery": {:hex, :artificery, "0.4.2", "3ded6e29e13113af52811c72f414d1e88f711410cac1b619ab3a2666bbd7efd4", [:mix], [], "hexpm"},
   "base58": {:git, "https://github.com/aeternity/erl-base58.git", "60a335668a60328a29f9731b67c4a0e9e3d50ab6", [ref: "60a3356"]},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
