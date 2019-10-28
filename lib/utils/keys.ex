@@ -17,7 +17,7 @@ defmodule AeppSDK.Utils.Keys do
   }
   #  2^ 16 =  65536, 2^18 = 262144
   @default_kdf_params %{
-    memlimit_kib: 65536,
+    memlimit_kib: 65_536,
     opslimit: 3,
     salt: "",
     parallelism: 1
@@ -386,7 +386,7 @@ defmodule AeppSDK.Utils.Keys do
     {:error, "#{__MODULE__}: Invalid data"}
   end
 
-  defp create_keystore(secret_key, password, name \\ "")
+  defp create_keystore(secret_key, password, name)
        when is_binary(secret_key) and is_binary(password) do
     salt = :enacl.randombytes(@random_salt_bytes)
     nonce = :enacl.randombytes(@random_nonce_bytes)
