@@ -15,7 +15,7 @@ defmodule AeppSDK.Utils.Keys do
     format: :raw_hash,
     argon2_type: 2
   }
-  #  2^ 16 =  65536, 2^18 = 262144
+  #  2^ 16 =  65_536, 2^18 = 262_144
   @default_kdf_params %{
     memlimit_kib: 65_536,
     opslimit: 3,
