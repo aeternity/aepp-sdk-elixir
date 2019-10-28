@@ -23,7 +23,7 @@ defmodule CoreChannelTest do
         %{
           public: "ak_2qRMVEKj7CWXLsBz1wtWANLyq4xBTdvFMSXpcKvmXb8RySumiX",
           secret:
-            "4ea197c1717de46debbd0ea35a24e28e473e98f5aa328bdbe389e82262b6c5ff1a3ad4ef3f2c48fad6c5719ae9e2c6107013165733c455c7b992927247e61d1"
+            "04ea197c1717de46debbd0ea35a24e28e473e98f5aa328bdbe389e82262b6c5ff1a3ad4ef3f2c48fad6c5719ae9e2c6107013165733c455c7b992927247e61d1"
         },
         "my_test",
         "http://localhost:3013/v2",
@@ -71,7 +71,7 @@ defmodule CoreChannelTest do
         %{
           public: "ak_287XG6Fied7M1W54mAtTnEzWbAPn6zHSf5Y84wXtp4nQBS7vmv",
           secret:
-            "175739f9d44ba397f3a5958b73a54e709424cbce81bc8a4912cac8155d2c33893d8844970c618fca06b0cdf8a16a54d4396c35123df2447602a305b4588f78e"
+            "0175739f9d44ba397f3a5958b73a54e709424cbce81bc8a4912cac8155d2c33893d8844970c618fca06b0cdf8a16a54d4396c35123df2447602a305b4588f78e"
         },
         "my_test",
         "http://localhost:3013/v2",

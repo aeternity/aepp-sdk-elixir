@@ -16,13 +16,17 @@ defmodule CoreGeneralizedAccountTest do
         "http://localhost:3113/v2"
       )
 
-    auth_keypair = %{
-      public: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
-      secret:
-        "799ef7aa9ed8e3d58cd2492b7a569ccf967f3b63dc49ac2d0c9ea916d29cf8387ca99a8cd824b2a3efc3c6c5d500585713430575d4ce6999b202cb20f86019d8"
-    }
-
-    auth_client = %Client{spend_client | keypair: auth_keypair}
+    auth_client =
+      Client.new(
+        %{
+          public: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+          secret:
+            "799ef7aa9ed8e3d58cd2492b7a569ccf967f3b63dc49ac2d0c9ea916d29cf8387ca99a8cd824b2a3efc3c6c5d500585713430575d4ce6999b202cb20f86019d8"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
 
     source_code = "contract Authorization =
 

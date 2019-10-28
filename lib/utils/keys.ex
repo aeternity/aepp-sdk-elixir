@@ -3,9 +3,25 @@ defmodule AeppSDK.Utils.Keys do
   Key generation, handling, encoding and crypto.
   """
   alias AeppSDK.Utils.Encoding
+  alias Argon2.Base, as: Argon2Base
 
-  @hex_base 16
   @prefix_bits 24
+  @random_salt_bytes 16
+  @random_nonce_bytes 24
+  @default_hash_params %{
+    m_cost: 16,
+    parallelism: 1,
+    t_cost: 3,
+    format: :raw_hash,
+    argon2_type: 2
+  }
+  #  2^ 16 =  65_536, 2^18 = 262_144
+  @default_kdf_params %{
+    memlimit_kib: 65_536,
+    opslimit: 3,
+    salt: "",
+    parallelism: 1
+  }
 
   @typedoc """
   A base58c encoded public key.
@@ -58,6 +74,57 @@ defmodule AeppSDK.Utils.Keys do
     public = :enacl.crypto_sign_ed25519_public_to_curve25519(peer_public_key)
     secret = :enacl.crypto_sign_ed25519_secret_to_curve25519(peer_secret_key)
     %{public: public, secret: secret}
+  end
+
+  @spec get_pubkey_from_secret_key(String.t()) :: String.t()
+  def get_pubkey_from_secret_key(secret_key) do
+    <<_::size(256), pubkey::size(256)>> = Base.decode16!(secret_key, case: :lower)
+
+    Encoding.prefix_encode_base58c("ak", :binary.encode_unsigned(pubkey))
+  end
+
+  @doc """
+  Create a new keystore
+
+  ## Example
+      iex> secret = "227bdeedb4c3dd2b554ea6b448ac6788fbe66df1b4f87093a450bba748f296f5348bd07453735393e2ff8c03c65b4593f3bdd94f957a2e7cb314688b53441280"
+      iex> AeppSDK.Utils.Keys.new_keystore(secret, "1234")
+      :ok
+  """
+  @spec new_keystore(String.t(), String.t(), list()) :: :ok | {:error, atom}
+  def new_keystore(secret_key, password, opts \\ []) do
+    %{year: year, month: month, day: day, hour: hour, minute: minute, second: second} =
+      DateTime.utc_now()
+
+    time = "#{year}-#{month}-#{day}-#{hour}-#{minute}-#{second}"
+    name = Keyword.get(opts, :name, time)
+    keystore = create_keystore(secret_key, password, name)
+    json = Poison.encode!(keystore)
+    {:ok, file} = File.open(name, [:read, :write])
+    IO.write(file, json)
+    File.close(file)
+  end
+
+  @doc """
+  Read the private key from the keystore
+
+  ## Example:
+      iex> AeppSDK.Utils.Keys.read_keystore("2019-10-25-9-48-48", "1234")
+      "227bdeedb4c3dd2b554ea6b448ac6788fbe66df1b4f87093a450bba748f296f5348bd07453735393e2ff8c03c65b4593f3bdd94f957a2e7cb314688b53441280"
+  """
+  @spec read_keystore(String.t(), String.t()) :: binary() | {:error, atom()}
+  def read_keystore(path, password) when is_binary(path) and is_binary(password) do
+    with {:ok, json_keystore} <- File.read(path),
+         {:ok, keystore} <- Poison.decode(json_keystore, keys: :atoms!),
+         params = process_params(keystore),
+         derived_key = derive_key_argon2(password, params.salt, params.kdf_params),
+         {:ok, secret} <-
+           decrypt(params.ciphertext, params.nonce, Base.decode16!(derived_key, case: :lower)) do
+      Base.encode16(secret, case: :lower)
+    else
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """
@@ -245,8 +312,7 @@ defmodule AeppSDK.Utils.Keys do
   """
   @spec secret_key_to_binary(secret_key()) :: binary()
   def secret_key_to_binary(secret_key) do
-    {integer_secret_key, _} = Integer.parse(secret_key, @hex_base)
-    :binary.encode_unsigned(integer_secret_key)
+    Base.decode16!(secret_key, case: :lower)
   end
 
   @doc """
@@ -259,10 +325,123 @@ defmodule AeppSDK.Utils.Keys do
   """
   @spec secret_key_from_binary(binary()) :: secret_key()
   def secret_key_from_binary(binary_secret_key) do
-    binary_secret_key
-    |> :binary.decode_unsigned()
-    |> Integer.to_string(@hex_base)
-    |> String.downcase()
+    Base.encode16(binary_secret_key, case: :lower)
+  end
+
+  defp process_params(%{
+         crypto: %{
+           cipher_params: %{nonce: nonce},
+           ciphertext: ciphertext,
+           kdf: kdf,
+           kdf_params: %{
+             memlimit_kib: memlimit,
+             opslimit: opslimit,
+             parallelism: parallelism,
+             salt: salt
+           }
+         }
+       }) do
+    kdf_algorithm = process_param(kdf)
+    m_cost = memlimit |> :math.log2() |> round
+    t_cost = opslimit
+    decoded_salt = Base.decode16!(salt, case: :lower)
+    decoded_ciphertext = Base.decode16!(ciphertext, case: :lower)
+    decoded_nonce = Base.decode16!(nonce, case: :lower)
+
+    %{
+      kdf_params: %{
+        m_cost: m_cost,
+        t_cost: t_cost,
+        parallelism: parallelism,
+        argon2_type: kdf_algorithm
+      },
+      salt: decoded_salt,
+      ciphertext: decoded_ciphertext,
+      nonce: decoded_nonce
+    }
+  end
+
+  defp process_param("argon2d") do
+    0
+  end
+
+  defp process_param("argon2i") do
+    1
+  end
+
+  defp process_param("argon2id") do
+    2
+  end
+
+  defp encrypt(plaintext, nonce, derived_key) do
+    :enacl.secretbox(plaintext, nonce, derived_key)
+  end
+
+  defp decrypt(ciphertext, nonce, derived_key)
+       when is_binary(ciphertext) and byte_size(nonce) == 24 and byte_size(derived_key) == 32 do
+    :enacl.secretbox_open(ciphertext, nonce, derived_key)
+  end
+
+  defp decrypt(_, _, _) do
+    {:error, "#{__MODULE__}: Invalid data"}
+  end
+
+  defp create_keystore(secret_key, password, name)
+       when is_binary(secret_key) and is_binary(password) do
+    salt = :enacl.randombytes(@random_salt_bytes)
+    nonce = :enacl.randombytes(@random_nonce_bytes)
+    derived_key = derive_key_argon2(password, salt, @default_hash_params)
+
+    encrypted_key =
+      encrypt(secret_key_to_binary(secret_key), nonce, Base.decode16!(derived_key, case: :lower))
+
+    %{
+      public_key: get_pubkey_from_secret_key(secret_key),
+      crypto: %{
+        secret_type: "ed25519",
+        symmetric_alg: "xsalsa20-poly1305",
+        ciphertext: Base.encode16(encrypted_key, case: :lower),
+        cipher_params: %{
+          nonce: Base.encode16(nonce, case: :lower)
+        },
+        kdf: "argon2id",
+        kdf_params: %{@default_kdf_params | salt: Base.encode16(salt, case: :lower)}
+      },
+      id: UUID.uuid4(),
+      name: name,
+      version: 1
+    }
+  end
+
+  defp derive_key_argon2(
+         password,
+         salt,
+         %{
+           memlimit_kib: memlimit_kib,
+           opslimit: opslimit,
+           salt: salt,
+           parallelism: parallelism
+         }
+       ) do
+    derive_key_argon2(password, salt, %{
+      m_cost: memlimit_kib |> :math.log2() |> round(),
+      parallelism: parallelism,
+      t_cost: opslimit
+    })
+  end
+
+  defp derive_key_argon2(password, salt, kdf_params) do
+    processed_kdf_params =
+      for kdf_param <- Map.keys(@default_hash_params), reduce: %{} do
+        acc ->
+          Map.put(
+            acc,
+            kdf_param,
+            Map.get(kdf_params, kdf_param, Map.get(@default_hash_params, kdf_param))
+          )
+      end
+
+    Argon2Base.hash_password(password, salt, Enum.into(processed_kdf_params, []))
   end
 
   defp mkdir(path) do

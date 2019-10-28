@@ -43,6 +43,8 @@ defmodule AeppSdkElixir.MixProject do
       {:poison, "~> 3.0.0"},
       {:ranch, github: "ninenines/ranch", tag: "1.4.0"},
       {:hackney, "~> 1.15"},
+      {:argon2_elixir, "~> 2.0"},
+      {:uuid, "~> 1.1"},
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end

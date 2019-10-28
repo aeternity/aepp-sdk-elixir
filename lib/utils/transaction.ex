@@ -154,7 +154,7 @@ defmodule AeppSDK.Utils.Transaction do
     signature =
       Keys.sign(
         serialized_tx,
-        Keys.secret_key_to_binary(secret_key),
+        Keys.secret_key_to_binary(secret_key.()),
         network_id
       )
 
@@ -617,7 +617,7 @@ defmodule AeppSDK.Utils.Transaction do
         signature =
           Keys.sign(
             serialized_tx,
-            Keys.secret_key_to_binary(secret_key),
+            Keys.secret_key_to_binary(secret_key.()),
             network_id
           )
 

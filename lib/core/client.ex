@@ -25,7 +25,7 @@ defmodule AeppSDK.Client do
           gas_price: non_neg_integer()
         }
 
-  @type keypair :: %{public: String.t(), secret: String.t()}
+  @type keypair :: %{public: String.t(), secret: fun()}
 
   plug(Tesla.Middleware.Headers, [{"User-Agent", "Elixir"}])
   plug(Tesla.Middleware.EncodeJson)
@@ -59,7 +59,7 @@ defmodule AeppSDK.Client do
           ]
         },
         keypair: %{
-          secret: "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61",
+          secret: #Function<1.83545712/0 in AeppSDK.Client.new/5>,
           public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
         },
         network_id: "ae_uat"
@@ -79,7 +79,7 @@ defmodule AeppSDK.Client do
     internal_connection = Connection.new(internal_url)
 
     %Client{
-      keypair: keypair,
+      keypair: %{keypair | secret: fn -> secret_key end},
       network_id: network_id,
       connection: connection,
       internal_connection: internal_connection,
