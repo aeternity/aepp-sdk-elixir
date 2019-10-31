@@ -10,6 +10,7 @@ Ensure that you have [Elixir](https://elixir-lang.org/install.html) and [wget](h
 ```
 git clone https://github.com/aeternity/aepp-sdk-elixir
 mix build_api v1.2.0-elixir v5.0.1
+mix build_middleware v1.2.0-elixir develop
 ```
 Where:
  - `v1.2.0-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.

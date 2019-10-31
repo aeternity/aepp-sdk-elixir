@@ -59,19 +59,13 @@ defmodule AeppSdkElixir.MixProject do
   end
 
   defp aliases do
-    [build_api: &build_api/1]
+    [build_api: &build_api/1, build_middleware: &build_middleware/1]
   end
 
   defp build_api([generator_version, api_specification_version]) do
     Enum.each(
       [
-        {"wget",
-         [
-           "--verbose",
-           "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{
-             get_file_name(:generator)
-           }-#{generator_version}-ubuntu-x86_64.tar.gz"
-         ]},
+        get_generator(generator_version),
         {"wget",
          [
            "--verbose",
@@ -103,11 +97,56 @@ defmodule AeppSdkElixir.MixProject do
     )
   end
 
+  defp build_middleware([generator_version, middleware_version]) do
+    Enum.each(
+      [
+        get_generator(generator_version),
+        {"wget",
+         [
+           "--verbose",
+           "https://raw.githubusercontent.com/aeternity/aepp-middleware/#{middleware_version}/swagger/#{
+             get_file_name(:specification)
+           }.json"
+         ]},
+        {"tar",
+         ["zxvf", "#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
+        {"rm", ["#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
+        {"java",
+         [
+           "-jar",
+           "./#{get_file_name(:generator)}.jar",
+           "generate",
+           "--skip-validate-spec",
+           "-i",
+           "./#{get_file_name(:specification)}.json",
+           "-g",
+           "elixir",
+           "-o",
+           "./lib/middleware/"
+         ]},
+        {"mix", ["format"]},
+        {"rm", ["-f", "#{get_file_name(:generator)}.jar"]},
+        {"rm", ["-f", "#{get_file_name(:specification)}.json"]}
+      ],
+      fn {com, args} -> System.cmd(com, args) end
+    )
+  end
+
   defp get_file_name(:specification) do
     "swagger"
   end
 
   defp get_file_name(:generator) do
     "openapi-generator-cli"
+  end
+
+  defp get_generator(generator_version) do
+    {"wget",
+     [
+       "--verbose",
+       "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{
+         get_file_name(:generator)
+       }-#{generator_version}-ubuntu-x86_64.tar.gz"
+     ]}
   end
 end
