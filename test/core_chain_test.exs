@@ -1,7 +1,7 @@
 defmodule CoreChainTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Chain, Client, Contract, Account}
+  alias AeppSDK.{Account, Chain, Client, Contract}
   alias Tesla.Env
 
   setup_all do
