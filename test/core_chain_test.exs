@@ -1,7 +1,7 @@
 defmodule CoreChainTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Chain, Client, Contract}
+  alias AeppSDK.{Chain, Client, Contract, Account}
   alias Tesla.Env
 
   setup_all do
@@ -17,6 +17,20 @@ defmodule CoreChainTest do
         "http://localhost:3113/v2"
       )
 
+    public_key = "ak_jQGc3ECvnQYDZY3i97WSHPigL9tTaVEz1oLBW5J4F1JTKS1g7"
+
+    secret_key =
+      "24865931054474805885eec12497ee398bc39bc26917c190ed435e3cd1fa954e6046ef581eef749d492360b1542c7be997b5ddca0d2e510a4312b217998bfc74"
+
+    network_id = "ae_uat"
+    url = "https://sdk-testnet.aepps.com/v2"
+    internal_url = "https://sdk-testnet.aepps.com/v2"
+
+    testnet_client =
+      Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url,
+        gas_price: 1_000_000_000
+      )
+
     source_code = "contract Identity =
         datatype event = AddedNumberEvent(indexed int, string)
 
@@ -29,7 +43,7 @@ defmodule CoreChainTest do
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
 
-    [client: client, source_code: source_code]
+    [client: client, source_code: source_code, testnet_client: testnet_client]
   end
 
   @tag :travis_test
@@ -40,6 +54,12 @@ defmodule CoreChainTest do
     {:ok, height} = height_result
     assert :ok == Chain.await_height(setup_data.client, height)
     assert :ok == Chain.await_height(setup_data.client, height + 1)
+  end
+
+  @tag :testnet
+  test "testnet named account spend operation", setup_data do
+    testnet_name = "a1234567890aseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef.chain"
+    assert {:ok, _tx_info} = Account.spend(setup_data.testnet_client, testnet_name, 10_000)
   end
 
   @tag :travis_test
