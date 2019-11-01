@@ -5,9 +5,11 @@ defmodule AeppSDK.Account do
    In order for its functions to be used, a client must be defined first.
    Client example can be found at: `AeppSDK.Client.new/4`
   """
-  alias AeppSDK.Client
+  alias AeppSDK.{AENS, Client}
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.{Encoding, Transaction}
+
+  alias AeppMiddleware.Api.Default, as: Middleware
 
   alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -38,7 +40,7 @@ defmodule AeppSDK.Account do
         tx_hash: "th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4"
       }}
   """
-  @spec spend(Client.t(), binary(), non_neg_integer(), spend_options()) ::
+  @spec spend(Client.t(), String.t(), non_neg_integer(), spend_options()) ::
           {:ok,
            %{
              block_hash: Encoding.base58c(),
@@ -54,16 +56,18 @@ defmodule AeppSDK.Account do
           },
           connection: connection,
           network_id: network_id,
+          middleware: middleware,
           gas_price: gas_price
         } = client,
-        <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
+        recipient,
         amount,
         opts \\ []
       )
-      when recipient_prefix in @allowed_recipient_tags and sender_prefix == "ak" do
+      when sender_prefix == "ak" do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_id),
+    with {:ok, recipient_id} <- process_recipient_id(recipient, middleware),
+         {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_id),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
            struct(
@@ -247,5 +251,27 @@ defmodule AeppSDK.Account do
 
   defp prepare_result({:error, _} = error) do
     error
+  end
+
+  defp process_recipient_id(
+         <<recipient_prefix::binary-size(@prefix_byte_size), _::binary>> = recipient_id,
+         _middleware
+       )
+       when recipient_prefix in @allowed_recipient_tags do
+    {:ok, recipient_id}
+  end
+
+  defp process_recipient_id(recipient_id, middleware) when is_binary(recipient_id) do
+    case AENS.validate_name(recipient_id) do
+      {:ok, name} ->
+        case Middleware.search_name(middleware, name) do
+          {:ok, [%{owner: owner}]} -> {:ok, owner}
+          {:ok, []} -> {:error, "#{__MODULE__}: No owner found"}
+          _ -> {:error, "#{__MODULE__}:Could not connect to middleware"}
+        end
+
+      {:error, _} = err ->
+        err
+    end
   end
 end

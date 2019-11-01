@@ -98,7 +98,6 @@ defmodule AeppSdkElixir.MixProject do
        "generate",
        "--skip-validate-spec",
        "-i",
-       # swagger.json
        "./#{get_file_name(:specification)}.yaml",
        "-g",
        "elixir",
@@ -115,7 +114,6 @@ defmodule AeppSdkElixir.MixProject do
        "generate",
        "--skip-validate-spec",
        "-i",
-       # swagger.json
        "./#{get_file_name(:specification)}.json",
        "-g",
        "elixir",
