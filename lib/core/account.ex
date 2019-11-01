@@ -267,11 +267,15 @@ defmodule AeppSDK.Account do
         case Middleware.search_name(middleware, name) do
           {:ok, [%{owner: owner}]} -> {:ok, owner}
           {:ok, []} -> {:error, "#{__MODULE__}: No owner found"}
-          _ -> {:error, "#{__MODULE__}:Could not connect to middleware"}
+          _ -> {:error, "#{__MODULE__}: Could not connect to middleware"}
         end
 
       {:error, _} = err ->
         err
     end
+  end
+
+  defp process_recipient_id(recipient, _) do
+    {:error, "#{__MODULE__}: Invalid recipient key/name: #{inspect(recipient)}"}
   end
 end
