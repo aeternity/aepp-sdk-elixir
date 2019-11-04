@@ -1,9 +1,9 @@
 defmodule AeppSDK.Account do
   @moduledoc """
-   High-level module for Account-related activities.
+  High-level module for Account-related activities.
 
-   In order for its functions to be used, a client must be defined first.
-   Client example can be found at: `AeppSDK.Client.new/4`
+  In order for its functions to be used, a client must be defined first.
+  Client example can be found at: `AeppSDK.Client.new/4`
   """
   alias AeppSDK.{AENS, Client}
   alias AeppSDK.Utils.Account, as: AccountUtils
