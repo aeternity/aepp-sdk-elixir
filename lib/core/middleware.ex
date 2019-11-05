@@ -6,7 +6,7 @@ defmodule AeppSDK.Middleware do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-  alias AeppMiddleware.Api.Default, as: Middleware
+  alias AeppMiddleware.Api.Default, as: MiddlewareAPI
   alias AeppSDK.Client
 
   @doc """
@@ -24,7 +24,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_active_channels(Client.t()) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def get_active_channels(%Client{middleware: connection}) do
-    Middleware.get_active_channels(connection)
+    MiddlewareAPI.get_active_channels(connection)
   end
 
   @doc """
@@ -58,7 +58,7 @@ defmodule AeppSDK.Middleware do
   @spec get_active_name_auctions(Client.t(), list()) ::
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_active_name_auctions(%Client{middleware: connection}, opts \\ []) do
-    Middleware.get_active_name_auctions(connection, opts)
+    MiddlewareAPI.get_active_name_auctions(connection, opts)
   end
 
   @doc """
@@ -71,7 +71,7 @@ defmodule AeppSDK.Middleware do
   @spec get_active_name_auctions_count(Client.t(), list()) ::
           {:ok, map()} | {:error, Tesla.Env.t()}
   def get_active_name_auctions_count(%Client{middleware: connection}, opts \\ []) do
-    Middleware.get_active_name_auctions_count(connection, opts)
+    MiddlewareAPI.get_active_name_auctions_count(connection, opts)
   end
 
   @doc """
@@ -120,7 +120,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_active_names(Client.t(), list()) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def get_active_names(%Client{middleware: connection}, opts \\ []) do
-    Middleware.get_active_names(connection, opts)
+    MiddlewareAPI.get_active_names(connection, opts)
   end
 
   @doc """
@@ -145,6 +145,7 @@ defmodule AeppSDK.Middleware do
             contract_id: "ct_2ofvJh4ZpGLJdB25cGit41bC42vcKbC5vi8T9Js6EREe24RbfN",
             transaction_hash: "th_3tX9UJPzaeBMgQf4UziNXkHfCNaBb79YqUKjnv8Sv5r4TjE56"
           },
+          %{block_height: 162696, ...},
           %{...},
           ...
         ]
@@ -152,7 +153,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_all_contracts(Client.t()) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def get_all_contracts(%Client{middleware: connection}) do
-    Middleware.get_all_contracts(connection)
+    MiddlewareAPI.get_all_contracts(connection)
   end
 
   @doc """
@@ -201,7 +202,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_all_names(Client.t(), list()) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def get_all_names(%Client{middleware: connection}, opts \\ []) do
-    Middleware.get_all_names(connection, opts)
+    MiddlewareAPI.get_all_names(connection, opts)
   end
 
   @doc """
@@ -271,7 +272,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_all_oracles(Client.t(), list) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def get_all_oracles(%Client{middleware: connection}, opts \\ []) do
-    Middleware.get_all_oracles(connection, opts)
+    MiddlewareAPI.get_all_oracles(connection, opts)
   end
 
   @doc """
@@ -283,7 +284,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_chain_size(Client.t()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_chain_size(%Client{middleware: connection}) do
-    Middleware.get_chain_size(connection)
+    MiddlewareAPI.get_chain_size(connection)
   end
 
   @doc """
@@ -321,7 +322,7 @@ defmodule AeppSDK.Middleware do
   @spec get_channel_txs(AeppSDK.Client.t(), String.t()) ::
           {:ok, map()} | {:error, Tesla.Env.t()}
   def get_channel_txs(%Client{middleware: connection}, <<"ch_", _::binary>> = channel_id) do
-    Middleware.get_channel_tx(connection, channel_id)
+    MiddlewareAPI.get_channel_tx(connection, channel_id)
   end
 
   @doc """
@@ -333,7 +334,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_compilers(Client.t()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_compilers(%Client{middleware: connection}) do
-    Middleware.get_compilers(connection)
+    MiddlewareAPI.get_compilers(connection)
   end
 
   @doc """
@@ -349,7 +350,7 @@ defmodule AeppSDK.Middleware do
         %Client{middleware: connection},
         <<"ct_", _::binary>> = contract_id
       ) do
-    Middleware.get_contract_address_calls(connection, contract_id)
+    MiddlewareAPI.get_contract_address_calls(connection, contract_id)
   end
 
   @doc """
@@ -387,7 +388,7 @@ defmodule AeppSDK.Middleware do
   @spec get_contract_tx(Client.t(), String.t()) ::
           {:ok, map()} | {:error, Tesla.Env.t()}
   def get_contract_tx(%Client{middleware: connection}, <<"ct_", _::binary>> = contract_id) do
-    Middleware.get_contract_tx(connection, contract_id)
+    MiddlewareAPI.get_contract_tx(connection, contract_id)
   end
 
   @doc """
@@ -399,7 +400,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_current_tx_count(Client.t()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_current_tx_count(%Client{middleware: connection}) do
-    Middleware.get_current_tx_count(connection)
+    MiddlewareAPI.get_current_tx_count(connection)
   end
 
   @doc """
@@ -466,7 +467,7 @@ defmodule AeppSDK.Middleware do
           {:ok, map()} | {:error, Tesla.Env.t()}
   def get_generations_by_range(%Client{middleware: connection}, from, to, opts \\ [])
       when is_integer(from) and is_integer(to) do
-    Middleware.get_generations_by_range(connection, from, to, opts)
+    MiddlewareAPI.get_generations_by_range(connection, from, to, opts)
   end
 
   @doc """
@@ -479,7 +480,7 @@ defmodule AeppSDK.Middleware do
   @spec get_height_by_time(AeppSDK.Client.t(), integer) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_height_by_time(%Client{middleware: connection}, milliseconds)
       when is_integer(milliseconds) do
-    Middleware.get_height_by_time(connection, milliseconds)
+    MiddlewareAPI.get_height_by_time(connection, milliseconds)
   end
 
   @doc """
@@ -492,7 +493,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_middleware_status(AeppSDK.Client.t()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_middleware_status(%Client{middleware: connection}) do
-    Middleware.get_mdw_status(connection)
+    MiddlewareAPI.get_mdw_status(connection)
   end
 
   @doc """
@@ -562,7 +563,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_name_auctions_bids_by_address(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-    Middleware.get_name_auctions_bidsby_address(connection, account, opts)
+    MiddlewareAPI.get_name_auctions_bidsby_address(connection, account, opts)
   end
 
   @doc """
@@ -597,7 +598,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_name_auctions_bids_by_name(%Client{middleware: connection}, name, opts \\ [])
       when is_binary(name) do
-    Middleware.get_name_auctions_bidsby_name(connection, name, opts)
+    MiddlewareAPI.get_name_auctions_bidsby_name(connection, name, opts)
   end
 
   @doc """
@@ -658,7 +659,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_name_by_address(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-    Middleware.get_name_by_address(connection, account, opts)
+    MiddlewareAPI.get_name_by_address(connection, account, opts)
   end
 
   @doc """
@@ -706,7 +707,7 @@ defmodule AeppSDK.Middleware do
         <<"ok_", _::binary>> = oracle_id,
         opts \\ []
       ) do
-    Middleware.get_oracle_data(connection, oracle_id, opts)
+    MiddlewareAPI.get_oracle_data(connection, oracle_id, opts)
   end
 
   @doc """
@@ -725,7 +726,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_reward_at_height(Client.t(), integer()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_reward_at_height(%Client{middleware: connection}, height) when is_integer(height) do
-    Middleware.get_reward_at_height(connection, height)
+    MiddlewareAPI.get_reward_at_height(connection, height)
   end
 
   @doc """
@@ -737,7 +738,7 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_size_at_height(Client.t(), integer()) :: {:ok, map()} | {:error, Tesla.Env.t()}
   def get_size_at_height(%Client{middleware: connection}, height) when is_integer(height) do
-    Middleware.get_size_at_height(connection, height)
+    MiddlewareAPI.get_size_at_height(connection, height)
   end
 
   @doc """
@@ -786,11 +787,11 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_tx_between_address(%Client{middleware: connection}, sender, receiver)
       when is_binary(sender) and is_binary(receiver) do
-    Middleware.get_tx_between_address(connection, sender, receiver)
+    MiddlewareAPI.get_tx_between_address(connection, sender, receiver)
   end
 
   @doc """
-  Get transaction by given account
+  Get transaction by given account.
 
   ## Example
       iex> AeppSDK.Middleware.get_tx_by_account(client, client.keypair.public)
@@ -836,20 +837,41 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, Tesla.Env.t()}
   def get_tx_by_account(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-    Middleware.get_tx_by_account(connection, account, opts)
+    MiddlewareAPI.get_tx_by_account(connection, account, opts)
   end
 
   @doc """
   Gets all transactions in between the given generation range.
 
   ## Example
-  #TODO tomorrow
+      iex> AeppSDK.Middleware.get_tx_by_generation_range(client, 162_028, 162_029)
+      {:ok,
+        %{
+          transactions: [
+            %{
+              block_hash: "mh_S2PaFf54rfoDWKpCnTRG2M7mkoLh9QwMSuRsuW11QtaXHrjUU",
+              block_height: 162028,
+              hash: "th_WrqJ572JPhr1pGZWUx79y7r43cvae242fFb3ERH2FfUUR2hAw",
+              signatures: ["sg_TnTp3pCmFEGDU3vfwE8j91rakHFzXsPgu7jYnmwE6wXzY6WQ29wjktejUreWDrgKCfTDR3nafFLPL3fx66KzjGQBYtgnw"],
+              tx: %{
+                amount: 20000,
+                fee: 19320000000000,
+                nonce: 731793,
+                payload: "ba_MTYyMDI4OmtoXzJxSFRQSlRrSnBGUDRidVlaR2t0dEc2QnQya29IbkR1ZkVnc3UxNVdIRDIxUDlXcnV6Om1oX1pKTW95OWJ3a3V5SlVZR2dFMVlveUNRQlpxcE5RR3d3VXg1QnlCdnNQZWRBYmVReVg6MTU3MjYwOTg3OJ7BQuw=",
+                recipient_id: "ak_2MNyoyers8hsh9gEHtoP7KNHC3ycs7RcVnK2udeb3ytqUD2TpC",
+                sender_id: "ak_2MNyoyers8hsh9gEHtoP7KNHC3ycs7RcVnK2udeb3ytqUD2TpC",
+                ttl: 162038,
+                type: "SpendTx",
+                version: 1
+              }
+            },...]}
+      }
   """
   @spec get_tx_by_generation_range(Client.t(), integer(), integer(), list()) ::
-          {:ok, list()} | {:error, Tesla.Env.t()}
+          {:ok, map()} | {:error, Tesla.Env.t()}
   def get_tx_by_generation_range(%Client{middleware: connection}, from, to, opts \\ [])
       when is_integer(from) and is_integer(to) do
-    Middleware.get_tx_between_address(connection, from, to, opts)
+    MiddlewareAPI.get_tx_by_generation_range(connection, from, to, opts)
   end
 
   @doc """
@@ -863,20 +885,21 @@ defmodule AeppSDK.Middleware do
           {:ok, map()} | {:error, Tesla.Env.t()}
   def get_tx_count_by_address(%Client{middleware: connection}, address, opts \\ [])
       when is_binary(address) do
-    Middleware.get_tx_count_by_address(connection, address, opts)
+    MiddlewareAPI.get_tx_count_by_address(connection, address, opts)
   end
 
   @doc """
   Gets transaction rate by provided date range.
 
   ## Example
-
-  #TODO should be added tomorrow
+      iex()> AeppSDK.Middleware.get_tx_rate_by_date_range(client, "20191103", "20191105")
+      {:ok, [%{amount: "55200300000676980000", count: 33866, date: "2019-11-04"}]}
   """
-  @spec get_tx_rate_by_date_range(Client.t(), integer(), integer()) :: none
+  @spec get_tx_rate_by_date_range(Client.t(), String.t(), String.t()) ::
+          {:ok, list()} | {:error, Tesla.Env.t()}
   def get_tx_rate_by_date_range(%Client{middleware: connection}, from, to)
-      when is_integer(from) and is_integer(to) do
-    Middleware.get_tx_rate_by_date_range(connection, from, to)
+      when is_binary(from) and is_binary(to) do
+    MiddlewareAPI.get_tx_rate_by_date_range(connection, from, to)
   end
 
   @doc """
@@ -900,17 +923,18 @@ defmodule AeppSDK.Middleware do
   """
   @spec search_name(Client.t(), String.t()) :: {:ok, list()} | {:error, Tesla.Env.t()}
   def search_name(%Client{middleware: connection}, name) when is_binary(name) do
-    Middleware.search_name(connection, name)
+    MiddlewareAPI.search_name(connection, name)
   end
 
   @doc """
   Verify a contract by submitting the source, compiler version and contract identifier.
 
   ## Example
-  #TODO Tomorrow  AeppSDK.Middleware.verify_contract client, body: %{contract_id: "ct_mBpDYtSPVANfymGUfo55fciHBrX7X9SvwWxVZqrKLtC1zapfW", source: source, compiler: "4.0.0"}
+      iex> AeppSDK.Middleware.verify_contract(client, contract: %{contract_id: "ct_2GAmeEZbVzuTE9rzWeVx7sJnTUSYdx13P3x2rCDruG5AYMM639", source: "contract Identity =
+  entrypoint main(x : int) = x", compiler: "4.0.0"})
   """
   @spec verify_contract(Client.t(), list()) :: {:ok, nil} | {:error, Tesla.Env.t()}
   def verify_contract(%Client{middleware: connection}, opts \\ []) do
-    Middleware.verify_contract(connection, opts)
+    MiddlewareAPI.verify_contract(connection, opts)
   end
 end

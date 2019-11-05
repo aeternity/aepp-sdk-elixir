@@ -21,7 +21,7 @@ defmodule AeppSDK.Client do
   @type t :: %Client{
           keypair: keypair(),
           network_id: String.t(),
-          middleware: String.t(),
+          middleware: struct(),
           connection: struct(),
           internal_connection: struct(),
           gas_price: non_neg_integer()

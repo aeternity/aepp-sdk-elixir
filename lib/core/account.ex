@@ -5,11 +5,9 @@ defmodule AeppSDK.Account do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`
   """
-  alias AeppSDK.{AENS, Client}
+  alias AeppSDK.{AENS, Client, Middleware}
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.{Encoding, Transaction}
-
-  alias AeppMiddleware.Api.Default, as: Middleware
 
   alias AeternityNode.Api.Account, as: AccountApi
   alias AeternityNode.Api.Chain, as: ChainApi
@@ -56,7 +54,6 @@ defmodule AeppSDK.Account do
           },
           connection: connection,
           network_id: network_id,
-          middleware: middleware,
           gas_price: gas_price
         } = client,
         recipient,
@@ -66,7 +63,7 @@ defmodule AeppSDK.Account do
       when sender_prefix == "ak" do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, recipient_id} <- process_recipient(recipient, middleware),
+    with {:ok, recipient_id} <- process_recipient(recipient, client),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(client, sender_id),
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          %SpendTx{} = spend_tx <-
@@ -261,10 +258,10 @@ defmodule AeppSDK.Account do
     {:ok, recipient_id}
   end
 
-  defp process_recipient(recipient_id, middleware) when is_binary(recipient_id) do
+  defp process_recipient(recipient_id, client) when is_binary(recipient_id) do
     case AENS.validate_name(recipient_id) do
       {:ok, name} ->
-        case Middleware.search_name(middleware, name) do
+        case Middleware.search_name(client, name) do
           {:ok, [%{owner: owner}]} -> {:ok, owner}
           {:ok, []} -> {:error, "#{__MODULE__}: No owner found"}
           _ -> {:error, "#{__MODULE__}: Could not connect to middleware"}
