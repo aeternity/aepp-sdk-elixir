@@ -57,5 +57,5 @@ script:
   - mix format --check-formatted
   - mix compile --warnings-as-errors
   - mix compile.xref --warnings-as-errors
-  - mix credo
+  - mix credo --strict
   - mix coveralls -u --exclude disabled
