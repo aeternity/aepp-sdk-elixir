@@ -90,7 +90,14 @@ defmodule AeppSDK.Client do
       case network_id do
         "ae_uat" -> "https://testnet.aeternal.io/middleware"
         "ae_mainnet" -> "https://mainnet.aeternal.io/middleware"
-        _ -> Keyword.get(opts, :middleware, "")
+        _ -> Keyword.get(opts, :middleware, :no_middleware)
+      end
+
+    build_middleware =
+      if middleware != :no_middleware do
+        Connection.new(middleware)
+      else
+        :no_middleware
       end
 
     connection = Connection.new(url)
@@ -99,7 +106,7 @@ defmodule AeppSDK.Client do
     %Client{
       keypair: %{keypair | secret: fn -> secret_key end},
       network_id: network_id,
-      middleware: Connection.new(middleware),
+      middleware: build_middleware,
       connection: connection,
       internal_connection: internal_connection,
       gas_price: Keyword.get(opts, :gas_price, @default_gas_price)

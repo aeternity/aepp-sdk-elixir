@@ -8,6 +8,7 @@ defmodule AeppSDK.Middleware do
   """
   alias AeppMiddleware.Api.Default, as: MiddlewareAPI
   alias AeppSDK.Client
+  alias Tesla.Client, as: TeslaClient
 
   @doc """
   Gets currently active channels.
@@ -23,9 +24,11 @@ defmodule AeppSDK.Middleware do
       }
   """
   @spec get_active_channels(Client.t()) :: {:ok, list()} | {:error, String.t()}
-  def get_active_channels(%Client{middleware: connection}) do
+  def get_active_channels(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_active_channels(connection))
   end
+
+  def get_active_channels(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets currently active name auctions.
@@ -57,9 +60,13 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_active_name_auctions(Client.t(), list()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_active_name_auctions(%Client{middleware: connection}, opts \\ []) do
+  def get_active_name_auctions(client, opts \\ [])
+
+  def get_active_name_auctions(%Client{middleware: %TeslaClient{} = connection}, opts) do
     process_result(MiddlewareAPI.get_active_name_auctions(connection, opts))
   end
+
+  def get_active_name_auctions(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets the count of  currently active name auctions.
@@ -70,9 +77,13 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_active_name_auctions_count(Client.t(), list()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_active_name_auctions_count(%Client{middleware: connection}, opts \\ []) do
+  def get_active_name_auctions_count(client, opts \\ [])
+
+  def get_active_name_auctions_count(%Client{middleware: %TeslaClient{} = connection}, opts) do
     process_result(MiddlewareAPI.get_active_name_auctions_count(connection, opts))
   end
+
+  def get_active_name_auctions_count(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets active names.
@@ -119,9 +130,13 @@ defmodule AeppSDK.Middleware do
         ]}
   """
   @spec get_active_names(Client.t(), list()) :: {:ok, list()} | {:error, String.t()}
-  def get_active_names(%Client{middleware: connection}, opts \\ []) do
+  def get_active_names(client, opts \\ [])
+
+  def get_active_names(%Client{middleware: %TeslaClient{} = connection}, opts) do
     process_result(MiddlewareAPI.get_active_names(connection, opts))
   end
+
+  def get_active_names(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets all contracts.
@@ -152,9 +167,11 @@ defmodule AeppSDK.Middleware do
       }
   """
   @spec get_all_contracts(Client.t()) :: {:ok, list()} | {:error, String.t()}
-  def get_all_contracts(%Client{middleware: connection}) do
+  def get_all_contracts(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_all_contracts(connection))
   end
+
+  def get_all_contracts(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets all names.
@@ -201,9 +218,13 @@ defmodule AeppSDK.Middleware do
         ]}
   """
   @spec get_all_names(Client.t(), list()) :: {:ok, list()} | {:error, String.t()}
-  def get_all_names(%Client{middleware: connection}, opts \\ []) do
+  def get_all_names(client, opts \\ [])
+
+  def get_all_names(%Client{middleware: %TeslaClient{} = connection}, opts) do
     process_result(MiddlewareAPI.get_all_names(connection, opts))
   end
+
+  def get_all_names(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets all currently active oracles.
@@ -270,10 +291,14 @@ defmodule AeppSDK.Middleware do
           }
       ]}
   """
-  @spec get_all_oracles(Client.t(), list) :: {:ok, list()} | {:error, String.t()}
-  def get_all_oracles(%Client{middleware: connection}, opts \\ []) do
+  @spec get_all_oracles(Client.t(), list()) :: {:ok, list()} | {:error, String.t()}
+  def get_all_oracles(client, opts \\ [])
+
+  def get_all_oracles(%Client{middleware: %TeslaClient{} = connection}, opts) do
     process_result(MiddlewareAPI.get_all_oracles(connection, opts))
   end
+
+  def get_all_oracles(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets current chain size.
@@ -283,9 +308,11 @@ defmodule AeppSDK.Middleware do
       {:ok, %{size: 2231715109}}
   """
   @spec get_chain_size(Client.t()) :: {:ok, map()} | {:error, String.t()}
-  def get_chain_size(%Client{middleware: connection}) do
+  def get_chain_size(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_chain_size(connection))
   end
+
+  def get_chain_size(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets channel transactions by channel id.
@@ -321,9 +348,14 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_channel_txs(Client.t(), String.t()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_channel_txs(%Client{middleware: connection}, <<"ch_", _::binary>> = channel_id) do
+  def get_channel_txs(
+        %Client{middleware: %TeslaClient{} = connection},
+        <<"ch_", _::binary>> = channel_id
+      ) do
     process_result(MiddlewareAPI.get_channel_tx(connection, channel_id))
   end
+
+  def get_channel_txs(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets currently available middleware compiler's version.
@@ -333,9 +365,11 @@ defmodule AeppSDK.Middleware do
       {:ok, %{compilers: ["4.0.0"]}}
   """
   @spec get_compilers(Client.t()) :: {:ok, map()} | {:error, String.t()}
-  def get_compilers(%Client{middleware: connection}) do
+  def get_compilers(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_compilers(connection))
   end
+
+  def get_compilers(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets contracts calls by contract id.
@@ -347,11 +381,13 @@ defmodule AeppSDK.Middleware do
   @spec get_contract_address_calls(Client.t(), String.t()) ::
           {:ok, list()} | {:error, String.t()}
   def get_contract_address_calls(
-        %Client{middleware: connection},
+        %Client{middleware: %TeslaClient{} = connection},
         <<"ct_", _::binary>> = contract_id
       ) do
     process_result(MiddlewareAPI.get_contract_address_calls(connection, contract_id))
   end
+
+  def get_contract_address_calls(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets contract tx information.
@@ -387,9 +423,14 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_contract_tx(Client.t(), String.t()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_contract_tx(%Client{middleware: connection}, <<"ct_", _::binary>> = contract_id) do
+  def get_contract_tx(
+        %Client{middleware: %TeslaClient{} = connection},
+        <<"ct_", _::binary>> = contract_id
+      ) do
     process_result(MiddlewareAPI.get_contract_tx(connection, contract_id))
   end
+
+  def get_contract_tx(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets current transactions count.
@@ -399,17 +440,17 @@ defmodule AeppSDK.Middleware do
       {:ok, %{count: 3563570}}
   """
   @spec get_current_tx_count(Client.t()) :: {:ok, map()} | {:error, String.t()}
-  def get_current_tx_count(%Client{middleware: connection}) do
+  def get_current_tx_count(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_current_tx_count(connection))
   end
+
+  def get_current_tx_count(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets generations by provided range.
 
   ## Example
-      iex()> from = 1
-      iex()> to = 3
-      iex()> AeppSDK.Middleware.get_generations_by_range(client, from, to)
+      iex()> AeppSDK.Middleware.get_generations_by_range(client, 1, 3)
       {:ok,
         %{
          data: %{
@@ -465,10 +506,14 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_generations_by_range(Client.t(), integer, integer, list()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_generations_by_range(%Client{middleware: connection}, from, to, opts \\ [])
+  def get_generations_by_range(client, from, to, opts \\ [])
+
+  def get_generations_by_range(%Client{middleware: %TeslaClient{} = connection}, from, to, opts)
       when is_integer(from) and is_integer(to) do
     process_result(MiddlewareAPI.get_generations_by_range(connection, from, to, opts))
   end
+
+  def get_generations_by_range(%Client{middleware: :no_middleware}, _, _, _), do: no_middleware()
 
   @doc """
   Gets height by provided timestamp in milliseconds.
@@ -478,10 +523,12 @@ defmodule AeppSDK.Middleware do
       {:ok, %{height: 163532}}
   """
   @spec get_height_by_time(Client.t(), integer) :: {:ok, map()} | {:error, String.t()}
-  def get_height_by_time(%Client{middleware: connection}, milliseconds)
+  def get_height_by_time(%Client{middleware: %TeslaClient{} = connection}, milliseconds)
       when is_integer(milliseconds) do
     process_result(MiddlewareAPI.get_height_by_time(connection, milliseconds))
   end
+
+  def get_height_by_time(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets current middleware status.
@@ -492,9 +539,11 @@ defmodule AeppSDK.Middleware do
         %{OK: true, queue_length: 0, seconds_since_last_block: 178, version: "0.10.0"}}
   """
   @spec get_middleware_status(Client.t()) :: {:ok, map()} | {:error, String.t()}
-  def get_middleware_status(%Client{middleware: connection}) do
+  def get_middleware_status(%Client{middleware: %TeslaClient{} = connection}) do
     process_result(MiddlewareAPI.get_mdw_status(connection))
   end
+
+  def get_middleware_status(%Client{middleware: :no_middleware}), do: no_middleware()
 
   @doc """
   Gets name auction bids by address.
@@ -561,10 +610,19 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_name_auctions_bids_by_address(Client.t(), String.t(), list()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_name_auctions_bids_by_address(%Client{middleware: connection}, account, opts \\ [])
+  def get_name_auctions_bids_by_address(client, account, opts \\ [])
+
+  def get_name_auctions_bids_by_address(
+        %Client{middleware: %TeslaClient{} = connection},
+        account,
+        opts
+      )
       when is_binary(account) do
     process_result(MiddlewareAPI.get_name_auctions_bidsby_address(connection, account, opts))
   end
+
+  def get_name_auctions_bids_by_address(%Client{middleware: :no_middleware}, _, _),
+    do: no_middleware()
 
   @doc """
   Gets name auction bids by name.
@@ -596,10 +654,15 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_name_auctions_bids_by_name(Client.t(), String.t(), list()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_name_auctions_bids_by_name(%Client{middleware: connection}, name, opts \\ [])
+  def get_name_auctions_bids_by_name(client, name, opts \\ [])
+
+  def get_name_auctions_bids_by_name(%Client{middleware: %TeslaClient{} = connection}, name, opts)
       when is_binary(name) do
     process_result(MiddlewareAPI.get_name_auctions_bidsby_name(connection, name, opts))
   end
+
+  def get_name_auctions_bids_by_name(%Client{middleware: :no_middleware}, _, _),
+    do: no_middleware()
 
   @doc """
   Gets name information by account address.
@@ -657,10 +720,14 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_name_by_address(Client.t(), String.t(), list()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_name_by_address(%Client{middleware: connection}, account, opts \\ [])
+  def get_name_by_address(client, account, opts \\ [])
+
+  def get_name_by_address(%Client{middleware: %TeslaClient{} = connection}, account, opts)
       when is_binary(account) do
     process_result(MiddlewareAPI.get_name_by_address(connection, account, opts))
   end
+
+  def get_name_by_address(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Gets oracle data by oracle id.
@@ -702,13 +769,17 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_oracle_data(Client.t(), String.t(), list()) ::
           {:ok, list()} | {:error, String.t()}
+  def get_oracle_data(client, oracle_id, opts \\ [])
+
   def get_oracle_data(
-        %Client{middleware: connection},
+        %Client{middleware: %TeslaClient{} = connection},
         <<"ok_", _::binary>> = oracle_id,
-        opts \\ []
+        opts
       ) do
     process_result(MiddlewareAPI.get_oracle_data(connection, oracle_id, opts))
   end
+
+  def get_oracle_data(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Gets miner reward at given height.
@@ -725,9 +796,12 @@ defmodule AeppSDK.Middleware do
       }}
   """
   @spec get_reward_at_height(Client.t(), integer()) :: {:ok, map()} | {:error, String.t()}
-  def get_reward_at_height(%Client{middleware: connection}, height) when is_integer(height) do
+  def get_reward_at_height(%Client{middleware: %TeslaClient{} = connection}, height)
+      when is_integer(height) do
     process_result(MiddlewareAPI.get_reward_at_height(connection, height))
   end
+
+  def get_reward_at_height(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Gets size of a blockchain at given height.
@@ -737,9 +811,12 @@ defmodule AeppSDK.Middleware do
       {:ok, %{size: 1220968}}
   """
   @spec get_size_at_height(Client.t(), integer()) :: {:ok, map()} | {:error, String.t()}
-  def get_size_at_height(%Client{middleware: connection}, height) when is_integer(height) do
+  def get_size_at_height(%Client{middleware: %TeslaClient{} = connection}, height)
+      when is_integer(height) do
     process_result(MiddlewareAPI.get_size_at_height(connection, height))
   end
+
+  def get_size_at_height(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   @doc """
   Get transactions made between 2 addresses.
@@ -785,10 +862,12 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_tx_between_address(Client.t(), binary(), binary()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_tx_between_address(%Client{middleware: connection}, sender, receiver)
+  def get_tx_between_address(%Client{middleware: %TeslaClient{} = connection}, sender, receiver)
       when is_binary(sender) and is_binary(receiver) do
     process_result(MiddlewareAPI.get_tx_between_address(connection, sender, receiver))
   end
+
+  def get_tx_between_address(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Get transaction by given account.
@@ -835,10 +914,14 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_tx_by_account(Client.t(), binary, keyword) ::
           {:ok, list()} | {:error, String.t()}
-  def get_tx_by_account(%Client{middleware: connection}, account, opts \\ [])
+  def get_tx_by_account(client, account, opts \\ [])
+
+  def get_tx_by_account(%Client{middleware: %TeslaClient{} = connection}, account, opts)
       when is_binary(account) do
     process_result(MiddlewareAPI.get_tx_by_account(connection, account, opts))
   end
+
+  def get_tx_by_account(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Gets all transactions in between the given generation range.
@@ -869,10 +952,15 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_tx_by_generation_range(Client.t(), integer(), integer(), list()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_tx_by_generation_range(%Client{middleware: connection}, from, to, opts \\ [])
+  def get_tx_by_generation_range(client, from, to, opts \\ [])
+
+  def get_tx_by_generation_range(%Client{middleware: %TeslaClient{} = connection}, from, to, opts)
       when is_integer(from) and is_integer(to) do
     process_result(MiddlewareAPI.get_tx_by_generation_range(connection, from, to, opts))
   end
+
+  def get_tx_by_generation_range(%Client{middleware: :no_middleware}, _, _, _),
+    do: no_middleware()
 
   @doc """
   Gets transaction count by address.
@@ -881,12 +969,16 @@ defmodule AeppSDK.Middleware do
       iex()> AeppSDK.Middleware.get_tx_count_by_address(client, client.keypair.public)
       {:ok, %{count: 9}}
   """
-  @spec get_tx_count_by_address(Client.t(), binary, keyword) ::
+  @spec get_tx_count_by_address(Client.t(), binary(), list()) ::
           {:ok, map()} | {:error, String.t()}
-  def get_tx_count_by_address(%Client{middleware: connection}, address, opts \\ [])
+  def get_tx_count_by_address(client, address, opts \\ [])
+
+  def get_tx_count_by_address(%Client{middleware: %TeslaClient{} = connection}, address, opts)
       when is_binary(address) do
     process_result(MiddlewareAPI.get_tx_count_by_address(connection, address, opts))
   end
+
+  def get_tx_count_by_address(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Gets transaction rate by provided date range.
@@ -897,6 +989,8 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_tx_rate_by_date_range(Client.t(), String.t(), String.t()) ::
           {:ok, list()} | {:error, String.t()}
+  def get_tx_rate_by_date_range(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
+
   def get_tx_rate_by_date_range(%Client{middleware: connection}, from, to)
       when is_binary(from) and is_binary(to) do
     process_result(MiddlewareAPI.get_tx_rate_by_date_range(connection, from, to))
@@ -922,9 +1016,11 @@ defmodule AeppSDK.Middleware do
         ]}
   """
   @spec search_name(Client.t(), String.t()) :: {:ok, list()} | {:error, String.t()}
-  def search_name(%Client{middleware: connection}, name) when is_binary(name) do
+  def search_name(%Client{middleware: %TeslaClient{} = connection}, name) when is_binary(name) do
     process_result(MiddlewareAPI.search_name(connection, name))
   end
+
+  def search_name(%Client{middleware: :no_middleware}, _), do: no_middleware()
 
   defp process_result({:ok, _struct} = response) do
     response
@@ -935,6 +1031,8 @@ defmodule AeppSDK.Middleware do
   end
 
   defp process_result(res) do
-    {:error, "#{__MODULE__} Unknown Error: #{inspect(res)}"}
+    {:error, "#{__MODULE__}: Unknown Error: #{inspect(res)}"}
   end
+
+  defp no_middleware, do: {:error, "#{__MODULE__}: Middleware is not defined"}
 end
