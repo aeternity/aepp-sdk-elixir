@@ -989,12 +989,12 @@ defmodule AeppSDK.Middleware do
   """
   @spec get_tx_rate_by_date_range(Client.t(), String.t(), String.t()) ::
           {:ok, list()} | {:error, String.t()}
-  def get_tx_rate_by_date_range(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
-
-  def get_tx_rate_by_date_range(%Client{middleware: connection}, from, to)
+  def get_tx_rate_by_date_range(%Client{middleware: %TeslaClient{} = connection}, from, to)
       when is_binary(from) and is_binary(to) do
     process_result(MiddlewareAPI.get_tx_rate_by_date_range(connection, from, to))
   end
+
+  def get_tx_rate_by_date_range(%Client{middleware: :no_middleware}, _, _), do: no_middleware()
 
   @doc """
   Searches for given name.
