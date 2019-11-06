@@ -350,7 +350,7 @@ defmodule AeppSDK.Middleware do
         %Client{middleware: connection},
         <<"ct_", _::binary>> = contract_id
       ) do
-        process_result(MiddlewareAPI.get_contract_address_calls(connection, contract_id))
+    process_result(MiddlewareAPI.get_contract_address_calls(connection, contract_id))
   end
 
   @doc """
@@ -467,7 +467,7 @@ defmodule AeppSDK.Middleware do
           {:ok, map()} | {:error, String.t()}
   def get_generations_by_range(%Client{middleware: connection}, from, to, opts \\ [])
       when is_integer(from) and is_integer(to) do
-        process_result(MiddlewareAPI.get_generations_by_range(connection, from, to, opts))
+    process_result(MiddlewareAPI.get_generations_by_range(connection, from, to, opts))
   end
 
   @doc """
@@ -480,7 +480,7 @@ defmodule AeppSDK.Middleware do
   @spec get_height_by_time(Client.t(), integer) :: {:ok, map()} | {:error, String.t()}
   def get_height_by_time(%Client{middleware: connection}, milliseconds)
       when is_integer(milliseconds) do
-        process_result(MiddlewareAPI.get_height_by_time(connection, milliseconds))
+    process_result(MiddlewareAPI.get_height_by_time(connection, milliseconds))
   end
 
   @doc """
@@ -563,7 +563,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_name_auctions_bids_by_address(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-        process_result(MiddlewareAPI.get_name_auctions_bidsby_address(connection, account, opts))
+    process_result(MiddlewareAPI.get_name_auctions_bidsby_address(connection, account, opts))
   end
 
   @doc """
@@ -598,7 +598,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_name_auctions_bids_by_name(%Client{middleware: connection}, name, opts \\ [])
       when is_binary(name) do
-        process_result(MiddlewareAPI.get_name_auctions_bidsby_name(connection, name, opts))
+    process_result(MiddlewareAPI.get_name_auctions_bidsby_name(connection, name, opts))
   end
 
   @doc """
@@ -659,7 +659,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_name_by_address(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-        process_result(MiddlewareAPI.get_name_by_address(connection, account, opts))
+    process_result(MiddlewareAPI.get_name_by_address(connection, account, opts))
   end
 
   @doc """
@@ -707,7 +707,7 @@ defmodule AeppSDK.Middleware do
         <<"ok_", _::binary>> = oracle_id,
         opts \\ []
       ) do
-        process_result(MiddlewareAPI.get_oracle_data(connection, oracle_id, opts))
+    process_result(MiddlewareAPI.get_oracle_data(connection, oracle_id, opts))
   end
 
   @doc """
@@ -787,7 +787,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_tx_between_address(%Client{middleware: connection}, sender, receiver)
       when is_binary(sender) and is_binary(receiver) do
-        process_result(MiddlewareAPI.get_tx_between_address(connection, sender, receiver))
+    process_result(MiddlewareAPI.get_tx_between_address(connection, sender, receiver))
   end
 
   @doc """
@@ -837,7 +837,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_tx_by_account(%Client{middleware: connection}, account, opts \\ [])
       when is_binary(account) do
-        process_result(MiddlewareAPI.get_tx_by_account(connection, account, opts))
+    process_result(MiddlewareAPI.get_tx_by_account(connection, account, opts))
   end
 
   @doc """
@@ -871,7 +871,7 @@ defmodule AeppSDK.Middleware do
           {:ok, map()} | {:error, String.t()}
   def get_tx_by_generation_range(%Client{middleware: connection}, from, to, opts \\ [])
       when is_integer(from) and is_integer(to) do
-        process_result(MiddlewareAPI.get_tx_by_generation_range(connection, from, to, opts))
+    process_result(MiddlewareAPI.get_tx_by_generation_range(connection, from, to, opts))
   end
 
   @doc """
@@ -885,7 +885,7 @@ defmodule AeppSDK.Middleware do
           {:ok, map()} | {:error, String.t()}
   def get_tx_count_by_address(%Client{middleware: connection}, address, opts \\ [])
       when is_binary(address) do
-        process_result(MiddlewareAPI.get_tx_count_by_address(connection, address, opts))
+    process_result(MiddlewareAPI.get_tx_count_by_address(connection, address, opts))
   end
 
   @doc """
@@ -899,7 +899,7 @@ defmodule AeppSDK.Middleware do
           {:ok, list()} | {:error, String.t()}
   def get_tx_rate_by_date_range(%Client{middleware: connection}, from, to)
       when is_binary(from) and is_binary(to) do
-        process_result(MiddlewareAPI.get_tx_rate_by_date_range(connection, from, to))
+    process_result(MiddlewareAPI.get_tx_rate_by_date_range(connection, from, to))
   end
 
   @doc """
@@ -925,7 +925,6 @@ defmodule AeppSDK.Middleware do
   def search_name(%Client{middleware: connection}, name) when is_binary(name) do
     process_result(MiddlewareAPI.search_name(connection, name))
   end
-
 
   defp process_result({:ok, _struct} = response) do
     response
