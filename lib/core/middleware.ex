@@ -925,16 +925,4 @@ defmodule AeppSDK.Middleware do
   def search_name(%Client{middleware: connection}, name) when is_binary(name) do
     MiddlewareAPI.search_name(connection, name)
   end
-
-  @doc """
-  Verify a contract by submitting the source, compiler version and contract identifier.
-
-  ## Example
-      iex> AeppSDK.Middleware.verify_contract(client, contract: %{contract_id: "ct_2GAmeEZbVzuTE9rzWeVx7sJnTUSYdx13P3x2rCDruG5AYMM639", source: "contract Identity =
-  entrypoint main(x : int) = x", compiler: "4.0.0"})
-  """
-  @spec verify_contract(Client.t(), list()) :: {:ok, nil} | {:error, Tesla.Env.t()}
-  def verify_contract(%Client{middleware: connection}, opts \\ []) do
-    MiddlewareAPI.verify_contract(connection, opts)
-  end
 end
