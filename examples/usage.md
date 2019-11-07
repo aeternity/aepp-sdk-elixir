@@ -5,7 +5,7 @@ First, add **Aepp SDK Elixir** to your `mix.exs` dependencies:
 ``` elixir
 defp deps do
   [
-    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.4.0"}
+    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.0"}
   ]
 end
 ```
@@ -21,11 +21,37 @@ iex -S mix
 ```
 
 ## Usage
-#### Define a client:
-In order to use functions that require retrieving/sending data to a node, a client structure is needed, for example:
+#### Generate key pair
+In order to operate with **aeternity node**, user has to generate a key-pair.
+
+**Example:**
 ``` elixir
-public_key = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
-secret_key = "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
+%{public: _, secret: secret} = AeppSDK.Utils.Keys.generate_keypair()
+```
+
+#### Store the secret key
+Now you have to store your newly generated secret key(for security reasons). 
+
+**Example:**
+``` elixir
+password = "my_secret_password"
+AeppSDK.Utils.Keys.new_keystore(secret, password, name: "aeternity-keystore.json")
+```
+#### Read the keystore
+In order to retrieve the secret key from the keystore you have to read the keystore.
+
+**Example:**
+``` elixir
+AeppSDK.Utils.Keys.read_keystore("aeternity-keystore.json", password)
+```
+
+#### Define a client:
+In order to use functions that require retrieving/sending data to a node, a client structure is needed.
+
+**Example:**
+``` elixir
+public_key = "ak_jQGc3ECvnQYDZY3i97WSHPigL9tTaVEz1oLBW5J4F1JTKS1g7"
+secret_key = "24865931054474805885eec12497ee398bc39bc26917c190ed435e3cd1fa954e6046ef581eef749d492360b1542c7be997b5ddca0d2e510a4312b217998bfc74"
 network_id = "ae_uat"
 url = "https://sdk-testnet.aepps.com/v2"
 internal_url = "https://sdk-testnet.aepps.com/v2"
