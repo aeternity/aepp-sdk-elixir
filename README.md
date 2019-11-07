@@ -43,6 +43,7 @@ Where:
 
 ## Implemented functionality
 - **Client module**
+
 Consists of definition of a client structure and other helper functions. Client structure helps us collect and manage all data needed to perform various requests to the HTTP endpoints.
 
 - **Account module**
