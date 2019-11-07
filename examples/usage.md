@@ -21,7 +21,7 @@ iex -S mix
 ```
 
 ## Usage
-#### Generate key pair
+### Generate key-pair
 In order to operate with **aeternity node**, user has to generate a key-pair.
 
 **Example:**
@@ -29,7 +29,7 @@ In order to operate with **aeternity node**, user has to generate a key-pair.
 %{public: _, secret: secret} = AeppSDK.Utils.Keys.generate_keypair()
 ```
 
-#### Store the secret key
+### Store the secret key
 Now you have to store your newly generated secret key(for security reasons). 
 
 **Example:**
@@ -37,7 +37,7 @@ Now you have to store your newly generated secret key(for security reasons).
 password = "my_secret_password"
 AeppSDK.Utils.Keys.new_keystore(secret, password, name: "aeternity-keystore.json")
 ```
-#### Read the keystore
+### Read the keystore
 In order to retrieve the secret key from the keystore you have to read the keystore.
 
 **Example:**
@@ -45,7 +45,7 @@ In order to retrieve the secret key from the keystore you have to read the keyst
 AeppSDK.Utils.Keys.read_keystore("aeternity-keystore.json", password)
 ```
 
-#### Define a client:
+### Define a client:
 In order to use functions that require retrieving/sending data to a node, a client structure is needed.
 
 **Example:**
