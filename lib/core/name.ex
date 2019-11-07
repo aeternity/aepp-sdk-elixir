@@ -748,6 +748,33 @@ defmodule AeppSDK.AENS do
     end
   end
 
+  @doc """
+  Validates a name.
+
+  ## Example
+      iex> name = "a1234567890asdfghjkl.chain"
+      iex> AeppSDK.AENS.validate_name(name)
+      {:ok, "a1234567890asdfghjkl.chain"}
+  """
+
+  @spec validate_name(String.t()) :: {:ok, String.t()} | {:error, atom()}
+  def validate_name(name) do
+    case name_parts(name) do
+      [_label, ns_registrar] ->
+        if Enum.member?(@allowed_registrars, ns_registrar) do
+          {:ok, name}
+        else
+          {:error, :registrar_unknown}
+        end
+
+      [_name] ->
+        {:error, :no_registrar}
+
+      [_label | _namespaces] ->
+        {:error, :multiple_namespaces}
+    end
+  end
+
   defp calculate_name_fee(name) when is_binary(name) do
     case validate_name(name) do
       {:ok, _name} ->
@@ -802,23 +829,6 @@ defmodule AeppSDK.AENS do
           true -> {:error, :no_label_in_registrar}
           false -> {:ok, :erlang.list_to_binary(name_ascii)}
         end
-    end
-  end
-
-  defp validate_name(name) do
-    case name_parts(name) do
-      [_label, ns_registrar] ->
-        if Enum.member?(@allowed_registrars, ns_registrar) do
-          {:ok, name}
-        else
-          {:error, :registrar_unknown}
-        end
-
-      [_name] ->
-        {:error, :no_registrar}
-
-      [_label | _namespaces] ->
-        {:error, :multiple_namespaces}
     end
   end
 

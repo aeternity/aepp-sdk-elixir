@@ -62,42 +62,21 @@ defmodule AeppSdkElixir.MixProject do
     [build_api: &build_api/1]
   end
 
-  defp build_api([generator_version, api_specification_version]) do
+  defp build_api([generator_version, aenode_spec_vsn, middleware_spec_vsn]) do
     Enum.each(
       [
-        {"wget",
-         [
-           "--verbose",
-           "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{
-             get_file_name(:generator)
-           }-#{generator_version}-ubuntu-x86_64.tar.gz"
-         ]},
-        {"wget",
-         [
-           "--verbose",
-           "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/apps/aehttp/priv/#{
-             get_file_name(:specification)
-           }.yaml"
-         ]},
+        get_generator(generator_version),
+        get_swagger_spec(:aenode, aenode_spec_vsn),
+        get_swagger_spec(:middleware, middleware_spec_vsn),
         {"tar",
          ["zxvf", "#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
         {"rm", ["#{get_file_name(:generator)}-#{generator_version}-ubuntu-x86_64.tar.gz"]},
-        {"java",
-         [
-           "-jar",
-           "./#{get_file_name(:generator)}.jar",
-           "generate",
-           "--skip-validate-spec",
-           "-i",
-           "./#{get_file_name(:specification)}.yaml",
-           "-g",
-           "elixir",
-           "-o",
-           "./lib/aeternity_node/"
-         ]},
+        prepare_java_commands(:aenode),
+        prepare_java_commands(:middleware),
         {"mix", ["format"]},
         {"rm", ["-f", "#{get_file_name(:generator)}.jar"]},
-        {"rm", ["-f", "#{get_file_name(:specification)}.yaml"]}
+        {"rm", ["-f", "#{get_file_name(:specification)}.yaml"]},
+        {"rm", ["-f", "#{get_file_name(:specification)}.json"]}
       ],
       fn {com, args} -> System.cmd(com, args) end
     )
@@ -109,5 +88,67 @@ defmodule AeppSdkElixir.MixProject do
 
   defp get_file_name(:generator) do
     "openapi-generator-cli"
+  end
+
+  defp prepare_java_commands(:aenode) do
+    {"java",
+     [
+       "-jar",
+       "./#{get_file_name(:generator)}.jar",
+       "generate",
+       "--skip-validate-spec",
+       "-i",
+       "./#{get_file_name(:specification)}.yaml",
+       "-g",
+       "elixir",
+       "-o",
+       "./lib/aeternity_node/"
+     ]}
+  end
+
+  defp prepare_java_commands(:middleware) do
+    {"java",
+     [
+       "-jar",
+       "./#{get_file_name(:generator)}.jar",
+       "generate",
+       "--skip-validate-spec",
+       "-i",
+       "./#{get_file_name(:specification)}.json",
+       "-g",
+       "elixir",
+       "-o",
+       "./lib/middleware/"
+     ]}
+  end
+
+  defp get_generator(generator_version) do
+    {"wget",
+     [
+       "--verbose",
+       "https://github.com/aeternity/openapi-generator/releases/download/#{generator_version}/#{
+         get_file_name(:generator)
+       }-#{generator_version}-ubuntu-x86_64.tar.gz"
+     ]}
+  end
+
+  defp get_swagger_spec(:aenode, api_specification_version) do
+    {"wget",
+     [
+       "--verbose",
+       "https://raw.githubusercontent.com/aeternity/aeternity/#{api_specification_version}/apps/aehttp/priv/#{
+         get_file_name(:specification)
+       }.yaml"
+     ]}
+  end
+
+  defp get_swagger_spec(:middleware, api_specification_version) do
+    {"wget",
+     [
+       "--verbose",
+       "https://raw.githubusercontent.com/aeternity/aepp-middleware/#{api_specification_version}/swagger/#{
+         get_file_name(:specification)
+       }.json"
+     ]}
   end
 end
