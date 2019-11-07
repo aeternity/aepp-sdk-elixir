@@ -2,6 +2,7 @@
 
 Elixir SDK targeting the [æternity node](https://github.com/aeternity/aeternity) implementation.
 
+## Installation
 To start using this project, simply use source code or compiled binaries, provided in our [releases](https://github.com/aeternity/aepp-sdk-elixir/releases).
 
 Or add **Aepp SDK Elixir** to your `mix.exs` dependencies:
@@ -20,16 +21,17 @@ In order to use code from master branch:
 sudo apt-install default-jdk
 sudo apt-install maven
 ```
-2. Then, you will have to [set-up the project](https://github.com/aeternity/aepp-sdk-elixir#setup-the-project)
+2. Then, you will have to [set-up the project](https://github.com/aeternity/aepp-sdk-elixir#setup-the-project).
 
-These dependencies are used by our [OpenAPI Code Generator](https://github.com/aeternity/openapi-generator), which builds low-level API calls, needed for [Aeternity Node](https://github.com/aeternity/aeternity) and [Aeternity Middleware](https://github.com/aeternity/aepp-middleware)
+These dependencies are used by our [OpenAPI Code Generator](https://github.com/aeternity/openapi-generator), which builds low-level API calls, needed for [Aeternity Node](https://github.com/aeternity/aeternity) and [Aeternity Middleware](https://github.com/aeternity/aepp-middleware).
+
 ## Prerequisites
 **Using released versions:**
 Ensure that you have [Elixir](https://elixir-lang.org/install.html) and [wget](https://www.gnu.org/software/wget/) installed.
 
-**Using code from master/other branches**, as mentioned before, additionally, you will have to install [Java](https://java.com/en/download/help/download_options.xml) and [Maven](https://maven.apache.org/install.html)
-## Setup the project
+**Using code from master/other branches**, as mentioned before, additionally, you will have to install [Java](https://java.com/en/download/help/download_options.xml) and [Maven](https://maven.apache.org/install.html).
 
+## Setup the project
 ```
 git clone https://github.com/aeternity/aepp-sdk-elixir
 mix build_api v1.2.1-elixir v5.0.2 v0.10.0
@@ -38,9 +40,9 @@ Where:
  - `v1.2.1-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.
  - `v5.0.2` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v5.0.2/apps/aehttp/priv/swagger.yaml).
  - `v0.10.0` - Aeternity middleware API [specification file](https://github.com/aeternity/aepp-middleware/blob/v0.10.0/swagger/swagger.json).
+
 ## Implemented functionality
 - **Client module**
-
 Consists of definition of a client structure and other helper functions. Client structure helps us collect and manage all data needed to perform various requests to the HTTP endpoints.
 
 - **Account module**
