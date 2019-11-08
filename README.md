@@ -4,19 +4,11 @@ Elixir SDK targeting the [æternity node](https://github.com/aeternity/aeternity
 
 ## Installation
 To start using this project, simply use source code or compiled binaries, provided in our [releases](https://github.com/aeternity/aepp-sdk-elixir/releases).
-
-Or add **Aepp SDK Elixir** to your `mix.exs` dependencies:
-``` elixir
-defp deps do
-  [
-    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.0"}
-  ]
-end
-```
-
+## Installation as a dependency
+An installation as library, basic usage guide can be found [here](https://github.com/aeternity/aepp-sdk-elixir/tree/master/examples/usage.md).
+## Using code from master/other branches
 In order to use code from master branch:
-1. You will need **Java** and **Maven**:
-
+1. First, you will need to install **Java** and **Maven**:
 ```
 sudo apt-install default-jdk
 sudo apt-install maven
@@ -77,6 +69,3 @@ Module, which works with enoise protocol, which is used by Aeternity. Implemente
 - **Middleware high-level module**
 
 Simple high-module which performs various requests to exposed endpoints in [Aeternity Middleware](https://github.com/aeternity/aepp-middleware) project.
-
-## Usage
-An installation (as library) and basic usage guide can be found [here](https://github.com/aeternity/aepp-sdk-elixir/tree/master/examples/usage.md).
