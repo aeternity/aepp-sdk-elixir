@@ -70,7 +70,7 @@ defmodule AeppSDK.Utils.Transaction do
 
   @network_id_list ["ae_mainnet", "ae_uat"]
 
-  @await_attempts 25
+  @await_attempts 75
   @await_attempt_interval 200
   @default_ttl 0
   @dummy_fee 0
