@@ -5,8 +5,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.2">
-    <meta name="project" content="aepp_sdk_elixir v0.1.0">
-    <title>AeppSDK.Oracle — aepp_sdk_elixir v0.1.0</title>
+    <meta name="project" content="aepp_sdk_elixir v0.5.0">
+    <title>AeppSDK.Oracle — aepp_sdk_elixir v0.5.0</title>
     <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
     <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
       <script src="docs_config.js"></script>
@@ -43,7 +43,7 @@
       <a href="api-reference.html" class="sidebar-projectName">
 aepp_sdk_elixir      </a>
       <h2 class="sidebar-projectVersion">
-        v0.1.0
+        v0.5.0
       </h2>
     </div>
       <a href="api-reference.html">
@@ -67,7 +67,7 @@ aepp_sdk_elixir      </a>
     <div id="content" class="content-inner">
 
       <h1>
-        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+        <small class="app-vsn">aepp_sdk_elixir v0.5.0</small>
 AeppSDK.Oracle      </h1>
 
 
@@ -313,13 +313,13 @@ Functions          </h1>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">extend</span><span class="p" data-group-id="3978700047-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">ttl</span><span class="p" data-group-id="3978700047-1">)</span><span class="w">
-</span><span class="p" data-group-id="3978700047-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="3978700047-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">extend</span><span class="p" data-group-id="0378281326-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">ttl</span><span class="p" data-group-id="0378281326-1">)</span><span class="w">
+</span><span class="p" data-group-id="0378281326-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0378281326-3">%{</span><span class="w">
    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_21HxnSLJRhqB9S3aUfLDAqR3BMFKPj62vT1zuy1MsS7N4Ps94s&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_3911tboNbJWA6X57tejX8yGQALdeqAQECk1BwyS43pPtEXt4C&quot;</span><span class="w">
- </span><span class="p" data-group-id="3978700047-3">}</span><span class="p" data-group-id="3978700047-2">}</span></code></pre>
+ </span><span class="p" data-group-id="0378281326-3">}</span><span class="p" data-group-id="0378281326-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_oracle/2">
@@ -352,16 +352,16 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_oracle</span><span class="p" data-group-id="1283900368-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="1283900368-1">)</span><span class="w">
-</span><span class="p" data-group-id="1283900368-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="1283900368-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_oracle</span><span class="p" data-group-id="4307300037-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="4307300037-1">)</span><span class="w">
+</span><span class="p" data-group-id="4307300037-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4307300037-3">%{</span><span class="w">
    </span><span class="ss">abi_version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
    </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">query_fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
    </span><span class="ss">query_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">response_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATWiO1g==&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">77316</span><span class="w">
- </span><span class="p" data-group-id="1283900368-3">}</span><span class="p" data-group-id="1283900368-2">}</span></code></pre>
+ </span><span class="p" data-group-id="4307300037-3">}</span><span class="p" data-group-id="4307300037-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_queries/2">
@@ -399,21 +399,21 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_queries</span><span class="p" data-group-id="1386223562-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="1386223562-1">)</span><span class="w">
-</span><span class="p" data-group-id="1386223562-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="1386223562-3">[</span><span class="w">
-   </span><span class="p" data-group-id="1386223562-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_queries</span><span class="p" data-group-id="6683032831-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p" data-group-id="6683032831-1">)</span><span class="w">
+</span><span class="p" data-group-id="6683032831-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6683032831-3">[</span><span class="w">
+   </span><span class="p" data-group-id="6683032831-4">%{</span><span class="w">
      </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
      </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1386223562-5">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="1386223562-5">}</span><span class="p">,</span><span class="w">
+     </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6683032831-5">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="6683032831-5">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">query_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">83952</span><span class="p">,</span><span class="w">
      </span><span class="ss">response</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">response_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
      </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">sender_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11662</span><span class="w">
-   </span><span class="p" data-group-id="1386223562-4">}</span><span class="w">
- </span><span class="p" data-group-id="1386223562-3">]</span><span class="p" data-group-id="1386223562-2">}</span></code></pre>
+   </span><span class="p" data-group-id="6683032831-4">}</span><span class="w">
+ </span><span class="p" data-group-id="6683032831-3">]</span><span class="p" data-group-id="6683032831-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_query/3">
@@ -454,19 +454,19 @@ Functions          </h1>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">query_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_query</span><span class="p" data-group-id="9051351517-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query_id</span><span class="p" data-group-id="9051351517-1">)</span><span class="w">
-</span><span class="p" data-group-id="9051351517-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="9051351517-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">get_query</span><span class="p" data-group-id="2911530077-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query_id</span><span class="p" data-group-id="2911530077-1">)</span><span class="w">
+</span><span class="p" data-group-id="2911530077-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="2911530077-3">%{</span><span class="w">
    </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
    </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_253A8BSZqUofetC5U9DqdJfYAcF5SHi6DPr5gPPSrayP8cwSUP&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9051351517-4">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="9051351517-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2911530077-4">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="2911530077-4">}</span><span class="p">,</span><span class="w">
    </span><span class="ss">query_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">83952</span><span class="p">,</span><span class="w">
    </span><span class="ss">response</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">response_ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
    </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">sender_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11662</span><span class="w">
- </span><span class="p" data-group-id="9051351517-3">}</span><span class="p" data-group-id="9051351517-2">}</span></code></pre>
+ </span><span class="p" data-group-id="2911530077-3">}</span><span class="p" data-group-id="2911530077-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="query/6">
@@ -507,16 +507,16 @@ and that the sum of the relative query and response TTL can&#39;t be higher than
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a query&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0743473003-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000</span><span class="p" data-group-id="0743473003-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="6287998458-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000</span><span class="p" data-group-id="6287998458-1">}</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">response_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1_000</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">query</span><span class="p" data-group-id="0743473003-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="n">query_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="0743473003-2">)</span><span class="w">
-</span><span class="p" data-group-id="0743473003-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="0743473003-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">query</span><span class="p" data-group-id="6287998458-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query</span><span class="p">,</span><span class="w"> </span><span class="n">query_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="6287998458-2">)</span><span class="w">
+</span><span class="p" data-group-id="6287998458-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6287998458-4">%{</span><span class="w">
    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2SgSB1yeekq8JseSfkKhAPuvs7RF3YUjm896g4aj2GPpSa9AnJ&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
    </span><span class="ss">query_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2esUdavCBmW1oYSCichdQv3txyWXYsDSAum2jAvQfpgktJ4oEt&quot;</span><span class="w">
- </span><span class="p" data-group-id="0743473003-4">}</span><span class="p" data-group-id="0743473003-3">}</span></code></pre>
+ </span><span class="p" data-group-id="6287998458-4">}</span><span class="p" data-group-id="6287998458-3">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="register/6">
@@ -557,16 +557,16 @@ The query and response types are sophia types.</p>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">query_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;string&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">response_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;map(string, string)&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">oracle_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5074501505-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10_000</span><span class="p" data-group-id="5074501505-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">oracle_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8718328865-1">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10_000</span><span class="p" data-group-id="8718328865-1">}</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">query_fee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">register</span><span class="p" data-group-id="5074501505-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">query_format</span><span class="p">,</span><span class="w"> </span><span class="n">response_format</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">query_fee</span><span class="p" data-group-id="5074501505-2">)</span><span class="w">
-</span><span class="p" data-group-id="5074501505-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="5074501505-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">register</span><span class="p" data-group-id="8718328865-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">query_format</span><span class="p">,</span><span class="w"> </span><span class="n">response_format</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_ttl</span><span class="p">,</span><span class="w"> </span><span class="n">query_fee</span><span class="p" data-group-id="8718328865-2">)</span><span class="w">
+</span><span class="p" data-group-id="8718328865-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="8718328865-4">%{</span><span class="w">
     </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_5zfVXCDwsBRjukTPjKRaS7T3TCc4Mn5PMTS19cWbcjRjeXjcF&quot;</span><span class="p">,</span><span class="w">
     </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
     </span><span class="ss">oracle_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="p">,</span><span class="w">
     </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_21qrcDco5fL1cuaNqM1Ug1ojHiSzjnuEYzVEpwxVwuS2V95qBk&quot;</span><span class="w">
-  </span><span class="p" data-group-id="5074501505-4">}</span><span class="p" data-group-id="5074501505-3">}</span></code></pre>
+  </span><span class="p" data-group-id="8718328865-4">}</span><span class="p" data-group-id="8718328865-3">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="respond/6">
@@ -605,16 +605,16 @@ The query and response types are sophia types.</p>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">query_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5172721025-1">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="s">&quot;response&quot;</span><span class="p" data-group-id="5172721025-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5172721025-2">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000</span><span class="p" data-group-id="5172721025-2">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0385968736-1">%{</span><span class="s">&quot;a&quot;</span><span class="w"> </span><span class="o">=</span><span class="o">&gt;</span><span class="w"> </span><span class="s">&quot;response&quot;</span><span class="p" data-group-id="0385968736-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">query_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0385968736-2">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:relative</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000</span><span class="p" data-group-id="0385968736-2">}</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">response_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1_000</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">respond</span><span class="p" data-group-id="5172721025-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query_id</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="5172721025-3">)</span><span class="w">
-</span><span class="p" data-group-id="5172721025-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="5172721025-5">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Oracle</span><span class="o">.</span><span class="n">respond</span><span class="p" data-group-id="0385968736-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">oracle_id</span><span class="p">,</span><span class="w"> </span><span class="n">query_id</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">response_ttl</span><span class="p" data-group-id="0385968736-3">)</span><span class="w">
+</span><span class="p" data-group-id="0385968736-4">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0385968736-5">%{</span><span class="w">
    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_QTXMDn8Ln6fiBBXByXJkEeD6wq6QzQZHMVuApbouTFaqWMkSt&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">77276</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2cBk9pBEwMSD3xtYMvrsFWJ3atuGN29XQUZfKV65KYMQuPJLiV&quot;</span><span class="w">
- </span><span class="p" data-group-id="5172721025-5">}</span><span class="p" data-group-id="5172721025-4">}</span></code></pre>
+ </span><span class="p" data-group-id="0385968736-5">}</span><span class="p" data-group-id="0385968736-4">}</span></code></pre>
   </section>
 </section>
           </div>

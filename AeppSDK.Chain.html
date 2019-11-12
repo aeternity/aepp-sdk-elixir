@@ -5,8 +5,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.2">
-    <meta name="project" content="aepp_sdk_elixir v0.1.0">
-    <title>AeppSDK.Chain — aepp_sdk_elixir v0.1.0</title>
+    <meta name="project" content="aepp_sdk_elixir v0.5.0">
+    <title>AeppSDK.Chain — aepp_sdk_elixir v0.5.0</title>
     <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
     <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
       <script src="docs_config.js"></script>
@@ -43,7 +43,7 @@
       <a href="api-reference.html" class="sidebar-projectName">
 aepp_sdk_elixir      </a>
       <h2 class="sidebar-projectVersion">
-        v0.1.0
+        v0.5.0
       </h2>
     </div>
       <a href="api-reference.html">
@@ -67,7 +67,7 @@ aepp_sdk_elixir      </a>
     <div id="content" class="content-inner">
 
       <h1>
-        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+        <small class="app-vsn">aepp_sdk_elixir v0.5.0</small>
 AeppSDK.Chain      </h1>
 
 
@@ -547,7 +547,7 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">await_height</span><span class="p" data-group-id="0090137102-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="mi">84_590</span><span class="p" data-group-id="0090137102-1">)</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">await_height</span><span class="p" data-group-id="2175753071-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="mi">84_590</span><span class="p" data-group-id="2175753071-1">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -572,7 +572,7 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">transaction_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_232gp9o5Lm1XZ8SMaDCAnLcvyj2CkDkf5tssfD5yVAoFAnPBm7&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">await_transaction</span><span class="p" data-group-id="2773595754-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">transaction_hash</span><span class="p" data-group-id="2773595754-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">await_transaction</span><span class="p" data-group-id="0575214935-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">transaction_hash</span><span class="p" data-group-id="0575214935-1">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -595,34 +595,34 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">transactions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="2958627703-1">[</span><span class="s">&quot;tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw==&quot;</span><span class="p" data-group-id="2958627703-1">]</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">accounts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="2958627703-2">[</span><span class="w">
-                  </span><span class="p" data-group-id="2958627703-3">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">transactions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7030886476-1">[</span><span class="s">&quot;tx_+N8rAaEBC7TteSf5e1HhvLXhNA0SM1sqKxLIvFIh1jxLyznUHmGCIIehBfZ7ZdL+i0DaHZpf8m42K6cj3on94Wg6F2eruDXsh5g6AYcFKtwr02gAAACDD0JAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgcMIbP6v40neQ7iIeZN4CbwwLC1JWUjXOkZs8Dc7Wtz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhIqvyBw==&quot;</span><span class="p" data-group-id="7030886476-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">accounts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7030886476-2">[</span><span class="w">
+                  </span><span class="p" data-group-id="7030886476-3">%{</span><span class="w">
                     </span><span class="ss">pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">1651002120672731042209</span><span class="w">
-                  </span><span class="p" data-group-id="2958627703-3">}</span><span class="w">
-                </span><span class="p" data-group-id="2958627703-2">]</span><span class="w">
+                  </span><span class="p" data-group-id="7030886476-3">}</span><span class="w">
+                </span><span class="p" data-group-id="7030886476-2">]</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_WPQzXtyDiwvUs54N1L88YsLPn51PERHF76bqcMhpT5vnrAEAT&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">dry_run</span><span class="p" data-group-id="2958627703-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">transactions</span><span class="p">,</span><span class="w"> </span><span class="n">accounts</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="2958627703-4">)</span><span class="w">
-</span><span class="p" data-group-id="2958627703-5">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="2958627703-6">[</span><span class="w">
-   </span><span class="p" data-group-id="2958627703-7">%{</span><span class="w">
-     </span><span class="ss">call_obj</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2958627703-8">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">dry_run</span><span class="p" data-group-id="7030886476-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">transactions</span><span class="p">,</span><span class="w"> </span><span class="n">accounts</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="7030886476-4">)</span><span class="w">
+</span><span class="p" data-group-id="7030886476-5">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7030886476-6">[</span><span class="w">
+   </span><span class="p" data-group-id="7030886476-7">%{</span><span class="w">
+     </span><span class="ss">call_obj</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7030886476-8">%{</span><span class="w">
        </span><span class="ss">caller_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
        </span><span class="ss">caller_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">8327</span><span class="p">,</span><span class="w">
        </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ct_2sZ43ScybbzKkd4iFMuLJw7uQib1dpUB8VDi9pLkALV5BpXXNR&quot;</span><span class="p">,</span><span class="w">
        </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span><span class="w">
        </span><span class="ss">gas_used</span><span class="p">:</span><span class="w"> </span><span class="mi">252</span><span class="p">,</span><span class="w">
        </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">61481</span><span class="p">,</span><span class="w">
-       </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2958627703-9">[</span><span class="p" data-group-id="2958627703-9">]</span><span class="p">,</span><span class="w">
+       </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7030886476-9">[</span><span class="p" data-group-id="7030886476-9">]</span><span class="p">,</span><span class="w">
        </span><span class="ss">return_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
        </span><span class="ss">return_value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvrXnzA&quot;</span><span class="w">
-     </span><span class="p" data-group-id="2958627703-8">}</span><span class="p">,</span><span class="w">
+     </span><span class="p" data-group-id="7030886476-8">}</span><span class="p">,</span><span class="w">
      </span><span class="ss">reason</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
      </span><span class="ss">result</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;contract_call&quot;</span><span class="w">
-   </span><span class="p" data-group-id="2958627703-7">}</span><span class="w">
- </span><span class="p" data-group-id="2958627703-6">]</span><span class="p" data-group-id="2958627703-5">}</span></code></pre>
+   </span><span class="p" data-group-id="7030886476-7">}</span><span class="w">
+ </span><span class="p" data-group-id="7030886476-6">]</span><span class="p" data-group-id="7030886476-5">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_current_generation/1">
@@ -644,32 +644,32 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_current_generation</span><span class="p" data-group-id="8698362239-1">(</span><span class="n">client</span><span class="p" data-group-id="8698362239-1">)</span><span class="w">
-</span><span class="p" data-group-id="8698362239-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="8698362239-3">%{</span><span class="w">
-   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8698362239-4">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_current_generation</span><span class="p" data-group-id="9462996468-1">(</span><span class="n">client</span><span class="p" data-group-id="9462996468-1">)</span><span class="w">
+</span><span class="p" data-group-id="9462996468-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="9462996468-3">%{</span><span class="w">
+   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9462996468-4">%{</span><span class="w">
      </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_LVmMAyjcTtcLTh76STB9gJoAzpXdZBgwtiYX2rC98tkzRpUt8&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84552</span><span class="p">,</span><span class="w">
      </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_rPG4k1G8MsbdVdgisDXAs95htP94eYeJHPdotCvdJUbNLXmVz&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1040728877473258350</span><span class="p">,</span><span class="w">
-     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8698362239-5">[</span><span class="mi">1816785</span><span class="p">,</span><span class="w"> </span><span class="mi">4563830</span><span class="p">,</span><span class="w"> </span><span class="mi">6535791</span><span class="p">,</span><span class="w"> </span><span class="mi">7371744</span><span class="p">,</span><span class="w"> </span><span class="mi">15431122</span><span class="p">,</span><span class="w"> </span><span class="mi">25810590</span><span class="p">,</span><span class="w"> </span><span class="mi">38354710</span><span class="p">,</span><span class="w">
+     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9462996468-5">[</span><span class="mi">1816785</span><span class="p">,</span><span class="w"> </span><span class="mi">4563830</span><span class="p">,</span><span class="w"> </span><span class="mi">6535791</span><span class="p">,</span><span class="w"> </span><span class="mi">7371744</span><span class="p">,</span><span class="w"> </span><span class="mi">15431122</span><span class="p">,</span><span class="w"> </span><span class="mi">25810590</span><span class="p">,</span><span class="w"> </span><span class="mi">38354710</span><span class="p">,</span><span class="w">
       </span><span class="mi">41068269</span><span class="p">,</span><span class="w"> </span><span class="mi">49508987</span><span class="p">,</span><span class="w"> </span><span class="mi">61851964</span><span class="p">,</span><span class="w"> </span><span class="mi">64661610</span><span class="p">,</span><span class="w"> </span><span class="mi">64916450</span><span class="p">,</span><span class="w"> </span><span class="mi">73480578</span><span class="p">,</span><span class="w"> </span><span class="mi">82460245</span><span class="p">,</span><span class="w">
       </span><span class="mi">84205198</span><span class="p">,</span><span class="w"> </span><span class="mi">110560762</span><span class="p">,</span><span class="w"> </span><span class="mi">119763104</span><span class="p">,</span><span class="w"> </span><span class="mi">126778601</span><span class="p">,</span><span class="w"> </span><span class="mi">131361835</span><span class="p">,</span><span class="w"> </span><span class="mi">152044373</span><span class="p">,</span><span class="w">
       </span><span class="mi">175440084</span><span class="p">,</span><span class="w"> </span><span class="mi">229990565</span><span class="p">,</span><span class="w"> </span><span class="mi">232441141</span><span class="p">,</span><span class="w"> </span><span class="mi">246507939</span><span class="p">,</span><span class="w"> </span><span class="mi">256839457</span><span class="p">,</span><span class="w"> </span><span class="mi">267089067</span><span class="p">,</span><span class="w">
       </span><span class="mi">281126946</span><span class="p">,</span><span class="w"> </span><span class="mi">297684504</span><span class="p">,</span><span class="w"> </span><span class="mi">358409889</span><span class="p">,</span><span class="w"> </span><span class="mi">368048805</span><span class="p">,</span><span class="w"> </span><span class="mi">374727588</span><span class="p">,</span><span class="w"> </span><span class="mi">389428641</span><span class="p">,</span><span class="w">
       </span><span class="mi">395353074</span><span class="p">,</span><span class="w"> </span><span class="mi">412257533</span><span class="p">,</span><span class="w"> </span><span class="mi">448812603</span><span class="p">,</span><span class="w"> </span><span class="mi">460866874</span><span class="p">,</span><span class="w"> </span><span class="mi">468707889</span><span class="p">,</span><span class="w"> </span><span class="mi">478197976</span><span class="p">,</span><span class="w">
-      </span><span class="mi">483791458</span><span class="p">,</span><span class="w"> </span><span class="mi">492777525</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="8698362239-5">]</span><span class="p">,</span><span class="w">
+      </span><span class="mi">483791458</span><span class="p">,</span><span class="w"> </span><span class="mi">492777525</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="9462996468-5">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_ZAX9bfDJVRU4yBZVJBjYHrSpWqEfjvTmjhRReAxMH1Tb4aX6D&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_qPF68kYqsw3qNWscQX883gi4XSRvy8K1AyAo6xKmCe22wYiHq&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538023502</span><span class="p">,</span><span class="w">
      </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614496897</span><span class="p">,</span><span class="w">
      </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
-   </span><span class="p" data-group-id="8698362239-4">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8698362239-6">[</span><span class="p" data-group-id="8698362239-6">]</span><span class="w">
- </span><span class="p" data-group-id="8698362239-3">}</span><span class="p" data-group-id="8698362239-2">}</span></code></pre>
+   </span><span class="p" data-group-id="9462996468-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9462996468-6">[</span><span class="p" data-group-id="9462996468-6">]</span><span class="w">
+ </span><span class="p" data-group-id="9462996468-3">}</span><span class="p" data-group-id="9462996468-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_generation/2">
@@ -694,37 +694,37 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">84_551</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_generation</span><span class="p" data-group-id="5010353801-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p" data-group-id="5010353801-1">)</span><span class="w">
-</span><span class="p" data-group-id="5010353801-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="5010353801-3">%{</span><span class="w">
-   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5010353801-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_generation</span><span class="p" data-group-id="6419873049-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p" data-group-id="6419873049-1">)</span><span class="w">
+</span><span class="p" data-group-id="6419873049-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6419873049-3">%{</span><span class="w">
+   </span><span class="ss">key_block</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6419873049-4">%{</span><span class="w">
      </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_QFqo5LsvnCxdMK184Rf8aeuQa5JWGf3n8dex2iSGqYE3mzWFn&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_sqnNrjX4s7uvwBksHK9hgq736vJvGakoB8DjVgqvzymjEiodP&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84551</span><span class="p">,</span><span class="w">
      </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_22cVmvsZq8vLxMTZjWcggZ5HQQi2RRF7UrAjMwQ5tCd1kCsNBb&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">8590250258</span><span class="p">,</span><span class="w">
-     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5010353801-5">[</span><span class="mi">4270548</span><span class="p">,</span><span class="w"> </span><span class="mi">4672365</span><span class="p">,</span><span class="w"> </span><span class="mi">26145245</span><span class="p">,</span><span class="w"> </span><span class="mi">46020752</span><span class="p">,</span><span class="w"> </span><span class="mi">50518165</span><span class="p">,</span><span class="w"> </span><span class="mi">61725479</span><span class="p">,</span><span class="w"> </span><span class="mi">82664155</span><span class="p">,</span><span class="w">
+     </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6419873049-5">[</span><span class="mi">4270548</span><span class="p">,</span><span class="w"> </span><span class="mi">4672365</span><span class="p">,</span><span class="w"> </span><span class="mi">26145245</span><span class="p">,</span><span class="w"> </span><span class="mi">46020752</span><span class="p">,</span><span class="w"> </span><span class="mi">50518165</span><span class="p">,</span><span class="w"> </span><span class="mi">61725479</span><span class="p">,</span><span class="w"> </span><span class="mi">82664155</span><span class="p">,</span><span class="w">
       </span><span class="mi">101009367</span><span class="p">,</span><span class="w"> </span><span class="mi">123337852</span><span class="p">,</span><span class="w"> </span><span class="mi">136176634</span><span class="p">,</span><span class="w"> </span><span class="mi">152345694</span><span class="p">,</span><span class="w"> </span><span class="mi">154969206</span><span class="p">,</span><span class="w"> </span><span class="mi">180766968</span><span class="p">,</span><span class="w">
       </span><span class="mi">182806912</span><span class="p">,</span><span class="w"> </span><span class="mi">197514003</span><span class="p">,</span><span class="w"> </span><span class="mi">198196883</span><span class="p">,</span><span class="w"> </span><span class="mi">199214273</span><span class="p">,</span><span class="w"> </span><span class="mi">202117489</span><span class="p">,</span><span class="w"> </span><span class="mi">202413040</span><span class="p">,</span><span class="w">
       </span><span class="mi">237707860</span><span class="p">,</span><span class="w"> </span><span class="mi">261164171</span><span class="p">,</span><span class="w"> </span><span class="mi">288613351</span><span class="p">,</span><span class="w"> </span><span class="mi">298097639</span><span class="p">,</span><span class="w"> </span><span class="mi">304490763</span><span class="p">,</span><span class="w"> </span><span class="mi">314326968</span><span class="p">,</span><span class="w">
       </span><span class="mi">348389855</span><span class="p">,</span><span class="w"> </span><span class="mi">355561157</span><span class="p">,</span><span class="w"> </span><span class="mi">363125716</span><span class="p">,</span><span class="w"> </span><span class="mi">364007441</span><span class="p">,</span><span class="w"> </span><span class="mi">382373111</span><span class="p">,</span><span class="w"> </span><span class="mi">384879255</span><span class="p">,</span><span class="w">
       </span><span class="mi">393259024</span><span class="p">,</span><span class="w"> </span><span class="mi">411552709</span><span class="p">,</span><span class="w"> </span><span class="mi">427321732</span><span class="p">,</span><span class="w"> </span><span class="mi">430989208</span><span class="p">,</span><span class="w"> </span><span class="mi">440655342</span><span class="p">,</span><span class="w"> </span><span class="mi">468506638</span><span class="p">,</span><span class="w">
-      </span><span class="mi">482430386</span><span class="p">,</span><span class="w"> </span><span class="mi">488147407</span><span class="p">,</span><span class="w"> </span><span class="mi">504275453</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="5010353801-5">]</span><span class="p">,</span><span class="w">
+      </span><span class="mi">482430386</span><span class="p">,</span><span class="w"> </span><span class="mi">488147407</span><span class="p">,</span><span class="w"> </span><span class="mi">504275453</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="6419873049-5">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2VZKBkQnR6JTo2WikRoUNtGNgfQD8FsqKAMXfrR8WKxrPd3Zdr&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2VZKBkQnR6JTo2WikRoUNtGNgfQD8FsqKAMXfrR8WKxrPd3Zdr&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_kWVRFL9VqTcBjsT56SHLsJWryemyTJnFwEBzaJ6aA7btYrKZ5&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538041170</span><span class="p">,</span><span class="w">
      </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614345333</span><span class="p">,</span><span class="w">
      </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
-   </span><span class="p" data-group-id="5010353801-4">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5010353801-6">[</span><span class="s">&quot;mh_NN4Tr4w6UBEobHucDNAFRn2sba12f9PFtvPDAAe2idBx3Ymsv&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="6419873049-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">micro_blocks</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6419873049-6">[</span><span class="s">&quot;mh_NN4Tr4w6UBEobHucDNAFRn2sba12f9PFtvPDAAe2idBx3Ymsv&quot;</span><span class="p">,</span><span class="w">
     </span><span class="s">&quot;mh_cXozyVg6968P68cWcNGYHsHsGX9yVoZUGc56APx7z3wo2Vzh2&quot;</span><span class="p">,</span><span class="w">
     </span><span class="s">&quot;mh_2XDQytSS9v39aQdBLioXz3pvYrjWFeVcK2hL8xHzj79QL54Lz6&quot;</span><span class="p">,</span><span class="w">
     </span><span class="s">&quot;mh_GDkX5cqPgq4C2W9QpncMAfsUqbVXSh6nrMAKcPtHiAx9uGURf&quot;</span><span class="p">,</span><span class="w">
     </span><span class="s">&quot;mh_59ZnCtvjvp5nT6Q8QfZhnmRkjEy38BcJ3VS47wwMRCDxNYUQE&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="s">&quot;mh_ZAX9bfDJVRU4yBZVJBjYHrSpWqEfjvTmjhRReAxMH1Tb4aX6D&quot;</span><span class="p" data-group-id="5010353801-6">]</span><span class="w">
- </span><span class="p" data-group-id="5010353801-3">}</span><span class="p" data-group-id="5010353801-2">}</span></code></pre>
+    </span><span class="s">&quot;mh_ZAX9bfDJVRU4yBZVJBjYHrSpWqEfjvTmjhRReAxMH1Tb4aX6D&quot;</span><span class="p" data-group-id="6419873049-6">]</span><span class="w">
+ </span><span class="p" data-group-id="6419873049-3">}</span><span class="p" data-group-id="6419873049-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_key_block/2">
@@ -749,28 +749,28 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">key_block_height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">84_547</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_key_block</span><span class="p" data-group-id="2203326398-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">key_block_height</span><span class="p" data-group-id="2203326398-1">)</span><span class="w">
-</span><span class="p" data-group-id="2203326398-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="2203326398-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_key_block</span><span class="p" data-group-id="7184245732-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">key_block_height</span><span class="p" data-group-id="7184245732-1">)</span><span class="w">
+</span><span class="p" data-group-id="7184245732-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7184245732-3">%{</span><span class="w">
    </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
    </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_HvaKBash8o8FEKVdm5a8qo2j8vx5NKxH2P4RrQMQGokdjo5C2&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">2093870402648332570</span><span class="p">,</span><span class="w">
-   </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2203326398-4">[</span><span class="mi">1290617</span><span class="p">,</span><span class="w"> </span><span class="mi">3493169</span><span class="p">,</span><span class="w"> </span><span class="mi">6212474</span><span class="p">,</span><span class="w"> </span><span class="mi">17228667</span><span class="p">,</span><span class="w"> </span><span class="mi">52038371</span><span class="p">,</span><span class="w"> </span><span class="mi">120922973</span><span class="p">,</span><span class="w"> </span><span class="mi">138413619</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pow</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7184245732-4">[</span><span class="mi">1290617</span><span class="p">,</span><span class="w"> </span><span class="mi">3493169</span><span class="p">,</span><span class="w"> </span><span class="mi">6212474</span><span class="p">,</span><span class="w"> </span><span class="mi">17228667</span><span class="p">,</span><span class="w"> </span><span class="mi">52038371</span><span class="p">,</span><span class="w"> </span><span class="mi">120922973</span><span class="p">,</span><span class="w"> </span><span class="mi">138413619</span><span class="p">,</span><span class="w">
     </span><span class="mi">159935660</span><span class="p">,</span><span class="w"> </span><span class="mi">177319436</span><span class="p">,</span><span class="w"> </span><span class="mi">178097802</span><span class="p">,</span><span class="w"> </span><span class="mi">207343351</span><span class="p">,</span><span class="w"> </span><span class="mi">226920891</span><span class="p">,</span><span class="w"> </span><span class="mi">291582142</span><span class="p">,</span><span class="w"> </span><span class="mi">313980921</span><span class="p">,</span><span class="w">
     </span><span class="mi">320129338</span><span class="p">,</span><span class="w"> </span><span class="mi">320796969</span><span class="p">,</span><span class="w"> </span><span class="mi">332416956</span><span class="p">,</span><span class="w"> </span><span class="mi">346721320</span><span class="p">,</span><span class="w"> </span><span class="mi">348325254</span><span class="p">,</span><span class="w"> </span><span class="mi">351068507</span><span class="p">,</span><span class="w"> </span><span class="mi">362644921</span><span class="p">,</span><span class="w">
     </span><span class="mi">374166089</span><span class="p">,</span><span class="w"> </span><span class="mi">393961637</span><span class="p">,</span><span class="w"> </span><span class="mi">393998472</span><span class="p">,</span><span class="w"> </span><span class="mi">398351923</span><span class="p">,</span><span class="w"> </span><span class="mi">398567840</span><span class="p">,</span><span class="w"> </span><span class="mi">405562469</span><span class="p">,</span><span class="w"> </span><span class="mi">408022294</span><span class="p">,</span><span class="w">
     </span><span class="mi">408391855</span><span class="p">,</span><span class="w"> </span><span class="mi">450435185</span><span class="p">,</span><span class="w"> </span><span class="mi">451429065</span><span class="p">,</span><span class="w"> </span><span class="mi">451522379</span><span class="p">,</span><span class="w"> </span><span class="mi">462140541</span><span class="p">,</span><span class="w"> </span><span class="mi">490201848</span><span class="p">,</span><span class="w"> </span><span class="mi">500060148</span><span class="p">,</span><span class="w">
-    </span><span class="mi">508150414</span><span class="p">,</span><span class="w"> </span><span class="mi">508157410</span><span class="p">,</span><span class="w"> </span><span class="mi">508331280</span><span class="p">,</span><span class="w"> </span><span class="mi">510140909</span><span class="p">,</span><span class="w"> </span><span class="mi">516740832</span><span class="p">,</span><span class="w"> </span><span class="mi">523867648</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="2203326398-4">]</span><span class="p">,</span><span class="w">
+    </span><span class="mi">508150414</span><span class="p">,</span><span class="w"> </span><span class="mi">508157410</span><span class="p">,</span><span class="w"> </span><span class="mi">508331280</span><span class="p">,</span><span class="w"> </span><span class="mi">510140909</span><span class="p">,</span><span class="w"> </span><span class="mi">516740832</span><span class="p">,</span><span class="w"> </span><span class="mi">523867648</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p" data-group-id="7184245732-4">]</span><span class="p">,</span><span class="w">
    </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_PP5rx6mi69FUhBCyDNtaFkitSaENZ1PTHpsmE5d5JGZCLAzZJ&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_PP5rx6mi69FUhBCyDNtaFkitSaENZ1PTHpsmE5d5JGZCLAzZJ&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_2V6HE7ZPTrJeA5tuhefgZZKmFAhRHtrE6CTnyB3THucfX3BPdC&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">538124450</span><span class="p">,</span><span class="w">
    </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614076955</span><span class="p">,</span><span class="w">
    </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
- </span><span class="p" data-group-id="2203326398-3">}</span><span class="p" data-group-id="2203326398-2">}</span></code></pre>
+ </span><span class="p" data-group-id="7184245732-3">}</span><span class="p" data-group-id="7184245732-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_micro_block_header/2">
@@ -793,9 +793,9 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">micro_block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_micro_block_header</span><span class="p" data-group-id="4748696280-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="4748696280-1">)</span><span class="w">
-</span><span class="p" data-group-id="4748696280-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="4748696280-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_micro_block_header</span><span class="p" data-group-id="3459955117-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="3459955117-1">)</span><span class="w">
+</span><span class="p" data-group-id="3459955117-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="3459955117-3">%{</span><span class="w">
    </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
    </span><span class="ss">pof_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;no_fraud&quot;</span><span class="p">,</span><span class="w">
@@ -806,7 +806,7 @@ Functions          </h1>
    </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1558614125599</span><span class="p">,</span><span class="w">
    </span><span class="ss">txs_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bx_22QhAmqifutmQ8g7x8kPPvxEANMqiqMwDBAsw7HqzWGxe93tHD&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
- </span><span class="p" data-group-id="4748696280-3">}</span><span class="p" data-group-id="4748696280-2">}</span></code></pre>
+ </span><span class="p" data-group-id="3459955117-3">}</span><span class="p" data-group-id="3459955117-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_micro_block_transactions/2">
@@ -831,17 +831,17 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">micro_block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_micro_block_transactions</span><span class="p" data-group-id="2329671257-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="2329671257-1">)</span><span class="w">
-</span><span class="p" data-group-id="2329671257-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="2329671257-3">[</span><span class="w">
-   </span><span class="p" data-group-id="2329671257-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_micro_block_transactions</span><span class="p" data-group-id="5643290897-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">micro_block_hash</span><span class="p" data-group-id="5643290897-1">)</span><span class="w">
+</span><span class="p" data-group-id="5643290897-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5643290897-3">[</span><span class="w">
+   </span><span class="p" data-group-id="5643290897-4">%{</span><span class="w">
      </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2GYkXiDbKGd9bMWL63AiaRbKRNDDHR8womVFzxk5BZP4KGQhgw&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">84547</span><span class="p">,</span><span class="w">
      </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2J8Xshv3yR8Rf8mEmUSoT6fk4YJz5oGbpLLqJkPAvV1GWeTK6A&quot;</span><span class="p">,</span><span class="w">
-     </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2329671257-5">[</span><span class="s">&quot;sg_PQffTEQQkf2DPthE2QoeRqAUr53m5BszPBGRrdH21Nfbb1s6SFLyckb9TvNPcWy37sBY5YABNsvvJJFdvetHntAkiXrsM&quot;</span><span class="p" data-group-id="2329671257-5">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2329671257-6">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ContractCreateTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="2329671257-6">}</span><span class="w">
-   </span><span class="p" data-group-id="2329671257-4">}</span><span class="w">
- </span><span class="p" data-group-id="2329671257-3">]</span><span class="p" data-group-id="2329671257-2">}</span></code></pre>
+     </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5643290897-5">[</span><span class="s">&quot;sg_PQffTEQQkf2DPthE2QoeRqAUr53m5BszPBGRrdH21Nfbb1s6SFLyckb9TvNPcWy37sBY5YABNsvvJJFdvetHntAkiXrsM&quot;</span><span class="p" data-group-id="5643290897-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5643290897-6">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ContractCreateTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="5643290897-6">}</span><span class="w">
+   </span><span class="p" data-group-id="5643290897-4">}</span><span class="w">
+ </span><span class="p" data-group-id="5643290897-3">]</span><span class="p" data-group-id="5643290897-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_node_info/1">
@@ -863,15 +863,15 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_node_info</span><span class="p" data-group-id="9168822217-1">(</span><span class="n">client</span><span class="p" data-group-id="9168822217-1">)</span><span class="w">
-</span><span class="p" data-group-id="9168822217-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="9168822217-3">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_node_info</span><span class="p" data-group-id="5928842235-1">(</span><span class="n">client</span><span class="p" data-group-id="5928842235-1">)</span><span class="w">
+</span><span class="p" data-group-id="5928842235-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5928842235-3">%{</span><span class="w">
    </span><span class="ss">node_beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">node_pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_24eXUB8mKvfHWhLrRVYC8cx2GXqKqZcTDyAequLkhJiyxrhVcq&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">peer_pubkey</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pp_RK92f7wt27WbYijumNi69C1YvgRMfSZxBxn3KeGvGTF5sCFBq&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9168822217-4">%{</span><span class="w">
-     </span><span class="ss">blocked</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9168822217-5">[</span><span class="p" data-group-id="9168822217-5">]</span><span class="p">,</span><span class="w">
-     </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9168822217-6">[</span><span class="s">&quot;aenode://pp_DMLqy7Zuhoxe2FzpydyQTgwCJ52wouzxtHWsPGo51XDcxc5c8@13.53.161.215:3015&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5928842235-4">%{</span><span class="w">
+     </span><span class="ss">blocked</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5928842235-5">[</span><span class="p" data-group-id="5928842235-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">peers</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5928842235-6">[</span><span class="s">&quot;aenode://pp_DMLqy7Zuhoxe2FzpydyQTgwCJ52wouzxtHWsPGo51XDcxc5c8@13.53.161.215:3015&quot;</span><span class="p">,</span><span class="w">
              </span><span class="s">&quot;aenode://pp_FhecVAucSqWJuMKt8vwsrC14G6Cizet9TppFep1PpGLQwQSpw@13.229.148.230:3015&quot;</span><span class="p">,</span><span class="w">
              </span><span class="s">&quot;aenode://pp_RMzsjgNLZMabSns3gWykAUWQaz218zaUzcQqLCtkbH5mQDGp8@54.245.137.153:3015&quot;</span><span class="p">,</span><span class="w">
              </span><span class="s">&quot;aenode://pp_auNgNxce82JNFd33Z4UVoDvNUJEaSUowwW37v681wMnZgsPfw@34.212.120.93:3015&quot;</span><span class="p">,</span><span class="w">
@@ -880,9 +880,9 @@ Functions          </h1>
              </span><span class="s">&quot;aenode://pp_2aKzR7Bnz53amwA1oU55nkkKFD19THF3oxVDudLiksVh52Sypb@3.0.201.37:3015&quot;</span><span class="p">,</span><span class="w">
              </span><span class="s">&quot;aenode://pp_2beMZ7ULM3jye6hdSFVtWmBFRpG1mTevDZ4XNDPfKCgpzqH2Ns@3.122.192.245:3015&quot;</span><span class="p">,</span><span class="w">
              </span><span class="s">&quot;aenode://pp_2vFiJ3LMWVchceNnBPQV3p1fzj4Zd4voCQKNKaU16c3M4UCJok@18.236.142.145:3015&quot;</span><span class="p">,</span><span class="w">
-             </span><span class="s">&quot;aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015&quot;</span><span class="p" data-group-id="9168822217-6">]</span><span class="w">
-   </span><span class="p" data-group-id="9168822217-4">}</span><span class="p">,</span><span class="w">
-   </span><span class="ss">status</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9168822217-7">%{</span><span class="w">
+             </span><span class="s">&quot;aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015&quot;</span><span class="p" data-group-id="5928842235-6">]</span><span class="w">
+   </span><span class="p" data-group-id="5928842235-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="ss">status</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5928842235-7">%{</span><span class="w">
      </span><span class="ss">difficulty</span><span class="p">:</span><span class="w"> </span><span class="mi">252791033</span><span class="p">,</span><span class="w">
      </span><span class="ss">genesis_key_block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_wUCideEB8aDtUaiHCtKcfywU6oHZW6gnyci8Mw6S1RSTCnCRu&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">listening</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="p">,</span><span class="w">
@@ -891,16 +891,16 @@ Functions          </h1>
      </span><span class="ss">node_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.0.0-rc.1&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">peer_count</span><span class="p">:</span><span class="w"> </span><span class="mi">8841</span><span class="p">,</span><span class="w">
      </span><span class="ss">pending_transactions_count</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-     </span><span class="ss">protocols</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9168822217-8">[</span><span class="w">
-       </span><span class="p" data-group-id="9168822217-9">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">82900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p" data-group-id="9168822217-9">}</span><span class="p">,</span><span class="w">
-       </span><span class="p" data-group-id="9168822217-10">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">40900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p" data-group-id="9168822217-10">}</span><span class="p">,</span><span class="w">
-       </span><span class="p" data-group-id="9168822217-11">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="9168822217-11">}</span><span class="w">
-     </span><span class="p" data-group-id="9168822217-8">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">protocols</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5928842235-8">[</span><span class="w">
+       </span><span class="p" data-group-id="5928842235-9">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">82900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p" data-group-id="5928842235-9">}</span><span class="p">,</span><span class="w">
+       </span><span class="p" data-group-id="5928842235-10">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">40900</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p" data-group-id="5928842235-10">}</span><span class="p">,</span><span class="w">
+       </span><span class="p" data-group-id="5928842235-11">%{</span><span class="ss">effective_at_height</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="5928842235-11">}</span><span class="w">
+     </span><span class="p" data-group-id="5928842235-8">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">solutions</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
      </span><span class="ss">sync_progress</span><span class="p">:</span><span class="w"> </span><span class="mf">100.0</span><span class="p">,</span><span class="w">
      </span><span class="ss">syncing</span><span class="p">:</span><span class="w"> </span><span class="no">false</span><span class="w">
-   </span><span class="p" data-group-id="9168822217-7">}</span><span class="w">
- </span><span class="p" data-group-id="9168822217-3">}</span><span class="p" data-group-id="9168822217-2">}</span></code></pre>
+   </span><span class="p" data-group-id="5928842235-7">}</span><span class="w">
+ </span><span class="p" data-group-id="5928842235-3">}</span><span class="p" data-group-id="5928842235-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_pending_transactions/1">
@@ -922,8 +922,8 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_pending_transactions</span><span class="p" data-group-id="8717871158-1">(</span><span class="n">client</span><span class="p" data-group-id="8717871158-1">)</span><span class="w">
-</span><span class="p" data-group-id="8717871158-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8717871158-3">[</span><span class="p" data-group-id="8717871158-3">]</span><span class="p" data-group-id="8717871158-2">}</span></code></pre>
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_pending_transactions</span><span class="p" data-group-id="1619042920-1">(</span><span class="n">client</span><span class="p" data-group-id="1619042920-1">)</span><span class="w">
+</span><span class="p" data-group-id="1619042920-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1619042920-3">[</span><span class="p" data-group-id="1619042920-3">]</span><span class="p" data-group-id="1619042920-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_transaction/2">
@@ -948,15 +948,15 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_transaction</span><span class="p" data-group-id="0380642136-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="0380642136-1">)</span><span class="w">
-</span><span class="p" data-group-id="0380642136-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="0380642136-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_transaction</span><span class="p" data-group-id="4212090035-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="4212090035-1">)</span><span class="w">
+</span><span class="p" data-group-id="4212090035-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="4212090035-3">%{</span><span class="w">
    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_bZUgGMEvu8kaAEv47xyatNfstvoH54VbrCb93y8J44gr2EsCJ&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">84531</span><span class="p">,</span><span class="w">
    </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_6FbthJ3jF2AE6z2SywBtg764tNK9LiBCxRW3RfWhMX68JAygz&quot;</span><span class="p">,</span><span class="w">
-   </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0380642136-4">[</span><span class="s">&quot;sg_R4q5gvb5c9VgwZPt7zLgPJLV4HFNv6ZHzwBVpKaA1ygApq6JBA1NSDsXPa9WLsrm2nGG5BrCy8iq11xGaSbsppzLZycts&quot;</span><span class="p" data-group-id="0380642136-4">]</span><span class="p">,</span><span class="w">
-   </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0380642136-5">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SpendTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="0380642136-5">}</span><span class="w">
- </span><span class="p" data-group-id="0380642136-3">}</span><span class="p" data-group-id="0380642136-2">}</span></code></pre>
+   </span><span class="ss">signatures</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4212090035-4">[</span><span class="s">&quot;sg_R4q5gvb5c9VgwZPt7zLgPJLV4HFNv6ZHzwBVpKaA1ygApq6JBA1NSDsXPa9WLsrm2nGG5BrCy8iq11xGaSbsppzLZycts&quot;</span><span class="p" data-group-id="4212090035-4">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4212090035-5">%{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SpendTx&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p" data-group-id="4212090035-5">}</span><span class="w">
+ </span><span class="p" data-group-id="4212090035-3">}</span><span class="p" data-group-id="4212090035-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get_transaction_info/2">
@@ -979,23 +979,23 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_2jg2P41iGUgNif3Nu1vZ34P1aeSeZq4CWtKhEpr6jeLDoTL4mH&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_transaction_info</span><span class="p" data-group-id="6720925658-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="6720925658-1">)</span><span class="w">
-</span><span class="p" data-group-id="6720925658-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="6720925658-3">%{</span><span class="w">
-   </span><span class="ss">call_info</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6720925658-4">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">get_transaction_info</span><span class="p" data-group-id="0626601222-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p" data-group-id="0626601222-1">)</span><span class="w">
+</span><span class="p" data-group-id="0626601222-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0626601222-3">%{</span><span class="w">
+   </span><span class="ss">call_info</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0626601222-4">%{</span><span class="w">
      </span><span class="ss">caller_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">caller_nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11837</span><span class="p">,</span><span class="w">
      </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ct_Y5Fjymet5kcequZTNNMjMTUaTnYBWBFsVmoPUGnKCyPsfnDg8&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000</span><span class="p">,</span><span class="w">
      </span><span class="ss">gas_used</span><span class="p">:</span><span class="w"> </span><span class="mi">1252</span><span class="p">,</span><span class="w">
      </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">84513</span><span class="p">,</span><span class="w">
-     </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6720925658-5">[</span><span class="p" data-group-id="6720925658-5">]</span><span class="p">,</span><span class="w">
+     </span><span class="ss">log</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0626601222-5">[</span><span class="p" data-group-id="0626601222-5">]</span><span class="p">,</span><span class="w">
      </span><span class="ss">return_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ok&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">return_value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_Xfbg4g==&quot;</span><span class="w">
-   </span><span class="p" data-group-id="6720925658-4">}</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="0626601222-4">}</span><span class="p">,</span><span class="w">
    </span><span class="ss">ga_info</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_info</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="w">
- </span><span class="p" data-group-id="6720925658-3">}</span><span class="p" data-group-id="6720925658-2">}</span></code></pre>
+ </span><span class="p" data-group-id="0626601222-3">}</span><span class="p" data-group-id="0626601222-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="height/1">
@@ -1016,8 +1016,8 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">height</span><span class="p" data-group-id="2260536898-1">(</span><span class="n">client</span><span class="p" data-group-id="2260536898-1">)</span><span class="w">
-</span><span class="p" data-group-id="2260536898-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">84535</span><span class="p" data-group-id="2260536898-2">}</span></code></pre>
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Chain</span><span class="o">.</span><span class="n">height</span><span class="p" data-group-id="8017015175-1">(</span><span class="n">client</span><span class="p" data-group-id="8017015175-1">)</span><span class="w">
+</span><span class="p" data-group-id="8017015175-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">84535</span><span class="p" data-group-id="8017015175-2">}</span></code></pre>
   </section>
 </section>
           </div>

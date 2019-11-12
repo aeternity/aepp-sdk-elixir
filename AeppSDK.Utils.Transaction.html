@@ -5,8 +5,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.2">
-    <meta name="project" content="aepp_sdk_elixir v0.1.0">
-    <title>AeppSDK.Utils.Transaction — aepp_sdk_elixir v0.1.0</title>
+    <meta name="project" content="aepp_sdk_elixir v0.5.0">
+    <title>AeppSDK.Utils.Transaction — aepp_sdk_elixir v0.5.0</title>
     <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
     <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
       <script src="docs_config.js"></script>
@@ -43,7 +43,7 @@
       <a href="api-reference.html" class="sidebar-projectName">
 aepp_sdk_elixir      </a>
       <h2 class="sidebar-projectVersion">
-        v0.1.0
+        v0.5.0
       </h2>
     </div>
       <a href="api-reference.html">
@@ -67,7 +67,7 @@ aepp_sdk_elixir      </a>
     <div id="content" class="content-inner">
 
       <h1>
-        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+        <small class="app-vsn">aepp_sdk_elixir v0.5.0</small>
 AeppSDK.Utils.Transaction      </h1>
 
 
@@ -243,7 +243,7 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="4714673544-1">%</span><span class="nc" data-group-id="4714673544-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="4714673544-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9257285458-1">%</span><span class="nc" data-group-id="9257285458-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="9257285458-1">{</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">40_000_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">10_624</span><span class="p">,</span><span class="w">
@@ -251,8 +251,8 @@ Functions          </h1>
                     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                  </span><span class="p" data-group-id="4714673544-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_fee</span><span class="p" data-group-id="4714673544-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">51_900</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p" data-group-id="4714673544-2">)</span><span class="w">
+                  </span><span class="p" data-group-id="9257285458-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_fee</span><span class="p" data-group-id="9257285458-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">51_900</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p" data-group-id="9257285458-2">)</span><span class="w">
 </span><span class="mi">16660000000</span></code></pre>
   </section>
 </section>
@@ -275,14 +275,14 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name_pre_claim_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="4025817540-1">%</span><span class="nc" data-group-id="4025817540-1">AeternityNode.Model.NamePreclaimTx</span><span class="p" data-group-id="4025817540-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">name_pre_claim_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9391980477-1">%</span><span class="nc" data-group-id="9391980477-1">AeternityNode.Model.NamePreclaimTx</span><span class="p" data-group-id="9391980477-1">{</span><span class="w">
                              </span><span class="ss">account_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt&quot;</span><span class="p">,</span><span class="w">
                              </span><span class="ss">commitment_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cm_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt&quot;</span><span class="p">,</span><span class="w">
                              </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                              </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                              </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                           </span><span class="p" data-group-id="4025817540-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_min_fee</span><span class="p" data-group-id="4025817540-2">(</span><span class="n">name_pre_claim_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">50_000</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_mainnet&quot;</span><span class="p" data-group-id="4025817540-2">)</span><span class="w">
+                           </span><span class="p" data-group-id="9391980477-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_min_fee</span><span class="p" data-group-id="9391980477-2">(</span><span class="n">name_pre_claim_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">50_000</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_mainnet&quot;</span><span class="p" data-group-id="9391980477-2">)</span><span class="w">
 </span><span class="mi">16500000000</span></code></pre>
   </section>
 </section>
@@ -311,7 +311,7 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9310106602-1">%</span><span class="nc" data-group-id="9310106602-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="9310106602-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5743174900-1">%</span><span class="nc" data-group-id="5743174900-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="5743174900-1">{</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000_000_000_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
@@ -319,8 +319,8 @@ Functions          </h1>
                     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                  </span><span class="p" data-group-id="9310106602-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_n_times_fee</span><span class="p" data-group-id="9310106602-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">58_336</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p" data-group-id="9310106602-2">)</span><span class="w">
+                  </span><span class="p" data-group-id="5743174900-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">calculate_n_times_fee</span><span class="p" data-group-id="5743174900-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">58_336</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p" data-group-id="5743174900-2">)</span><span class="w">
 </span><span class="mi">16740000000</span></code></pre>
   </section>
 </section>
@@ -427,18 +427,18 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_register_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="6563723913-1">%</span><span class="nc" data-group-id="6563723913-1">AeternityNode.Model.OracleRegisterTx</span><span class="p" data-group-id="6563723913-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">oracle_register_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7609237528-1">%</span><span class="nc" data-group-id="7609237528-1">AeternityNode.Model.OracleRegisterTx</span><span class="p" data-group-id="7609237528-1">{</span><span class="w">
                               </span><span class="ss">abi_version</span><span class="p">:</span><span class="w"> </span><span class="mh">0x60001</span><span class="p">,</span><span class="w">
                               </span><span class="ss">account_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt&quot;</span><span class="p">,</span><span class="w">
                               </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                               </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">37_122</span><span class="p">,</span><span class="w">
-                              </span><span class="ss">oracle_ttl</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="6563723913-2">%</span><span class="nc" data-group-id="6563723913-2">AeternityNode.Model.Ttl</span><span class="p" data-group-id="6563723913-2">{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:absolute</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p" data-group-id="6563723913-2">}</span><span class="p">,</span><span class="w">
+                              </span><span class="ss">oracle_ttl</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7609237528-2">%</span><span class="nc" data-group-id="7609237528-2">AeternityNode.Model.Ttl</span><span class="p" data-group-id="7609237528-2">{</span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:absolute</span><span class="p">,</span><span class="w"> </span><span class="ss">value</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p" data-group-id="7609237528-2">}</span><span class="p">,</span><span class="w">
                               </span><span class="ss">query_fee</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">
                               </span><span class="ss">query_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;query_format&quot;</span><span class="p">,</span><span class="w">
                               </span><span class="ss">response_format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;response_format&quot;</span><span class="p">,</span><span class="w">
                               </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-                            </span><span class="p" data-group-id="6563723913-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">gas_limit</span><span class="p" data-group-id="6563723913-3">(</span><span class="n">oracle_register_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p" data-group-id="6563723913-3">)</span><span class="w">
+                            </span><span class="p" data-group-id="7609237528-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">gas_limit</span><span class="p" data-group-id="7609237528-3">(</span><span class="n">oracle_register_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p" data-group-id="7609237528-3">)</span><span class="w">
 </span><span class="mi">16581</span></code></pre>
   </section>
 </section>
@@ -460,7 +460,7 @@ Functions          </h1>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="3786663175-1">%</span><span class="nc" data-group-id="3786663175-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="3786663175-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="6561464449-1">%</span><span class="nc" data-group-id="6561464449-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="6561464449-1">{</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">5_018_857_520_000_000_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">37181</span><span class="p">,</span><span class="w">
@@ -468,8 +468,8 @@ Functions          </h1>
                     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                  </span><span class="p" data-group-id="3786663175-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">min_gas</span><span class="p" data-group-id="3786663175-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">50_000</span><span class="p" data-group-id="3786663175-2">)</span><span class="w">
+                  </span><span class="p" data-group-id="6561464449-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">min_gas</span><span class="p" data-group-id="6561464449-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="mi">50_000</span><span class="p" data-group-id="6561464449-2">)</span><span class="w">
 </span><span class="mi">16740</span></code></pre>
   </section>
 </section>
@@ -493,7 +493,7 @@ add calculated minimum fee and post it to the node.</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="6480131239-1">%</span><span class="nc" data-group-id="6480131239-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="6480131239-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5680352049-1">%</span><span class="nc" data-group-id="5680352049-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="5680352049-1">{</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">10_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">16_680_000_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
@@ -501,14 +501,14 @@ add calculated minimum fee and post it to the node.</p>
                     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                  </span><span class="p" data-group-id="6480131239-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">post</span><span class="p" data-group-id="6480131239-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="ss">:no_auth</span><span class="p">,</span><span class="w"> </span><span class="ss">:one_signature</span><span class="p" data-group-id="6480131239-2">)</span><span class="w">
-</span><span class="p" data-group-id="6480131239-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="6480131239-4">%{</span><span class="w">
+                  </span><span class="p" data-group-id="5680352049-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">post</span><span class="p" data-group-id="5680352049-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="ss">:no_auth</span><span class="p">,</span><span class="w"> </span><span class="ss">:one_signature</span><span class="p" data-group-id="5680352049-2">)</span><span class="w">
+</span><span class="p" data-group-id="5680352049-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5680352049-4">%{</span><span class="w">
    </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2wRRkfzcHd24cGbqdqaLAhxgpv4iMB8y1Cp5n9FAfhvDZJ7Qh&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">149</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_umEMGk2S1EtkeAZCVHXDoTqQMdMawK9R9j1yvDZWjvKmstg5c&quot;</span><span class="w">
- </span><span class="p" data-group-id="6480131239-4">}</span><span class="p" data-group-id="6480131239-3">}</span></code></pre>
+ </span><span class="p" data-group-id="5680352049-4">}</span><span class="p" data-group-id="5680352049-3">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="sign_tx/3">
@@ -531,7 +531,7 @@ add calculated minimum fee and post it to the node.</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="1664220687-1">%</span><span class="nc" data-group-id="1664220687-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="1664220687-1">{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">spend_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="6491126929-1">%</span><span class="nc" data-group-id="6491126929-1">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="6491126929-1">{</span><span class="w">
                     </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">1_000_000_000_000</span><span class="p">,</span><span class="w">
                     </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
                     </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
@@ -539,11 +539,11 @@ add calculated minimum fee and post it to the node.</p>
                     </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
                     </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-                  </span><span class="p" data-group-id="1664220687-1">}</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">sign_tx</span><span class="p" data-group-id="1664220687-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="n">client</span><span class="p" data-group-id="1664220687-2">)</span><span class="w">
-</span><span class="p" data-group-id="1664220687-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="1664220687-4">[</span><span class="w">
-   </span><span class="p" data-group-id="1664220687-5">%</span><span class="nc" data-group-id="1664220687-5">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="1664220687-5">{</span><span class="w">
+                  </span><span class="p" data-group-id="6491126929-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Utils.Transaction</span><span class="o">.</span><span class="n">sign_tx</span><span class="p" data-group-id="6491126929-2">(</span><span class="n">spend_tx</span><span class="p">,</span><span class="w"> </span><span class="n">client</span><span class="p" data-group-id="6491126929-2">)</span><span class="w">
+</span><span class="p" data-group-id="6491126929-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6491126929-4">[</span><span class="w">
+   </span><span class="p" data-group-id="6491126929-5">%</span><span class="nc" data-group-id="6491126929-5">AeternityNode.Model.SpendTx</span><span class="p" data-group-id="6491126929-5">{</span><span class="w">
      </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000000000</span><span class="p">,</span><span class="w">
      </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
      </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
@@ -551,11 +551,11 @@ add calculated minimum fee and post it to the node.</p>
      </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
      </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
-   </span><span class="p" data-group-id="1664220687-5">}</span><span class="p">,</span><span class="w">
+   </span><span class="p" data-group-id="6491126929-5">}</span><span class="p">,</span><span class="w">
    </span><span class="o">&lt;</span><span class="mi">168</span><span class="p">,</span><span class="w"> </span><span class="mi">173</span><span class="p">,</span><span class="w"> </span><span class="mi">62</span><span class="p">,</span><span class="w"> </span><span class="mi">192</span><span class="p">,</span><span class="w"> </span><span class="mi">198</span><span class="p">,</span><span class="w"> </span><span class="mi">163</span><span class="p">,</span><span class="w"> </span><span class="mi">29</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">,</span><span class="w"> </span><span class="mi">83</span><span class="p">,</span><span class="w"> </span><span class="mi">235</span><span class="p">,</span><span class="w"> </span><span class="mi">68</span><span class="p">,</span><span class="w"> </span><span class="mi">152</span><span class="p">,</span><span class="w"> </span><span class="mi">82</span><span class="p">,</span><span class="w"> </span><span class="mi">151</span><span class="p">,</span><span class="w"> </span><span class="mi">77</span><span class="p">,</span><span class="w"> </span><span class="mi">68</span><span class="p">,</span><span class="w">
     </span><span class="mi">228</span><span class="p">,</span><span class="w"> </span><span class="mi">138</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="mi">74</span><span class="p">,</span><span class="w"> </span><span class="mi">125</span><span class="p">,</span><span class="w"> </span><span class="mi">222</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="mi">114</span><span class="p">,</span><span class="w"> </span><span class="mi">79</span><span class="p">,</span><span class="w"> </span><span class="mi">84</span><span class="p">,</span><span class="w"> </span><span class="mi">160</span><span class="p">,</span><span class="w"> </span><span class="mi">83</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w">
     </span><span class="mi">63</span><span class="p">,</span><span class="w"> </span><span class="mi">165</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">146</span><span class="p">,</span><span class="w"> </span><span class="mi">164</span><span class="p">,</span><span class="w"> </span><span class="mi">168</span><span class="p">,</span><span class="w"> </span><span class="mi">144</span><span class="p">,</span><span class="w"> </span><span class="mi">116</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">253</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w"> </span><span class="mi">119</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">147</span><span class="p">,</span><span class="w"> </span><span class="n">...</span><span class="p">&gt;&gt;</span><span class="w">
- </span><span class="p" data-group-id="1664220687-4">]</span><span class="p" data-group-id="1664220687-3">}</span></code></pre>
+ </span><span class="p" data-group-id="6491126929-4">]</span><span class="p" data-group-id="6491126929-3">}</span></code></pre>
   </section>
 </section>
           </div>
