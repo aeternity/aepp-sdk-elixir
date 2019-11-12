@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeppSDK.Account — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
+    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+      <a href="api-reference.html">
+        <img src="assets/logo.png" alt="aepp_sdk_elixir" class="sidebar-projectImage">
+      </a>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeppSDK.Account      </h1>
+
+
+        <section id="moduledoc">
+<p>High-level module for Account-related activities.</p>
+<p>In order for its functions to be used, a client must be defined first.
+Client example can be found at: <a href="AeppSDK.Client.html#new/4"><code class="inline">AeppSDK.Client.new/4</code></a></p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:account/0">account()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:spend_options/0">spend_options()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#balance/2">balance(client, pubkey)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an account&#39;s balance</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#balance/3">balance(client, pubkey, height)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an account&#39;s balance at a given block hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get/2">get(client, pubkey)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an actual account information</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get/3">get(client, pubkey, height)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an account at a given block hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#spend/4">spend(client, recipient, amount, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Send tokens to an account.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:account/0">
+  <div class="detail-header">
+    <a href="#t:account/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">account()</h1>
+      <div class="specs">
+          <pre>account() :: %{
+  id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  balance: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  nonce: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:spend_options/0">
+  <div class="detail-header">
+    <a href="#t:spend_options/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">spend_options()</h1>
+      <div class="specs">
+          <pre>spend_options() :: [
+  fee: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  ttl: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  payload: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="balance/2">
+  <div class="detail-header">
+    <a href="#balance/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">balance(client, pubkey)</h1>
+      <div class="specs">
+          <pre>balance(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an account&#39;s balance</p>
+<h2 id="balance/2-example" class="section-heading">
+  <a href="#balance/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="4863140227-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="4863140227-1">)</span><span class="w">
+</span><span class="p" data-group-id="4863140227-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1652992279192254044805</span><span class="p" data-group-id="4863140227-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="balance/3">
+  <div class="detail-header">
+    <a href="#balance/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">balance(client, pubkey, height)</h1>
+      <div class="specs">
+          <pre>balance(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) ::
+  {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+          <pre>balance(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an account&#39;s balance at a given block hash</p>
+<h2 id="balance/3-example" class="section-heading">
+  <a href="#balance/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="8776701524-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="8776701524-1">)</span><span class="w">
+</span><span class="p" data-group-id="8776701524-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1653014562214254044805</span><span class="p" data-group-id="8776701524-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get/2">
+  <div class="detail-header">
+    <a href="#get/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get(client, pubkey)</h1>
+      <div class="specs">
+          <pre>get(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:account/0">account</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an actual account information</p>
+<h2 id="get/2-example" class="section-heading">
+  <a href="#get/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="2290936279-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="2290936279-1">)</span><span class="w">
+</span><span class="p" data-group-id="2290936279-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="2290936279-3">%{</span><span class="w">
+   </span><span class="ss">auth_fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">balance</span><span class="p">:</span><span class="w"> </span><span class="mi">151688000000000000000</span><span class="p">,</span><span class="w">
+   </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;basic&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+   </span><span class="ss">payable</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="w">
+ </span><span class="p" data-group-id="2290936279-3">}</span><span class="p" data-group-id="2290936279-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get/3">
+  <div class="detail-header">
+    <a href="#get/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get(client, pubkey, height)</h1>
+      <div class="specs">
+          <pre>get(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) ::
+  {:ok, <a href="#t:account/0">account</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+          <pre>get(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()) ::
+  {:ok, <a href="#t:account/0">account</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an account at a given block hash</p>
+<h2 id="get/3-example" class="section-heading">
+  <a href="#get/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="6937376619-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="6937376619-1">)</span><span class="w">
+</span><span class="p" data-group-id="6937376619-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="6937376619-3">%{</span><span class="w">
+   </span><span class="ss">auth_fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">balance</span><span class="p">:</span><span class="w"> </span><span class="mi">1653014562214254044805</span><span class="p">,</span><span class="w">
+   </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;basic&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11837</span><span class="w">
+ </span><span class="p" data-group-id="6937376619-3">}</span><span class="p" data-group-id="6937376619-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="spend/4">
+    <span id="spend/3"></span>
+  <div class="detail-header">
+    <a href="#spend/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">spend(client, recipient, amount, opts \\ [])</h1>
+      <div class="specs">
+          <pre>spend(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(), <a href="#t:spend_options/0">spend_options</a>()) ::
+  {:ok,
+   %{
+     block_hash: <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Send tokens to an account.</p>
+<h2 id="spend/4-example" class="section-heading">
+  <a href="#spend/4-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">public_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">spend</span><span class="p" data-group-id="0364230104-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">public_key</span><span class="p">,</span><span class="w"> </span><span class="mi">10_000_000</span><span class="p" data-group-id="0364230104-1">)</span><span class="w">
+</span><span class="p" data-group-id="0364230104-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="0364230104-3">%{</span><span class="w">
+  </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">74871</span><span class="p">,</span><span class="w">
+  </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4&quot;</span><span class="w">
+</span><span class="p" data-group-id="0364230104-3">}</span><span class="p" data-group-id="0364230104-2">}</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>

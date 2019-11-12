@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeppSDK.Channel.OffChain — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
+    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+      <a href="api-reference.html">
+        <img src="assets/logo.png" alt="aepp_sdk_elixir" class="sidebar-projectImage">
+      </a>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeppSDK.Channel.OffChain      </h1>
+
+
+        <section id="moduledoc">
+<p>Module for Aeternity Off-chain channel activities, see: <a href="https://github.com/aeternity/protocol/blob/master/channels/OFF-CHAIN.md">https://github.com/aeternity/protocol/blob/master/channels/OFF-CHAIN.md</a>
+Contains Off-Chain channel-related functionality.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#new/4">new(channel_id, round, encoded_state_hash, int)</a>
+  </div>
+    <div class="summary-synopsis"><p>Creates new off-chain transactions, without supporting updates, with given parameters.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#new/5">new(channel_id, round, encoded_state_hash, int, updates)</a>
+  </div>
+    <div class="summary-synopsis"><p>Creates new off-chain transactions, supporting updates, with given parameters.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#serialize_tx/1">serialize_tx(offchain_tx)</a>
+  </div>
+    <div class="summary-synopsis"><p>Serializes off-chain transactions, supports both updates and no-updates versions.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#serialize_updates/1">serialize_updates(update)</a>
+  </div>
+    <div class="summary-synopsis"><p>Serializes off-chain updates.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="new/4">
+  <div class="detail-header">
+    <a href="#new/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">new(channel_id, round, encoded_state_hash, int)</h1>
+      <div class="specs">
+          <pre>new(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()) :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Creates new off-chain transactions, without supporting updates, with given parameters.</p>
+<h2 id="new/4-example" class="section-heading">
+  <a href="#new/4-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<p>  iex&gt; channel = &quot;ch_11111111111111111111111111111111273Yts&quot;
+  iex&gt; state_hash = &quot;st_11111111111111111111111111111111273Yts&quot;
+  iex&gt; AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 2)</p>
+<pre><code class="nohighlight makeup elixir"><span class="p" data-group-id="6040745712-1">%{</span><span class="w">
+  </span><span class="ss">channel_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ch_11111111111111111111111111111111273Yts&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">round</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;st_11111111111111111111111111111111273Yts&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+</span><span class="p" data-group-id="6040745712-1">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="new/5">
+  <div class="detail-header">
+    <a href="#new/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">new(channel_id, round, encoded_state_hash, int, updates)</h1>
+      <div class="specs">
+          <pre>new(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()) :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Creates new off-chain transactions, supporting updates, with given parameters.</p>
+<h2 id="new/5-example" class="section-heading">
+  <a href="#new/5-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<p>  iex&gt; channel = &quot;ch_11111111111111111111111111111111273Yts&quot;
+  iex&gt; state_hash = &quot;st_11111111111111111111111111111111273Yts&quot;
+  iex&gt; AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 1, [])</p>
+<pre><code class="nohighlight makeup elixir"><span class="p" data-group-id="9537011749-1">%{</span><span class="w">
+  </span><span class="ss">channel_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ch_11111111111111111111111111111111273Yts&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">round</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="ss">state_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;st_11111111111111111111111111111111273Yts&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="ss">updates</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9537011749-2">[</span><span class="p" data-group-id="9537011749-2">]</span><span class="p">,</span><span class="w">
+  </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span><span class="p" data-group-id="9537011749-1">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="serialize_tx/1">
+  <div class="detail-header">
+    <a href="#serialize_tx/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">serialize_tx(offchain_tx)</h1>
+      <div class="specs">
+          <pre>serialize_tx(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()) :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Serializes off-chain transactions, supports both updates and no-updates versions.</p>
+<h2 id="serialize_tx/1-example" class="section-heading">
+  <a href="#serialize_tx/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<p>  iex&gt; channel = &quot;ch_11111111111111111111111111111111273Yts&quot;
+  iex&gt; state_hash = &quot;st_11111111111111111111111111111111273Yts&quot;
+  iex&gt; channel_off_chain_tx = AeppSDK.Channel.OffChain.new(channel, 1, state_hash, 2)
+  iex&gt; AeppSDK.Channel.OffChain.serialize_tx(channel_off_chain_tx)</p>
+<pre><code class="nohighlight makeup elixir"><span class="p" data-group-id="0705598338-1">&lt;&lt;</span><span class="mi">248</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">161</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="w">
+</span><span class="mi">160</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p" data-group-id="0705598338-1">&gt;&gt;</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="serialize_updates/1">
+  <div class="detail-header">
+    <a href="#serialize_updates/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">serialize_updates(update)</h1>
+      <div class="specs">
+          <pre>serialize_updates(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()) :: [<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()]</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Serializes off-chain updates.</p>
+<h2 id="serialize_updates/1-example" class="section-heading">
+  <a href="#serialize_updates/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<p>  iex&gt; update = %{type: :transfer, from: {:id, :account, &lt;<0::256>&gt;}, to: {:id, :account, &lt;<0::256>&gt;}, amount: 100}
+  iex&gt; AeppSDK.Channel.OffChain.serialize_updates(update)</p>
+<pre><code class="nohighlight makeup elixir"><span class="p" data-group-id="8798739541-1">[</span><span class="p" data-group-id="8798739541-2">&lt;&lt;</span><span class="mi">248</span><span class="p">,</span><span class="mi">73</span><span class="p">,</span><span class="mi">130</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">58</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">161</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="w">
+</span><span class="mi">161</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p" data-group-id="8798739541-2">&gt;&gt;</span><span class="p" data-group-id="8798739541-1">]</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeppSDK.Listener — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
+    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+      <a href="api-reference.html">
+        <img src="assets/logo.png" alt="aepp_sdk_elixir" class="sidebar-projectImage">
+      </a>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeppSDK.Listener      </h1>
+
+
+        <section id="moduledoc">
+<p>A listener service that connects to peers in a network and notifies processes for new blocks and transactions.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#check_tx_confirmations/4">check_tx_confirmations(client, tx_hash, block_count, subscriber_pid)</a>
+  </div>
+    <div class="summary-synopsis"><p>Subscribe a process to be notified whether or not a transaction with a given hash
+has been confirmed after a <code class="inline">block_count</code> amount of key blocks. Requires a client to be
+passed as the first argument as it makes requests to a node.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#child_spec/1">child_spec(init_arg)</a>
+  </div>
+    <div class="summary-synopsis"><p>Returns a specification to start this module under a supervisor.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#notify/3">notify(event, _, _)</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#start/2">start(network_id, port \\ 3016)</a>
+  </div>
+    <div class="summary-synopsis"><p>Start the listener for mainnet or testnet (<code class="inline">network_id</code> - <code class="inline">&quot;ae_mainnet&quot;</code> or <code class="inline">&quot;ae_uat&quot;</code>).
+Starting the listener is required before subscribing to any events.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#start/4">start(peers, network_id, genesis_hash, port \\ 3016)</a>
+  </div>
+    <div class="summary-synopsis"><p>Start the listener for a custom/private network with a set of user defined peers, network ID and genesis hash.
+Starting the listener is required before subscribing to any events.
+A peer is defined in the following format:
+<code class="inline">&quot;aenode://peer_pubkey@host:port&quot;</code> i.e. <code class="inline">&quot;aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015&quot;</code></p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#stop/0">stop()</a>
+  </div>
+    <div class="summary-synopsis"><p>Stop the listener</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#subscribe/2">subscribe(event, subscriber_pid)</a>
+  </div>
+    <div class="summary-synopsis"><p>Subscribe a process to notifications for a general event.
+These events are the following (passed as an atom)</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#subscribe/3">subscribe(event, subscriber_pid, filter)</a>
+  </div>
+    <div class="summary-synopsis"><p>Subscribe a process to notifications for a filterable event i.e. a spend transaction
+with a specific recipient or an oracle query transaction that targets a specific oracle.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#subscribe_for_contract_events/3">subscribe_for_contract_events(client, subscriber_pid, contract_id)</a>
+  </div>
+    <div class="summary-synopsis"><p>Subscribe a process to notifications for any events that are to be emitted by a contract.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#subscribe_for_contract_events/5">subscribe_for_contract_events(client, subscriber_pid, contract_id, event_name, topic_types \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Subscribe a process to notifications for any events with the specified name that are to be emitted by a contract.
+Optionally, topics can be encoded by passing a list of their respective types (must be in the same order as in the event).
+The types can be the following</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#unsubscribe/2">unsubscribe(event, subscriber_pid)</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#unsubscribe/3">unsubscribe(event, subscriber_pid, filter)</a>
+  </div>
+    <div class="summary-synopsis"><p>Unsubscribe a process from a filterable event.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="check_tx_confirmations/4">
+  <div class="detail-header">
+    <a href="#check_tx_confirmations/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">check_tx_confirmations(client, tx_hash, block_count, subscriber_pid)</h1>
+      <div class="specs">
+          <pre>check_tx_confirmations(
+  <a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(),
+  <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>()
+) :: :ok | {:error, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Subscribe a process to be notified whether or not a transaction with a given hash
+has been confirmed after a <code class="inline">block_count</code> amount of key blocks. Requires a client to be
+passed as the first argument as it makes requests to a node.</p>
+<h2 id="check_tx_confirmations/4-example" class="section-heading">
+  <a href="#check_tx_confirmations/4-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="3324849293-1">(</span><span class="w">
+  </span><span class="p" data-group-id="3324849293-2">%{</span><span class="w">
+    </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">secret</span><span class="p">:</span><span class="w">
+      </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+  </span><span class="p" data-group-id="3324849293-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="p" data-group-id="3324849293-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">block_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">check_tx_confirmations</span><span class="p" data-group-id="3324849293-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p">,</span><span class="w"> </span><span class="n">block_count</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="3324849293-4">(</span><span class="p" data-group-id="3324849293-4">)</span><span class="p" data-group-id="3324849293-3">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="3324849293-5">(</span><span class="p" data-group-id="3324849293-5">)</span><span class="w">
+</span><span class="p" data-group-id="3324849293-6">{</span><span class="ss">:tx_confirmations</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="3324849293-7">%{</span><span class="w">
+   </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">111283</span><span class="p">,</span><span class="w">
+   </span><span class="ss">status</span><span class="p">:</span><span class="w"> </span><span class="ss">:confirmed</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM&quot;</span><span class="w">
+ </span><span class="p" data-group-id="3324849293-7">}</span><span class="p" data-group-id="3324849293-6">}</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="child_spec/1">
+  <div class="detail-header">
+    <a href="#child_spec/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">child_spec(init_arg)</h1>
+  </div>
+  <section class="docstring">
+<p>Returns a specification to start this module under a supervisor.</p>
+<p>See <a href="https://hexdocs.pm/elixir/Supervisor.html"><code class="inline">Supervisor</code></a>.</p>
+  </section>
+</section>
+<section class="detail" id="notify/3">
+  <div class="detail-header">
+    <a href="#notify/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">notify(event, _, _)</h1>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="start/2">
+    <span id="start/1"></span>
+  <div class="detail-header">
+    <a href="#start/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">start(network_id, port \\ 3016)</h1>
+      <div class="specs">
+          <pre>start(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()) :: {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Start the listener for mainnet or testnet (<code class="inline">network_id</code> - <code class="inline">&quot;ae_mainnet&quot;</code> or <code class="inline">&quot;ae_uat&quot;</code>).
+Starting the listener is required before subscribing to any events.</p>
+<h2 id="start/2-example" class="section-heading">
+  <a href="#start/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="7173191246-1">(</span><span class="s">&quot;ae_uat&quot;</span><span class="p" data-group-id="7173191246-1">)</span><span class="w">
+</span><span class="p" data-group-id="7173191246-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7173191246-3">#</span><span class="nc" data-group-id="7173191246-3">PID</span><span class="p" data-group-id="7173191246-3">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">261</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="7173191246-3">&gt;</span><span class="p" data-group-id="7173191246-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="start/4">
+    <span id="start/3"></span>
+  <div class="detail-header">
+    <a href="#start/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">start(peers, network_id, genesis_hash, port \\ 3016)</h1>
+      <div class="specs">
+          <pre>start(
+  [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()],
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>()
+) :: {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Start the listener for a custom/private network with a set of user defined peers, network ID and genesis hash.
+Starting the listener is required before subscribing to any events.
+A peer is defined in the following format:
+<code class="inline">&quot;aenode://peer_pubkey@host:port&quot;</code> i.e. <code class="inline">&quot;aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015&quot;</code></p>
+<h2 id="start/4-example" class="section-heading">
+  <a href="#start/4-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="5934614259-1">(</span><span class="w">
+      </span><span class="p" data-group-id="5934614259-2">[</span><span class="s">&quot;aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015&quot;</span><span class="p" data-group-id="5934614259-2">]</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;localnet&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;kh_2Eo9AVWHxTKio278ccANnwtr9hkUpzb1nLePfUzs7StwWyJ2xB&quot;</span><span class="w">
+    </span><span class="p" data-group-id="5934614259-1">)</span><span class="w">
+</span><span class="p" data-group-id="5934614259-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5934614259-4">#</span><span class="nc" data-group-id="5934614259-4">PID</span><span class="p" data-group-id="5934614259-4">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">214</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="5934614259-4">&gt;</span><span class="p" data-group-id="5934614259-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="stop/0">
+  <div class="detail-header">
+    <a href="#stop/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">stop()</h1>
+      <div class="specs">
+          <pre>stop() :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Stop the listener</p>
+<h2 id="stop/0-example" class="section-heading">
+  <a href="#stop/0-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">stop</span><span class="p" data-group-id="0318064548-1">(</span><span class="p" data-group-id="0318064548-1">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="subscribe/2">
+  <div class="detail-header">
+    <a href="#subscribe/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">subscribe(event, subscriber_pid)</h1>
+      <div class="specs">
+          <pre>subscribe(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>()) :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Subscribe a process to notifications for a general event.
+These events are the following (passed as an atom):</p>
+<ul>
+<li><code class="inline">:micro_blocks</code>
+</li>
+<li><code class="inline">:key_blocks</code>
+</li>
+<li><code class="inline">:transactions</code>
+</li>
+<li><code class="inline">:pool_transactions</code>
+</li>
+</ul>
+<p>Micro blocks are in a light format, meaning that they don&#39;t contain any transactions.
+Subscribing to <code class="inline">:transactions</code> will notify for any mined transactions, while <code class="inline">:pool_transactions</code>
+will notify for any new transactions added to the pool.</p>
+<h2 id="subscribe/2-example" class="section-heading">
+  <a href="#subscribe/2-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="1903260727-1">(</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="1903260727-2">(</span><span class="p" data-group-id="1903260727-2">)</span><span class="p" data-group-id="1903260727-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="1903260727-3">(</span><span class="p" data-group-id="1903260727-3">)</span><span class="w">
+</span><span class="p" data-group-id="1903260727-4">{</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="1903260727-5">%{</span><span class="w">
+   </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">107613</span><span class="p">,</span><span class="w">
+   </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_V9dqj32R728EmdtaeXmGC7Zn94oAtje2mU2R9vQeCE3uDF52z&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">15682880022608178725</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pow_evidence</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1903260727-6">[</span><span class="mi">36880953</span><span class="p">,</span><span class="w"> </span><span class="mi">49948618</span><span class="p">,</span><span class="w"> </span><span class="mi">71657014</span><span class="p">,</span><span class="w"> </span><span class="mi">77943721</span><span class="p">,</span><span class="w"> </span><span class="mi">103433465</span><span class="p">,</span><span class="w"> </span><span class="mi">109309407</span><span class="p">,</span><span class="w">
+    </span><span class="mi">127422545</span><span class="p">,</span><span class="w"> </span><span class="mi">140895507</span><span class="p">,</span><span class="w"> </span><span class="mi">181678786</span><span class="p">,</span><span class="w"> </span><span class="mi">182358531</span><span class="p">,</span><span class="w"> </span><span class="mi">186372470</span><span class="p">,</span><span class="w"> </span><span class="mi">188704699</span><span class="p">,</span><span class="w"> </span><span class="mi">189292674</span><span class="p">,</span><span class="w">
+    </span><span class="mi">201708293</span><span class="p">,</span><span class="w"> </span><span class="mi">215741852</span><span class="p">,</span><span class="w"> </span><span class="mi">233410604</span><span class="p">,</span><span class="w"> </span><span class="mi">255594855</span><span class="p">,</span><span class="w"> </span><span class="mi">257736633</span><span class="p">,</span><span class="w"> </span><span class="mi">266211649</span><span class="p">,</span><span class="w"> </span><span class="mi">269325362</span><span class="p">,</span><span class="w">
+    </span><span class="mi">274670268</span><span class="p">,</span><span class="w"> </span><span class="mi">292854435</span><span class="p">,</span><span class="w"> </span><span class="mi">295392989</span><span class="p">,</span><span class="w"> </span><span class="mi">307433512</span><span class="p">,</span><span class="w"> </span><span class="mi">312822688</span><span class="p">,</span><span class="w"> </span><span class="mi">330979144</span><span class="p">,</span><span class="w"> </span><span class="mi">339358365</span><span class="p">,</span><span class="w">
+    </span><span class="mi">340662380</span><span class="p">,</span><span class="w"> </span><span class="mi">356338119</span><span class="p">,</span><span class="w"> </span><span class="mi">356413992</span><span class="p">,</span><span class="w"> </span><span class="mi">363610991</span><span class="p">,</span><span class="w"> </span><span class="mi">364811647</span><span class="p">,</span><span class="w"> </span><span class="mi">387037152</span><span class="p">,</span><span class="w"> </span><span class="mi">387943984</span><span class="p">,</span><span class="w">
+    </span><span class="mi">438683034</span><span class="p">,</span><span class="w"> </span><span class="mi">469469067</span><span class="p">,</span><span class="w"> </span><span class="mi">472181309</span><span class="p">,</span><span class="w"> </span><span class="mi">479842054</span><span class="p">,</span><span class="w"> </span><span class="mi">484418139</span><span class="p">,</span><span class="w"> </span><span class="mi">506523084</span><span class="p">,</span><span class="w"> </span><span class="mi">517149088</span><span class="p">,</span><span class="w">
+    </span><span class="mi">532705934</span><span class="p" data-group-id="1903260727-6">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_nxXxmga7AU5T3N7GGUV4s5T8YvJYEZnXGTaaUoLgBStva1dT4&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_j47UCW6UYYN4FhcMwQgynpAKdddKeAkPUUFyF6G35hArsfo8Q&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">root_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_2hpHUMa7VWVTdcwwSm4L7U1CLMXqTbhrjZYJ2FMLz1LZCKfoCG&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">504011610</span><span class="p">,</span><span class="w">
+   </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1562765121744</span><span class="p">,</span><span class="w">
+   </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
+ </span><span class="p" data-group-id="1903260727-5">}</span><span class="p" data-group-id="1903260727-4">}</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="subscribe/3">
+  <div class="detail-header">
+    <a href="#subscribe/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">subscribe(event, subscriber_pid, filter)</h1>
+      <div class="specs">
+          <pre>subscribe(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>(), <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>()) :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Subscribe a process to notifications for a filterable event i.e. a spend transaction
+with a specific recipient or an oracle query transaction that targets a specific oracle.</p>
+<p>These events are the following and are filtered by a specific property:</p>
+<ul>
+<li><code class="inline">:spend_transactions</code> - recipient
+</li>
+<li><code class="inline">:oracle_queries</code> - oracle ID
+</li>
+<li><code class="inline">:oracle_responses</code> - oracle query ID
+</li>
+<li><code class="inline">:pool_spend_transactions</code> - recipient
+</li>
+<li><code class="inline">:pool_oracle_queries</code> - oracle ID
+</li>
+<li><code class="inline">:pool_oracle_responses</code> - oracle query ID
+</li>
+</ul>
+<h2 id="subscribe/3-example" class="section-heading">
+  <a href="#subscribe/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="3937623631-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="3937623631-2">(</span><span class="p" data-group-id="3937623631-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="3937623631-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="3937623631-3">(</span><span class="p" data-group-id="3937623631-3">)</span><span class="w">
+</span><span class="p" data-group-id="3937623631-4">{</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="3937623631-5">%{</span><span class="w">
+    </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2Z9198iTQbBBE3jdeFxJQNMHqGNSESxG7PyTs3vU3JZUjYs319&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3937623631-6">%{</span><span class="w">
+      </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
+      </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">16640000000</span><span class="p">,</span><span class="w">
+      </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+      </span><span class="ss">payload</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">recipient_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:spend_tx</span><span class="w">
+    </span><span class="p" data-group-id="3937623631-6">}</span><span class="w">
+  </span><span class="p" data-group-id="3937623631-5">}</span><span class="w">
+</span><span class="p" data-group-id="3937623631-4">}</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="subscribe_for_contract_events/3">
+  <div class="detail-header">
+    <a href="#subscribe_for_contract_events/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">subscribe_for_contract_events(client, subscriber_pid, contract_id)</h1>
+      <div class="specs">
+          <pre>subscribe_for_contract_events(
+  <a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>(),
+  <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>()
+) :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Subscribe a process to notifications for any events that are to be emitted by a contract.</p>
+<h2 id="subscribe_for_contract_events/3-example" class="section-heading">
+  <a href="#subscribe_for_contract_events/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="8012064059-1">(</span><span class="w">
+  </span><span class="p" data-group-id="8012064059-2">%{</span><span class="w">
+    </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">secret</span><span class="p">:</span><span class="w">
+      </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+  </span><span class="p" data-group-id="8012064059-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="p" data-group-id="8012064059-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">contract_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ct_jzmNJ8ZrMRFw8boyhxFDVYZhNGkmBNNV8hhKeebnFoKFYoQ58&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="8012064059-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="8012064059-4">(</span><span class="p" data-group-id="8012064059-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p" data-group-id="8012064059-3">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="subscribe_for_contract_events/5">
+    <span id="subscribe_for_contract_events/4"></span>
+  <div class="detail-header">
+    <a href="#subscribe_for_contract_events/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">subscribe_for_contract_events(client, subscriber_pid, contract_id, event_name, topic_types \\ [])</h1>
+      <div class="specs">
+          <pre>subscribe_for_contract_events(
+  <a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(),
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>(),
+  <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>(),
+  <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(),
+  [<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>()]
+) :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Subscribe a process to notifications for any events with the specified name that are to be emitted by a contract.
+Optionally, topics can be encoded by passing a list of their respective types (must be in the same order as in the event).
+The types can be the following:</p>
+<ul>
+<li><code class="inline">:address</code>
+</li>
+<li><code class="inline">:contract</code>
+</li>
+<li><code class="inline">:oracle</code>
+</li>
+<li><code class="inline">:oracle_query</code>
+</li>
+<li><code class="inline">:int</code>
+</li>
+<li><code class="inline">:bits</code>
+</li>
+<li><code class="inline">:bytes</code>
+</li>
+<li><code class="inline">:bool</code>
+</li>
+</ul>
+<h2 id="subscribe_for_contract_events/5-example" class="section-heading">
+  <a href="#subscribe_for_contract_events/5-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="4809883618-1">(</span><span class="w">
+  </span><span class="p" data-group-id="4809883618-2">%{</span><span class="w">
+    </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">secret</span><span class="p">:</span><span class="w">
+      </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+  </span><span class="p" data-group-id="4809883618-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
+  </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="p" data-group-id="4809883618-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">contract_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ct_jzmNJ8ZrMRFw8boyhxFDVYZhNGkmBNNV8hhKeebnFoKFYoQ58&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">event_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SomeEvent&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="4809883618-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="4809883618-4">(</span><span class="p" data-group-id="4809883618-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p">,</span><span class="w"> </span><span class="n">event_name</span><span class="p" data-group-id="4809883618-3">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="unsubscribe/2">
+  <div class="detail-header">
+    <a href="#unsubscribe/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">unsubscribe(event, subscriber_pid)</h1>
+      <div class="specs">
+          <pre>unsubscribe(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">pid</a>()) :: :ok</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="unsubscribe/3">
+  <div class="detail-header">
+    <a href="#unsubscribe/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">unsubscribe(event, subscriber_pid, filter)</h1>
+  </div>
+  <section class="docstring">
+<p>Unsubscribe a process from a filterable event.</p>
+<h2 id="unsubscribe/3-example" class="section-heading">
+  <a href="#unsubscribe/3-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p" data-group-id="4465293816-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="4465293816-2">(</span><span class="p" data-group-id="4465293816-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="4465293816-1">)</span><span class="w">
+</span><span class="ss">:ok</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>

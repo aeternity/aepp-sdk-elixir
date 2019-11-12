@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeppSDK.GeneralizedAccount — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
+    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+      <a href="api-reference.html">
+        <img src="assets/logo.png" alt="aepp_sdk_elixir" class="sidebar-projectImage">
+      </a>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeppSDK.GeneralizedAccount      </h1>
+
+
+        <section id="moduledoc">
+<p>Contains all generalized accounts functionalities.</p>
+<p>In order for its functions to be used, a client must be defined first.
+Client example can be found at: <a href="AeppSDK.Client.html#new/4"><code class="inline">AeppSDK.Client.new/4</code></a>.</p>
+<p>For more information: <a href="https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md">https://github.com/aeternity/protocol/blob/master/generalized_accounts/generalized_accounts.md</a></p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#attach/5">attach(client, source_code, auth_fun, init_args, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Attach a generalized account to a basic account. After a generalized account has been attached, it&#39;s possible
+pass an :auth option to transaction related functions in order to authorize them through the attached contract.
+A transaction is authorized whenever the call to the auth function returns true (and unauthorized when false).</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#compute_auth_id/1">compute_auth_id(meta_tx)</a>
+  </div>
+    <div class="summary-synopsis"><p>   Computes an authorization id for given GA meta tx</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#default_gas/0">default_gas()</a>
+  </div>
+    <div class="summary-synopsis"><p>false</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="attach/5">
+    <span id="attach/4"></span>
+  <div class="detail-header">
+    <a href="#attach/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">attach(client, source_code, auth_fun, init_args, opts \\ [])</h1>
+      <div class="specs">
+          <pre>attach(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), [<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()], <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()) ::
+  {:ok,
+   %{
+     block_hash: <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>(),
+     block_height: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+     tx_hash: <a href="AeppSDK.Utils.Encoding.html#t:base58c/0">AeppSDK.Utils.Encoding.base58c</a>()
+   }}
+  | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()}
+  | {:error, Env.t()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Attach a generalized account to a basic account. After a generalized account has been attached, it&#39;s possible
+pass an :auth option to transaction related functions in order to authorize them through the attached contract.
+A transaction is authorized whenever the call to the auth function returns true (and unauthorized when false).</p>
+<p>The option looks like this:
+auth: [
+  auth_contract_source: &quot;contract Authorization =</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">function</span><span class="w"> </span><span class="n">auth</span><span class="p" data-group-id="5533547734-1">(</span><span class="n">auth_value</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="p" data-group-id="5533547734-1">)</span><span class="w"> </span><span class="o">=</span><span class="w">
+  </span><span class="n">auth_value</span><span class="err">&quot;</span><span class="p">,</span></code></pre>
+<p>  auth_args: [&quot;true&quot;],
+  fee: 1_000_000_000_000_00,
+  gas: 50_000,
+  gas_price: 1_000_000_000,
+  ttl: 0
+]
+where gas, gas_price and ttl are optional.</p>
+<h2 id="attach/5-examples" class="section-heading">
+  <a href="#attach/5-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">source_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;contract Authorization =
+
+  entrypoint auth(auth_value : bool) =
+    auth_value&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">auth_fun</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;auth&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">init_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0610020229-1">[</span><span class="p" data-group-id="0610020229-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.GeneralizedAccount</span><span class="o">.</span><span class="n">attach</span><span class="p" data-group-id="0610020229-2">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">source_code</span><span class="p">,</span><span class="w"> </span><span class="n">auth_fun</span><span class="p">,</span><span class="w"> </span><span class="n">init_args</span><span class="p" data-group-id="0610020229-2">)</span><span class="w">
+</span><span class="p" data-group-id="0610020229-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="0610020229-4">%{</span><span class="w">
+   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_CfEuHm4V2omAQGNAxcdPARrkfnYbKuuF1HpGhG5oQvoVC34nD&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">92967</span><span class="p">,</span><span class="w">
+   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_9LutrWD1FuFyx4MUUeMcfyF3uebfaP8t5gzatWDLyFYsqK744&quot;</span><span class="w">
+ </span><span class="p" data-group-id="0610020229-4">}</span><span class="p" data-group-id="0610020229-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="compute_auth_id/1">
+  <div class="detail-header">
+    <a href="#compute_auth_id/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">compute_auth_id(meta_tx)</h1>
+      <div class="specs">
+          <pre>compute_auth_id(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()) :: {:ok, <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">binary</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>   Computes an authorization id for given GA meta tx</p>
+<h2 id="compute_auth_id/1-examples" class="section-heading">
+  <a href="#compute_auth_id/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">meta_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="7073356578-1">%{</span><span class="w">
+                  </span><span class="ss">abi_version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">auth_data</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7073356578-2">&lt;&lt;</span><span class="mi">43</span><span class="p">,</span><span class="w"> </span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="mi">244</span><span class="p">,</span><span class="w"> </span><span class="mi">119</span><span class="p">,</span><span class="w"> </span><span class="mi">202</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span><span class="w"> </span><span class="mi">127</span><span class="p" data-group-id="7073356578-2">&gt;&gt;</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">100000000000000</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">ga_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M&quot;</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">gas</span><span class="p">:</span><span class="w"> </span><span class="mi">50000</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+                  </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7073356578-3">&lt;&lt;</span><span class="mi">248</span><span class="p">,</span><span class="w"> </span><span class="mi">87</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">192</span><span class="p">,</span><span class="w"> </span><span class="mi">184</span><span class="p">,</span><span class="w"> </span><span class="mi">82</span><span class="p">,</span><span class="w"> </span><span class="mi">248</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">161</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">124</span><span class="p">,</span><span class="w"> </span><span class="mi">169</span><span class="p">,</span><span class="w"> </span><span class="mi">154</span><span class="p">,</span><span class="w">
+                    </span><span class="mi">140</span><span class="p">,</span><span class="w"> </span><span class="mi">216</span><span class="p">,</span><span class="w"> </span><span class="mi">36</span><span class="p">,</span><span class="w"> </span><span class="mi">178</span><span class="p">,</span><span class="w"> </span><span class="mi">163</span><span class="p">,</span><span class="w"> </span><span class="mi">239</span><span class="p">,</span><span class="w"> </span><span class="mi">195</span><span class="p">,</span><span class="w"> </span><span class="mi">198</span><span class="p">,</span><span class="w"> </span><span class="mi">197</span><span class="p">,</span><span class="w"> </span><span class="mi">213</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">88</span><span class="p">,</span><span class="w"> </span><span class="mi">87</span><span class="p">,</span><span class="w"> </span><span class="mi">19</span><span class="p">,</span><span class="w"> </span><span class="mi">67</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">117</span><span class="p">,</span><span class="w">
+                    </span><span class="mi">212</span><span class="p">,</span><span class="w"> </span><span class="mi">206</span><span class="p">,</span><span class="w"> </span><span class="mi">105</span><span class="p">,</span><span class="w"> </span><span class="mi">153</span><span class="p">,</span><span class="w"> </span><span class="mi">178</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">203</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">248</span><span class="p">,</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="mi">216</span><span class="p">,</span><span class="w"> </span><span class="mi">161</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span><span class="w"> </span><span class="mi">180</span><span class="p">,</span><span class="w"> </span><span class="mi">237</span><span class="p">,</span><span class="w">
+                    </span><span class="mi">121</span><span class="p">,</span><span class="w"> </span><span class="mi">39</span><span class="p">,</span><span class="w"> </span><span class="mi">249</span><span class="p">,</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">81</span><span class="p">,</span><span class="w"> </span><span class="mi">225</span><span class="p">,</span><span class="w"> </span><span class="mi">188</span><span class="p">,</span><span class="w"> </span><span class="mi">181</span><span class="p">,</span><span class="w"> </span><span class="mi">225</span><span class="p">,</span><span class="w"> </span><span class="mi">52</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w"> </span><span class="mi">51</span><span class="p">,</span><span class="w"> </span><span class="mi">91</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">,</span><span class="w">
+                    </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">188</span><span class="p">,</span><span class="w"> </span><span class="mi">82</span><span class="p">,</span><span class="w"> </span><span class="mi">33</span><span class="p">,</span><span class="w"> </span><span class="mi">214</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="mi">75</span><span class="p">,</span><span class="w"> </span><span class="mi">203</span><span class="p">,</span><span class="w"> </span><span class="mi">57</span><span class="p">,</span><span class="w"> </span><span class="mi">212</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">97</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">133</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">223</span><span class="p">,</span><span class="w"> </span><span class="mi">210</span><span class="p">,</span><span class="w">
+                    </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p" data-group-id="7073356578-3">&gt;&gt;</span><span class="w">
+                </span><span class="p" data-group-id="7073356578-1">}</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.GeneralizedAccount</span><span class="o">.</span><span class="n">compute_auth_id</span><span class="p" data-group-id="7073356578-4">(</span><span class="n">meta_tx</span><span class="p" data-group-id="7073356578-4">)</span><span class="w">
+</span><span class="p" data-group-id="7073356578-5">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7073356578-6">&lt;&lt;</span><span class="mi">141</span><span class="p">,</span><span class="w"> </span><span class="mi">79</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">237</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">190</span><span class="p">,</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w"> </span><span class="mi">175</span><span class="p">,</span><span class="w"> </span><span class="mi">230</span><span class="p">,</span><span class="w"> </span><span class="mi">66</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">,</span><span class="w"> </span><span class="mi">247</span><span class="p">,</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span><span class="w"> </span><span class="mi">83</span><span class="p">,</span><span class="w"> </span><span class="mi">109</span><span class="p">,</span><span class="w"> </span><span class="mi">142</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+   </span><span class="mi">161</span><span class="p">,</span><span class="w"> </span><span class="mi">69</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">114</span><span class="p">,</span><span class="w"> </span><span class="mi">107</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">,</span><span class="w"> </span><span class="mi">155</span><span class="p">,</span><span class="w"> </span><span class="mi">198</span><span class="p">,</span><span class="w"> </span><span class="mi">212</span><span class="p">,</span><span class="w"> </span><span class="mi">142</span><span class="p">,</span><span class="w"> </span><span class="mi">147</span><span class="p">,</span><span class="w"> </span><span class="mi">104</span><span class="p">,</span><span class="w"> </span><span class="mi">117</span><span class="p" data-group-id="7073356578-6">&gt;&gt;</span><span class="p" data-group-id="7073356578-5">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="default_gas/0">
+  <div class="detail-header">
+    <a href="#default_gas/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">default_gas()</h1>
+  </div>
+  <section class="docstring">
+<p>false</p>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>

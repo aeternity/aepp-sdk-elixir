@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.21.2">
+    <meta name="project" content="aepp_sdk_elixir v0.1.0">
+    <title>AeppSDK.Client — aepp_sdk_elixir v0.1.0</title>
+    <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
+    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+      <script src="docs_config.js"></script>
+    <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectDetails">
+      <a href="api-reference.html" class="sidebar-projectName">
+aepp_sdk_elixir      </a>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+      <a href="api-reference.html">
+        <img src="assets/logo.png" alt="aepp_sdk_elixir" class="sidebar-projectImage">
+      </a>
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+
+
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+      <h1>
+        <small class="app-vsn">aepp_sdk_elixir v0.1.0</small>
+AeppSDK.Client      </h1>
+
+
+        <section id="moduledoc">
+<p>Contains the Client structure, holding all the data that is needed in order to use the SDK.</p>
+        </section>
+
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:keypair/0">keypair()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:option/0">option()</a>
+  </div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:t/0">t()</a>
+  </div>
+</div>
+  </div>
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#delete/3">delete(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a DELETE request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#delete!/3">delete!(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a DELETE request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get/3">get(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a GET request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get!/3">get!(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a GET request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#head/3">head(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a HEAD request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#head!/3">head!(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a HEAD request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#new/5">new(keypair, network_id, url, internal_url, opts \\ [])</a>
+  </div>
+    <div class="summary-synopsis"><p>Client constructor</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#options/3">options(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a OPTIONS request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#options!/3">options!(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a OPTIONS request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#patch/4">patch(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a PATCH request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#patch!/4">patch!(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a PATCH request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#post/4">post(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a POST request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#post!/4">post!(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a POST request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#put/4">put(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a PUT request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#put!/4">put!(client, url, body, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a PUT request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#request/2">request(client \\ %Tesla.Client{}, options)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a request</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#request!/2">request!(client \\ %Tesla.Client{}, options)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform request and raise in case of error.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#trace/3">trace(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a TRACE request.</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#trace!/3">trace!(client, url, opts)</a>
+  </div>
+    <div class="summary-synopsis"><p>Perform a TRACE request.</p></div>
+</div>
+  </div>
+        </section>
+
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types          </h1>
+          <div class="types-list">
+<section class="detail" id="t:keypair/0">
+  <div class="detail-header">
+    <a href="#t:keypair/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">keypair()</h1>
+      <div class="specs">
+          <pre>keypair() :: %{public: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), secret: (... -> <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>())}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:option/0">
+  <div class="detail-header">
+    <a href="#t:option/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">option()</h1>
+      <div class="specs">
+          <pre>option() ::
+  {:method, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:method/0">Tesla.Env.method</a>()}
+  | {:url, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>()}
+  | {:query, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:query/0">Tesla.Env.query</a>()}
+  | {:headers, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:headers/0">Tesla.Env.headers</a>()}
+  | {:body, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>()}
+  | {:opts, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:opts/0">Tesla.Env.opts</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+<section class="detail" id="t:t/0">
+  <div class="detail-header">
+    <a href="#t:t/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">t()</h1>
+      <div class="specs">
+          <pre>t() :: %AeppSDK.Client{
+  connection: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">struct</a>(),
+  gas_price: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">non_neg_integer</a>(),
+  internal_connection: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">struct</a>(),
+  keypair: <a href="#t:keypair/0">keypair</a>(),
+  middleware: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">struct</a>(),
+  network_id: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()
+}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+  </section>
+</section>
+          </div>
+        </section>
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Functions          </h1>
+          <div class="functions-list">
+<section class="detail" id="delete/3">
+  <div class="detail-header">
+    <a href="#delete/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">delete(client, url, opts)</h1>
+      <div class="specs">
+          <pre>delete(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a DELETE request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">delete</span><span class="p" data-group-id="5801224231-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="5801224231-1">)</span><span class="w">
+</span><span class="n">delete</span><span class="p" data-group-id="5801224231-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5801224231-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="5801224231-3">]</span><span class="p" data-group-id="5801224231-2">)</span><span class="w">
+</span><span class="n">delete</span><span class="p" data-group-id="5801224231-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="5801224231-4">)</span><span class="w">
+</span><span class="n">delete</span><span class="p" data-group-id="5801224231-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5801224231-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="5801224231-6">]</span><span class="p" data-group-id="5801224231-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="delete!/3">
+  <div class="detail-header">
+    <a href="#delete!/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">delete!(client, url, opts)</h1>
+      <div class="specs">
+          <pre>delete!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a DELETE request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">delete!</span><span class="p" data-group-id="0943579762-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="0943579762-1">)</span><span class="w">
+</span><span class="n">delete!</span><span class="p" data-group-id="0943579762-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0943579762-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="0943579762-3">]</span><span class="p" data-group-id="0943579762-2">)</span><span class="w">
+</span><span class="n">delete!</span><span class="p" data-group-id="0943579762-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="0943579762-4">)</span><span class="w">
+</span><span class="n">delete!</span><span class="p" data-group-id="0943579762-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0943579762-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="0943579762-6">]</span><span class="p" data-group-id="0943579762-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get/3">
+  <div class="detail-header">
+    <a href="#get/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get(client, url, opts)</h1>
+      <div class="specs">
+          <pre>get(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a GET request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">get</span><span class="p" data-group-id="2551375250-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="2551375250-1">)</span><span class="w">
+</span><span class="n">get</span><span class="p" data-group-id="2551375250-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2551375250-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2551375250-3">]</span><span class="p" data-group-id="2551375250-2">)</span><span class="w">
+</span><span class="n">get</span><span class="p" data-group-id="2551375250-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="2551375250-4">)</span><span class="w">
+</span><span class="n">get</span><span class="p" data-group-id="2551375250-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2551375250-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2551375250-6">]</span><span class="p" data-group-id="2551375250-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get!/3">
+  <div class="detail-header">
+    <a href="#get!/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get!(client, url, opts)</h1>
+      <div class="specs">
+          <pre>get!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a GET request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">get!</span><span class="p" data-group-id="3781859649-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="3781859649-1">)</span><span class="w">
+</span><span class="n">get!</span><span class="p" data-group-id="3781859649-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3781859649-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="3781859649-3">]</span><span class="p" data-group-id="3781859649-2">)</span><span class="w">
+</span><span class="n">get!</span><span class="p" data-group-id="3781859649-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="3781859649-4">)</span><span class="w">
+</span><span class="n">get!</span><span class="p" data-group-id="3781859649-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3781859649-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="3781859649-6">]</span><span class="p" data-group-id="3781859649-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="head/3">
+  <div class="detail-header">
+    <a href="#head/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">head(client, url, opts)</h1>
+      <div class="specs">
+          <pre>head(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a HEAD request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">head</span><span class="p" data-group-id="1324937542-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="1324937542-1">)</span><span class="w">
+</span><span class="n">head</span><span class="p" data-group-id="1324937542-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1324937542-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1324937542-3">]</span><span class="p" data-group-id="1324937542-2">)</span><span class="w">
+</span><span class="n">head</span><span class="p" data-group-id="1324937542-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="1324937542-4">)</span><span class="w">
+</span><span class="n">head</span><span class="p" data-group-id="1324937542-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1324937542-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1324937542-6">]</span><span class="p" data-group-id="1324937542-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="head!/3">
+  <div class="detail-header">
+    <a href="#head!/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">head!(client, url, opts)</h1>
+      <div class="specs">
+          <pre>head!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a HEAD request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">head!</span><span class="p" data-group-id="2324400344-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="2324400344-1">)</span><span class="w">
+</span><span class="n">head!</span><span class="p" data-group-id="2324400344-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2324400344-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2324400344-3">]</span><span class="p" data-group-id="2324400344-2">)</span><span class="w">
+</span><span class="n">head!</span><span class="p" data-group-id="2324400344-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="2324400344-4">)</span><span class="w">
+</span><span class="n">head!</span><span class="p" data-group-id="2324400344-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2324400344-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2324400344-6">]</span><span class="p" data-group-id="2324400344-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="new/5">
+    <span id="new/4"></span>
+  <div class="detail-header">
+    <a href="#new/5" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">new(keypair, network_id, url, internal_url, opts \\ [])</h1>
+      <div class="specs">
+          <pre>new(<a href="#t:keypair/0">keypair</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()) :: <a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Client constructor</p>
+<h2 id="new/5-example" class="section-heading">
+  <a href="#new/5-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">public_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">secret_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">network_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">internal_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="3800067237-1">(</span><span class="p" data-group-id="3800067237-2">%{</span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="n">public_key</span><span class="p">,</span><span class="w"> </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="n">secret_key</span><span class="p" data-group-id="3800067237-2">}</span><span class="p">,</span><span class="w"> </span><span class="n">network_id</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">internal_url</span><span class="p" data-group-id="3800067237-1">)</span><span class="w">
+</span><span class="p" data-group-id="3800067237-3">%</span><span class="nc" data-group-id="3800067237-3">AeppSDK.Client</span><span class="p" data-group-id="3800067237-3">{</span><span class="w">
+      </span><span class="ss">connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-4">%</span><span class="nc" data-group-id="3800067237-4">Tesla.Client</span><span class="p" data-group-id="3800067237-4">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-5">{</span><span class="nc">Tesla.Adapter.Hackney</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3800067237-6">[</span><span class="p" data-group-id="3800067237-7">[</span><span class="ss">recv_timeout</span><span class="p">:</span><span class="w"> </span><span class="mi">30000</span><span class="p" data-group-id="3800067237-7">]</span><span class="p" data-group-id="3800067237-6">]</span><span class="p" data-group-id="3800067237-5">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-8">[</span><span class="p" data-group-id="3800067237-8">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-9">[</span><span class="w">
+          </span><span class="p" data-group-id="3800067237-10">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3800067237-11">[</span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p" data-group-id="3800067237-11">]</span><span class="p" data-group-id="3800067237-10">}</span><span class="w">
+        </span><span class="p" data-group-id="3800067237-9">]</span><span class="w">
+      </span><span class="p" data-group-id="3800067237-4">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">gas_price</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+      </span><span class="ss">internal_connection</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-12">%</span><span class="nc" data-group-id="3800067237-12">Tesla.Client</span><span class="p" data-group-id="3800067237-12">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-13">{</span><span class="nc">Tesla.Adapter.Hackney</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3800067237-14">[</span><span class="p" data-group-id="3800067237-15">[</span><span class="ss">recv_timeout</span><span class="p">:</span><span class="w"> </span><span class="mi">30000</span><span class="p" data-group-id="3800067237-15">]</span><span class="p" data-group-id="3800067237-14">]</span><span class="p" data-group-id="3800067237-13">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-16">[</span><span class="p" data-group-id="3800067237-16">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-17">[</span><span class="w">
+          </span><span class="p" data-group-id="3800067237-18">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3800067237-19">[</span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p" data-group-id="3800067237-19">]</span><span class="p" data-group-id="3800067237-18">}</span><span class="w">
+        </span><span class="p" data-group-id="3800067237-17">]</span><span class="w">
+      </span><span class="p" data-group-id="3800067237-12">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">keypair</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-20">%{</span><span class="w">
+        </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+        </span><span class="ss">secret</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-21">#</span><span class="nc" data-group-id="3800067237-21">Function</span><span class="p" data-group-id="3800067237-21">&lt;</span><span class="mf">1.7530086</span><span class="o">/</span><span class="mi">0</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="o">/</span><span class="mi">5</span><span class="p" data-group-id="3800067237-21">&gt;</span><span class="w">
+      </span><span class="p" data-group-id="3800067237-20">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">middleware</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-22">%</span><span class="nc" data-group-id="3800067237-22">Tesla.Client</span><span class="p" data-group-id="3800067237-22">{</span><span class="w">
+        </span><span class="ss">adapter</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-23">{</span><span class="nc">Tesla.Adapter.Hackney</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3800067237-24">[</span><span class="p" data-group-id="3800067237-25">[</span><span class="ss">recv_timeout</span><span class="p">:</span><span class="w"> </span><span class="mi">30000</span><span class="p" data-group-id="3800067237-25">]</span><span class="p" data-group-id="3800067237-24">]</span><span class="p" data-group-id="3800067237-23">}</span><span class="p">,</span><span class="w">
+        </span><span class="ss">fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+        </span><span class="ss">post</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-26">[</span><span class="p" data-group-id="3800067237-26">]</span><span class="p">,</span><span class="w">
+        </span><span class="ss">pre</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3800067237-27">[</span><span class="w">
+          </span><span class="p" data-group-id="3800067237-28">{</span><span class="nc">Tesla.Middleware.BaseUrl</span><span class="p">,</span><span class="w"> </span><span class="ss">:call</span><span class="p">,</span><span class="w">
+           </span><span class="p" data-group-id="3800067237-29">[</span><span class="s">&quot;https://testnet.aeternal.io/middleware&quot;</span><span class="p" data-group-id="3800067237-29">]</span><span class="p" data-group-id="3800067237-28">}</span><span class="w">
+        </span><span class="p" data-group-id="3800067237-27">]</span><span class="w">
+      </span><span class="p" data-group-id="3800067237-22">}</span><span class="p">,</span><span class="w">
+      </span><span class="ss">network_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ae_uat&quot;</span><span class="w">
+    </span><span class="p" data-group-id="3800067237-3">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="options/3">
+  <div class="detail-header">
+    <a href="#options/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">options(client, url, opts)</h1>
+      <div class="specs">
+          <pre>options(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a OPTIONS request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">options</span><span class="p" data-group-id="4317010533-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="4317010533-1">)</span><span class="w">
+</span><span class="n">options</span><span class="p" data-group-id="4317010533-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4317010533-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="4317010533-3">]</span><span class="p" data-group-id="4317010533-2">)</span><span class="w">
+</span><span class="n">options</span><span class="p" data-group-id="4317010533-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="4317010533-4">)</span><span class="w">
+</span><span class="n">options</span><span class="p" data-group-id="4317010533-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4317010533-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="4317010533-6">]</span><span class="p" data-group-id="4317010533-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="options!/3">
+  <div class="detail-header">
+    <a href="#options!/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">options!(client, url, opts)</h1>
+      <div class="specs">
+          <pre>options!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a OPTIONS request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">options!</span><span class="p" data-group-id="5248956271-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="5248956271-1">)</span><span class="w">
+</span><span class="n">options!</span><span class="p" data-group-id="5248956271-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5248956271-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="5248956271-3">]</span><span class="p" data-group-id="5248956271-2">)</span><span class="w">
+</span><span class="n">options!</span><span class="p" data-group-id="5248956271-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="5248956271-4">)</span><span class="w">
+</span><span class="n">options!</span><span class="p" data-group-id="5248956271-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5248956271-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="5248956271-6">]</span><span class="p" data-group-id="5248956271-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="patch/4">
+  <div class="detail-header">
+    <a href="#patch/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">patch(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>patch(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a PATCH request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">patch</span><span class="p" data-group-id="9619073980-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9619073980-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="9619073980-2">}</span><span class="p" data-group-id="9619073980-1">)</span><span class="w">
+</span><span class="n">patch</span><span class="p" data-group-id="9619073980-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9619073980-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="9619073980-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9619073980-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="9619073980-5">]</span><span class="p" data-group-id="9619073980-3">)</span><span class="w">
+</span><span class="n">patch</span><span class="p" data-group-id="9619073980-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9619073980-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="9619073980-7">}</span><span class="p" data-group-id="9619073980-6">)</span><span class="w">
+</span><span class="n">patch</span><span class="p" data-group-id="9619073980-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9619073980-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="9619073980-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9619073980-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="9619073980-10">]</span><span class="p" data-group-id="9619073980-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="patch!/4">
+  <div class="detail-header">
+    <a href="#patch!/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">patch!(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>patch!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a PATCH request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">patch!</span><span class="p" data-group-id="1153747738-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1153747738-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1153747738-2">}</span><span class="p" data-group-id="1153747738-1">)</span><span class="w">
+</span><span class="n">patch!</span><span class="p" data-group-id="1153747738-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1153747738-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1153747738-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1153747738-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1153747738-5">]</span><span class="p" data-group-id="1153747738-3">)</span><span class="w">
+</span><span class="n">patch!</span><span class="p" data-group-id="1153747738-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1153747738-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1153747738-7">}</span><span class="p" data-group-id="1153747738-6">)</span><span class="w">
+</span><span class="n">patch!</span><span class="p" data-group-id="1153747738-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1153747738-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1153747738-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1153747738-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1153747738-10">]</span><span class="p" data-group-id="1153747738-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="post/4">
+  <div class="detail-header">
+    <a href="#post/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">post(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>post(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a POST request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">post</span><span class="p" data-group-id="7999209653-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7999209653-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="7999209653-2">}</span><span class="p" data-group-id="7999209653-1">)</span><span class="w">
+</span><span class="n">post</span><span class="p" data-group-id="7999209653-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7999209653-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="7999209653-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7999209653-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="7999209653-5">]</span><span class="p" data-group-id="7999209653-3">)</span><span class="w">
+</span><span class="n">post</span><span class="p" data-group-id="7999209653-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7999209653-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="7999209653-7">}</span><span class="p" data-group-id="7999209653-6">)</span><span class="w">
+</span><span class="n">post</span><span class="p" data-group-id="7999209653-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7999209653-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="7999209653-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7999209653-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="7999209653-10">]</span><span class="p" data-group-id="7999209653-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="post!/4">
+  <div class="detail-header">
+    <a href="#post!/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">post!(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>post!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a POST request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">post!</span><span class="p" data-group-id="2063242133-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2063242133-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="2063242133-2">}</span><span class="p" data-group-id="2063242133-1">)</span><span class="w">
+</span><span class="n">post!</span><span class="p" data-group-id="2063242133-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2063242133-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="2063242133-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2063242133-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2063242133-5">]</span><span class="p" data-group-id="2063242133-3">)</span><span class="w">
+</span><span class="n">post!</span><span class="p" data-group-id="2063242133-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2063242133-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="2063242133-7">}</span><span class="p" data-group-id="2063242133-6">)</span><span class="w">
+</span><span class="n">post!</span><span class="p" data-group-id="2063242133-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="2063242133-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="2063242133-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2063242133-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="2063242133-10">]</span><span class="p" data-group-id="2063242133-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="put/4">
+  <div class="detail-header">
+    <a href="#put/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">put(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>put(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a PUT request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">put</span><span class="p" data-group-id="0283362391-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0283362391-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="0283362391-2">}</span><span class="p" data-group-id="0283362391-1">)</span><span class="w">
+</span><span class="n">put</span><span class="p" data-group-id="0283362391-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0283362391-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="0283362391-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0283362391-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="0283362391-5">]</span><span class="p" data-group-id="0283362391-3">)</span><span class="w">
+</span><span class="n">put</span><span class="p" data-group-id="0283362391-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0283362391-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="0283362391-7">}</span><span class="p" data-group-id="0283362391-6">)</span><span class="w">
+</span><span class="n">put</span><span class="p" data-group-id="0283362391-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0283362391-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="0283362391-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0283362391-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="0283362391-10">]</span><span class="p" data-group-id="0283362391-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="put!/4">
+  <div class="detail-header">
+    <a href="#put!/4" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">put!(client, url, body, opts)</h1>
+      <div class="specs">
+          <pre>put!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:body/0">Tesla.Env.body</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a PUT request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">put!</span><span class="p" data-group-id="1495412383-1">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1495412383-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1495412383-2">}</span><span class="p" data-group-id="1495412383-1">)</span><span class="w">
+</span><span class="n">put!</span><span class="p" data-group-id="1495412383-3">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1495412383-4">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1495412383-4">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1495412383-5">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1495412383-5">]</span><span class="p" data-group-id="1495412383-3">)</span><span class="w">
+</span><span class="n">put!</span><span class="p" data-group-id="1495412383-6">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1495412383-7">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1495412383-7">}</span><span class="p" data-group-id="1495412383-6">)</span><span class="w">
+</span><span class="n">put!</span><span class="p" data-group-id="1495412383-8">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="1495412383-9">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="1495412383-9">}</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1495412383-10">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="1495412383-10">]</span><span class="p" data-group-id="1495412383-8">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="request/2">
+    <span id="request/1"></span>
+  <div class="detail-header">
+    <a href="#request/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">request(client \\ %Tesla.Client{}, options)</h1>
+      <div class="specs">
+          <pre>request(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a request</p>
+<p>Options:</p>
+<ul>
+<li><code class="inline">:method</code>   - the request method, one of [:head, :get, :delete, :trace, :options, :post, :put, :patch]
+</li>
+<li><code class="inline">:url</code>      - either full url e.g. &quot;<a href="http://example.com/some/path">http://example.com/some/path</a>&quot; or just &quot;/some/path&quot; if using <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Middleware.BaseUrl.html"><code class="inline">Tesla.Middleware.BaseUrl</code></a>
+</li>
+<li><code class="inline">:query</code>    - a keyword list of query params, e.g. <code class="inline">[page: 1, per_page: 100]</code>
+</li>
+<li><code class="inline">:headers</code>  - a keyworld list of headers, e.g. <code class="inline">[{&quot;content-type&quot;, &quot;text/plain&quot;}]</code>
+</li>
+<li><p><code class="inline">:body</code>     - depends on used middleware:</p>
+<ul>
+<li>by default it can be a binary
+</li>
+<li>if using e.g. JSON encoding middleware it can be a nested map
+</li>
+<li>if adapter supports it it can be a Stream with any of the above
+</li>
+</ul>
+</li>
+<li><code class="inline">:opts</code>     - custom, per-request middleware or adapter options
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code class="nohighlight makeup elixir"><span class="nc">ExampleApi</span><span class="o">.</span><span class="n">request</span><span class="p" data-group-id="1937250521-1">(</span><span class="ss">method</span><span class="p">:</span><span class="w"> </span><span class="ss">:get</span><span class="p">,</span><span class="w"> </span><span class="ss">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/users/path&quot;</span><span class="p" data-group-id="1937250521-1">)</span></code></pre>
+<p>You can also use shortcut methods like:</p>
+<pre><code class="nohighlight makeup elixir"><span class="nc">ExampleApi</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="8631384766-1">(</span><span class="s">&quot;/users/1&quot;</span><span class="p" data-group-id="8631384766-1">)</span></code></pre>
+<p>or</p>
+<pre><code class="nohighlight makeup elixir"><span class="nc">ExampleApi</span><span class="o">.</span><span class="n">post</span><span class="p" data-group-id="4425774317-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4425774317-2">%{</span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Jon&quot;</span><span class="p" data-group-id="4425774317-2">}</span><span class="p" data-group-id="4425774317-1">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="request!/2">
+    <span id="request!/1"></span>
+  <div class="detail-header">
+    <a href="#request!/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">request!(client \\ %Tesla.Client{}, options)</h1>
+      <div class="specs">
+          <pre>request!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform request and raise in case of error.</p>
+<p>This is similar to <a href="#request/2"><code class="inline">request/2</code></a> behaviour from Tesla 0.x</p>
+<p>See <a href="#request/2"><code class="inline">request/2</code></a> for list of available options.</p>
+  </section>
+</section>
+<section class="detail" id="trace/3">
+  <div class="detail-header">
+    <a href="#trace/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">trace(client, url, opts)</h1>
+      <div class="specs">
+          <pre>trace(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) :: <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:result/0">Tesla.Env.result</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a TRACE request.</p>
+<p>See <a href="#request/1"><code class="inline">request/1</code></a> or <a href="#request/2"><code class="inline">request/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">trace</span><span class="p" data-group-id="8089174985-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="8089174985-1">)</span><span class="w">
+</span><span class="n">trace</span><span class="p" data-group-id="8089174985-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8089174985-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="8089174985-3">]</span><span class="p" data-group-id="8089174985-2">)</span><span class="w">
+</span><span class="n">trace</span><span class="p" data-group-id="8089174985-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="8089174985-4">)</span><span class="w">
+</span><span class="n">trace</span><span class="p" data-group-id="8089174985-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8089174985-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="8089174985-6">]</span><span class="p" data-group-id="8089174985-5">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="trace!/3">
+  <div class="detail-header">
+    <a href="#trace!/3" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">trace!(client, url, opts)</h1>
+      <div class="specs">
+          <pre>trace!(<a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:client/0">Tesla.Env.client</a>(), <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:url/0">Tesla.Env.url</a>(), [<a href="#t:option/0">option</a>()]) ::
+  <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>() | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">no_return</a>()</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Perform a TRACE request.</p>
+<p>See <a href="#request!/1"><code class="inline">request!/1</code></a> or <a href="#request!/2"><code class="inline">request!/2</code></a> for options definition.</p>
+<pre><code class="nohighlight makeup elixir"><span class="n">trace!</span><span class="p" data-group-id="9799676477-1">(</span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="9799676477-1">)</span><span class="w">
+</span><span class="n">trace!</span><span class="p" data-group-id="9799676477-2">(</span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9799676477-3">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="9799676477-3">]</span><span class="p" data-group-id="9799676477-2">)</span><span class="w">
+</span><span class="n">trace!</span><span class="p" data-group-id="9799676477-4">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="9799676477-4">)</span><span class="w">
+</span><span class="n">trace!</span><span class="p" data-group-id="9799676477-5">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">query</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9799676477-6">[</span><span class="ss">scope</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;admin&quot;</span><span class="p" data-group-id="9799676477-6">]</span><span class="p" data-group-id="9799676477-5">)</span></code></pre>
+  </section>
+</section>
+          </div>
+        </section>
+      <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v0.21.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  </body>
+</html>
