@@ -4,7 +4,7 @@ defmodule AeppSdkElixir.MixProject do
   def project do
     [
       app: :aepp_sdk_elixir,
-      version: "0.1.0",
+      version: "0.5.0",
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
@@ -12,6 +12,7 @@ defmodule AeppSdkElixir.MixProject do
       aliases: aliases(),
       elixir: "~> 1.9",
       test_coverage: [tool: ExCoveralls],
+      docs: [logo: "logo.png", filter_prefix: "AeppSDK"],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
