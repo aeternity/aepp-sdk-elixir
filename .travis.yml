@@ -6,7 +6,7 @@ elixir: '1.9'
 
 env:
   global:
-    - AETERNITY_VERSION=5.0.2
+    - AETERNITY_VERSION=5.1.0
     - GENERATOR_VERSION=1.2.1
     - MIDDLEWARE_VERSION=0.10.0
     - LD_LIBRARY_PATH=$HOME/.libsodium/lib:$LD_LIBRARY_PATH
