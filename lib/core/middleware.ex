@@ -6,7 +6,7 @@ defmodule AeppSDK.Middleware do
   In order for its functions to be used, a client must be defined first.
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
-  alias AeppMiddleware.Api.Default, as: MiddlewareAPI
+  alias Aeternal.Api.Default, as: MiddlewareAPI
   alias AeppSDK.Client
   alias Tesla.Client, as: TeslaClient
 
