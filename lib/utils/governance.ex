@@ -42,6 +42,7 @@ defmodule AeppSDK.Utils.Governance do
   def tx_base_gas(%OracleQueryTx{}), do: @tx_base_gas
   def tx_base_gas(%OracleRespondTx{}), do: @tx_base_gas
   def tx_base_gas(%OracleExtendTx{}), do: @tx_base_gas
+  def tx_base_gas(%ContractCallTx{abi_version: 3}), do: 12 * @tx_base_gas
   def tx_base_gas(%ContractCallTx{}), do: 30 * @tx_base_gas
   def tx_base_gas(%ContractCreateTx{}), do: 5 * @tx_base_gas
   def tx_base_gas(%ChannelDepositTx{}), do: @tx_base_gas
