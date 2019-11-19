@@ -1,0 +1,11 @@
+contract Identity =
+      datatype event =
+        SomeEvent(string)
+        | AnotherEvent(string)
+
+      entrypoint init() =
+        ()
+
+      stateful entrypoint emit_event() =
+        Chain.event(SomeEvent("some event"))
+        Chain.event(AnotherEvent("another event"))

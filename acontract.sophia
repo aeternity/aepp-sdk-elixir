@@ -1,0 +1,10 @@
+ contract Identity =
+      datatype event =
+        SomeEvent(bool, bits, bytes(8))
+        | AnotherEvent(address, oracle(int, int), oracle_query(int, int))
+
+      stateful entrypoint emit_event() =
+        Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))
+        Chain.event(AnotherEvent(ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG,
+          ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5,
+          oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY))
