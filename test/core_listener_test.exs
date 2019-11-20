@@ -16,8 +16,8 @@ defmodule CoreListenerTest do
         "http://localhost:3113/v2"
       )
 
-    {:ok, fate_source_code} = File.read("fcontract.sophia")
-    {:ok, aevm_source_code} = File.read("acontract.sophia")
+    {:ok, fate_source_code} = File.read("fate_contract.sophia")
+    {:ok, aevm_source_code} = File.read("aevm_contract.sophia")
     [client: client, fate_source_code: fate_source_code, aevm_source_code: aevm_source_code]
   end
 
@@ -231,7 +231,7 @@ defmodule CoreListenerTest do
            ]} ->
             :ok
 
-          res ->
+          _res ->
             flunk("Received invalid message")
         end
 
