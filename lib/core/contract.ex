@@ -39,6 +39,7 @@ defmodule AeppSDK.Contract do
   @fate_ct_version 0x50003
   @aevm_ct_version 0x60001
   @genesis_beneficiary "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  @empty_error_msg "cb_Xfbg4g=="
 
   @type deploy_options :: [
           deposit: non_neg_integer(),
@@ -318,7 +319,7 @@ defmodule AeppSDK.Contract do
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
       {:ok, :aeb_fate_encoding.deserialize(decoded_return_value)}
     else
-      "error" when return_value === "cb_Xfbg4g==" ->
+      "error" when return_value === @empty_error_msg ->
         {:ok, :no_data}
 
       {:error, _} = error ->
