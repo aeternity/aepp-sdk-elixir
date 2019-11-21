@@ -16,19 +16,9 @@ defmodule CoreListenerTest do
         "http://localhost:3113/v2"
       )
 
-    source_code = "contract Identity =
-      datatype event =
-        SomeEvent(bool, bits, bytes(8))
-        | AnotherEvent(address, oracle(int, int), oracle_query(int, int))
-
-      type state = unit
-
-      stateful entrypoint emit_event() =
-        Chain.event(SomeEvent(true, Bits.all, #123456789abcdef))
-        Chain.event(AnotherEvent(ak_2bKhoFWgQ9os4x8CaeDTHZRGzUcSwcXYUrM12gZHKTdyreGRgG,
-          ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5,
-          oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY))"
-    [client: client, source_code: source_code]
+    {:ok, fate_source_code} = File.read("fate_contract.sophia")
+    {:ok, aevm_source_code} = File.read("aevm_contract.sophia")
+    [client: client, fate_source_code: fate_source_code, aevm_source_code: aevm_source_code]
   end
 
   @tag :travis_test
@@ -43,35 +33,77 @@ defmodule CoreListenerTest do
 
     public_key = setup_data.client.keypair.public
 
-    {:ok, %{contract_id: ct_address}} =
+    {:ok, %{contract_id: aevm_ct_address}} =
       Contract.deploy(
         setup_data.client,
-        setup_data.source_code,
+        setup_data.aevm_source_code,
         [],
         vm: :aevm
       )
 
-    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address)
+    {:ok, %{contract_id: fate_ct_address}} =
+      Contract.deploy(
+        setup_data.client,
+        setup_data.fate_source_code,
+        []
+      )
 
-    Listener.subscribe_for_contract_events(setup_data.client, self(), ct_address, "SomeEvent", [
-      :bool,
-      :bits,
-      :bytes
-    ])
+    Listener.subscribe_for_contract_events(setup_data.client, self(), aevm_ct_address)
+
+    Listener.subscribe_for_contract_events(setup_data.client, self(), fate_ct_address)
 
     Listener.subscribe_for_contract_events(
       setup_data.client,
       self(),
-      ct_address,
+      aevm_ct_address,
+      "SomeEvent",
+      [
+        :bool,
+        :bits,
+        :bytes
+      ]
+    )
+
+    Listener.subscribe_for_contract_events(
+      setup_data.client,
+      self(),
+      fate_ct_address,
+      "SomeEvent",
+      [
+        :string
+      ]
+    )
+
+    Listener.subscribe_for_contract_events(
+      setup_data.client,
+      self(),
+      aevm_ct_address,
       "AnotherEvent",
       [:address, :oracle, :oracle_query]
+    )
+
+    Listener.subscribe_for_contract_events(
+      setup_data.client,
+      self(),
+      fate_ct_address,
+      "AnotherEvent",
+      [:string]
     )
 
     {:ok, %{return_type: "ok"}} =
       Contract.call(
         setup_data.client,
-        ct_address,
-        setup_data.source_code,
+        aevm_ct_address,
+        setup_data.aevm_source_code,
+        "emit_event",
+        []
+      )
+
+    {:ok, %{return_type: "ok"}} =
+      Contract.call(
+        setup_data.client,
+        fate_ct_address,
+        setup_data.aevm_source_code,
         "emit_event",
         []
       )
@@ -88,13 +120,13 @@ defmodule CoreListenerTest do
     # receive one of each of the events that we've subscribed to,
     # we don't know the order in which the messages have been sent
     Enum.each(0..9, fn _ ->
-      receive_and_check_message(public_key, setup_data.client, ct_address)
+      receive_and_check_message(public_key, setup_data.client, aevm_ct_address, fate_ct_address)
     end)
 
     :ok = Listener.stop()
   end
 
-  defp receive_and_check_message(public_key, client, contract_address) do
+  defp receive_and_check_message(public_key, client, aevm_contract_address, fate_contract_address) do
     receive do
       message ->
         case message do
@@ -122,12 +154,25 @@ defmodule CoreListenerTest do
           {:contract_events,
            [
              %{
-               address: ^contract_address,
+               address: ^aevm_contract_address,
                data: ""
              },
              %{
-               address: ^contract_address,
+               address: ^aevm_contract_address,
                data: ""
+             }
+           ]} ->
+            :ok
+
+          {:contract_events,
+           [
+             %{
+               address: ^fate_contract_address,
+               data: "another event"
+             },
+             %{
+               address: ^fate_contract_address,
+               data: "some event"
              }
            ]} ->
             :ok
@@ -135,7 +180,7 @@ defmodule CoreListenerTest do
           {:contract_events, "SomeEvent",
            [
              %{
-               address: ^contract_address,
+               address: ^aevm_contract_address,
                data: "",
                topics: [
                  "SomeEvent",
@@ -147,10 +192,22 @@ defmodule CoreListenerTest do
            ]} ->
             :ok
 
+          {:contract_events, "SomeEvent",
+           [
+             %{
+               address: ^fate_contract_address,
+               data: "some event",
+               topics: [
+                 "SomeEvent"
+               ]
+             }
+           ]} ->
+            :ok
+
           {:contract_events, "AnotherEvent",
            [
              %{
-               address: ^contract_address,
+               address: ^aevm_contract_address,
                data: "",
                topics: [
                  "AnotherEvent",
@@ -162,13 +219,25 @@ defmodule CoreListenerTest do
            ]} ->
             :ok
 
-          _ ->
+          {:contract_events, "AnotherEvent",
+           [
+             %{
+               address: ^fate_contract_address,
+               data: "another event",
+               topics: [
+                 "AnotherEvent"
+               ]
+             }
+           ]} ->
+            :ok
+
+          _res ->
             flunk("Received invalid message")
         end
 
         Listener.unsubscribe(elem(message, 0), self())
     after
-      30_000 -> flunk("Didn't receive message")
+      45_000 -> flunk("Didn't receive message")
     end
   end
 

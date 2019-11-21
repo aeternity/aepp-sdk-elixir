@@ -39,6 +39,7 @@ defmodule AeppSDK.Contract do
   @fate_ct_version 0x50003
   @aevm_ct_version 0x60001
   @genesis_beneficiary "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
+  @empty_error_msg "cb_Xfbg4g=="
 
   @type deploy_options :: [
           deposit: non_neg_integer(),
@@ -318,6 +319,9 @@ defmodule AeppSDK.Contract do
            :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
       {:ok, :aeb_fate_encoding.deserialize(decoded_return_value)}
     else
+      "error" when return_value === @empty_error_msg ->
+        {:ok, :no_data}
+
       {:error, _} = error ->
         error
 
@@ -773,7 +777,8 @@ defmodule AeppSDK.Contract do
           %DryRunResults{
             results: [
               %DryRunResult{
-                call_obj: transaction_info
+                call_obj: transaction_info,
+                result: "ok"
               }
             ]
           }} <-
@@ -939,7 +944,9 @@ defmodule AeppSDK.Contract do
 
   defp build_contract_call_tx(
          %Client{
-           keypair: %{public: public_key}
+           keypair: %{public: public_key},
+           connection: connection,
+           network_id: network_id
          } = client,
          contract_address,
          source_code,
@@ -958,9 +965,13 @@ defmodule AeppSDK.Contract do
         AccountUtils.next_valid_nonce(client, public_key)
       end
 
+    gas_price = Keyword.get(opts, :gas_price, @default_gas_price)
+    gas = Keyword.get(opts, :gas_price, @default_gas)
+
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok, nonce} <- nonce_result,
+         {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          {:ok, calldata} <-
            create_calldata(source_code, function_name, function_args, get_vm(vm_version)),
          contract_call_tx <- %ContractCallTx{
@@ -971,11 +982,20 @@ defmodule AeppSDK.Contract do
            fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
            amount: Keyword.get(opts, :amount, @default_amount),
-           gas: Keyword.get(opts, :gas, @default_gas),
-           gas_price: Keyword.get(opts, :gas_price, @default_gas_price),
+           gas: gas,
+           gas_price: gas_price,
            call_data: calldata
-         } do
-      {:ok, contract_call_tx}
+         },
+         new_fee <-
+           Transaction.calculate_n_times_fee(
+             contract_call_tx,
+             height,
+             network_id,
+             user_fee,
+             gas_price,
+             Transaction.default_fee_calculation_times()
+           ) do
+      {:ok, %{contract_call_tx | fee: new_fee}}
     else
       {:ok, %Error{reason: message}} ->
         {:error, message}
