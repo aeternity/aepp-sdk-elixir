@@ -156,6 +156,29 @@ defmodule AeppSDK.Account do
 
   @doc """
   Get an actual account information
+  ## Example
+      iex> AeppSDK.Account.get(client)
+      {:ok,
+       %{
+         auth_fun: nil,
+         balance: 151688000000000000000,
+         contract_id: nil,
+         id: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
+         kind: "basic",
+         nonce: 0,
+         payable: true
+       }}
+  """
+  @spec get(Client.t()) :: {:ok, account()} | {:error, String.t()} | {:error, Env.t()}
+  def get(%Client{connection: connection, keypair: %{public: pubkey}})
+      when is_binary(pubkey) do
+    response = AccountApi.get_account_by_pubkey(connection, pubkey)
+
+    prepare_result(response)
+  end
+
+  @doc """
+  Get an actual account information
 
   ## Example
       iex> pubkey = "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU"
