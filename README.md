@@ -31,8 +31,8 @@ mix build_api v1.2.1-elixir v5.2.0 v0.11.1
 ```
 Where:
  - `v1.2.1-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.
- - `v5.1.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v5.1.0/apps/aehttp/priv/swagger.yaml).
- - `v0.10.0` - Aeternity middleware API [specification file](https://github.com/aeternity/aepp-middleware/blob/v0.10.0/swagger/swagger.json).
+ - `v5.2.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v5.2.0/apps/aehttp/priv/swagger.yaml).
+ - `v0.11.1` - Aeternity middleware API [specification file](https://github.com/aeternity/aepp-middleware/blob/v0.11.1/swagger/swagger.json).
 
 ## Implemented functionality
 - [**Client module**](http://aeternity.com/aepp-sdk-elixir/AeppSDK.Client.html#content)
