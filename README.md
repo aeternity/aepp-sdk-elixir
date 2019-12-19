@@ -77,7 +77,7 @@ Simple high-module which performs various requests to exposed endpoints in [Aete
 In order to play around with the **Elixir SDK**, you can use docker image:
 
 ```
-docker pull danielapivanova/aepp-sdk-elixir:0.5.2
-docker run -it danielapivanova/aepp-sdk-elixir:0.5.2
+docker pull aeternity/aepp-sdk-elixir:0.5.2
+docker run -it aeternity/aepp-sdk-elixir:0.5.2
 ```
 Example to defined a client can be found [here](https://github.com/aeternity/aepp-sdk-elixir/blob/master/examples/usage.md#define-a-client).
