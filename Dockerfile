@@ -2,7 +2,6 @@ FROM elixir:1.9-alpine
 
 RUN apk add --no-cache libsodium-dev git g++ make
 
-# lib folder should include generated low-level API modules
 COPY config ./config
 COPY lib ./lib
 COPY mix.exs .

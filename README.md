@@ -72,3 +72,12 @@ Module, which works with enoise protocol, which is used by Aeternity. Implemente
 Simple high-module which performs various requests to exposed endpoints in [Aeternity Middleware](https://github.com/aeternity/aepp-middleware) project.
 
 **Full documentation can be found [here](http://aeternity.com/aepp-sdk-elixir/api-reference.html).**
+
+## Use Docker image
+In order to play around with the **Elixir SDK**, you can use docker image:
+
+```
+docker pull danielapivanova/aepp-sdk-elixir:0.5.2
+docker run -it danielapivanova/aepp-sdk-elixir:0.5.2
+```
+Example to defined a client can be found [here](https://github.com/aeternity/aepp-sdk-elixir/blob/master/examples/usage.md#define-a-client).
