@@ -27,12 +27,12 @@ Ensure that you have [Elixir](https://elixir-lang.org/install.html) and [wget](h
 ```
 git clone https://github.com/aeternity/aepp-sdk-elixir
 cd aepp-sdk-elixir
-mix build_api v1.2.1-elixir v5.1.0 v0.11.1
+mix build_api v1.2.1-elixir v5.2.0 v0.11.1
 ```
 Where:
  - `v1.2.1-elixir` - OpenAPI client [generator](https://github.com/aeternity/openapi-generator/tree/elixir-adjustment#openapi-generator) [release](https://github.com/aeternity/openapi-generator/releases) version.
- - `v5.1.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v5.1.0/apps/aehttp/priv/swagger.yaml).
- - `v0.10.0` - Aeternity middleware API [specification file](https://github.com/aeternity/aepp-middleware/blob/v0.10.0/swagger/swagger.json).
+ - `v5.2.0` - Aeternity node API [specification file](https://github.com/aeternity/aeternity/blob/v5.2.0/apps/aehttp/priv/swagger.yaml).
+ - `v0.11.1` - Aeternity middleware API [specification file](https://github.com/aeternity/aepp-middleware/blob/v0.11.1/swagger/swagger.json).
 
 ## Implemented functionality
 - [**Client module**](http://aeternity.com/aepp-sdk-elixir/AeppSDK.Client.html#content)
@@ -72,3 +72,12 @@ Module, which works with enoise protocol, which is used by Aeternity. Implemente
 Simple high-module which performs various requests to exposed endpoints in [Aeternity Middleware](https://github.com/aeternity/aepp-middleware) project.
 
 **Full documentation can be found [here](http://aeternity.com/aepp-sdk-elixir/api-reference.html).**
+
+## Use Docker image
+In order to play around with the **Elixir SDK**, you can use docker image:
+
+```
+docker pull aeternity/aepp-sdk-elixir:0.5.2
+docker run -it aeternity/aepp-sdk-elixir:0.5.2
+```
+Example to defined a client can be found [here](https://github.com/aeternity/aepp-sdk-elixir/blob/master/examples/usage.md#define-a-client).

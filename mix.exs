@@ -1,4 +1,4 @@
-defmodule AeppSdkElixir.MixProject do
+defmodule AeppSDK.MixProject do
   use Mix.Project
 
   def project do
