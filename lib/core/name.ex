@@ -30,6 +30,8 @@ defmodule AeppSDK.AENS do
   @label_separator "."
   @allowed_registrars ["chain"]
   @multiplier_14 100_000_000_000_000
+  @await_attempt_interval 1_000
+  @await_attempts 100_000_000
   @type aens_options :: [fee: non_neg_integer(), ttl: non_neg_integer()]
   @type preclaim_options :: [
           fee: non_neg_integer(),
@@ -181,14 +183,18 @@ defmodule AeppSDK.AENS do
   """
   @spec claim({:ok, map()} | {:error, String.t()}, aens_options()) ::
           {:error, String.t()} | {:ok, map()}
-  def claim(preclaim_result, opts \\ []) do
-    case preclaim_result do
-      {:ok, %{client: client, name: name, name_salt: name_salt}} ->
-        claim(client, name, name_salt, opts)
+  def claim(preclaim_result, opts \\ [])
 
-      {:error, _reason} = error ->
-        error
-    end
+  def claim(
+        {:ok, preclaim_result},
+        opts
+      ) do
+    attempts = Keyword.get(opts, :await_attempts, @await_attempts)
+    claim_attempts(preclaim_result, attempts, opts)
+  end
+
+  def claim({:error, _} = error, _opts) do
+    error
   end
 
   @doc """
@@ -1024,6 +1030,31 @@ defmodule AeppSDK.AENS do
        }}
     else
       {:error, _info} = error -> error
+    end
+  end
+
+  defp claim_attempts(_preclaim_result, 0, _opts) do
+    {:error,
+     "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1_000} seconds"}
+  end
+
+  defp claim_attempts(
+         %{
+           block_height: block_height,
+           client: %Client{connection: connection} = client,
+           name: name,
+           name_salt: name_salt
+         } = preclaim_result,
+         attempts,
+         opts
+       ) do
+    Process.sleep(@await_attempt_interval)
+    {:ok, %{height: height}} = Chain.get_current_key_block_height(connection)
+
+    if block_height < height do
+      claim(client, name, name_salt, opts)
+    else
+      claim_attempts(preclaim_result, attempts - 1, opts)
     end
   end
 end
