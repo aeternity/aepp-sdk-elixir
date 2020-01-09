@@ -1035,7 +1035,7 @@ defmodule AeppSDK.AENS do
 
   defp claim_attempts(_preclaim_result, 0, _opts) do
     {:error,
-     "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1_000} seconds"}
+     "Could not reach next keyblock height, needed to post claim transaction within the given time, aborting..."}
   end
 
   defp claim_attempts(
