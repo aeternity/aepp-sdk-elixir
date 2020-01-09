@@ -506,10 +506,12 @@ defmodule AeppSDK.Utils.Transaction do
   end
 
   @doc false
-  def await_mining(_connection, _tx_hash, 0, _type),
+  def await_mining(_connection, tx_hash, 0, _type),
     do:
       {:error,
-       "Transaction wasn't mined after #{@await_attempts * @await_attempt_interval / 1_000} seconds"}
+       "Transaction #{inspect(tx_hash)} wasn't mined after #{
+         @await_attempts * @await_attempt_interval / 1_000
+       } seconds"}
 
   @doc false
   def await_mining(connection, tx_hash, attempts, type) do
