@@ -570,62 +570,57 @@ defmodule AeppSDK.Chain do
   ## Example
       iex> AeppSDK.Chain.get_node_info(client)
       {:ok,
-       %{
-         node_beneficiary: "ak_2iBPH7HUz3cSDVEUWiHg76MZJ6tZooVNBmmxcgVK6VV8KAE688",
-         node_pubkey: "ak_24eXUB8mKvfHWhLrRVYC8cx2GXqKqZcTDyAequLkhJiyxrhVcq",
-         peer_pubkey: "pp_RK92f7wt27WbYijumNi69C1YvgRMfSZxBxn3KeGvGTF5sCFBq",
-         peers: %{
-           blocked: [],
-           peers: ["aenode://pp_DMLqy7Zuhoxe2FzpydyQTgwCJ52wouzxtHWsPGo51XDcxc5c8@13.53.161.215:3015",
-                   "aenode://pp_FhecVAucSqWJuMKt8vwsrC14G6Cizet9TppFep1PpGLQwQSpw@13.229.148.230:3015",
-                   "aenode://pp_RMzsjgNLZMabSns3gWykAUWQaz218zaUzcQqLCtkbH5mQDGp8@54.245.137.153:3015",
-                   "aenode://pp_auNgNxce82JNFd33Z4UVoDvNUJEaSUowwW37v681wMnZgsPfw@34.212.120.93:3015",
-                   "aenode://pp_27xmgQ4N1E3QwHyoutLtZsHW5DSW4zneQJ3CxT5JbUejxtFuAu@13.250.162.250:3015",
-                   "aenode://pp_2JREXVhMur6RHVDPnEomoc8EP1cgmWdgrJMh9Z7j7a7yebAEKs@52.57.34.16:3015",
-                   "aenode://pp_2aKzR7Bnz53amwA1oU55nkkKFD19THF3oxVDudLiksVh52Sypb@3.0.201.37:3015",
-                   "aenode://pp_2beMZ7ULM3jye6hdSFVtWmBFRpG1mTevDZ4XNDPfKCgpzqH2Ns@3.122.192.245:3015",
-                   "aenode://pp_2vFiJ3LMWVchceNnBPQV3p1fzj4Zd4voCQKNKaU16c3M4UCJok@18.236.142.145:3015",
-                   "aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015"]
-         },
-         status: %{
-           difficulty: 252791033,
-           genesis_key_block_hash: "kh_wUCideEB8aDtUaiHCtKcfywU6oHZW6gnyci8Mw6S1RSTCnCRu",
-           listening: true,
-           network_id: "ae_uat",
-           node_revision: "a267159203252ddd6964f49e9125f32bce1efbb0",
-           node_version: "3.0.0-rc.1",
-           peer_count: 8841,
-           pending_transactions_count: 0,
-           protocols: [
-             %{effective_at_height: 82900, version: 3},
-             %{effective_at_height: 40900, version: 2},
-             %{effective_at_height: 0, version: 1}
-           ],
-           solutions: 0,
-           sync_progress: 100.0,
-           syncing: false
-         }
-       }}
+        %{
+          node_beneficiary: "beneficiary_not_configured",
+          node_pubkey: "ak_ayGGSiLMFN3zsUNCBL5B8U17CyzyxavEbhnAFhfgGH1XSnYJm",
+          peer_pubkey: "pp_8Un82n2zm4XKiWfhU5UpaEKXrJXkQ2w8dyjYRRa9FkoronTMA",
+          peers: %{
+            blocked: [],
+            peers: ["aenode://pp_8YqicXrgYbcy7nbgPbntKdivbohJ7CisF7YvT6MDeBjnJsKbq@18.139.117.241:3015",
+             "aenode://pp_QU9CvhAQH56a2kA15tCnWPRJ2srMJW8ZmfbbFTAy7eG4o16Bf@52.10.46.160:3015",
+             "aenode://pp_apWJNy8fkPjigPwMhoPg3w9QweGZ8ZzZnmwzaCp6PHZP6usAE@54.212.224.255:3015",
+             "aenode://pp_2254vzzreTrcfkzfWSfabNLWGhruqqKgnzSdrQiQ7QD36DtH9f@18.197.33.230:3015",
+             "aenode://pp_27xmgQ4N1E3QwHyoutLtZsHW5DSW4zneQJ3CxT5JbUejxtFuAu@13.250.162.250:3015",
+             "aenode://pp_2B3vrmDZx3P1LPZ9t1S8dA4ra4ugH7pE2qJbg77md8kvj91oEz@52.221.215.138:3015",
+             "aenode://pp_2E4vnrxXoP8V1ydbXYdSrDMVrZkc1EsawimeETH7SjXvVLYtZd@18.196.41.135:3015",
+             "aenode://pp_2nd7pm3R4BiioVzRDCGQsniSGQ8vWGMjsdyvBsPdthsdSj8nQ7@13.48.132.10:3015",
+             "aenode://pp_2vhFb3HtHd1S7ynbpbFnEdph1tnDXFSfu4NGtq46S2eM5HCdbC@18.195.109.60:3015"]
+          },
+          status: %{
+            difficulty: 56070996,
+            genesis_key_block_hash: "kh_wUCideEB8aDtUaiHCtKcfywU6oHZW6gnyci8Mw6S1RSTCnCRu",
+            listening: true,
+            network_id: "ae_uat",
+            node_revision: "c6c12b039971ebe9a367d76826c6acbbd966fa0d",
+            node_version: "5.2.0",
+            peer_connections: %{inbound: 0, outbound: 9},
+            peer_count: 10947,
+            peer_pubkey: "pp_8Un82n2zm4XKiWfhU5UpaEKXrJXkQ2w8dyjYRRa9FkoronTMA",
+            pending_transactions_count: 0,
+            protocols: [
+              %{effective_at_height: 154300, version: 4},
+              %{effective_at_height: 82900, version: 3},
+              %{effective_at_height: 40900, version: 2},
+              %{effective_at_height: 0, version: 1}
+            ],
+            solutions: 0,
+            sync_progress: 100.0,
+            syncing: false,
+            top_block_height: 195097,
+            top_key_block_hash: "kh_uuT9nzrupajRxeKazsg2KhKM5jZZoZdAAJTkdZ9xd4Pbz1rFJ"
+          }
+        }}
   """
-  @spec get_node_info(Client.t()) :: {:ok, node_info()} | {:error, String.t()} | {:error, Env.t()}
+  @spec get_node_info(Client.t()) :: {:ok, node_info()}
   def get_node_info(%Client{connection: connection, internal_connection: internal_connection}) do
-    with {:ok, %PeerPubKey{pubkey: peer_pubkey}} <-
-           NodeInfoApi.get_peer_pubkey(connection),
-         {:ok, %Status{} = status} <- NodeInfoApi.get_status(connection),
-         {:ok, %PubKey{pub_key: node_beneficiary}} <-
-           NodeInfoApi.get_node_beneficiary(internal_connection),
-         {:ok, %PubKey{pub_key: node_pubkey}} <- NodeInfoApi.get_node_pubkey(internal_connection),
-         {:ok, %Peers{} = peers} <-
-           NodeInfoApi.get_peers(internal_connection) do
-      {:ok,
-       %{
-         peer_pubkey: peer_pubkey,
-         status: struct_to_map_recursive(status),
-         node_beneficiary: node_beneficiary,
-         node_pubkey: node_pubkey,
-         peers: Map.from_struct(peers)
-       }}
-    end
+    {:ok,
+     %{
+       peer_pubkey: format_response(NodeInfoApi.get_peer_pubkey(connection)),
+       status: format_response(NodeInfoApi.get_status(connection)),
+       node_beneficiary: format_response(NodeInfoApi.get_node_beneficiary(internal_connection)),
+       node_pubkey: format_response(NodeInfoApi.get_node_pubkey(internal_connection)),
+       peers: format_response(NodeInfoApi.get_peers(internal_connection))
+     }}
   end
 
   defp await_height(_client, height, 0, _interval),
@@ -771,14 +766,24 @@ defmodule AeppSDK.Chain do
     %{dry_run_result_map | call_obj: contract_call_object_map}
   end
 
-  defp struct_to_map_recursive(%Status{protocols: protocols} = status) do
+  defp struct_to_map_recursive(
+         %Status{protocols: protocols, peer_connections: peer_connections} = status
+       ) do
     protocols =
       Enum.map(protocols, fn %Protocol{} = protocol ->
         Map.from_struct(protocol)
       end)
 
     status_map = Map.from_struct(status)
+    peer_connections_map = Map.from_struct(peer_connections)
 
-    %{status_map | protocols: protocols}
+    %{status_map | protocols: protocols, peer_connections: peer_connections_map}
   end
+
+  defp format_response({:ok, %Status{} = status}), do: struct_to_map_recursive(status)
+  defp format_response({:ok, %PeerPubKey{pubkey: peer_pubkey}}), do: peer_pubkey
+  defp format_response({:ok, %PubKey{pub_key: node_beneficiary}}), do: node_beneficiary
+  defp format_response({:ok, %Peers{} = peers}), do: Map.from_struct(peers)
+  defp format_response({:ok, %Error{reason: reason}}), do: reason
+  defp format_response({:error, err}), do: err
 end
