@@ -364,27 +364,6 @@ defmodule AeppSDK.Contract do
   end
 
   @doc """
-  false
-  """
-  def typerep_decode_return_value(typerep, return_value, return_type) do
-    with "ok" <- return_type,
-         {:ok, decoded_return_value} <-
-           :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
-      :aeb_heap.from_binary(typerep, decoded_return_value)
-    else
-      {:error, _} = error ->
-        error
-
-      _ ->
-        {:ok, decoded_return_value} =
-          :aeser_api_encoder.safe_decode(:contract_bytearray, return_value)
-
-        {:ok, message} = :aeb_heap.from_binary(:string, decoded_return_value)
-        {:error, message}
-    end
-  end
-
-  @doc """
   Compile a contract
 
   ## Example
@@ -1031,6 +1010,24 @@ defmodule AeppSDK.Contract do
 
       _ ->
         {@genesis_beneficiary, min_balance}
+    end
+  end
+
+  defp typerep_decode_return_value(typerep, return_value, return_type) do
+    with "ok" <- return_type,
+         {:ok, decoded_return_value} <-
+           :aeser_api_encoder.safe_decode(:contract_bytearray, return_value) do
+      :aeb_heap.from_binary(typerep, decoded_return_value)
+    else
+      {:error, _} = error ->
+        error
+
+      _ ->
+        {:ok, decoded_return_value} =
+          :aeser_api_encoder.safe_decode(:contract_bytearray, return_value)
+
+        {:ok, message} = :aeb_heap.from_binary(:string, decoded_return_value)
+        {:error, message}
     end
   end
 

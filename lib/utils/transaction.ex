@@ -6,7 +6,7 @@ defmodule AeppSDK.Utils.Transaction do
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeppSDK.Account, as: AccountApi
-  alias AeppSDK.{Client, Contract, GeneralizedAccount}
+  alias AeppSDK.{Chain, Client, Contract, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Governance, Keys, Serialization}
 
   alias AeternityNode.Api.Transaction, as: TransactionApi
@@ -196,18 +196,29 @@ defmodule AeppSDK.Utils.Transaction do
       ) do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)
+    IO.inspect("in posting of gen acc")
 
     with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get(client, public_key),
-         {:ok, %{abi_version: abi_version}} <- Contract.get(client, contract_id),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, height} <- Chain.height(client),
+         {:ok, %{abi_version: abi_version}} <- Contract.get(client, contract_id),
+         new_fee <-
+           calculate_n_times_fee(
+             tx,
+             height,
+             network_id,
+             Map.get(tx, :fee, dummy_fee),
+             gas_price,
+             default_fee_calculation_times()
+           ),
          {:ok, calldata} =
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
              auth_fun,
              Keyword.get(auth_opts, :auth_args)
            ),
-         serialized_tx = wrap_in_empty_signed_tx(tx),
+         serialized_tx = wrap_in_empty_signed_tx(%{tx | fee: new_fee}),
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
@@ -225,8 +236,8 @@ defmodule AeppSDK.Utils.Transaction do
                  auth_opts,
                  :fee,
                  calculate_fee(
-                   tx,
-                   @fortuna_height,
+                   meta_tx_dummy_fee,
+                   height,
                    network_id,
                    @dummy_fee,
                    meta_tx_dummy_fee.gas_price
@@ -234,6 +245,7 @@ defmodule AeppSDK.Utils.Transaction do
                )
          },
          serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
+         IO.inspect(serialized_meta_tx, limit: :infinity),
          encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx),
          {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
            TransactionApi.post_transaction(connection, %Tx{
@@ -338,6 +350,14 @@ defmodule AeppSDK.Utils.Transaction do
   end
 
   def min_gas(%ContractCreateTx{} = tx, _height) do
+    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas()
+  end
+
+  def min_gas(
+        %{ga_id: _, auth_data: _, abi_version: _, fee: _, gas: _, gas_price: _, ttl: _, tx: _} =
+          tx,
+        _height
+      ) do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas()
   end
 
