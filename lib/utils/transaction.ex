@@ -208,7 +208,7 @@ defmodule AeppSDK.Utils.Transaction do
              tx,
              height,
              network_id,
-             Map.get(tx, :fee, dummy_fee),
+             Map.get(tx, :fee, dummy_fee()),
              gas_price,
              default_fee_calculation_times()
            ),
@@ -223,7 +223,7 @@ defmodule AeppSDK.Utils.Transaction do
            ga_id: public_key,
            auth_data: calldata,
            abi_version: abi_version,
-           fee: @dummy_fee,
+           fee: dummy_fee(),
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
@@ -235,17 +235,17 @@ defmodule AeppSDK.Utils.Transaction do
                Keyword.get(
                  auth_opts,
                  :fee,
-                 calculate_fee(
+                 calculate_n_times_fee(
                    meta_tx_dummy_fee,
                    height,
                    network_id,
-                   @dummy_fee,
-                   meta_tx_dummy_fee.gas_price
+                   Keyword.get(auth_opts, :fee, dummy_fee()),
+                   gas_price,
+                   default_fee_calculation_times()
                  )
                )
          },
          serialized_meta_tx = wrap_in_empty_signed_tx(meta_tx),
-         IO.inspect(serialized_meta_tx, limit: :infinity),
          encoded_signed_tx = Encoding.prefix_encode_base64("tx", serialized_meta_tx),
          {:ok, %PostTxResponse{tx_hash: tx_hash}} <-
            TransactionApi.post_transaction(connection, %Tx{
@@ -679,7 +679,7 @@ defmodule AeppSDK.Utils.Transaction do
            ga_id: public_key,
            auth_data: calldata,
            abi_version: abi_version,
-           fee: @dummy_fee,
+           fee: dummy_fee(),
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
@@ -695,7 +695,7 @@ defmodule AeppSDK.Utils.Transaction do
                    tx,
                    @fortuna_height,
                    network_id,
-                   @dummy_fee,
+                   dummy_fee(),
                    meta_tx_dummy_fee.gas_price
                  )
                )
