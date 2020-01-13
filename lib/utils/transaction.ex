@@ -196,7 +196,6 @@ defmodule AeppSDK.Utils.Transaction do
       ) do
     tx = %{tx | nonce: 0}
     type = Map.get(tx, :__struct__, :no_type)
-    IO.inspect("in posting of gen acc")
 
     with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get(client, public_key),
