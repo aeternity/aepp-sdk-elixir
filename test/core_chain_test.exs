@@ -17,10 +17,10 @@ defmodule CoreChainTest do
         "http://localhost:3113/v2"
       )
 
-    public_key = "ak_jQGc3ECvnQYDZY3i97WSHPigL9tTaVEz1oLBW5J4F1JTKS1g7"
+    public_key = "ak_2q5ESPrAyyxXyovUaRYE6C9is93ZCXmfTfJxGH9oWkDV6SEa1R"
 
     secret_key =
-      "24865931054474805885eec12497ee398bc39bc26917c190ed435e3cd1fa954e6046ef581eef749d492360b1542c7be997b5ddca0d2e510a4312b217998bfc74"
+      "8025bf7f8946838a1282ea220da183e43e2dc7d3ec8c6049bd0f239b496becc4f0da0490d743080cc2ce734f4b048137e78cc07b396a1fdb06f98ca5a816ee80"
 
     network_id = "ae_uat"
     url = "https://sdk-testnet.aepps.com/v2"
@@ -30,13 +30,6 @@ defmodule CoreChainTest do
       Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url,
         gas_price: 1_000_000_000
       )
-
-    auth_source_code = "contract Authorization =
-
-        entrypoint auth(auth_value : bool) =
-          auth_value"
-
-    auth = [auth_contract_source: auth_source_code, auth_args: ["true"]]
 
     source_code = "contract Identity =
         datatype event = AddedNumberEvent(indexed int, string)
@@ -50,7 +43,7 @@ defmodule CoreChainTest do
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
 
-    [client: client, source_code: source_code, testnet_client: testnet_client, auth: auth]
+    [client: client, source_code: source_code, testnet_client: testnet_client]
   end
 
   @tag :travis_test
@@ -67,8 +60,7 @@ defmodule CoreChainTest do
   test "testnet named account spend operation", setup_data do
     testnet_name = "a1234567890aseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef.chain"
 
-    assert {:ok, _tx_info} =
-             Account.spend(setup_data.testnet_client, testnet_name, 1, auth: setup_data.auth)
+    assert {:ok, _tx_info} = Account.spend(setup_data.testnet_client, testnet_name, 10)
   end
 
   @tag :travis_test
