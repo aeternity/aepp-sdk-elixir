@@ -31,6 +31,13 @@ defmodule CoreChainTest do
         gas_price: 1_000_000_000
       )
 
+    auth_source_code = "contract Authorization =
+
+        entrypoint auth(auth_value : bool) =
+          auth_value"
+
+    auth = [auth_contract_source: auth_source_code, auth_args: ["true"]]
+
     source_code = "contract Identity =
         datatype event = AddedNumberEvent(indexed int, string)
 
@@ -43,7 +50,7 @@ defmodule CoreChainTest do
           Chain.event(AddedNumberEvent(x, \"Added a number\"))
           state.number + x"
 
-    [client: client, source_code: source_code, testnet_client: testnet_client]
+    [client: client, source_code: source_code, testnet_client: testnet_client, auth: auth]
   end
 
   @tag :travis_test
@@ -59,7 +66,9 @@ defmodule CoreChainTest do
   @tag :testnet
   test "testnet named account spend operation", setup_data do
     testnet_name = "a1234567890aseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef.chain"
-    assert {:ok, _tx_info} = Account.spend(setup_data.testnet_client, testnet_name, 10_000)
+
+    assert {:ok, _tx_info} =
+             Account.spend(setup_data.testnet_client, testnet_name, 1, auth: setup_data.auth)
   end
 
   @tag :travis_test
