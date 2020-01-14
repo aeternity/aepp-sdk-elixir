@@ -1,49 +1,12 @@
 defmodule CoreChainTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Account, Chain, Client, Contract}
+  alias AeppSDK.{Chain, Contract}
   alias Tesla.Env
 
   setup_all do
-    client =
-      Client.new(
-        %{
-          public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-          secret:
-            "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-        },
-        "my_test",
-        "http://localhost:3013/v2",
-        "http://localhost:3113/v2"
-      )
-
-    public_key = "ak_2q5ESPrAyyxXyovUaRYE6C9is93ZCXmfTfJxGH9oWkDV6SEa1R"
-
-    secret_key =
-      "8025bf7f8946838a1282ea220da183e43e2dc7d3ec8c6049bd0f239b496becc4f0da0490d743080cc2ce734f4b048137e78cc07b396a1fdb06f98ca5a816ee80"
-
-    network_id = "ae_uat"
-    url = "https://sdk-testnet.aepps.com/v2"
-    internal_url = "https://sdk-testnet.aepps.com/v2"
-
-    testnet_client =
-      Client.new(%{public: public_key, secret: secret_key}, network_id, url, internal_url,
-        gas_price: 1_000_000_000
-      )
-
-    source_code = "contract Identity =
-        datatype event = AddedNumberEvent(indexed int, string)
-
-        record state = { number : int }
-
-        entrypoint init(x : int) =
-          { number = x }
-
-        entrypoint add_to_number(x : int) =
-          Chain.event(AddedNumberEvent(x, \"Added a number\"))
-          state.number + x"
-
-    [client: client, source_code: source_code, testnet_client: testnet_client]
+    Code.require_file("test_utils.ex", "test/")
+    TestUtils.get_test_data()
   end
 
   @tag :travis_test
@@ -54,13 +17,6 @@ defmodule CoreChainTest do
     {:ok, height} = height_result
     assert :ok == Chain.await_height(setup_data.client, height)
     assert :ok == Chain.await_height(setup_data.client, height + 1)
-  end
-
-  @tag :testnet
-  test "testnet named account spend operation", setup_data do
-    testnet_name = "a1234567890aseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef.chain"
-
-    assert {:ok, _tx_info} = Account.spend(setup_data.testnet_client, testnet_name, 10)
   end
 
   @tag :travis_test

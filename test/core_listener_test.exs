@@ -1,24 +1,11 @@
 defmodule CoreListenerTest do
   use ExUnit.Case
 
-  alias AeppSDK.{Account, Chain, Client, Contract, Listener}
+  alias AeppSDK.{Account, Chain, Contract, Listener}
 
   setup_all do
-    client =
-      Client.new(
-        %{
-          public: "ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU",
-          secret:
-            "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61"
-        },
-        "my_test",
-        "http://localhost:3013/v2",
-        "http://localhost:3113/v2"
-      )
-
-    {:ok, fate_source_code} = File.read("fate_contract.sophia")
-    {:ok, aevm_source_code} = File.read("aevm_contract.sophia")
-    [client: client, fate_source_code: fate_source_code, aevm_source_code: aevm_source_code]
+    Code.require_file("test_utils.ex", "test/")
+    TestUtils.get_test_data()
   end
 
   @tag :travis_test
