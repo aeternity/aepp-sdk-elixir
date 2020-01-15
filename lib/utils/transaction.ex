@@ -75,7 +75,6 @@ defmodule AeppSDK.Utils.Transaction do
   @default_ttl 0
   @dummy_fee 0
   @default_payload ""
-  @fortuna_height 90_800
   @fee_calculation_times 5
 
   @type tx_types ::
@@ -664,6 +663,7 @@ defmodule AeppSDK.Utils.Transaction do
     with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get(client, public_key),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, height} <- Chain.height(client),
          {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
            Contract.get(client, contract_id),
          {:ok, calldata} =
@@ -692,7 +692,7 @@ defmodule AeppSDK.Utils.Transaction do
                  :fee,
                  calculate_fee(
                    tx,
-                   @fortuna_height,
+                   height,
                    network_id,
                    dummy_fee(),
                    meta_tx_dummy_fee.gas_price
