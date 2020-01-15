@@ -26,6 +26,7 @@ defmodule AeppSDK.Utils.Transaction do
     ContractCallTx,
     ContractCreateTx,
     Error,
+    GaObject,
     GenericSignedTx,
     NameClaimTx,
     NamePreclaimTx,
@@ -573,6 +574,24 @@ defmodule AeppSDK.Utils.Transaction do
            return_value: return_value,
            return_type: return_type,
            log: log
+         }}
+
+      {:ok,
+       %TxInfoObject{
+         call_info: nil,
+         ga_info: %GaObject{return_value: return_value, return_type: return_type}
+       }} ->
+        {:ok, %GenericSignedTx{block_hash: block_hash, block_height: block_height, hash: tx_hash}} =
+          TransactionApi.get_transaction_by_hash(connection, tx_hash)
+
+        {:ok,
+         %{
+           block_hash: block_hash,
+           block_height: block_height,
+           tx_hash: tx_hash,
+           return_value: return_value,
+           return_type: return_type,
+           log: []
          }}
 
       {:ok, %Error{}} ->

@@ -1041,6 +1041,10 @@ defmodule AeppSDK.Contract do
     {:error, Poison.decode!(message)}
   end
 
+  defp prepare_result({:ok, %{reason: reason}}) do
+    {:error, reason}
+  end
+
   defp prepare_result({:error, _} = error) do
     error
   end
