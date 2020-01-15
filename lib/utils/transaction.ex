@@ -6,7 +6,7 @@ defmodule AeppSDK.Utils.Transaction do
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeppSDK.Account, as: AccountApi
-  alias AeppSDK.{Client, Contract, GeneralizedAccount}
+  alias AeppSDK.{Chain, Client, Contract, GeneralizedAccount}
   alias AeppSDK.Utils.{Encoding, Governance, Keys, Serialization}
 
   alias AeternityNode.Api.Transaction, as: TransactionApi
@@ -75,7 +75,6 @@ defmodule AeppSDK.Utils.Transaction do
   @default_ttl 0
   @dummy_fee 0
   @default_payload ""
-  @fortuna_height 90_800
   @fee_calculation_times 5
 
   @type tx_types ::
@@ -199,20 +198,30 @@ defmodule AeppSDK.Utils.Transaction do
 
     with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get(client, public_key),
-         {:ok, %{abi_version: abi_version}} <- Contract.get(client, contract_id),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, height} <- Chain.height(client),
+         {:ok, %{abi_version: abi_version}} <- Contract.get(client, contract_id),
+         new_fee <-
+           calculate_n_times_fee(
+             tx,
+             height,
+             network_id,
+             Map.get(tx, :fee, dummy_fee()),
+             gas_price,
+             default_fee_calculation_times()
+           ),
          {:ok, calldata} =
            Contract.create_calldata(
              Keyword.get(auth_opts, :auth_contract_source),
              auth_fun,
              Keyword.get(auth_opts, :auth_args)
            ),
-         serialized_tx = wrap_in_empty_signed_tx(tx),
+         serialized_tx = wrap_in_empty_signed_tx(%{tx | fee: new_fee}),
          meta_tx_dummy_fee = %{
            ga_id: public_key,
            auth_data: calldata,
            abi_version: abi_version,
-           fee: @dummy_fee,
+           fee: dummy_fee(),
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
@@ -224,12 +233,13 @@ defmodule AeppSDK.Utils.Transaction do
                Keyword.get(
                  auth_opts,
                  :fee,
-                 calculate_fee(
-                   tx,
-                   @fortuna_height,
+                 calculate_n_times_fee(
+                   meta_tx_dummy_fee,
+                   height,
                    network_id,
-                   @dummy_fee,
-                   meta_tx_dummy_fee.gas_price
+                   Keyword.get(auth_opts, :fee, dummy_fee()),
+                   gas_price,
+                   default_fee_calculation_times()
                  )
                )
          },
@@ -338,6 +348,14 @@ defmodule AeppSDK.Utils.Transaction do
   end
 
   def min_gas(%ContractCreateTx{} = tx, _height) do
+    Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas()
+  end
+
+  def min_gas(
+        %{ga_id: _, auth_data: _, abi_version: _, fee: _, gas: _, gas_price: _, ttl: _, tx: _} =
+          tx,
+        _height
+      ) do
     Governance.tx_base_gas(tx) + byte_size(Serialization.serialize(tx)) * Governance.byte_gas()
   end
 
@@ -645,6 +663,7 @@ defmodule AeppSDK.Utils.Transaction do
     with {:ok, %{kind: "generalized", auth_fun: auth_fun, contract_id: contract_id}} <-
            AccountApi.get(client, public_key),
          :ok <- ensure_auth_opts(auth_opts),
+         {:ok, height} <- Chain.height(client),
          {:ok, %{vm_version: vm_version, abi_version: abi_version}} <-
            Contract.get(client, contract_id),
          {:ok, calldata} =
@@ -659,7 +678,7 @@ defmodule AeppSDK.Utils.Transaction do
            ga_id: public_key,
            auth_data: calldata,
            abi_version: abi_version,
-           fee: @dummy_fee,
+           fee: dummy_fee(),
            gas: Keyword.get(auth_opts, :gas, GeneralizedAccount.default_gas()),
            gas_price: Keyword.get(auth_opts, :gas_price, gas_price),
            ttl: Keyword.get(auth_opts, :ttl, @default_ttl),
@@ -673,9 +692,9 @@ defmodule AeppSDK.Utils.Transaction do
                  :fee,
                  calculate_fee(
                    tx,
-                   @fortuna_height,
+                   height,
                    network_id,
-                   @dummy_fee,
+                   dummy_fee(),
                    meta_tx_dummy_fee.gas_price
                  )
                )

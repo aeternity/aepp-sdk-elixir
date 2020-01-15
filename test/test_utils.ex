@@ -297,6 +297,40 @@ defmodule TestUtils do
         "http://localhost:3113/v2"
       )
 
+    auth_client =
+      Client.new(
+        %{
+          public: "ak_wuLXPE5pd2rvFoxHxvenBgp459rW6Y1cZ6cYTZcAcLAevPE5M",
+          secret:
+            "799ef7aa9ed8e3d58cd2492b7a569ccf967f3b63dc49ac2d0c9ea916d29cf8387ca99a8cd824b2a3efc3c6c5d500585713430575d4ce6999b202cb20f86019d8"
+        },
+        "my_test",
+        "http://localhost:3013/v2",
+        "http://localhost:3113/v2"
+      )
+
+    source_code = "contract Identity =
+        datatype event = AddedNumberEvent(indexed int, string)
+
+        record state = { number : int }
+
+        entrypoint init(x : int) =
+          { number = x }
+
+        entrypoint get_number() =
+          state.number
+
+        stateful entrypoint add_to_number(x : int) =
+          Chain.event(AddedNumberEvent(x, \"Added a number\"))
+          state.number + x"
+
+    source_code_auth_client = "contract Authorization =
+
+                    entrypoint auth(auth_value : bool) =
+                      auth_value"
+
+    {:ok, fate_source_code} = File.read("fate_contract.sophia")
+    {:ok, aevm_source_code} = File.read("aevm_contract.sophia")
     valid_pub_key = "ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv"
     amount = 40_000_000
 
@@ -327,7 +361,12 @@ defmodule TestUtils do
       contract_call_tx: contract_call_tx,
       client: client,
       valid_pub_key: valid_pub_key,
-      amount: amount
+      amount: amount,
+      source_code: source_code,
+      auth_client: auth_client,
+      source_code_auth_client: source_code_auth_client,
+      fate_source_code: fate_source_code,
+      aevm_source_code: aevm_source_code
     ]
   end
 end
