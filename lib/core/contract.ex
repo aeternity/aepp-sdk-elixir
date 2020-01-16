@@ -6,7 +6,7 @@ defmodule AeppSDK.Contract do
   Client example can be found at: `AeppSDK.Client.new/4`.
   """
   alias AeppSDK.Account, as: AccountApi
-  alias AeppSDK.Client
+  alias AeppSDK.{Client, GeneralizedAccount}
   alias AeppSDK.Utils.Account, as: AccountUtils
   alias AeppSDK.Utils.Chain, as: ChainUtils
   alias AeppSDK.Utils.{Encoding, Keys, Serialization, Transaction}
@@ -121,6 +121,7 @@ defmodule AeppSDK.Contract do
     {:ok, source_hash} = Hash.hash(source_code)
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
     vm = Keyword.get(opts, :vm, :fate)
+    auth_opts = Keyword.get(opts, :auth, :no_auth)
 
     with {:ok, ct_version} <- get_ct_version(opts),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(client, public_key),
@@ -168,10 +169,25 @@ defmodule AeppSDK.Contract do
            Transaction.post(
              client,
              %{contract_create_tx | fee: new_fee},
-             Keyword.get(opts, :auth, :no_auth),
+             auth_opts,
              :one_signature
-           ),
-         contract_account <- compute_contract_account(public_key_binary, nonce) do
+           ) do
+      contract_account =
+        case auth_opts do
+          :no_auth ->
+            compute_contract_account(public_key_binary, nonce)
+
+          _ ->
+            {:ok, auth_data} =
+              create_calldata(
+                Keyword.get(auth_opts, :auth_contract_source),
+                "auth",
+                Keyword.get(auth_opts, :auth_args)
+              )
+
+            compute_contract_account(public_key_binary, %{ga_id: public_key, auth_data: auth_data})
+        end
+
       {:ok, Map.merge(response, %{contract_id: contract_account, log: encode_logs(log, [])})}
     else
       {:ok, %Error{reason: message}} ->
@@ -914,10 +930,16 @@ defmodule AeppSDK.Contract do
 
   defp into_tuple(fields), do: Enum.join(fields, " * ")
 
-  defp compute_contract_account(owner_address, nonce) do
+  defp compute_contract_account(owner_address, nonce) when is_integer(nonce) do
     nonce_binary = :binary.encode_unsigned(nonce)
     {:ok, hash} = Hash.hash(<<owner_address::binary, nonce_binary::binary>>)
 
+    Encoding.prefix_encode_base58c("ct", hash)
+  end
+
+  defp compute_contract_account(owner, %{ga_id: _, auth_data: _} = auth_data) do
+    {:ok, auth_id} = GeneralizedAccount.compute_auth_id(auth_data)
+    {:ok, hash} = Hash.hash(<<owner::binary, auth_id::binary>>)
     Encoding.prefix_encode_base58c("ct", hash)
   end
 
