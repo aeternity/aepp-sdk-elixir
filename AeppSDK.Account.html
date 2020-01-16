@@ -5,10 +5,10 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.2">
-    <meta name="project" content="aepp_sdk_elixir v0.5.0">
-    <title>AeppSDK.Account — aepp_sdk_elixir v0.5.0</title>
+    <meta name="project" content="aepp_sdk_elixir v0.5.3">
+    <title>AeppSDK.Account — aepp_sdk_elixir v0.5.3</title>
     <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
-    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+    <script src="dist/sidebar_items-0b139845da.js"></script>
       <script src="docs_config.js"></script>
     <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
   </head>
@@ -43,7 +43,7 @@
       <a href="api-reference.html" class="sidebar-projectName">
 aepp_sdk_elixir      </a>
       <h2 class="sidebar-projectVersion">
-        v0.5.0
+        v0.5.3
       </h2>
     </div>
       <a href="api-reference.html">
@@ -67,7 +67,7 @@ aepp_sdk_elixir      </a>
     <div id="content" class="content-inner">
 
       <h1>
-        <small class="app-vsn">aepp_sdk_elixir v0.5.0</small>
+        <small class="app-vsn">aepp_sdk_elixir v0.5.3</small>
 AeppSDK.Account      </h1>
 
 
@@ -115,6 +115,12 @@ Client example can be found at: <a href="AeppSDK.Client.html#new/4"><code class=
     <a href="#balance/3">balance(client, pubkey, height)</a>
   </div>
     <div class="summary-synopsis"><p>Get an account&#39;s balance at a given block hash</p></div>
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#get/1">get(client)</a>
+  </div>
+    <div class="summary-synopsis"><p>Get an actual account information</p></div>
 </div>
 <div class="summary-row">
   <div class="summary-signature">
@@ -211,8 +217,8 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="4833550016-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="4833550016-1">)</span><span class="w">
-</span><span class="p" data-group-id="4833550016-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1652992279192254044805</span><span class="p" data-group-id="4833550016-2">}</span></code></pre>
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="6042049913-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="6042049913-1">)</span><span class="w">
+</span><span class="p" data-group-id="6042049913-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1652992279192254044805</span><span class="p" data-group-id="6042049913-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="balance/3">
@@ -238,8 +244,40 @@ Functions          </h1>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="4134961157-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="4134961157-1">)</span><span class="w">
-</span><span class="p" data-group-id="4134961157-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1653014562214254044805</span><span class="p" data-group-id="4134961157-2">}</span></code></pre>
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">balance</span><span class="p" data-group-id="1961021662-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="1961021662-1">)</span><span class="w">
+</span><span class="p" data-group-id="1961021662-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="mi">1653014562214254044805</span><span class="p" data-group-id="1961021662-2">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="get/1">
+  <div class="detail-header">
+    <a href="#get/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature">get(client)</h1>
+      <div class="specs">
+          <pre>get(<a href="AeppSDK.Client.html#t:t/0">AeppSDK.Client.t</a>()) ::
+  {:ok, <a href="#t:account/0">account</a>()} | {:error, <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()} | {:error, <a href="https://hexdocs.pm/tesla/1.2.1/Tesla.Env.html#t:t/0">Tesla.Env.t</a>()}</pre>
+      </div>
+  </div>
+  <section class="docstring">
+<p>Get an actual account information</p>
+<h2 id="get/1-example" class="section-heading">
+  <a href="#get/1-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example
+</h2>
+
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="8328221881-1">(</span><span class="n">client</span><span class="p" data-group-id="8328221881-1">)</span><span class="w">
+</span><span class="p" data-group-id="8328221881-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="8328221881-3">%{</span><span class="w">
+   </span><span class="ss">auth_fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">balance</span><span class="p">:</span><span class="w"> </span><span class="mi">151688000000000000000</span><span class="p">,</span><span class="w">
+   </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+   </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;basic&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+   </span><span class="ss">payable</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="w">
+ </span><span class="p" data-group-id="8328221881-3">}</span><span class="p" data-group-id="8328221881-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get/2">
@@ -262,9 +300,9 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="4902274424-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="4902274424-1">)</span><span class="w">
-</span><span class="p" data-group-id="4902274424-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="4902274424-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="7336185240-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p" data-group-id="7336185240-1">)</span><span class="w">
+</span><span class="p" data-group-id="7336185240-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="7336185240-3">%{</span><span class="w">
    </span><span class="ss">auth_fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">balance</span><span class="p">:</span><span class="w"> </span><span class="mi">151688000000000000000</span><span class="p">,</span><span class="w">
    </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
@@ -272,7 +310,7 @@ Functions          </h1>
    </span><span class="ss">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;basic&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
    </span><span class="ss">payable</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="w">
- </span><span class="p" data-group-id="4902274424-3">}</span><span class="p" data-group-id="4902274424-2">}</span></code></pre>
+ </span><span class="p" data-group-id="7336185240-3">}</span><span class="p" data-group-id="7336185240-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="get/3">
@@ -298,16 +336,16 @@ Functions          </h1>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">pubkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">block_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;kh_2XteYFUyUYjnMDJzHszhHegpoV59QpWTLnMPw5eohsXntzdf6P&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="7196778147-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="7196778147-1">)</span><span class="w">
-</span><span class="p" data-group-id="7196778147-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="7196778147-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">get</span><span class="p" data-group-id="1070125905-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">pubkey</span><span class="p">,</span><span class="w"> </span><span class="n">block_hash</span><span class="p" data-group-id="1070125905-1">)</span><span class="w">
+</span><span class="p" data-group-id="1070125905-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="1070125905-3">%{</span><span class="w">
    </span><span class="ss">auth_fun</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">balance</span><span class="p">:</span><span class="w"> </span><span class="mi">1653014562214254044805</span><span class="p">,</span><span class="w">
    </span><span class="ss">contract_id</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
    </span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">kind</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;basic&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">11837</span><span class="w">
- </span><span class="p" data-group-id="7196778147-3">}</span><span class="p" data-group-id="7196778147-2">}</span></code></pre>
+ </span><span class="p" data-group-id="1070125905-3">}</span><span class="p" data-group-id="1070125905-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="spend/4">
@@ -338,13 +376,13 @@ Functions          </h1>
 </h2>
 
 <pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">public_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">spend</span><span class="p" data-group-id="0038301071-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">public_key</span><span class="p">,</span><span class="w"> </span><span class="mi">10_000_000</span><span class="p" data-group-id="0038301071-1">)</span><span class="w">
-</span><span class="p" data-group-id="0038301071-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="0038301071-3">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Account</span><span class="o">.</span><span class="n">spend</span><span class="p" data-group-id="9771133333-1">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">public_key</span><span class="p">,</span><span class="w"> </span><span class="mi">10_000_000</span><span class="p" data-group-id="9771133333-1">)</span><span class="w">
+</span><span class="p" data-group-id="9771133333-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="9771133333-3">%{</span><span class="w">
   </span><span class="ss">block_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_2hM7ZkifnstA9HEdpZRwKjZgNUSrkVmrB1jmCgG7Ly2b1vF7t&quot;</span><span class="p">,</span><span class="w">
   </span><span class="ss">block_height</span><span class="p">:</span><span class="w"> </span><span class="mi">74871</span><span class="p">,</span><span class="w">
   </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_FBqci65KYGsup7GettzvWVxP91podgngX9EJK2BDiduFf8FY4&quot;</span><span class="w">
-</span><span class="p" data-group-id="0038301071-3">}</span><span class="p" data-group-id="0038301071-2">}</span></code></pre>
+</span><span class="p" data-group-id="9771133333-3">}</span><span class="p" data-group-id="9771133333-2">}</span></code></pre>
   </section>
 </section>
           </div>

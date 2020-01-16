@@ -5,10 +5,10 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.21.2">
-    <meta name="project" content="aepp_sdk_elixir v0.5.0">
-    <title>AeppSDK.Listener — aepp_sdk_elixir v0.5.0</title>
+    <meta name="project" content="aepp_sdk_elixir v0.5.3">
+    <title>AeppSDK.Listener — aepp_sdk_elixir v0.5.3</title>
     <link rel="stylesheet" href="dist/html-de2388dc2f8074b0a4db.css" />
-    <script src="dist/sidebar_items-aca9f8cc3f.js"></script>
+    <script src="dist/sidebar_items-0b139845da.js"></script>
       <script src="docs_config.js"></script>
     <script async src="dist/html-de2388dc2f8074b0a4db.js"></script>
   </head>
@@ -43,7 +43,7 @@
       <a href="api-reference.html" class="sidebar-projectName">
 aepp_sdk_elixir      </a>
       <h2 class="sidebar-projectVersion">
-        v0.5.0
+        v0.5.3
       </h2>
     </div>
       <a href="api-reference.html">
@@ -67,7 +67,7 @@ aepp_sdk_elixir      </a>
     <div id="content" class="content-inner">
 
       <h1>
-        <small class="app-vsn">aepp_sdk_elixir v0.5.0</small>
+        <small class="app-vsn">aepp_sdk_elixir v0.5.3</small>
 AeppSDK.Listener      </h1>
 
 
@@ -203,26 +203,26 @@ passed as the first argument as it makes requests to a node.</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="7470346732-1">(</span><span class="w">
-  </span><span class="p" data-group-id="7470346732-2">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="9756519668-1">(</span><span class="w">
+  </span><span class="p" data-group-id="9756519668-2">%{</span><span class="w">
     </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
     </span><span class="ss">secret</span><span class="p">:</span><span class="w">
       </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
-  </span><span class="p" data-group-id="7470346732-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="9756519668-2">}</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
-</span><span class="p" data-group-id="7470346732-1">)</span><span class="w">
+</span><span class="p" data-group-id="9756519668-1">)</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">tx_hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">block_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">check_tx_confirmations</span><span class="p" data-group-id="7470346732-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p">,</span><span class="w"> </span><span class="n">block_count</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="7470346732-4">(</span><span class="p" data-group-id="7470346732-4">)</span><span class="p" data-group-id="7470346732-3">)</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="7470346732-5">(</span><span class="p" data-group-id="7470346732-5">)</span><span class="w">
-</span><span class="p" data-group-id="7470346732-6">{</span><span class="ss">:tx_confirmations</span><span class="p">,</span><span class="w">
- </span><span class="p" data-group-id="7470346732-7">%{</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">check_tx_confirmations</span><span class="p" data-group-id="9756519668-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">tx_hash</span><span class="p">,</span><span class="w"> </span><span class="n">block_count</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="9756519668-4">(</span><span class="p" data-group-id="9756519668-4">)</span><span class="p" data-group-id="9756519668-3">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="9756519668-5">(</span><span class="p" data-group-id="9756519668-5">)</span><span class="w">
+</span><span class="p" data-group-id="9756519668-6">{</span><span class="ss">:tx_confirmations</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="9756519668-7">%{</span><span class="w">
    </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">111283</span><span class="p">,</span><span class="w">
    </span><span class="ss">status</span><span class="p">:</span><span class="w"> </span><span class="ss">:confirmed</span><span class="p">,</span><span class="w">
    </span><span class="ss">tx_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2RMnW2GYbS2n5mwRtjFjb61ZgSNzNNUHGWU5EBmQXeUZfpP4vM&quot;</span><span class="w">
- </span><span class="p" data-group-id="7470346732-7">}</span><span class="p" data-group-id="7470346732-6">}</span><span class="w">
+ </span><span class="p" data-group-id="9756519668-7">}</span><span class="p" data-group-id="9756519668-6">}</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -270,8 +270,8 @@ Starting the listener is required before subscribing to any events.</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="4498698967-1">(</span><span class="s">&quot;ae_uat&quot;</span><span class="p" data-group-id="4498698967-1">)</span><span class="w">
-</span><span class="p" data-group-id="4498698967-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4498698967-3">#</span><span class="nc" data-group-id="4498698967-3">PID</span><span class="p" data-group-id="4498698967-3">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">261</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="4498698967-3">&gt;</span><span class="p" data-group-id="4498698967-2">}</span></code></pre>
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="6715968810-1">(</span><span class="s">&quot;ae_uat&quot;</span><span class="p" data-group-id="6715968810-1">)</span><span class="w">
+</span><span class="p" data-group-id="6715968810-2">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="6715968810-3">#</span><span class="nc" data-group-id="6715968810-3">PID</span><span class="p" data-group-id="6715968810-3">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">261</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="6715968810-3">&gt;</span><span class="p" data-group-id="6715968810-2">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="start/4">
@@ -301,12 +301,12 @@ A peer is defined in the following format:
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="5109449767-1">(</span><span class="w">
-      </span><span class="p" data-group-id="5109449767-2">[</span><span class="s">&quot;aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015&quot;</span><span class="p" data-group-id="5109449767-2">]</span><span class="p">,</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">start</span><span class="p" data-group-id="7619623848-1">(</span><span class="w">
+      </span><span class="p" data-group-id="7619623848-2">[</span><span class="s">&quot;aenode://pp_2L8A5vSjnkLtfFNpJNgP9HbmGLD7ZAGFxoof47N8L4yyLAyyMi@18.136.37.63:3015&quot;</span><span class="p" data-group-id="7619623848-2">]</span><span class="p">,</span><span class="w">
       </span><span class="s">&quot;localnet&quot;</span><span class="p">,</span><span class="w">
       </span><span class="s">&quot;kh_2Eo9AVWHxTKio278ccANnwtr9hkUpzb1nLePfUzs7StwWyJ2xB&quot;</span><span class="w">
-    </span><span class="p" data-group-id="5109449767-1">)</span><span class="w">
-</span><span class="p" data-group-id="5109449767-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5109449767-4">#</span><span class="nc" data-group-id="5109449767-4">PID</span><span class="p" data-group-id="5109449767-4">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">214</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="5109449767-4">&gt;</span><span class="p" data-group-id="5109449767-3">}</span></code></pre>
+    </span><span class="p" data-group-id="7619623848-1">)</span><span class="w">
+</span><span class="p" data-group-id="7619623848-3">{</span><span class="ss">:ok</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7619623848-4">#</span><span class="nc" data-group-id="7619623848-4">PID</span><span class="p" data-group-id="7619623848-4">&lt;</span><span class="mi">0</span><span class="o">.</span><span class="mi">214</span><span class="o">.</span><span class="mi">0</span><span class="p" data-group-id="7619623848-4">&gt;</span><span class="p" data-group-id="7619623848-3">}</span></code></pre>
   </section>
 </section>
 <section class="detail" id="stop/0">
@@ -327,7 +327,7 @@ A peer is defined in the following format:
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">stop</span><span class="p" data-group-id="4012109569-1">(</span><span class="p" data-group-id="4012109569-1">)</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">stop</span><span class="p" data-group-id="6252182883-1">(</span><span class="p" data-group-id="6252182883-1">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -363,29 +363,29 @@ will notify for any new transactions added to the pool.</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="5612276736-1">(</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="5612276736-2">(</span><span class="p" data-group-id="5612276736-2">)</span><span class="p" data-group-id="5612276736-1">)</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="5612276736-3">(</span><span class="p" data-group-id="5612276736-3">)</span><span class="w">
-</span><span class="p" data-group-id="5612276736-4">{</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="5612276736-5">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="1278825812-1">(</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="1278825812-2">(</span><span class="p" data-group-id="1278825812-2">)</span><span class="p" data-group-id="1278825812-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="1278825812-3">(</span><span class="p" data-group-id="1278825812-3">)</span><span class="w">
+</span><span class="p" data-group-id="1278825812-4">{</span><span class="ss">:key_blocks</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="1278825812-5">%{</span><span class="w">
    </span><span class="ss">beneficiary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_nv5B93FPzRHrGNmMdTDfGdd5xGZvep3MVSpJqzcQmMp59bBCv&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">height</span><span class="p">:</span><span class="w"> </span><span class="mi">107613</span><span class="p">,</span><span class="w">
    </span><span class="ss">info</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cb_AAAAAfy4hFE=&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">miner</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_V9dqj32R728EmdtaeXmGC7Zn94oAtje2mU2R9vQeCE3uDF52z&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">15682880022608178725</span><span class="p">,</span><span class="w">
-   </span><span class="ss">pow_evidence</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5612276736-6">[</span><span class="mi">36880953</span><span class="p">,</span><span class="w"> </span><span class="mi">49948618</span><span class="p">,</span><span class="w"> </span><span class="mi">71657014</span><span class="p">,</span><span class="w"> </span><span class="mi">77943721</span><span class="p">,</span><span class="w"> </span><span class="mi">103433465</span><span class="p">,</span><span class="w"> </span><span class="mi">109309407</span><span class="p">,</span><span class="w">
+   </span><span class="ss">pow_evidence</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1278825812-6">[</span><span class="mi">36880953</span><span class="p">,</span><span class="w"> </span><span class="mi">49948618</span><span class="p">,</span><span class="w"> </span><span class="mi">71657014</span><span class="p">,</span><span class="w"> </span><span class="mi">77943721</span><span class="p">,</span><span class="w"> </span><span class="mi">103433465</span><span class="p">,</span><span class="w"> </span><span class="mi">109309407</span><span class="p">,</span><span class="w">
     </span><span class="mi">127422545</span><span class="p">,</span><span class="w"> </span><span class="mi">140895507</span><span class="p">,</span><span class="w"> </span><span class="mi">181678786</span><span class="p">,</span><span class="w"> </span><span class="mi">182358531</span><span class="p">,</span><span class="w"> </span><span class="mi">186372470</span><span class="p">,</span><span class="w"> </span><span class="mi">188704699</span><span class="p">,</span><span class="w"> </span><span class="mi">189292674</span><span class="p">,</span><span class="w">
     </span><span class="mi">201708293</span><span class="p">,</span><span class="w"> </span><span class="mi">215741852</span><span class="p">,</span><span class="w"> </span><span class="mi">233410604</span><span class="p">,</span><span class="w"> </span><span class="mi">255594855</span><span class="p">,</span><span class="w"> </span><span class="mi">257736633</span><span class="p">,</span><span class="w"> </span><span class="mi">266211649</span><span class="p">,</span><span class="w"> </span><span class="mi">269325362</span><span class="p">,</span><span class="w">
     </span><span class="mi">274670268</span><span class="p">,</span><span class="w"> </span><span class="mi">292854435</span><span class="p">,</span><span class="w"> </span><span class="mi">295392989</span><span class="p">,</span><span class="w"> </span><span class="mi">307433512</span><span class="p">,</span><span class="w"> </span><span class="mi">312822688</span><span class="p">,</span><span class="w"> </span><span class="mi">330979144</span><span class="p">,</span><span class="w"> </span><span class="mi">339358365</span><span class="p">,</span><span class="w">
     </span><span class="mi">340662380</span><span class="p">,</span><span class="w"> </span><span class="mi">356338119</span><span class="p">,</span><span class="w"> </span><span class="mi">356413992</span><span class="p">,</span><span class="w"> </span><span class="mi">363610991</span><span class="p">,</span><span class="w"> </span><span class="mi">364811647</span><span class="p">,</span><span class="w"> </span><span class="mi">387037152</span><span class="p">,</span><span class="w"> </span><span class="mi">387943984</span><span class="p">,</span><span class="w">
     </span><span class="mi">438683034</span><span class="p">,</span><span class="w"> </span><span class="mi">469469067</span><span class="p">,</span><span class="w"> </span><span class="mi">472181309</span><span class="p">,</span><span class="w"> </span><span class="mi">479842054</span><span class="p">,</span><span class="w"> </span><span class="mi">484418139</span><span class="p">,</span><span class="w"> </span><span class="mi">506523084</span><span class="p">,</span><span class="w"> </span><span class="mi">517149088</span><span class="p">,</span><span class="w">
-    </span><span class="mi">532705934</span><span class="p" data-group-id="5612276736-6">]</span><span class="p">,</span><span class="w">
+    </span><span class="mi">532705934</span><span class="p" data-group-id="1278825812-6">]</span><span class="p">,</span><span class="w">
    </span><span class="ss">prev_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mh_nxXxmga7AU5T3N7GGUV4s5T8YvJYEZnXGTaaUoLgBStva1dT4&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">prev_key_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;kh_j47UCW6UYYN4FhcMwQgynpAKdddKeAkPUUFyF6G35hArsfo8Q&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">root_hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bs_2hpHUMa7VWVTdcwwSm4L7U1CLMXqTbhrjZYJ2FMLz1LZCKfoCG&quot;</span><span class="p">,</span><span class="w">
    </span><span class="ss">target</span><span class="p">:</span><span class="w"> </span><span class="mi">504011610</span><span class="p">,</span><span class="w">
    </span><span class="ss">time</span><span class="p">:</span><span class="w"> </span><span class="mi">1562765121744</span><span class="p">,</span><span class="w">
    </span><span class="ss">version</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w">
- </span><span class="p" data-group-id="5612276736-5">}</span><span class="p" data-group-id="5612276736-4">}</span><span class="w">
+ </span><span class="p" data-group-id="1278825812-5">}</span><span class="p" data-group-id="1278825812-4">}</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -423,12 +423,12 @@ with a specific recipient or an oracle query transaction that targets a specific
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="7921260000-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="7921260000-2">(</span><span class="p" data-group-id="7921260000-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="7921260000-1">)</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="7921260000-3">(</span><span class="p" data-group-id="7921260000-3">)</span><span class="w">
-</span><span class="p" data-group-id="7921260000-4">{</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="7921260000-5">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe</span><span class="p" data-group-id="5321854964-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="5321854964-2">(</span><span class="p" data-group-id="5321854964-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="5321854964-1">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">flush</span><span class="p" data-group-id="5321854964-3">(</span><span class="p" data-group-id="5321854964-3">)</span><span class="w">
+</span><span class="p" data-group-id="5321854964-4">{</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="5321854964-5">%{</span><span class="w">
     </span><span class="ss">hash</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;th_2Z9198iTQbBBE3jdeFxJQNMHqGNSESxG7PyTs3vU3JZUjYs319&quot;</span><span class="p">,</span><span class="w">
-    </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7921260000-6">%{</span><span class="w">
+    </span><span class="ss">tx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5321854964-6">%{</span><span class="w">
       </span><span class="ss">amount</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
       </span><span class="ss">fee</span><span class="p">:</span><span class="w"> </span><span class="mi">16640000000</span><span class="p">,</span><span class="w">
       </span><span class="ss">nonce</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
@@ -437,9 +437,9 @@ with a specific recipient or an oracle query transaction that targets a specific
       </span><span class="ss">sender_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
       </span><span class="ss">ttl</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
       </span><span class="ss">type</span><span class="p">:</span><span class="w"> </span><span class="ss">:spend_tx</span><span class="w">
-    </span><span class="p" data-group-id="7921260000-6">}</span><span class="w">
-  </span><span class="p" data-group-id="7921260000-5">}</span><span class="w">
-</span><span class="p" data-group-id="7921260000-4">}</span><span class="w">
+    </span><span class="p" data-group-id="5321854964-6">}</span><span class="w">
+  </span><span class="p" data-group-id="5321854964-5">}</span><span class="w">
+</span><span class="p" data-group-id="5321854964-4">}</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -465,18 +465,18 @@ with a specific recipient or an oracle query transaction that targets a specific
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="4659955415-1">(</span><span class="w">
-  </span><span class="p" data-group-id="4659955415-2">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="7634789562-1">(</span><span class="w">
+  </span><span class="p" data-group-id="7634789562-2">%{</span><span class="w">
     </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
     </span><span class="ss">secret</span><span class="p">:</span><span class="w">
       </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
-  </span><span class="p" data-group-id="4659955415-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="7634789562-2">}</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
-</span><span class="p" data-group-id="4659955415-1">)</span><span class="w">
+</span><span class="p" data-group-id="7634789562-1">)</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">contract_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ct_jzmNJ8ZrMRFw8boyhxFDVYZhNGkmBNNV8hhKeebnFoKFYoQ58&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="4659955415-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="4659955415-4">(</span><span class="p" data-group-id="4659955415-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p" data-group-id="4659955415-3">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="7634789562-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="7634789562-4">(</span><span class="p" data-group-id="7634789562-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p" data-group-id="7634789562-3">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -525,19 +525,19 @@ The types can be the following:</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="8867064588-1">(</span><span class="w">
-  </span><span class="p" data-group-id="8867064588-2">%{</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">AeppSDK.Client</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="4033402049-1">(</span><span class="w">
+  </span><span class="p" data-group-id="4033402049-2">%{</span><span class="w">
     </span><span class="ss">public</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ak_6A2vcm1Sz6aqJezkLCssUXcyZTX7X8D5UwbuS2fRJr9KkYpRU&quot;</span><span class="p">,</span><span class="w">
     </span><span class="ss">secret</span><span class="p">:</span><span class="w">
       </span><span class="s">&quot;a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61&quot;</span><span class="w">
-  </span><span class="p" data-group-id="8867064588-2">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="4033402049-2">}</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;ae_uat&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="p">,</span><span class="w">
   </span><span class="s">&quot;https://sdk-testnet.aepps.com/v2&quot;</span><span class="w">
-</span><span class="p" data-group-id="8867064588-1">)</span><span class="w">
+</span><span class="p" data-group-id="4033402049-1">)</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">contract_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ct_jzmNJ8ZrMRFw8boyhxFDVYZhNGkmBNNV8hhKeebnFoKFYoQ58&quot;</span><span class="w">
 </span><span class="gp unselectable">iex&gt; </span><span class="n">event_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SomeEvent&quot;</span><span class="w">
-</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="8867064588-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="8867064588-4">(</span><span class="p" data-group-id="8867064588-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p">,</span><span class="w"> </span><span class="n">event_name</span><span class="p" data-group-id="8867064588-3">)</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">subscribe_for_contract_events</span><span class="p" data-group-id="4033402049-3">(</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="4033402049-4">(</span><span class="p" data-group-id="4033402049-4">)</span><span class="p">,</span><span class="w"> </span><span class="n">contract_id</span><span class="p">,</span><span class="w"> </span><span class="n">event_name</span><span class="p" data-group-id="4033402049-3">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
@@ -570,7 +570,7 @@ The types can be the following:</p>
   Example
 </h2>
 
-<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p" data-group-id="4209191265-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="4209191265-2">(</span><span class="p" data-group-id="4209191265-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="4209191265-1">)</span><span class="w">
+<pre><code class="nohighlight makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">AeppSDK.Listener</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p" data-group-id="3016693107-1">(</span><span class="ss">:spend_transactions</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p" data-group-id="3016693107-2">(</span><span class="p" data-group-id="3016693107-2">)</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ak_2siRXKa5hT1YpR2oPwcU3LDpYzAdAcgt6HSNUt61NNV9NqkRP9&quot;</span><span class="p" data-group-id="3016693107-1">)</span><span class="w">
 </span><span class="ss">:ok</span></code></pre>
   </section>
 </section>
