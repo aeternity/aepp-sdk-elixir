@@ -4,7 +4,7 @@ defmodule AeppSDK.MixProject do
   def project do
     [
       app: :aepp_sdk_elixir,
-      version: "0.5.2",
+      version: "0.5.3",
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
