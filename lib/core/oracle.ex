@@ -243,7 +243,6 @@ defmodule AeppSDK.Oracle do
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
-      iex> query_ttl = %{type: :relative, value: 1_000}
       iex> response_ttl = 1_000
       iex> AeppSDK.Oracle.respond(client, oracle_id, query_id, response, response_ttl)
       {:ok,
@@ -632,12 +631,10 @@ defmodule AeppSDK.Oracle do
     Encoding.prefix_encode_base58c("oq", hash)
   end
 
-  def sophia_type_to_binary(type, @no_vm_abi_version) do
-    {:ok, type}
-  end
+  defp sophia_type_to_binary(type, @no_vm_abi_version), do: {:ok, type}
 
-  def sophia_type_to_binary(type, abi_version)
-      when abi_version == @aevm_abi_version or abi_version == @fate_abi_version do
+  defp sophia_type_to_binary(type, abi_version)
+       when abi_version == @aevm_abi_version or abi_version == @fate_abi_version do
     charlist_type = String.to_charlist(type)
 
     try do
@@ -652,7 +649,7 @@ defmodule AeppSDK.Oracle do
     end
   end
 
-  def sophia_type_to_binary(data, abi_version),
+  defp sophia_type_to_binary(data, abi_version),
     do: {:error, "Invalid data: #{inspect(data)} , and/or abi version: #{inspect(abi_version)}"}
 
   defp sophia_data_to_binary(data, @no_vm_abi_version), do: {:ok, data}
@@ -669,7 +666,7 @@ defmodule AeppSDK.Oracle do
     {:ok, :aeb_fate_encoding.serialize(data)}
   end
 
-  def sophia_data_from_binary(data, format, abi_version) do
+  defp sophia_data_from_binary(data, format, abi_version) do
     binary_format = Encoding.prefix_decode_base64(format)
 
     case Encoding.prefix_decode_base64(data) do
