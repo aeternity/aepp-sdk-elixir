@@ -5,7 +5,7 @@ First, add **Aepp SDK Elixir** to your `mix.exs` dependencies:
 ``` elixir
 defp deps do
   [
-    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.3"}
+    {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.4"}
   ]
 end
 ```
