@@ -24,7 +24,9 @@ defmodule AeppSDK.Oracle do
     Ttl
   }
 
-  @abi_version 0x01
+  @no_vm_abi_version 0x00
+  @aevm_abi_version 0x01
+  @fate_abi_version 0x03
   @nonce_size 256
 
   @typedoc """
@@ -92,10 +94,13 @@ defmodule AeppSDK.Oracle do
       when is_binary(query_format) and is_binary(response_format) and is_integer(query_fee) and
              query_fee > 0 and is_list(opts) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
+    abi_version = Keyword.get(opts, :abi_version, @no_vm_abi_version)
 
     with {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
-         {:ok, binary_query_format} <- sophia_type_to_binary(query_format),
-         {:ok, binary_response_format} <- sophia_type_to_binary(response_format),
+         {:ok, valid_abi_version} <- validate_abi_version(abi_version),
+         {:ok, binary_query_format} <- sophia_type_to_binary(query_format, valid_abi_version),
+         {:ok, binary_response_format} <-
+           sophia_type_to_binary(response_format, valid_abi_version),
          register_tx = %OracleRegisterTx{
            query_format: binary_query_format,
            response_format: binary_response_format,
@@ -105,7 +110,7 @@ defmodule AeppSDK.Oracle do
            nonce: nonce,
            fee: user_fee,
            ttl: Keyword.get(opts, :ttl, Transaction.default_ttl()),
-           abi_version: @abi_version
+           abi_version: valid_abi_version
          },
          {:ok, %{height: height}} <- ChainApi.get_current_key_block_height(connection),
          :ok <- validate_ttl(ttl, height),
@@ -184,11 +189,12 @@ defmodule AeppSDK.Oracle do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
     with {:ok,
-          %RegisteredOracle{
+          %{
+            abi_version: abi_version,
             query_fee: oracle_query_fee,
             ttl: oracle_ttl
-          }} <- OracleApi.get_oracle_by_pubkey(connection, oracle_id),
-         {:ok, binary_query} <- sophia_data_to_binary(query),
+          }} <- get_oracle(client, oracle_id),
+         {:ok, binary_query} <- sophia_data_to_binary(query, abi_version),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          query_tx = %OracleQueryTx{
            oracle_id: oracle_id,
@@ -237,7 +243,6 @@ defmodule AeppSDK.Oracle do
       iex> oracle_id = "ok_4K1dYTkXcLwoUEat9fMgVp3RrG3HTD51v4VzszYDgt2MqxzKM"
       iex> query_id = "oq_u7sgmMQNjZQ4ffsN9sSmEhzqsag1iEfx8SkHDeG1y8EbDB5Aq"
       iex> response = %{"a" => "response"}
-      iex> query_ttl = %{type: :relative, value: 1_000}
       iex> response_ttl = 1_000
       iex> AeppSDK.Oracle.respond(client, oracle_id, query_id, response, response_ttl)
       {:ok,
@@ -280,7 +285,8 @@ defmodule AeppSDK.Oracle do
              is_list(opts) do
     user_fee = Keyword.get(opts, :fee, Transaction.dummy_fee())
 
-    with {:ok, binary_response} <- sophia_data_to_binary(response),
+    with {:ok, %{abi_version: abi_version}} <- get_oracle(client, oracle_id),
+         {:ok, binary_response} <- sophia_data_to_binary(response, abi_version),
          {:ok, nonce} <- AccountUtils.next_valid_nonce(client, pubkey),
          response_tx = %OracleRespondTx{
            query_id: query_id,
@@ -444,6 +450,9 @@ defmodule AeppSDK.Oracle do
     end
   end
 
+  def get_oracle(%Client{keypair: %{public: <<"ak_", rest_public_key::binary>>}} = client),
+    do: get_oracle(client, "ok_" <> rest_public_key)
+
   @doc """
   Get all queries of an oracle.
 
@@ -503,6 +512,9 @@ defmodule AeppSDK.Oracle do
         err
     end
   end
+
+  def get_queries(%Client{keypair: %{public: <<"ak_", rest_public_key::binary>>}} = client),
+    do: get_queries(client, "ok_" <> rest_public_key)
 
   @doc """
   Get an oracle query by its ID.
@@ -565,7 +577,14 @@ defmodule AeppSDK.Oracle do
     end
   end
 
-  defp decode_queries(queries, query_format, response_format, abi_version) do
+  def get_query(
+        %Client{keypair: %{public: <<"ak_", rest_public_key::binary>>}} = client,
+        query_id
+      ),
+      do: get_query(client, "ok_" <> rest_public_key, query_id)
+
+  defp decode_queries(queries, query_format, response_format, abi_version)
+       when abi_version in [@no_vm_abi_version, @aevm_abi_version, @fate_abi_version] do
     Enum.map(queries, fn %OracleQuery{
                            fee: fee,
                            id: id,
@@ -580,12 +599,12 @@ defmodule AeppSDK.Oracle do
       # decode query/response only when the oracle is typed
       {decoded_query, decoded_response} =
         case abi_version do
-          0 ->
-            {query, response}
+          @no_vm_abi_version ->
+            {Encoding.prefix_decode_base64(query), Encoding.prefix_decode_base64(response)}
 
-          1 ->
-            {sophia_data_from_binary(query, query_format),
-             sophia_data_from_binary(response, response_format)}
+          _ ->
+            {sophia_data_from_binary(query, query_format, abi_version),
+             sophia_data_from_binary(response, response_format, abi_version)}
         end
 
       %{
@@ -612,18 +631,30 @@ defmodule AeppSDK.Oracle do
     Encoding.prefix_encode_base58c("oq", hash)
   end
 
-  defp sophia_type_to_binary(type) do
+  defp sophia_type_to_binary(type, @no_vm_abi_version), do: {:ok, type}
+
+  defp sophia_type_to_binary(type, abi_version)
+       when abi_version == @aevm_abi_version or abi_version == @fate_abi_version do
     charlist_type = String.to_charlist(type)
 
     try do
       {:ok, typerep} = :aeso_compiler.sophia_type_to_typerep(charlist_type)
-      {:ok, :aeb_heap.to_binary(typerep)}
+
+      case abi_version do
+        @aevm_abi_version -> {:ok, :aeb_heap.to_binary(typerep)}
+        @fate_abi_version -> {:ok, to_string(:aeb_fate_encoding.serialize_type(typerep))}
+      end
     rescue
       _ -> {:error, "Bad Sophia type: #{type}"}
     end
   end
 
-  defp sophia_data_to_binary(data) do
+  defp sophia_type_to_binary(data, abi_version),
+    do: {:error, "Invalid data: #{inspect(data)} , and/or abi version: #{inspect(abi_version)}"}
+
+  defp sophia_data_to_binary(data, @no_vm_abi_version), do: {:ok, data}
+
+  defp sophia_data_to_binary(data, @aevm_abi_version) do
     try do
       {:ok, :aeb_heap.to_binary(data)}
     rescue
@@ -631,17 +662,25 @@ defmodule AeppSDK.Oracle do
     end
   end
 
-  defp sophia_data_from_binary(data, format) do
+  defp sophia_data_to_binary(data, @fate_abi_version) do
+    {:ok, :aeb_fate_encoding.serialize(data)}
+  end
+
+  defp sophia_data_from_binary(data, format, abi_version) do
     binary_format = Encoding.prefix_decode_base64(format)
 
     case Encoding.prefix_decode_base64(data) do
       "" ->
         ""
 
-      binary_data ->
+      binary_data when abi_version == @aevm_abi_version ->
         {:ok, format_typerep} = :aeb_heap.from_binary(:typerep, binary_format)
         {:ok, decoded_data} = :aeb_heap.from_binary(format_typerep, binary_data)
         decoded_data
+
+      binary_data when abi_version == @fate_abi_version ->
+        {_type, <<>>} = :aeb_fate_encoding.deserialize_type(binary_format)
+        _fate_term = :aeb_fate_encoding.deserialize(binary_data)
     end
   end
 
@@ -690,4 +729,11 @@ defmodule AeppSDK.Oracle do
         {:error, "TTL value must be higher than 0"}
     end
   end
+
+  defp validate_abi_version(@no_vm_abi_version), do: {:ok, @no_vm_abi_version}
+  defp validate_abi_version(@aevm_abi_version), do: {:ok, @aevm_abi_version}
+  defp validate_abi_version(@fate_abi_version), do: {:ok, @fate_abi_version}
+
+  defp validate_abi_version(invalid_abi_version),
+    do: {:error, "Invalid or unsupported abi version: #{inspect(invalid_abi_version)}"}
 end
