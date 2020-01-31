@@ -17,7 +17,8 @@ defmodule CoreOracleTest do
         "map(string, int)",
         "map(string, int)",
         %{type: :relative, value: 500},
-        30
+        30,
+        abi_version: 1
       )
 
     assert match?({:ok, _}, register)
@@ -91,7 +92,8 @@ defmodule CoreOracleTest do
                "bad format",
                "bad format",
                %{type: :relative, value: 30},
-               30
+               30,
+               abi_version: 1
              )
            )
   end
